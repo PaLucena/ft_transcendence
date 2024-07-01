@@ -35,7 +35,7 @@ Transcendence is an advanced project from 42 School designed to challenge our fu
 2. Navigate to the project directory:
 
     ```sh
-    cd transcendence
+    cd ft_transcendence
     ```
 
 ## Co-authors
