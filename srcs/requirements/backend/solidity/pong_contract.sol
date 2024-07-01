@@ -30,7 +30,7 @@ contract PongTournament {
     }
 
     modifier OnlyOwner(address _dir) {
-        require(_dir == owner, "Only owner can call this function");
+        require(_dir == owner, "You are not the owner of this contract");
         _;
     }
 
