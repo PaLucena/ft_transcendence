@@ -7,6 +7,7 @@ RUN apt-get -y install postgresql-client
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install channels channels_redis
 
 COPY init_django.sh .
 

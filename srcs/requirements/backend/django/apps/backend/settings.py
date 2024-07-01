@@ -38,9 +38,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'corsheaders',
-	'counter'
+	'counter',
+    'user',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'channels',
 ]
+
+# in-memory channel layer for development. For production- channels_redis.
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -130,3 +140,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "https://localhost:8080",
 ]
+
+#overriding the deafult user for django
+AUTH_USER_MODEL = 'user.User'
