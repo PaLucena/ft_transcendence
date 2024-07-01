@@ -29,7 +29,7 @@ Transcendence is an advanced project from 42 School designed to challenge our fu
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/pablovilchez/42-transcendence.git
+    git clone https://github.com/PaLucena/ft_transcendence.git
     ```
 
 2. Navigate to the project directory:
