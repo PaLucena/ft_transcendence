@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'counter',
     'user',
     'rest_framework',
     'rest_framework.authtoken',
@@ -82,6 +81,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+
+ASGI_APPLICATION = 'backend.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -142,4 +143,4 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 #overriding the deafult user for django
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'user.AppUser'

@@ -9,9 +9,8 @@ from django.template import context
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import User
 from rest_framework.response import Response
-import serial
-from yaml import serialize
 from .serializers import UserSerializerClass
+from .models import AppUser
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, logout
@@ -27,7 +26,7 @@ def signup(request):
 		try:
 			serializer.save()
 		
-			user = User.objects.get(username=request.data['username'])
+			user = AppUser.objects.get(username=request.data['username'])
 			token = Token.objects.get(user=user)
 
 			serializer = UserSerializerClass(user)
@@ -38,7 +37,7 @@ def signup(request):
 			}
 			return Response(data, status=status.HTTP_201_CREATED)
 		except IntegrityError as e:
-			return Response({"error": "Username or email already exists. Please choose a different one."}, status=status.HTTP_400_BAD_REQUEST)
+			return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 	
 	return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
@@ -52,7 +51,7 @@ def login(request):
 	authenticate_user = authenticate(username=data['username'], password=data['password'])
 
 	if authenticate_user is not None:
-		user = User.objects.get(username=data['username'])
+		user = AppUser.objects.get(username=data['username'])
 		serializer = UserSerializerClass(user)
 
 		response_data = {

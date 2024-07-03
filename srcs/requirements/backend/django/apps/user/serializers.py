@@ -1,18 +1,18 @@
-from django.contrib.auth.models import User
+from .models import AppUser
 from rest_framework.serializers import ModelSerializer
 from rest_framework.authtoken.models import Token
 
 #to send data from database to user
 class UserSerializerClass(ModelSerializer):
 	class Meta:
-		model = User
+		model = AppUser
 		fields = ['id', 'username', 'email', 'password']
 
 	def save(self, **kwargs):
 
-		new_user= User.objects.create_user(
+		new_user= AppUser.objects.create_user(
 			username = self.validated_data['username'],
-			email = self.validated_data['email'],
+			email = self.validated_data['email'], #may delete
 			password = self.validated_data['password'],
 		)
 

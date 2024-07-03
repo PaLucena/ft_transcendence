@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import consumers
 
 """ urlpatterns = [
 	
@@ -12,4 +13,5 @@ urlpatterns = [
     path('signup/', views.signup),
     path('test-view/', views.TestView),
     path('logout/', views.logout),
+    path('ws/status/', consumers.UserStatus.as_asgi()),
 ]

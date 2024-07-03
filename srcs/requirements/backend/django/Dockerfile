@@ -4,6 +4,7 @@ ENV PYTHONUNBUFFERED=1
 
 RUN apt-get -y update && apt-get -y upgrade
 RUN apt-get -y install postgresql-client
+RUN apt-get -y install tree
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <script>
+        async function handleLogin(event) {
+            event.preventDefault();  // Prevent default form submission
+            const formData = new FormData(event.target);
+            const response = await fetch('/login/', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: formData.get('username'),
+                    password: formData.get('password')
+                })
+            });
+
+            if (response.ok) {
+                document.getElementById('login-form').style.display = 'none'; // Hide login form
+                document.getElementById('login-message').innerText = 'Login successful!';
+                
+                // Initialize WebSocket connection after login
+                initWebSocket();
+            } else {
+                document.getElementById('login-message').innerText = 'Login failed. Please try again.';
+            }
+        }
+
+        function initWebSocket() {
+            const ws_scheme = window.location.protocol === "https:" ? "wss://" : "ws://";
+            const ws_path = ws_scheme + window.location.host + "/ws/status/";
+            const ws = new WebSocket(ws_path);
+
+            ws.onopen = function() {
+                console.log("Connected to WebSocket");
+            };
+
+            ws.onmessage = function(e) {
+                console.log("Received message: " + e.data);
+            };
+
+            ws.onclose = function(e) {
+                console.error("WebSocket closed unexpectedly");
+            };
+
+            ws.onerror = function(e) {
+                console.error("WebSocket error:", e.message);
+            };
+        }
+    </script>
+</head>
+<body>
+    <div id="login-form">
+        <form onsubmit="handleLogin(event)">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    <div id="login-message"></div>
+</body>
+</html>
