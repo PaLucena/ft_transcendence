@@ -10,13 +10,7 @@ class UserStatus(AsyncWebsocketConsumer):
 			await self.channel_layer.group_add("online_user", self.channel_name)
 			await self.accept()
 			await self.update_user_status(user, "online")
-			self.send(text_data=json.dumps({
-				'type':'connected',
-				'message':'hello'
-			}))
-	def receive(self, text_data):
 		
-
 	async def disconnect(self) -> None:
 		user = self.scope['user']
 		if self.user.is_authenticated:

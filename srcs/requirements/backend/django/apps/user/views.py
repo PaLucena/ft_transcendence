@@ -17,6 +17,8 @@ from django.contrib.auth import authenticate, logout
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+import json
+from django.http import JsonResponse
 
 @api_view(["POST"])
 def signup(request):
@@ -47,7 +49,7 @@ def signup(request):
 @api_view(["POST"])
 def login(request):
 
-	data = request.data
+	data = json.loads(request.data)
 	authenticate_user = authenticate(username=data['username'], password=data['password'])
 
 	if authenticate_user is not None:
@@ -64,9 +66,9 @@ def login(request):
 			response_data['token'] = token.key
 		elif created_token:
 			response_data['token'] = created_token.key
-		return Response(response_data)
+		return JsonResponse(response_data, status=status.HTTP_200_OK)
 
-	return Response({"detail": "not found"}, status=status.HTTP_400_BAD_REQUEST)
+	return JsonResponse({"detail": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
 #return Response({"message": "login page"})
 
 
