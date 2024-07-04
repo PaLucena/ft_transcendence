@@ -19,6 +19,8 @@ from rest_framework.authentication import TokenAuthentication, SessionAuthentica
 from rest_framework.permissions import IsAuthenticated
 import json
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 
 @api_view(["POST"])
 def signup(request):
@@ -49,7 +51,7 @@ def signup(request):
 @api_view(["POST"])
 def login(request):
 
-	data = json.loads(request.data)
+	data = request.data
 	authenticate_user = authenticate(username=data['username'], password=data['password'])
 
 	if authenticate_user is not None:
@@ -66,9 +68,9 @@ def login(request):
 			response_data['token'] = token.key
 		elif created_token:
 			response_data['token'] = created_token.key
-		return JsonResponse(response_data, status=status.HTTP_200_OK)
+		return Response(response_data, status=status.HTTP_200_OK)
 
-	return JsonResponse({"detail": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
+	return Response({"detail": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
 #return Response({"message": "login page"})
 
 
@@ -89,3 +91,24 @@ def logout(request):
 	#logout(request)
 
 	return Response({"message": "logout was successful"})
+
+
+@api_view(["POST"])
+@login_required
+def set_nickname(request):
+	nickname = request.data.get('nickname')
+	if not nickname:
+		return Response({"error": "This nickname is already in use."}, status=status.HTTP_400_BAD_REQUEST)
+
+	user = request.user
+	if AppUser.objects.filter(nickname__iexact=nickname).exclude(pk=user.pk).exists():
+		return Response({"error": "This nickname is already in use."}, status=status.HTTP_400_BAD_REQUEST)
+	
+	user.nickname = nickname
+	user.save()
+	return Response({"message": nickname}, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def upload_avatar():
+	

@@ -6,14 +6,14 @@ import json
 class UserStatus(AsyncWebsocketConsumer):
 	async def connect(self):
 		user = self.scope['user']
-		if self.user.is_authenticated and self.user.is_active:
+		if user.is_authenticated and user.is_active:
 			await self.channel_layer.group_add("online_user", self.channel_name)
 			await self.accept()
 			await self.update_user_status(user, "online")
 		
 	async def disconnect(self) -> None:
 		user = self.scope['user']
-		if self.user.is_authenticated:
+		if user.is_authenticated:
 			await self.channel_layer.group_discard("online_users", self.channel_name)
 			await self.update_user_status(user, "offline")
 	

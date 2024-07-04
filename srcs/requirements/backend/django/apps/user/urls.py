@@ -13,5 +13,8 @@ urlpatterns = [
     path('signup/', views.signup),
     path('test-view/', views.TestView),
     path('logout/', views.logout),
+	path('setnickname/', views.set_nickname),
+	path('uploadavatar/', views.upload_avatar),
+
     path('ws/status/', consumers.UserStatus.as_asgi()),
 ]

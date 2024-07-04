@@ -11,7 +11,7 @@ import os
 from django.core.asgi import get_asgi_application
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
-import user.routing
+import routing
 from django.urls import path
 from user.consumers import UserStatus
 
@@ -22,8 +22,8 @@ application = ProtocolTypeRouter({
 
     'websocket': AuthMiddlewareStack(
         URLRouter([
-          # user.routing.websocket_urlpatterns
-         path('ws/status/', UserStatus.as_asgi()),
+          routing.websocket_urlpatterns
+         #path('ws/status/', UserStatus.as_asgi()),
         ])
     ),
 })

@@ -4,12 +4,12 @@ from .models import AppUser
 
 class AppUserAdmin(UserAdmin):
 	model = AppUser
-	list_display = ['username', 'email', 'id', 'nickname', 'online']
+	list_display = ['username', 'email', 'id', 'nickname', 'online', 'avatar']
 	fieldsets = UserAdmin.fieldsets + (
-		(None, {'fields': ('nickname', 'online')}),
+		(None, {'fields': ('nickname', 'online', 'avatar')}),
 	)
 	add_fieldsets = UserAdmin.add_fieldsets + (
-		(None, {'fields': ('nickname', 'online')}),
+		(None, {'fields': ('nickname', 'online', 'avatar')}),
 	)
 
 admin.site.register(AppUser, AppUserAdmin)
