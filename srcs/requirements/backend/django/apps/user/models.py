@@ -4,19 +4,21 @@ from django.utils.choices import BlankChoiceIterator
 from django.core.exceptions import ValidationError
 
 class AppUser(AbstractUser):
-	#username = models.CharField(max_length=50, unique=True)
-	#email = models.EmailField(max_length=50, unique=True)
-	#password = models.CharField(max_length=50)
 	nickname = models.CharField(max_length=100, null=True, blank=True)
-	avatar = models.ImageField(upload_to='media/', default='media/default.jpg', null=True, blank=True)
-	# #updated = models.DateTimeField(auto_now=True)
-	# #created = models.DateTimeField(auto_now_add=True)
+	avatar = models.FileField(upload_to='avatars/', default='avatars/default.jpg', null=True, blank=True)
 	last_seen = models.DateTimeField(null=True, blank=True)
 	online = models.CharField(max_length=100, default="offline")
-
+	image_link = models.URLField(null=True, blank=True)
+	games_played = models.IntegerField(default=0)
+	games_won = models.IntegerField(default=0)
+	games_lost = models.IntegerField(default=0)
+	score = models.IntegerField(default=0)
+	# #updated = models.DateTimeField(auto_now=True)
+	# #created = models.DateTimeField(auto_now_add=True)
+	
 	def clean(self):
 		if AppUser.objects.filter(nickname__iexact=self.nickname).exclude(pk=self.pk).exists():
 			raise ValidationError({'nickname': "This nickname is already in use."})
-	
+
 	def __str__(self):
 		return self.username

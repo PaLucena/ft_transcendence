@@ -15,6 +15,7 @@ urlpatterns = [
     path('logout/', views.logout),
 	path('setnickname/', views.set_nickname),
 	path('uploadavatar/', views.upload_avatar),
+    path('updateuserinfo/', views.update_user_info),
 
     path('ws/status/', consumers.UserStatus.as_asgi()),
 ]

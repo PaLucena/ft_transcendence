@@ -73,7 +73,7 @@ def login(request):
 	return Response({"detail": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
 #return Response({"message": "login page"})
 
-
+#shit
 @api_view(["GET"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -94,7 +94,6 @@ def logout(request):
 
 
 @api_view(["POST"])
-@login_required
 def set_nickname(request):
 	nickname = request.data.get('nickname')
 	if not nickname:
@@ -110,5 +109,50 @@ def set_nickname(request):
 
 
 @api_view(["POST"])
-def upload_avatar():
+def upload_avatar(request):
+	try:
+		user = AppUser.objects.get(username=request.data['username'])
+		file = request.FILES.get('image')
+		
+		if not file:
+			return Response({'error': 'No file uploaded.'}, status=status.HTTP_400_BAD_REQUEST)
+		if file.size == 0:
+			return Response({'error': 'File is empty'}, status=status.HTTP_400_BAD_REQUEST)
+		if not file.content_type.startswith('image'):
+			return Response({'error': 'Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 	
+		user.avatar = file
+		user.save()
+		return Response({'message': 'Avatar updated successfully.'}, status=status.HTTP_200_OK)
+	
+	except Exception as e:
+		return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+
+
+@api_view(["POST"])
+@login_required
+def update_user_info(request):
+	print("Request User:", request.headers)
+
+	try:
+		user = request.user
+		new_username = request.data.get('new_username')
+		new_nickname = request.data.get('nickname')
+		new_avatar = request.FILES.get('image')
+
+		if new_username:
+			if AppUser.objects.filter(username__iexact=new_username).exclude(pk=user.pk).exists():
+				return Response({'error': 'This username is already taken.'}, status=status.HTTP_400_BAD_REQUEST)
+			user.username = new_username
+		
+		if new_nickname:
+			set_nickname(request)
+
+		if new_avatar:
+			upload_avatar(request)
+		
+		user.save()
+		return Response({'message': 'User info updated successfully.'}, status=status.HTTP_200_OK)
+	
+	except Exception as e:
+		return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)

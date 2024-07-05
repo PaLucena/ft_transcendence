@@ -104,9 +104,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',  # For browsable API
         'rest_framework.authentication.TokenAuthentication',  # For API clients
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
 }
 
 # Password validation
