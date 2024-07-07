@@ -16,9 +16,5 @@ class AppUser(AbstractUser):
 	# #updated = models.DateTimeField(auto_now=True)
 	# #created = models.DateTimeField(auto_now_add=True)
 	
-	def clean(self):
-		if AppUser.objects.filter(nickname__iexact=self.nickname).exclude(pk=self.pk).exists():
-			raise ValidationError({'nickname': "This nickname is already in use."})
-
 	def __str__(self):
 		return self.username

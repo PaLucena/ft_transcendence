@@ -21,6 +21,7 @@ import json
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password, make_password
 
 @api_view(["POST"])
 def signup(request):
@@ -51,23 +52,31 @@ def signup(request):
 @api_view(["POST"])
 def login(request):
 
-	data = request.data
-	authenticate_user = authenticate(username=data['username'], password=data['password'])
+	username = request.data.get('username')
+	password = request.data.get('password')
+	nickname = request.data.get('nickname')
 
-	if authenticate_user is not None:
-		user = AppUser.objects.get(username=data['username'])
-		serializer = UserSerializerClass(user)
+	if not all ([username, password]):
+		return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
+	authenticated_user = authenticate(username=username, password=password)
+	if authenticated_user is not None:
+		user = AppUser.objects.get(username=username)
+
+		login(request, user)
+		set_nickname(request)
 		response_data = {
-			'user': serializer.data
+			'message': 'Login successful',
+			'username': user.username,
+			'email': user.email,
+			'nickname': user.nickname,
+			#'score': getattr(user, 'score', '0'),
+			#'jwt_token': encoded_token,
 		}
 
-		token, created_token = Token.objects.get_or_create(user=user)
+		token, _ = Token.objects.get_or_create(user=user)
+		response_data['token'] = token.key
 
-		if token:
-			response_data['token'] = token.key
-		elif created_token:
-			response_data['token'] = created_token.key
 		return Response(response_data, status=status.HTTP_200_OK)
 
 	return Response({"detail": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
@@ -96,16 +105,19 @@ def logout(request):
 @api_view(["POST"])
 def set_nickname(request):
 	nickname = request.data.get('nickname')
-	if not nickname:
-		return Response({"error": "This nickname is already in use."}, status=status.HTTP_400_BAD_REQUEST)
+	#print("NICKNAME:", request.data)
 
 	user = request.user
 	if AppUser.objects.filter(nickname__iexact=nickname).exclude(pk=user.pk).exists():
 		return Response({"error": "This nickname is already in use."}, status=status.HTTP_400_BAD_REQUEST)
-	
-	user.nickname = nickname
+
+	if not nickname:
+		user.nickname = "unknown"
+		#return Response({"error": "No nickanme entered."}, status=status.HTTP_400_BAD_REQUEST)
+	else:
+		user.nickname = nickname
 	user.save()
-	return Response({"message": nickname}, status=status.HTTP_200_OK)
+	return Response({"message": nickname}, status=status.HTTP_200_OK) #???? might delete
 
 
 @api_view(["POST"])
@@ -139,6 +151,9 @@ def update_user_info(request):
 		new_username = request.data.get('new_username')
 		new_nickname = request.data.get('nickname')
 		new_avatar = request.FILES.get('image')
+		old_password = request.data.get('old_password')
+		new_password = request.data.get('new_password')
+		confirm_password = request.data.get('confirm_password')
 
 		if new_username:
 			if AppUser.objects.filter(username__iexact=new_username).exclude(pk=user.pk).exists():
@@ -151,6 +166,13 @@ def update_user_info(request):
 		if new_avatar:
 			upload_avatar(request)
 		
+		if old_password and new_password and confirm_password:
+			if not check_password(new_password, user.password):
+				return Response({'error': 'Incorrect old password.'}, status=status.HTTP_400_BAD_REQUEST)
+			if new_password != confirm_password:
+				return Response({'error': "Passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
+			user.password = make_password(new_password)
+
 		user.save()
 		return Response({'message': 'User info updated successfully.'}, status=status.HTTP_200_OK)
 	

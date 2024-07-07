@@ -12,7 +12,7 @@ class UserSerializerClass(ModelSerializer):
 
 		new_user= AppUser.objects.create_user(
 			username = self.validated_data['username'],
-			email = self.validated_data['email'], #may delete
+			email = self.validated_data['email'],
 			password = self.validated_data['password'],
 		)
 
