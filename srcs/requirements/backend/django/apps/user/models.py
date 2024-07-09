@@ -4,7 +4,7 @@ from django.utils.choices import BlankChoiceIterator
 from django.core.exceptions import ValidationError
 
 class AppUser(AbstractUser):
-	nickname = models.CharField(max_length=100, null=True, blank=True)
+	nickname = models.CharField(max_length=100, null=True, blank=True, unique=True)
 	avatar = models.FileField(upload_to='avatars/', default='avatars/default.jpg', null=True, blank=True)
 	last_seen = models.DateTimeField(null=True, blank=True)
 	online = models.CharField(max_length=100, default="offline")

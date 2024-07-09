@@ -25,7 +25,8 @@ from django.contrib.auth.hashers import check_password, make_password
 
 @api_view(["POST"])
 def signup(request):
-		
+	print("REGISTER header:", request.headers)
+	print("REGISTER body:", request.data)
 	serializer = UserSerializerClass(data=request.data)
 	if serializer.is_valid():
 		try:
@@ -51,25 +52,22 @@ def signup(request):
 
 @api_view(["POST"])
 def login(request):
-
 	username = request.data.get('username')
 	password = request.data.get('password')
-	nickname = request.data.get('nickname')
 
 	if not all ([username, password]):
 		return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
 	authenticated_user = authenticate(username=username, password=password)
 	if authenticated_user is not None:
+		print("lohin info:", request.data)
 		user = AppUser.objects.get(username=username)
 
-		login(request, user)
-		set_nickname(request)
+		#login(request, user)
 		response_data = {
 			'message': 'Login successful',
 			'username': user.username,
-			'email': user.email,
-			'nickname': user.nickname,
+			#'avatar':
 			#'score': getattr(user, 'score', '0'),
 			#'jwt_token': encoded_token,
 		}
@@ -78,11 +76,11 @@ def login(request):
 		response_data['token'] = token.key
 
 		return Response(response_data, status=status.HTTP_200_OK)
-
-	return Response({"detail": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
+	else:
+		return Response({"detail": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
 #return Response({"message": "login page"})
 
-#shit
+#shitq
 @api_view(["GET"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -112,7 +110,7 @@ def set_nickname(request):
 		return Response({"error": "This nickname is already in use."}, status=status.HTTP_400_BAD_REQUEST)
 
 	if not nickname:
-		user.nickname = "unknown"
+		user.nickname = user.username
 		#return Response({"error": "No nickanme entered."}, status=status.HTTP_400_BAD_REQUEST)
 	else:
 		user.nickname = nickname
@@ -126,11 +124,11 @@ def upload_avatar(request):
 		user = AppUser.objects.get(username=request.data['username'])
 		file = request.FILES.get('image')
 		
-		if not file:
-			return Response({'error': 'No file uploaded.'}, status=status.HTTP_400_BAD_REQUEST)
+		#if not file:
+		#	return Response({'error': 'No file uploaded.'}, status=status.HTTP_400_BAD_REQUEST)
 		if file.size == 0:
 			return Response({'error': 'File is empty'}, status=status.HTTP_400_BAD_REQUEST)
-		if not file.content_type.startswith('image'):
+		elif not file.content_type.startswith('image'):
 			return Response({'error': 'Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 	
 		user.avatar = file
