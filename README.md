@@ -16,7 +16,7 @@ Transcendence is an advanced project from 42 School designed to challenge our fu
 
 - Full-stack web application development
 - Backend built with Django
-- Frontend developed using <.....>
+- Frontend developed using Bootstrap & JavaScript
 - Database management with PostgreSQL
 - Focus on clean code, scalability, and best practices
 
