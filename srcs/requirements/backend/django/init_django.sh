@@ -15,9 +15,11 @@ done
 
 python3 /app/manage.py makemigrations --no-input
 python3 /app/manage.py migrate --no-input
-djangouser=$(python3 /app/manage.py shell -c "from django.contrib.auth.models import User; print('True' if User.objects.filter(username='admin').exists() else 'False')")
+#djangouser=$(python3 /app/manage.py shell -c "from django.contrib.auth.models import User; print('True' if User.objects.filter(username='admin').exists() else 'False')")
+djangouser=$(python3 /app/manage.py shell -c "from django.conf import settings; from django.apps import apps; UserModel = apps.get_model(settings.AUTH_USER_MODEL); print('True' if UserModel.objects.filter(username='admin').exists() else 'False')")
 if [ "$djangouser" = "False" ]; then
-	python3 /app/manage.py createsuperuser --noinput --username admin --email admin@admin.com
+ 	echo "Creating new user"
+ 	python3 /app/manage.py createsuperuser --noinput --username admin --email admin@admin.com
 fi
 modelcreated=$(python3 /app/manage.py shell -c "from counter.models import Click; print('True' if Click.objects.filter(id=1).exists() else 'False')")
 if [ "$modelcreated" = "False" ]; then
