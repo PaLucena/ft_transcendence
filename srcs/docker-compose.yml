@@ -16,6 +16,17 @@ services:
     networks: 
       - transcendence_net
 
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: on-failure
+    ports:
+      - "6666:6666"
+    env_file: .env
+    command: --port 6666
+    depends_on:
+      - django
+
   postgres:
     container_name: postgres
     image: bitnami/postgresql:16.2.0-debian-12-r8
@@ -53,7 +64,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/requirements/frontend
+      device: ./requirements/frontend
       o: bind
 
   db_volume:
@@ -69,7 +80,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/requirements/backend/django/apps
+      device: ./requirements/backend/django/apps
       o: bind
 
 

@@ -1,31 +1,28 @@
-function connectWebSocket() {
-	const socket = new WebSocket('ws://api/ws/counter/'); // URL del endpoint WebSocket
+// Initialize WebSocket connection
+let socket = new WebSocket("ws://localhost:8000/ws/clicks/");
 
-	socket.onopen = function(event) {
-		console.log('WebSocket connection established.');
-		// Opcional: Puedes enviar mensajes al servidor al establecer la conexión si es necesario
-		// socket.send(JSON.stringify({ action: 'get_count' }));
-	};
+// Function to handle WebSocket open
+socket.onopen = function(event) {
+    console.log("WebSocket connection established.");
+    // Start periodic polling every 5 seconds
+    setInterval(getCountUpdate, 100);  // Adjust interval as needed
+};
 
-	socket.onmessage = function(event) {
-		const data = JSON.parse(event.data);
-		if (data.action === 'update_count') {
-			document.getElementById('contador').textContent = data.count;
-		}
-	};
+// Function to handle WebSocket messages
+socket.onmessage = function(event) {
+    let data = JSON.parse(event.data);
+    console.log("Count value:", data.count);
 
-	socket.onclose = function(event) {
-		console.log('WebSocket connection closed.');
-		// Puedes intentar reconectar aquí si es necesario
-		// connectWebSocket();
-	};
+    // Update the count in the HTML
+    document.getElementById('contador').innerText = data.count;
+};
 
-	socket.onerror = function(error) {
-		console.error('WebSocket error:', error);
-	};
+// Function to request count update
+function getCountUpdate() {
+    // Check WebSocket state before sending
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({}));
+    } else {
+        console.error('WebSocket not open.');
+    }
 }
-
-// Llamar a la función para iniciar la conexión WebSocket al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-	connectWebSocket();
-});
