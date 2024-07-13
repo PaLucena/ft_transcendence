@@ -14,24 +14,26 @@
 			<div class="d-flex justify-content-center pb-4">
 				<h1 class="display-3 mt-3">Login</h1>
 			</div>
-			<div class="row mb-3">
-				<form class="col-sm-8">
-					<input type="text" id="username_login" required>
-					<label for="username_login">Username</label>
-				</form>
-			</div>
-			<div class="row">
-				<form class="col-sm-8">
-					<input type="password" id="password_login" required>
-					<label for="password_login">Password</label>
-				</form>
-			</div>
-			<div class="row mb-1 justify-content-center">
-				<a class="btn btn-link" onclick="forgotPassword()">Forgot your password?</a>
-			</div>
-			<div class="row text-center col-sm-8 mx-auto mb-5 justify-content-center">
-				<button class="btn btn-success fw-bold shadow" onclick="login()">ENTER</button>
-			</div>
+			<form id="loginForm">
+				<div class="row mb-3">
+					<div class="col-sm-8" id="form">
+						<input type="text" id="username_login" required>
+						<label for="username_login">Username</label>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-8" id="form">
+						<input type="password" id="password_login" required>
+						<label for="password_login">Password</label>
+					</div>
+				</div>
+				<div class="row mb-1 justify-content-center">
+					<a class="btn btn-link" onclick="forgotPassword()">Forgot your password?</a>
+				</div>
+				<div class="row text-center col-sm-8 mx-auto mb-5 justify-content-center">
+					<button type="submit" class="btn btn-success fw-bold shadow">ENTER</button>
+				</div>
+			</form>
 			<hr>
 			<div class="d-flex text-center col-12 mx-auto pt-3 justify-content-center">
 				<p>Don't have an account? <a href="#" onclick="goToSignUp()">Sign up</a></p>
