@@ -21,7 +21,7 @@ socket.onmessage = function(event) {
 function getCountUpdate() {
     // Check WebSocket state before sending
     if (socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({}));
+        socket.send(JSON.stringify({'action': 'get_count'}));
     } else {
         console.error('WebSocket not open.');
     }

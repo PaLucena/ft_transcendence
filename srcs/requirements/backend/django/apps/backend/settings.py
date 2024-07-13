@@ -80,15 +80,15 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('redis', 6666)],
-        },
-    },
+            'hosts': [('redis', 6379)],
+        }
+    }
 }
 
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://redis:6666/1',  # Adjust based on your Redis configuration
+        'LOCATION': 'redis://redis:6379',  # Adjust based on your Redis configuration
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }

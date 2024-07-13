@@ -1,30 +1,41 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
-
+from .models import Click
+from asgiref.sync import sync_to_async
 class ClickConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
+        self.groupName = "all"
+        await self.channel_layer.group_add(
+            self.groupName,
+            self.channel_name
+        )
 
     async def disconnect(self, close_code):
-        pass
+        self.channel_layer.group_discard(
+            self.groupName,
+            self.channel_name
+        )
 
     async def receive(self, text_data):
         # Handle incoming WebSocket messages
-        data = json.loads(text_data)
+        try:
+            data = json.loads(text_data)
+        except json.JSONDecodeError as error:
+            print("error decoding JSON", error)
         action = data.get('action')
 
         if action == 'get_count':
-            # Retrieve count from Redis or database
-            count = await self.get_count_from_redis()  # Example function to fetch count
-            await self.send(text_data=json.dumps({'count': count}))
+            count = await sync_to_async(Click.getCount)
+            await self.channel_layer.group_send(
+                self.groupName, {
+                    'type': 'sendCount',
+                    'count': count
+                }
+            )
 
-    async def get_count_from_redis(self):
-        # Example function to retrieve count from Redis
-        # Use channels-redis API to interact with Redis
-        from channels.layers import get_channel_layer
-        channel_layer = get_channel_layer()
-
-        # Example: Get count from Redis
-        count = await channel_layer.redis.get('clicks_count')
-
-        return count
+    async def sendCount(self, event):
+        await self.send(text_data= json.dumps({
+            'type': 'sendCount',
+            'count': event['count']
+        }))
