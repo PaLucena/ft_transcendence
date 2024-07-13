@@ -2,6 +2,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from .models import Click
 from asgiref.sync import sync_to_async
+import asyncio
+
 class ClickConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
@@ -26,7 +28,7 @@ class ClickConsumer(AsyncWebsocketConsumer):
         action = data.get('action')
 
         if action == 'get_count':
-            count = await sync_to_async(Click.getCount)
+            count = await sync_to_async(Click.getCount)()
             await self.channel_layer.group_send(
                 self.groupName, {
                     'type': 'sendCount',

@@ -1,5 +1,5 @@
 // Initialize WebSocket connection
-let socket = new WebSocket("ws://localhost:8000/ws/clicks/");
+let socket = new WebSocket(`wss://${window.location.host}/ws/clicks/`);
 
 // Function to handle WebSocket open
 socket.onopen = function(event) {

@@ -17,6 +17,6 @@ class Click(models.Model):
 		click.count = 0
 		click.save()
 	@classmethod
-	def getCount():
+	def getCount(cls):
 		obj = Click.objects.get(id=1)
-		return ()
+		return (obj.count)
