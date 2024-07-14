@@ -18,3 +18,21 @@ class AppUser(AbstractUser):
 	
 	def __str__(self):
 		return self.username
+
+class Friend(models.Model):
+	PENDING = 'pending'
+	ACCEPTED = 'accepted'
+
+	user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_creator') #user.friendship_creator.all()
+	friend = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_receiver') #user.friendship_receiver.all()
+	status = models.IntegerField(default=PENDING)
+
+	class Meta:
+		unique_together = ('user', 'friend')
+
+# class Match(models.Model):
+# 	user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+# 	opponent = models.ForeignKey(AppUser)
+# 	user_score = models.IntegerField(null=True)
+# 	opponent_score = models.IntegerField(null=True)
+	

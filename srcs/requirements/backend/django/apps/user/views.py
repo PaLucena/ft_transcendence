@@ -10,7 +10,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.models import AbstractUser, User
 from rest_framework.response import Response
 from .serializers import UserSerializerClass
-from .models import AppUser
+from .models import AppUser, Friend
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, logout
@@ -172,3 +172,64 @@ def update_user_info(request):
 	
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
+
+
+#CBV has to be created to not repeat code
+@api_view (["POST"])
+@login_required
+def invite_friend(request):
+	friend_username = request.data.get('friend_username')
+	if not friend_username:
+		return Response({'error': 'Friend username required'}, status=status.HTTP_400_BAD_REQUEST)
+	
+	try:
+		friend = AppUser.objects.get(username=friend_username)
+	except Exception as e:
+		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+	
+	if Friend.objects.filter(user=request.user, friend=friend).exists():
+		return Response({'error': 'Friend request already sent'}, status=status.HTTP_409_CONFLICT)
+
+	Friend.objects.create(user=request.user, friend=friend)
+	return Response({'message': 'Friend request sent successfully.'}, status=status.HTTP_200_OK)
+
+
+
+@api_view (["DELETE"])
+@login_required
+def remove_friend(request):
+	friend_username = request.data.get('friend_username')
+	if not friend_username:
+		return Response({'error': 'Friend username required'}, status=status.HTTP_400_BAD_REQUEST)
+	
+	try:
+		friend = AppUser.objects.get(username=friend_username)
+	except Exception as e:
+		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+	friendship = Friend.objects.filter(
+		user=request.user, friend=friend
+	) | Friend.objects.filter(
+		user=friend, friend=request.user
+	)
+
+	if not friendship.exists():
+		return Response({'error': 'Friendship does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+
+	friendship.delete()
+	return Response({'message': 'Friend successfully removed.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view (["POST"])
+@login_required
+def confirm_friend_request():
+	
+
+
+	return Response({'message': 'Friend request confirmed.'}, status=status.HTTP_200_OK)
+
+#@api_view (["GET"])
+#def get_friends
+
+#@api_view (["POST"])
+#def get_online_friends
