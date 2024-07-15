@@ -9,41 +9,14 @@
 	<link rel="stylesheet" href="styles/style.css" />
 </head>
 <body data-bs-theme="dark">
-	<div id="particles-js"><canvas class="particles-js-canvas-el" width="637" height="930"></canvas></div>
-	<div id="root" class="d-flex justify-content-center align-items-center">
-		<div id="body" class="row align-items-center rounded">
-			<div class="d-flex justify-content-center pb-4">
-				<h1 class="display-3 mt-3">Login</h1>
-			</div>
-			<form id="loginForm">
-				<div class="row mb-3">
-					<div class="col-sm-8" id="form">
-						<input type="text" id="username" name="username" required>
-						<label for="username">Username</label>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-8" id="form">
-						<input type="password" id="password" name="password" required>
-						<label for="password">Password</label>
-					</div>
-				</div>
-				<div class="row mb-1 justify-content-center">
-					<a class="btn btn-link" onclick="forgotPassword()">Forgot your password?</a>
-				</div>
-				<div class="row text-center col-sm-8 mx-auto mb-5 justify-content-center">
-					<button type="submit" class="btn btn-success fw-bold shadow" id="">ENTER</button>
-				</div>
-			</form>
-			<hr>
-			<div class="d-flex text-center col-12 mx-auto pt-3 justify-content-center">
-				<p>Don't have an account? <a href="#" onclick="goToSignUp()">Sign up</a></p>
-			</div>
-		</div>
-	</div>
+
+	<div id="placeholder"></div>
+
 	<script src="components/background_particles/particles.js"></script>
 	<script src="scripts/background_particles.js"></script>
+	<script src="scripts/spa.js"></script>
 	<script src="scripts/login.js"></script>
+	<script src="scripts/intra-login.js"></script>
 	<script src="scripts/signup.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

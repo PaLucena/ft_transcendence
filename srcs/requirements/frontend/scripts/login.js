@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			jsonData[key] = value;
 		});
 
-		fetch("http://localhost:8000/login/", {
+		fetch("/api/login/", {
 			method: "POST",
 			headers: {
 				'Content-Type': 'application/json'
