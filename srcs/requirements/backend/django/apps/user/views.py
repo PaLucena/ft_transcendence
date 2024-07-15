@@ -7,10 +7,10 @@ from django.core import serializers
 from django.shortcuts import render
 from django.template import context
 from rest_framework.decorators import api_view
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser, User
 from rest_framework.response import Response
 from .serializers import UserSerializerClass
-from .models import AppUser
+from .models import AppUser, Friend
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, logout
@@ -18,7 +18,6 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 import json
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password, make_password
@@ -31,23 +30,22 @@ def signup(request):
 	if serializer.is_valid():
 		try:
 			serializer.save()
-		
 			user = AppUser.objects.get(username=request.data['username'])
-			token = Token.objects.get(user=user)
-
 			serializer = UserSerializerClass(user)
 
 			data = {
-				"user": serializer.data,
-				"token": token.key
+				'message': 'Login successful',
+				'user': {
+					'username': user.username,
+					'nickname': user.nickname,
+					'avatar': user.avatar.url if user.avatar else None
+				}
 			}
 			return Response(data, status=status.HTTP_201_CREATED)
 		except IntegrityError as e:
 			return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 	
 	return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-
-#return Response({"message": "sign up page"})
 
 
 @api_view(["POST"])
@@ -58,18 +56,20 @@ def login(request):
 	if not all ([username, password]):
 		return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-	authenticated_user = authenticate(username=username, password=password)
+	authenticated_user: AbstractUser | None = authenticate(username=username, password=password)
 	if authenticated_user is not None:
-		print("lohin info:", request.data)
 		user = AppUser.objects.get(username=username)
 
 		#login(request, user)
 		response_data = {
 			'message': 'Login successful',
-			'username': user.username,
-			#'avatar':
-			#'score': getattr(user, 'score', '0'),
-			#'jwt_token': encoded_token,
+			'user': {
+				'username': user.username,
+				'nickname': user.nickname,
+				'avatar': user.avatar.url,
+				#'score': getattr(user, 'score', '0'),
+				#'jwt_token': encoded_token,
+			}
 		}
 
 		token, _ = Token.objects.get_or_create(user=user)
@@ -77,10 +77,9 @@ def login(request):
 
 		return Response(response_data, status=status.HTTP_200_OK)
 	else:
-		return Response({"detail": "User not found"}, status=status.HTTP_404_BAD_REQUEST)
-#return Response({"message": "login page"})
+		return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-#shitq
+#shit
 @api_view(["GET"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -95,15 +94,12 @@ def TestView(request):
 def logout(request):
 
 	request.user.auth_token.delete()
-	#logout(request)
-
 	return Response({"message": "logout was successful"})
 
 
-@api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def set_nickname(request):
 	nickname = request.data.get('nickname')
-	#print("NICKNAME:", request.data)
 
 	user = request.user
 	if AppUser.objects.filter(nickname__iexact=nickname).exclude(pk=user.pk).exists():
@@ -111,21 +107,19 @@ def set_nickname(request):
 
 	if not nickname:
 		user.nickname = user.username
-		#return Response({"error": "No nickanme entered."}, status=status.HTTP_400_BAD_REQUEST)
+
 	else:
 		user.nickname = nickname
 	user.save()
 	return Response({"message": nickname}, status=status.HTTP_200_OK) #???? might delete
 
 
-@api_view(["POST"])
+@login_required
 def upload_avatar(request):
 	try:
-		user = AppUser.objects.get(username=request.data['username'])
+		user = request.user
 		file = request.FILES.get('image')
 		
-		#if not file:
-		#	return Response({'error': 'No file uploaded.'}, status=status.HTTP_400_BAD_REQUEST)
 		if file.size == 0:
 			return Response({'error': 'File is empty'}, status=status.HTTP_400_BAD_REQUEST)
 		elif not file.content_type.startswith('image'):
@@ -133,6 +127,7 @@ def upload_avatar(request):
 	
 		user.avatar = file
 		user.save()
+		print("user avatar:", user.avatar)
 		return Response({'message': 'Avatar updated successfully.'}, status=status.HTTP_200_OK)
 	
 	except Exception as e:
@@ -165,7 +160,8 @@ def update_user_info(request):
 			upload_avatar(request)
 		
 		if old_password and new_password and confirm_password:
-			if not check_password(new_password, user.password):
+			print("user.password old_password new_password :", user.password, old_password, new_password)
+			if not check_password(old_password, user.password):
 				return Response({'error': 'Incorrect old password.'}, status=status.HTTP_400_BAD_REQUEST)
 			if new_password != confirm_password:
 				return Response({'error': "Passwords do not match."}, status=status.HTTP_400_BAD_REQUEST)
@@ -176,3 +172,64 @@ def update_user_info(request):
 	
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
+
+
+#CBV has to be created to not repeat code
+@api_view (["POST"])
+@login_required
+def invite_friend(request):
+	friend_username = request.data.get('friend_username')
+	if not friend_username:
+		return Response({'error': 'Friend username required'}, status=status.HTTP_400_BAD_REQUEST)
+	
+	try:
+		friend = AppUser.objects.get(username=friend_username)
+	except Exception as e:
+		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+	
+	if Friend.objects.filter(user=request.user, friend=friend).exists():
+		return Response({'error': 'Friend request already sent'}, status=status.HTTP_409_CONFLICT)
+
+	Friend.objects.create(user=request.user, friend=friend)
+	return Response({'message': 'Friend request sent successfully.'}, status=status.HTTP_200_OK)
+
+
+
+@api_view (["DELETE"])
+@login_required
+def remove_friend(request):
+	friend_username = request.data.get('friend_username')
+	if not friend_username:
+		return Response({'error': 'Friend username required'}, status=status.HTTP_400_BAD_REQUEST)
+	
+	try:
+		friend = AppUser.objects.get(username=friend_username)
+	except Exception as e:
+		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
+	friendship = Friend.objects.filter(
+		user=request.user, friend=friend
+	) | Friend.objects.filter(
+		user=friend, friend=request.user
+	)
+
+	if not friendship.exists():
+		return Response({'error': 'Friendship does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+
+	friendship.delete()
+	return Response({'message': 'Friend successfully removed.'}, status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view (["POST"])
+@login_required
+def confirm_friend_request():
+	
+
+
+	return Response({'message': 'Friend request confirmed.'}, status=status.HTTP_200_OK)
+
+#@api_view (["GET"])
+#def get_friends
+
+#@api_view (["POST"])
+#def get_online_friends

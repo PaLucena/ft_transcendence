@@ -8,13 +8,14 @@ from django.core.files.images import get_image_dimensions
 
 class UserSerializerClass(ModelSerializer):
 	confirm_password = serializers.CharField(write_only=True, style={'input_type': 'password'})
-	#avatar = serializers.ImageField(allow_null=True, required=False, use_url=True)
+	avatar = serializers.FileField(allow_null=True, required=False, use_url=True)
 	
 	class Meta:
 		model = AppUser
 		fields = ['id', 'username', 'email', 'password', 'nickname', 'confirm_password', 'avatar']
 		extra_kwargs = {
-			'password': {'write_only': True}
+			'password': {'write_only': True},
+			'email': {'required': True},
 		}
 
 	def validate_email(self, value):
@@ -28,7 +29,6 @@ class UserSerializerClass(ModelSerializer):
 		return value
 
 	def validate_avatar(self, value):
-		print("CONTENT TYPE:", value.content_type)
 		if value:
 			if not value.content_type.startswith('image'):
 				raise serializers.ValidationError("Only image files are allowed.")
@@ -42,18 +42,19 @@ class UserSerializerClass(ModelSerializer):
 		return data
 
 	def save(self, **kwargs):
+		print("SELF validated_data :", self.validated_data)
 		validated_data = {key: value for key, value in self.validated_data.items() if key != 'confirm_password'}
-		print("validated_data :", validated_data)
-		#avatar = validated_data.get('avatar', None)
 
-		new_user= AppUser.objects.create_user(
-			username = self.validated_data['username'],
-			email = self.validated_data['email'],
-			password = self.validated_data['password'],
-			nickname = self.validated_data['nickname'],
-			avatar = self.validated_data['avatar'],
-		)
+		user_data = {
+			'username': validated_data['username'],
+			'email': validated_data['email'],
+			'password': validated_data['password'],
+			'nickname': validated_data.get('nickname', validated_data['username'])  
+		}
+		if 'avatar' in validated_data:
+				user_data['avatar'] = validated_data['avatar']
 
-		new_user.save()
-
+		new_user = AppUser.objects.create_user(**user_data)
 		new_token = Token.objects.create(user=new_user)
+
+		return new_user
