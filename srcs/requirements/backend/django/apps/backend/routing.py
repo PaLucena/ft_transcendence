@@ -4,7 +4,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.urls import path
-from counter import consumers
+# from YourAppHere import consumers
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
