@@ -1,0 +1,16 @@
+#navbar-placeholder {
+	height: 10vh;
+}
+
+#root {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	background-size: 100% 100%;
+	height: 90vh;
+	background-repeat: no-repeat;
+}
+
+#left, #right {
+	height: 100%;
+}
