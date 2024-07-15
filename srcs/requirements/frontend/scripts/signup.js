@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	signupForm.addEventListener("submit", function(event) {
 		event.preventDefault();
-		console.log(event.target[0].value);
 
 		const formData = new FormData(event.target);
 		let jsonData = {};
