@@ -1,3 +1,4 @@
+from http.client import ACCEPTED
 from operator import imod
 from re import T
 from sqlite3 import IntegrityError
@@ -34,7 +35,7 @@ def signup(request):
 			serializer = UserSerializerClass(user)
 
 			data = {
-				'message': 'Login successful',
+				'message': 'Signup successful',
 				'user': {
 					'username': user.username,
 					'nickname': user.nickname,
@@ -178,19 +179,20 @@ def update_user_info(request):
 @api_view (["POST"])
 @login_required
 def invite_friend(request):
-	friend_username = request.data.get('friend_username')
-	if not friend_username:
+	print("INVITE FRIEND:", request.headers)
+	username = request.data.get('username')
+	if not username:
 		return Response({'error': 'Friend username required'}, status=status.HTTP_400_BAD_REQUEST)
 	
 	try:
-		friend = AppUser.objects.get(username=friend_username)
+		friend = AppUser.objects.get(username=username)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 	
-	if Friend.objects.filter(user=request.user, friend=friend).exists():
+	if Friend.objects.filter(from_user=request.user, to_user=friend).exists():
 		return Response({'error': 'Friend request already sent'}, status=status.HTTP_409_CONFLICT)
 
-	Friend.objects.create(user=request.user, friend=friend)
+	Friend.objects.create(from_user=request.user, to_user=friend)
 	return Response({'message': 'Friend request sent successfully.'}, status=status.HTTP_200_OK)
 
 
@@ -208,9 +210,9 @@ def remove_friend(request):
 		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
 	friendship = Friend.objects.filter(
-		user=request.user, friend=friend
+		from_user=request.user, to_user=friend
 	) | Friend.objects.filter(
-		user=friend, friend=request.user
+		to_user=friend, from_user=request.user
 	)
 
 	if not friendship.exists():
@@ -222,14 +224,23 @@ def remove_friend(request):
 
 @api_view (["POST"])
 @login_required
-def confirm_friend_request():
-	
+def accept_friend_request(request):
+	print("FRIENDSHIP ID:", request.data.get('requestID'))
+	friendship_request = request.data.get('id') # idk how its assinged in databse
+	action = request.data.get('action')
 
+	#if friendship_request is not None:
 
-	return Response({'message': 'Friend request confirmed.'}, status=status.HTTP_200_OK)
+	if friendship_request.to_user == request.user:
+		friendship_request.to_user.friends.add(friendship_request.from_user)
+		friendship_request.user.from_user.add(friendship_request.to_user)
+		friendship_request.status = Friend.ACCEPTED
+		#friendship_request.delete()
+		return Response({'message': 'Friend request accepted.'}, status=status.HTTP_200_OK)
+	else:
+		return Response({'message': 'Friend request not accepted.'}, status=status.HTTP_200_OK)
+
 
 #@api_view (["GET"])
 #def get_friends
 
-#@api_view (["POST"])
-#def get_online_friends

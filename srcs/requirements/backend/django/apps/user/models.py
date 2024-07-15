@@ -15,20 +15,21 @@ class AppUser(AbstractUser):
 	score = models.IntegerField(default=0)
 	# #updated = models.DateTimeField(auto_now=True)
 	# #created = models.DateTimeField(auto_now_add=True)
-	
+	friends = models.ManyToManyField("AppUser", blank=True)
+
 	def __str__(self):
 		return self.username
 
 class Friend(models.Model):
-	PENDING = 'pending'
-	ACCEPTED = 'accepted'
+	PENDING = 0
+	ACCEPTED = 1
 
-	user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_creator') #user.friendship_creator.all()
-	friend = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_receiver') #user.friendship_receiver.all()
+	from_user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_creator') #user.friendship_creator.all()
+	to_user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_receiver') #user.friendship_receiver.all()
 	status = models.IntegerField(default=PENDING)
 
 	class Meta:
-		unique_together = ('user', 'friend')
+		unique_together = ('from_user', 'to_user')
 
 # class Match(models.Model):
 # 	user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
