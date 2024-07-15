@@ -4,15 +4,12 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from channels.security.websocket import AllowedHostsOriginValidator
 from django.urls import path
+from user import consumers
+from user import routing as UserAppRouting
 # from YourAppHere import consumers
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
-# Define WebSocket URL patterns
-websocket_urlpatterns = [
-    path('ws/clicks/', consumers.ClickConsumer.as_asgi()),
-    # Add more WebSocket URL patterns as needed
-]
 
 # ProtocolTypeRouter for routing different protocols
 application = ProtocolTypeRouter({
@@ -20,7 +17,7 @@ application = ProtocolTypeRouter({
     "websocket": AllowedHostsOriginValidator(  # WebSocket handling
         AuthMiddlewareStack(
             URLRouter(
-                websocket_urlpatterns
+                UserAppRouting.websocket_urlpatterns
             )
         )
     ),

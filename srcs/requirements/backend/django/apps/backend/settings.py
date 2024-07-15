@@ -22,6 +22,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
+#overriding the deafult user for django
+AUTH_USER_MODEL = 'user.AppUser'
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-6zo0ju)i62p%5hpqz*i^yv*4(%is8xo-s!o-2grlvrdp28h&3!'
 
@@ -34,6 +37,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'user',
 	'daphne',
 	'channels',
 	'django_redis',
@@ -43,11 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user',
     'rest_framework',
     'rest_framework.authtoken',
 	'corsheaders',
-    'channels',
 ]
 
 MIDDLEWARE = [
@@ -168,6 +170,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "https://localhost:8080",
 ]
-
-#overriding the deafult user for django
-AUTH_USER_MODEL = 'user.AppUser'
