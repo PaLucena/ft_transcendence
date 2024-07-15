@@ -16,6 +16,8 @@ urlpatterns = [
 	path('setnickname/', views.set_nickname),
 	path('uploadavatar/', views.upload_avatar),
     path('updateuserinfo/', views.update_user_info),
-	
+	path('invite_friend/', views.invite_friend, name='invite_friend'),
+	path('accept_friend_request/', views.accept_friend_request, name='accept_friend_request'),
+	path('remove_friend/', views.remove_friend, name='remove_friend'),
     path('ws/status/', consumers.UserStatus.as_asgi()),
 ]

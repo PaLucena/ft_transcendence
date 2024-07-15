@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import AppUser
+from .models import AppUser, Friend
 from django.utils.html import format_html
 
 class AppUserAdmin(UserAdmin):
@@ -19,4 +19,13 @@ class AppUserAdmin(UserAdmin):
 		else:
 			return "No avatar"
 		display_avatar.short_description = 'Avatar'
+
+
+class FriendAdmin(admin.ModelAdmin):
+    list_display = ('to_user', 'from_user', 'status')
+    list_filter = ('status',)
+
+
+admin.site.register(Friend, FriendAdmin)
 admin.site.register(AppUser, AppUserAdmin)
+

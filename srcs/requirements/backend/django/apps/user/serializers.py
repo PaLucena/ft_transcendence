@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import AppUser
 from rest_framework.serializers import ModelSerializer
 from rest_framework.authtoken.models import Token
-from django.core.files.images import get_image_dimensions
+#from django.core.files.images import get_image_dimensions
 #to send data from database to user
 
 class UserSerializerClass(ModelSerializer):
