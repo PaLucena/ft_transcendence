@@ -1,11 +1,11 @@
 
 document.addEventListener("DOMContentLoaded", () => {
-	const loginForm = document.getElementById("loginForm");
+	const loginForm = document.querySelector("#loginForm");
 
 	loginForm.addEventListener("submit", function(event) {
 		event.preventDefault();
 
-		const formData = new FormData(loginForm);
+		const formData = new FormData(event.target);
 		const jsonData = {};
 
 		formData.forEach((value, key) => {
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			},
 			body: JSON.stringify(jsonData)
 		})
-		.then(response => response.json)
+		.then(response => {return (response.json)})
 		.then(data => {
 			console.log("Success", data);
 		})
@@ -29,10 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	})
 })
 
-function	login() {
-	alert("Work in progress...");
-}
-
 function	forgotPassword() {
 	alert("Tough luck!");
 }
@@ -40,8 +36,4 @@ function	forgotPassword() {
 function	goToSignUp() {
 	console.log("Changing to Sign Up"); // debug
 	window.location.href = "pages/signup.html";
-}
-
-function	createAccount() {
-	alert("Work in progress...");
 }

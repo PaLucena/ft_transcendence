@@ -1,7 +1,15 @@
+#particles-js {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+
 #root {
 	display: flex;
 	align-items: center;
 	height: 100vh;
+	z-index: 2;
 }
 
 .btn {
@@ -25,7 +33,6 @@
 
 input {
 	color: black;
-	background: transparent;
 	background-color: white;
 	border: 1px solid #ccc;
 	transition: all .3s ease;
@@ -36,8 +43,8 @@ input {
 }
 
 input:focus {
-	border-color: rgb(19, 87, 54);;
-	outline: 1px solid rgb(19, 87, 54);;
+	border-color: rgb(19, 87, 54);
+	outline: 1px solid rgb(19, 87, 54);
 }
 
 label {

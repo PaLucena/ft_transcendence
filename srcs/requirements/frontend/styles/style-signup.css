@@ -16,7 +16,7 @@
 	justify-content: center;
 }
 
-form {
+#form {
 	margin: 0 auto;
 	position: relative;
 	background-color: white;
@@ -24,6 +24,7 @@ form {
 }
 
 input {
+	color: black;
 	background: transparent;
 	background-color: white;
 	border: 1px solid #ccc;
