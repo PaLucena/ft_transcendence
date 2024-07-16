@@ -18,9 +18,7 @@ class AppUser(AbstractUser):
 
 	def __str__(self):
 		return self.username
-	
-	class Meta:
-		db_table = 'user_appuser'
+
 
 class Friend(models.Model):
 	PENDING = 0
