@@ -15,8 +15,8 @@ while [ $STATUS -ne 0 ]; do
 done
 
 # Aplicar migraciones
-python3 /app/manage.py makemigrations --no-input
-python3 /app/manage.py migrate --no-input
+python3 /app/manage.py makemigrations
+python3 /app/manage.py migrate
 
 # Crear superusuario si no existe
 djangouser=$(python3 /app/manage.py shell -c "from django.conf import settings; from django.apps import apps; UserModel = apps.get_model(settings.AUTH_USER_MODEL); print('True' if UserModel.objects.filter(username='admin').exists() else 'False')")
