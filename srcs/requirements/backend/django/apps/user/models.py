@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 class AppUser(AbstractUser):
 	nickname = models.CharField(max_length=100, null=True, blank=True, unique=True)
-	avatar = models.FileField(upload_to='avatars/', default='avatars/default.jpg', null=True, blank=True)
+	avatar = models.FileField(upload_to='avatars/', default='default/default.jpg', null=True, blank=True)
 	last_seen = models.DateTimeField(null=True, blank=True)
 	online = models.CharField(max_length=100, default="offline")
 	image_link = models.URLField(null=True, blank=True)
@@ -15,7 +15,7 @@ class AppUser(AbstractUser):
 	score = models.IntegerField(default=0)
 	# #updated = models.DateTimeField(auto_now=True)
 	# #created = models.DateTimeField(auto_now_add=True)
-	friends = models.ManyToManyField("AppUser", blank=True)
+	#friends = models.ManyToManyField("AppUser", blank=True)
 
 	def __str__(self):
 		return self.username
@@ -24,8 +24,8 @@ class Friend(models.Model):
 	PENDING = 0
 	ACCEPTED = 1
 
-	from_user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_creator') #user.friendship_creator.all()
-	to_user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_receiver') #user.friendship_receiver.all()
+	from_user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_creator', null=True) #user.friendship_creator.all()
+	to_user = models.ForeignKey(AppUser, on_delete=models.CASCADE, related_name='friendship_receiver', null=True) #user.friendship_receiver.all()
 	status = models.IntegerField(default=PENDING)
 
 	class Meta:

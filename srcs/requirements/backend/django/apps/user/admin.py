@@ -22,7 +22,7 @@ class AppUserAdmin(UserAdmin):
 
 
 class FriendAdmin(admin.ModelAdmin):
-    list_display = ('to_user', 'from_user', 'status')
+    list_display = ('to_user', 'from_user', 'id', 'status')
     list_filter = ('status',)
 
 
