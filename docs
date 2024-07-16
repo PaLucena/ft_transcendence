@@ -1,0 +1,6 @@
+to enter inside db:
+
+psql -d transcendence_db -U dbadmin
+\dt
+SELECT * FROM user_appuser;
+
