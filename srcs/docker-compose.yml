@@ -7,11 +7,12 @@ services:
       - "8080:8080"
     volumes:
       - webcnt_volume:/var/www/html
+      - ssl_volume:/etc/nginx/ssl
     restart: always
     env_file: .env
     depends_on:
       - django
-    networks: 
+    networks:
       - transcendence_net
 
   redis:
@@ -23,7 +24,7 @@ services:
     expose:
       - "6379"
     env_file: .env
-  
+
   postgres:
     container_name: postgres
     image: bitnami/postgresql:16.2.0-debian-12-r8
@@ -72,6 +73,9 @@ volumes:
       type: none
       device: /home/${USER}/data/db_volume
       o: bind
+
+  ssl_volume:
+    name: ssl_volume
 
   django_volume:
     name: django_volume
