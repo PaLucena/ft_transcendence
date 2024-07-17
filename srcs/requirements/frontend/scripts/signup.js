@@ -18,7 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			},
 			body: JSON.stringify(jsonData)
 		})
-		.then(response => {return (response.json)})
+		.then(response => {
+			return response.json();
+		})
 		.then(data => {
 			console.log("Success", data);
 		})

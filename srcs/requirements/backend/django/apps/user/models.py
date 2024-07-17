@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.utils.choices import BlankChoiceIterator
 from django.core.exceptions import ValidationError
 
 class AppUser(AbstractUser):
@@ -19,6 +18,7 @@ class AppUser(AbstractUser):
 
 	def __str__(self):
 		return self.username
+
 
 class Friend(models.Model):
 	PENDING = 0

@@ -1,1 +1,77 @@
+# Django #
+*.log
+*.pot
 *.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+# /srcs/requirements/backend/django/apps/media/
+# https://docs.djangoproject.com/en/5.0/topics/migrations/
+# migrations/
+
+# Backup files #
+*.bak
+
+# If you are using PyCharm #
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# File-based project format
+*.iws
+
+# IntelliJ
+out/
+
+# Distribution / packaging
+.Python build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.whl
+*.egg-info/
+.installed.cfg
+*.egg
+*.manifest
+*.spec
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.py[cod]
+*$py.class
+
+#Trash
+.idea
+.DS_Store
+node/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# bd dump data
+fixtures/
