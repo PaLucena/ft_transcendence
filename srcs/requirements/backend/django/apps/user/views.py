@@ -276,7 +276,7 @@ def get_friends(request):
 	return Response(response_data, status=status.HTTP_200_OK)
 
 
-@api_view (["GET"]) #?
+@api_view (["GET"])
 @login_required
 def delete_account(request):
 	user = request.user
@@ -292,6 +292,7 @@ def delete_account(request):
 	Friend.objects.filter(Q(from_user=user) | Q(to_user=user)).delete()
 
     # Mark user in tournaments as deleted
+	user.anonymize()
 	user.is_deleted = True
 	user.is_active = False
 	user.save()

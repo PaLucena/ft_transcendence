@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.choices import BlankChoiceIterator
 from django.core.exceptions import ValidationError
+from django.utils.crypto import get_random_string
 
 class AppUser(AbstractUser):
 	nickname = models.CharField(max_length=100, null=True, blank=True, unique=True)
@@ -18,10 +19,11 @@ class AppUser(AbstractUser):
 	# #updated = models.DateTimeField(auto_now=True)
 
 	def anonymize(self):
+		unique_suffix = get_random_string(length=6)
 		self.email = f"deleted_user_{self.id}@example.com"
 		self.set_unusable_password()
 		self.username = f"deleted_user_{self.id}"
-		self.nickname = "Deleted User"
+		self.nickname = f"Deleted User {unique_suffix}"
 		self.avatar = None
 		self.last_seen = None
 		self.online = "offline"
