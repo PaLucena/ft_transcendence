@@ -117,8 +117,9 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",  # For browsable API
-        "rest_framework.authentication.TokenAuthentication",  # For API clients
+        #"rest_framework.authentication.SessionAuthentication",  # For browsable API
+        #"rest_framework.authentication.TokenAuthentication",  # For API clients
+		"rest_framework.authentication.BasicAuthentication"   # pongo esto porque no tenemos csrf todavia
     ],
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.IsAuthenticated',
