@@ -2,26 +2,29 @@
 
 STATUS=1
 
+# Esperar a que la base de datos esté lista
 while [ $STATUS -ne 0 ]; do
-	pg_isready -h $DB_HOST -p $DB_PORT -U $DB_USER
-	STATUS=$?
+    pg_isready -h $DB_HOST -p $DB_PORT -U $DB_USER
+    STATUS=$?
 
-	if [ $STATUS -eq 0 ]; then
-		echo "Database is ready"
-	else
-		sleep 1
-	fi
+    if [ $STATUS -eq 0 ]; then
+        echo "Database is ready"
+    else
+        sleep 1
+    fi
 done
 
-python3 /app/manage.py makemigrations --no-input
-python3 /app/manage.py migrate --no-input
+# Aplicar migraciones
+python3 /app/manage.py makemigrations
+python3 /app/manage.py migrate
+
+# Crear superusuario si no existe
 djangouser=$(python3 /app/manage.py shell -c "from django.conf import settings; from django.apps import apps; UserModel = apps.get_model(settings.AUTH_USER_MODEL); print('True' if UserModel.objects.filter(username='admin').exists() else 'False')")
 if [ "$djangouser" = "False" ]; then
- 	echo "Creating new user"
- 	python3 /app/manage.py createsuperuser --noinput --username admin --email admin@admin.com
+    echo "Creating new user"
+    python3 /app/manage.py createsuperuser --noinput --username admin --email admin@admin.com
 fi
-modelcreated=$(python3 /app/manage.py shell -c "from counter.models import Click; print('True' if Click.objects.filter(id=1).exists() else 'False')")
-if [ "$modelcreated" = "False" ]; then
-	python3 /app/manage.py shell -c "from counter.models import Click; click = Click.objects.create(count=0); click.save()"
-fi
+
+# Ejecutar el servidor
 python3 /app/manage.py runserver 0.0.0.0:8000
+

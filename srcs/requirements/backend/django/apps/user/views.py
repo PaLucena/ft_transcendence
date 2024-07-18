@@ -44,7 +44,7 @@ def signup(request):
 			return Response(data, status=status.HTTP_201_CREATED)
 		except IntegrityError as e:
 			return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-	
+
 	return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
@@ -122,17 +122,17 @@ def upload_avatar(request):
 	try:
 		user = request.user
 		file = request.FILES.get('image')
-		
+
 		if file.size == 0:
 			return Response({'error': 'File is empty'}, status=status.HTTP_400_BAD_REQUEST)
 		elif not file.content_type.startswith('image'):
 			return Response({'error': 'Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
-	
+
 		user.avatar = file
 		user.save()
 		print("user avatar:", user.avatar)
 		return Response({'message': 'Avatar updated successfully.'}, status=status.HTTP_200_OK)
-	
+
 	except Exception as e:
 		return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
 
@@ -155,13 +155,13 @@ def update_user_info(request):
 			if AppUser.objects.filter(username__iexact=new_username).exclude(pk=user.pk).exists():
 				return Response({'error': 'This username is already taken.'}, status=status.HTTP_400_BAD_REQUEST)
 			user.username = new_username
-		
+
 		if new_nickname:
 			set_nickname(request)
 
 		if new_avatar:
 			upload_avatar(request)
-		
+
 		if old_password and new_password and confirm_password:
 			print("user.password old_password new_password :", user.password, old_password, new_password)
 			if not check_password(old_password, user.password):
@@ -172,7 +172,7 @@ def update_user_info(request):
 
 		user.save()
 		return Response({'message': 'User info updated successfully.'}, status=status.HTTP_200_OK)
-	
+
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_409_CONFLICT)
 
@@ -184,12 +184,12 @@ def invite_friend(request):
 	username = request.data.get('username')
 	if not username:
 		return Response({'error': 'Friend username required'}, status=status.HTTP_400_BAD_REQUEST)
-	
+
 	try:
 		friend = AppUser.objects.get(username=username)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
-	
+
 	if Friend.objects.filter(from_user=request.user, to_user=friend).exists():
 		return Response({'error': 'Friend request already sent'}, status=status.HTTP_409_CONFLICT)
 
@@ -204,7 +204,7 @@ def remove_friend(request):
 	friend_username = request.data.get('username')
 	if not friend_username:
 		return Response({'error': 'Friend username required'}, status=status.HTTP_400_BAD_REQUEST)
-	
+
 	try:
 		friend = AppUser.objects.get(username=friend_username)
 	except Exception as e:

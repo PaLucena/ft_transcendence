@@ -1,0 +1,3 @@
+function	intraLogin() {
+	alert("NO");
+}
