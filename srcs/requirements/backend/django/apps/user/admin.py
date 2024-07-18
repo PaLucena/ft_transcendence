@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import AppUser, Friend
+from .models import AppUser, Friend, Match
 from django.utils.html import format_html
 
 class AppUserAdmin(UserAdmin):
@@ -23,9 +23,10 @@ class AppUserAdmin(UserAdmin):
 
 class FriendAdmin(admin.ModelAdmin):
     list_display = ('to_user', 'from_user', 'id', 'status')
-    list_filter = ('status',)
 
+class MatchAdmin(admin.ModelAdmin):
+    list_display = ('user', 'opponent', 'id', 'user_score', 'opponent_score', 'date')
 
 admin.site.register(Friend, FriendAdmin)
 admin.site.register(AppUser, AppUserAdmin)
-
+admin.site.register(Match, MatchAdmin)

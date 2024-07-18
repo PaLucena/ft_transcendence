@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.models import AbstractUser, User
 from rest_framework.response import Response
 from .serializers import UserSerializerClass
-from .models import AppUser, Friend
+from .models import AppUser, Friend, Match
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, logout
@@ -274,3 +274,26 @@ def get_friends(request):
 	}
 
 	return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view (["GET"]) #?
+@login_required
+def delete_account(request):
+	user = request.user
+	matches = Match.objects.filter(Q(user=user) | Q(opponent=user))
+
+	for ghost_match in matches:
+		if ghost_match.user == user:
+			ghost_match.user.anonymize()
+		if ghost_match.opponent == user:
+			ghost_match.opponent.anonymize()
+		ghost_match.save()
+
+	Friend.objects.filter(Q(from_user=user) | Q(to_user=user)).delete()
+
+    # Mark user in tournaments as deleted
+	user.is_deleted = True
+	user.is_active = False
+	user.save()
+
+	return Response({'message': 'User account deleted sucessfully.'}, status=status.HTTP_204_NO_CONTENT)

@@ -20,6 +20,7 @@ urlpatterns = [
 	path('accept_friend_request/', views.accept_friend_request, name='accept_friend_request'),
 	path('remove_friend/', views.remove_friend, name='remove_friend'),
 	path('get_friends/', views.get_friends, name='get_friends'),
+	path('delete_account/', views.delete_account, name='delete_account'),
 
     path('ws/status/', consumers.UserStatus.as_asgi()),
 ]
