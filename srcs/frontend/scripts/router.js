@@ -17,6 +17,7 @@ const routes = {
 	"/signup": "pages/signup.html",
 	"/play": "pages/play.html",
 	"/profile": "pages/profile.html",
+	"/chat": "pages/chatroom.html",
 };
 
 const handleLocation = async () => {
@@ -54,7 +55,7 @@ const navigateToOnBootup = () => {
 
 navigateToOnBootup();
 
-/* 
+/*
 renderInitialPage = () => {
 	navigateTo("/login");
 }
