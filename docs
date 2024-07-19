@@ -1,6 +1,9 @@
 to enter inside db:
-
 psql -d transcendence_db -U dbadmin
 \dt
 SELECT * FROM user_appuser;
 
+
+to start app:
+naviagte to dir where manage.py is located
+run: django-admin startapp name

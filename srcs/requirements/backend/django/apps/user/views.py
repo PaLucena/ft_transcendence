@@ -59,7 +59,7 @@ def login(request):
 	authenticated_user: AbstractUser | None = authenticate(username=username, password=password)
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
-		user.online = 'online'
+		#user.online = 'online'
 		user.save()
 		#login(request, user)
 		response_data = {
@@ -94,7 +94,7 @@ def TestView(request):
 @permission_classes([IsAuthenticated])
 def logout(request):
 	user= request.user #delete later
-	user.online = 'offline' #delete later
+	#user.online = 'offline' #delete later
 	request.user.auth_token.delete()
 	user.save()
 	return Response({"message": "logout was successful"})
