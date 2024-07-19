@@ -117,8 +117,10 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",  # For browsable API
-        "rest_framework.authentication.TokenAuthentication",  # For API clients
+       # "rest_framework.authentication.SessionAuthentication",  # For browsable API
+       # "rest_framework.authentication.TokenAuthentication",  # For API clients
+        'rest_framework.authentication.BasicAuthentication', 
+
     ],
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.IsAuthenticated',
@@ -167,5 +169,9 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = [
+    "https://localhost:8080",
+]
+
+CSRF_TRUSTED_ORIGINS = [
     "https://localhost:8080",
 ]

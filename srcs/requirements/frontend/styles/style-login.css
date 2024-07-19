@@ -9,7 +9,7 @@
 #root {
 	display: flex;
 	align-items: center;
-	height: 100vh;
+	height: 90vh;
 	z-index: 2;
 }
 

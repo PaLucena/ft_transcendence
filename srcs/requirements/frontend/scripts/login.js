@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			jsonData[key] = value;
 		});
 
-		fetch("/api/login/", {
+		fetch("/login/", {
 			method: "POST",
 			headers: {
 				'Content-Type': 'application/json'
@@ -21,14 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		})
 		.then(response => {return (response.json)})
 		.then(data => {
-			console.log("Success", data);
+			console.log("Login successful", data);
 		})
 		.catch((error) => {
-			console.error("Error: ", error);
+			console.error("Login error: ", error);
 		})
 	})
 })
-
-function	forgotPassword() {
-	alert("Tough luck!");
-}
