@@ -2,14 +2,14 @@ services:
   nginx:
     container_name: nginx
     build:
-      context: ./requirements/backend/nginx
+      context: ./srcs/backend/nginx
     ports:
       - "8080:8080"
     volumes:
       - webcnt_volume:/var/www/html
       - ssl_volume:/etc/nginx/ssl
     restart: always
-    env_file: .env
+    env_file: srcs/.env
     depends_on:
       - django
     networks:
@@ -23,15 +23,15 @@ services:
       - transcendence_net
     expose:
       - "6379"
-    env_file: .env
+    env_file: srcs/.env
 
   postgres:
     container_name: postgres
     image: bitnami/postgresql:16.2.0-debian-12-r8
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: srcs/${DB_NAME}
+      POSTGRES_USER: srcs/${DB_USER}
+      POSTGRES_PASSWORD: srcs/${DB_PASSWORD}
     volumes:
       - db_volume:/var/lib/postgresql/data
     expose:
@@ -43,8 +43,8 @@ services:
   django:
     container_name: django
     build:
-      context: ./requirements/backend/django
-    env_file: .env
+      context: ./srcs/backend/django
+    env_file: srcs/.env
     depends_on:
       - postgres
       - redis
@@ -63,7 +63,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ${SRCS_PATH}/requirements/frontend
+      device: ./srcs/frontend
       o: bind
 
   db_volume:
@@ -82,7 +82,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ${SRCS_PATH}/requirements/backend/django/apps
+      device: ./srcs/backend/django/apps
       o: bind
 
 
