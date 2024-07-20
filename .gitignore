@@ -1,3 +1,5 @@
+./srcs/sslcert/*
+
 # Django #
 *.log
 *.pot
@@ -5,9 +7,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-# /srcs/requirements/backend/django/apps/media/
-# https://docs.djangoproject.com/en/5.0/topics/migrations/
-# migrations/
 
 # Backup files #
 *.bak
