@@ -4,7 +4,7 @@ STATUS=1
 
 # Esperar a que la base de datos esté lista
 while [ $STATUS -ne 0 ]; do
-    pg_isready -h $DB_HOST -p $DB_PORT -U $DB_USER
+    pg_isready -h $DB_HOST -p $DB_PORT -U $POSTGRES_USER
     STATUS=$?
 
     if [ $STATUS -eq 0 ]; then

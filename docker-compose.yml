@@ -28,10 +28,7 @@ services:
   postgres:
     container_name: postgres
     image: bitnami/postgresql:16.2.0-debian-12-r8
-    environment:
-      POSTGRES_DB: srcs/${DB_NAME}
-      POSTGRES_USER: srcs/${DB_USER}
-      POSTGRES_PASSWORD: srcs/${DB_PASSWORD}
+    env_file: srcs/.env
     volumes:
       - db_volume:/var/lib/postgresql/data
     expose:
