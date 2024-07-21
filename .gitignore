@@ -1,4 +1,4 @@
-./srcs/sslcert/*
+sslselfsigned.crt
 
 # Django #
 *.log
