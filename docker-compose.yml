@@ -47,6 +47,7 @@ services:
       - redis
     volumes:
       - django_volume:/app
+      - ssl_volume:/certs/ssl
     ports:
       - "8000:8000"
     networks:
@@ -73,6 +74,11 @@ volumes:
 
   ssl_volume:
     name: ssl_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/backend/sslcert
+      o: bind
 
   django_volume:
     name: django_volume

@@ -26,5 +26,6 @@ if [ "$djangouser" = "False" ]; then
 fi
 
 # Ejecutar el servidor
-python3 /app/manage.py runserver 0.0.0.0:8000
+#python3 /app/manage.py runserver 0.0.0.0:8000
+python3 /app/manage.py runserver_plus --cert-file certs/ssl/sslselfsigned.crt --key-file certs/ssl/sslselfsigned.key 0.0.0.0:8000
 

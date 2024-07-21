@@ -2,7 +2,7 @@ USER := $(shell echo $$USER)
 CONTAINERS_DIR := /home/$(USER)/data
 
 all:
-	-@ mkdir -p $(CONTAINERS_DIR) $(CONTAINERS_DIR)/db_volume
+	-@ mkdir -p $(CONTAINERS_DIR) $(CONTAINERS_DIR)/db_volume ./srcs/sslcert
 	-@ docker-compose -f docker-compose.yml up --build -d
 
 up:
@@ -20,9 +20,13 @@ logs:
 clean: down
 	-@ rm -rf $(CONTAINERS_DIR)/db_volume
 	-@ docker rmi -f $$(docker images -qa); docker volume rm $$(docker volume ls -q); docker network rm $$(docker network ls -q) 2>/dev/null
-	# -@ clear
+	-@ clear
 	-@ echo "Transcendence cleaned"
 
 re: clean all
 
-.PHONY: all stop down logs clean up re
+debug: all logs
+
+re-debug: re logs
+
+.PHONY: all stop down logs clean up re debug re-debug

@@ -5,6 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 COPY requirements.txt requirements.txt
 COPY init_django.sh .
+RUN mkdir /certs /certs/ssl
 
 RUN apt-get -y update && apt-get -y upgrade
 RUN apt-get -y install postgresql-client

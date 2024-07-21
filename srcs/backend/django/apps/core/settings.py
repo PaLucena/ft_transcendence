@@ -35,7 +35,6 @@ ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
-
 INSTALLED_APPS = [
     "daphne",
     "user",
@@ -46,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+	"django_extensions",
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
@@ -80,6 +80,7 @@ TEMPLATES = [
     },
 ]
 
+# WEBSOCKETS CONFIGURATION
 ASGI_APPLICATION = "core.asgi.application"
 
 CHANNEL_LAYERS = {
@@ -170,3 +171,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
     "https://localhost:8080",
 ]
+
+# SSL CONFIG
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
