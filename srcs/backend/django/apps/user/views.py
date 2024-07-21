@@ -1,6 +1,4 @@
-from http.client import ACCEPTED
-from operator import imod
-from re import T
+from pickletools import read_uint1
 from sqlite3 import IntegrityError
 from urllib import response
 from urllib.robotparser import RequestRate
@@ -11,7 +9,7 @@ from rest_framework.decorators import api_view
 from django.contrib.auth.models import AbstractUser, User
 from rest_framework.response import Response
 from .serializers import UserSerializerClass
-from .models import AppUser, Friend
+from .models import AppUser, Friend, Match
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, logout
@@ -22,6 +20,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password, make_password
+from django.db.models import Q
 
 @api_view(["POST"])
 def signup(request):
@@ -60,7 +59,8 @@ def login(request):
 	authenticated_user: AbstractUser | None = authenticate(username=username, password=password)
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
-
+		user.online = 'online'
+		user.save()
 		#login(request, user)
 		response_data = {
 			'message': 'Login successful',
@@ -93,8 +93,10 @@ def TestView(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def logout(request):
-
+	user= request.user #delete later
+	user.online = 'offline' #delete later
 	request.user.auth_token.delete()
+	user.save()
 	return Response({"message": "logout was successful"})
 
 
@@ -179,7 +181,6 @@ def update_user_info(request):
 @api_view (["POST"])
 @login_required
 def invite_friend(request):
-	print("INVITE FRIEND:", request.headers)
 	username = request.data.get('username')
 	if not username:
 		return Response({'error': 'Friend username required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -200,7 +201,7 @@ def invite_friend(request):
 @api_view (["DELETE"])
 @login_required
 def remove_friend(request):
-	friend_username = request.data.get('friend_username')
+	friend_username = request.data.get('username')
 	if not friend_username:
 		return Response({'error': 'Friend username required'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -225,22 +226,75 @@ def remove_friend(request):
 @api_view (["POST"])
 @login_required
 def accept_friend_request(request):
-	print("FRIENDSHIP ID:", request.data.get('requestID'))
-	friendship_request = request.data.get('id') # idk how its assinged in databse
+	try:
+		friendship_request = Friend.objects.get(to_user=request.user)
+	except Exception as e:
+		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+	
 	action = request.data.get('action')
 
-	#if friendship_request is not None:
-
+	if friendship_request is None:
+		return Response({'error': 'Missing friendship ID.'}, status=status.HTTP_400_BAD_REQUEST)
+	
 	if friendship_request.to_user == request.user:
-		friendship_request.to_user.friends.add(friendship_request.from_user)
-		friendship_request.user.from_user.add(friendship_request.to_user)
+		# friendship_request.to_user.friends.add(friendship_request.from_user)
+		# friendship_request.user.from_user.add(friendship_request.to_user)
 		friendship_request.status = Friend.ACCEPTED
-		#friendship_request.delete()
+		friendship_request.save()
 		return Response({'message': 'Friend request accepted.'}, status=status.HTTP_200_OK)
 	else:
+		friendship_request.delete()
 		return Response({'message': 'Friend request not accepted.'}, status=status.HTTP_200_OK)
 
 
-#@api_view (["GET"])
-#def get_friends
+@api_view (["GET"])
+@login_required
+def get_friends(request):
+	user = request.user
+	all_friends = []
+	online_friends = []
 
+	friendships = Friend.objects.filter(
+		Q(from_user=user) | Q(to_user=user),
+		status=Friend.ACCEPTED
+	)
+	
+	for friendship in friendships:
+		friend = friendship.to_user if friendship.from_user == user else friendship.from_user
+		all_friends.append(friend)
+		if friend.online == 'online':
+			online_friends.append(friend)
+
+	all_friends_data = [{'username': friend.username, 'status': friend.online} for friend in all_friends]
+	online_friends_data = [{'username': friend.username} for friend in online_friends]
+
+	response_data = {
+		'all_friends': all_friends_data,
+		'online_friends': online_friends_data
+	}
+
+	return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view (["GET"])
+@login_required
+def delete_account(request):
+	user = request.user
+	matches = Match.objects.filter(Q(user=user) | Q(opponent=user))
+
+	for ghost_match in matches:
+		if ghost_match.user == user:
+			ghost_match.user.anonymize()
+		if ghost_match.opponent == user:
+			ghost_match.opponent.anonymize()
+		ghost_match.save()
+
+	Friend.objects.filter(Q(from_user=user) | Q(to_user=user)).delete()
+
+    # Mark user in tournaments as deleted
+	user.anonymize()
+	user.is_deleted = True
+	user.is_active = False
+	user.save()
+
+	return Response({'message': 'User account deleted sucessfully.'}, status=status.HTTP_204_NO_CONTENT)
