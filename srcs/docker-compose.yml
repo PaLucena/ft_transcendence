@@ -63,7 +63,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/requirements/frontend
+      device: ./requirements/frontend
       o: bind
 
   db_volume:
@@ -82,7 +82,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./srcs/requirements/backend/django/apps
+      device: ./requirements/backend/django/apps
       o: bind
 
 
