@@ -1,5 +1,7 @@
 #!/bin/sh
 
+rm 
+
 if [ ! -f "$CERT_PATH" ] && [ ! -f "$CERTKEY_PATH" ]; then
 	# create the directory where we will have the ssl crt and key
     mkdir -p /etc/nginx/ssl

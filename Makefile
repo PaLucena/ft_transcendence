@@ -19,8 +19,9 @@ logs:
 
 clean: down
 	-@ rm -rf $(CONTAINERS_DIR)/db_volume
+	rm -rf ./srcs/sslcert/
 	-@ docker rmi -f $$(docker images -qa); docker volume rm $$(docker volume ls -q); docker network rm $$(docker network ls -q) 2>/dev/null
-	-@ clear
+	#-@ clear
 	-@ echo "Transcendence cleaned"
 
 re: clean all

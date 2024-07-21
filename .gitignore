@@ -1,4 +1,5 @@
 sslselfsigned.crt
+sslselfsigned.key
 
 # Django #
 *.log
