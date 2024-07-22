@@ -5,21 +5,21 @@ from srcs.requirements.backend.django.apps.user.models import AppUser
 from .models import UserStats
 from rest_framework.response import Response
 
-# expected from frontend smth like this
+# expected from blockchain smth like this
 # {
 #     "player1": {
-#         "user_id": 1,
+#         "user_id": 2,
 #         "won": true,
 #         "score": 150
 #     },
 #     "player2": {
-#         "user_id": 2,
+#         "user_id": 3,
 #         "won": false,
 #         "score": 120
 #     }
 # }
 
-
+#will be called after every match to update user data
 @login_required
 @api_view(["POST"])
 def user_stats_update(request):
@@ -42,3 +42,28 @@ def user_stats_update(request):
 
 	except Exception as e:
 		return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+
+
+#user requests to see it's statistics
+@login_required
+@api_view(["GET"])
+def show_stats(request):
+	try:
+		user = request.user
+		stats = UserStats.objects.get(user=user)
+
+		data = {
+			"games_played": stats.games_played,
+			"games_won": stats.games_won,
+			"games_lost": stats.games_lost,
+			"winning_streak": stats.winning_streak,
+			"losing_streak": stats.losing_streak,
+			"highest_score": stats.highest_score,
+			"average_score": stats.average_score,
+			"win_rate": stats.win_rate,
+		}
+		
+		return Response(data, status=status.HTTP_200_OK)
+	except UserStats.DoesNotExist:
+		return Response({'error': 'User statistics not found'}, status=status.HTTP_404_NOT_FOUND)
+	
