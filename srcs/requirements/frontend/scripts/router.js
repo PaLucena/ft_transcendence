@@ -1,5 +1,10 @@
+/* (function bootup() {
+	navigateToOnBootup();
+})(); */
+
 const route = (event) => {
 	event = event || window.event;
+	console.log(event);
 	event.preventDefault();
 	window.history.pushState({}, "", event.target.href);
 	handleLocation();
@@ -17,19 +22,45 @@ const routes = {
 const handleLocation = async () => {
 	const path = window.location.pathname;
 	const route = routes[path] || routes [404];
-	console.log("fetching to", route)
+	console.log("fetching to", route);
 	const html = await fetch(route).then((data) => data.text());
 	document.getElementById("container").innerHTML = html;
+
+	if (path === "/signup") {
+		initSignupForm();
+	}
+	else if (path === "/login") {
+		initLoginForm();
+	}
 }
 
 window.onpopstate = handleLocation;
 
 window.route = route;
 
-handleLocation();
+const navigateTo = (url) => {
+	window.history.pushState({}, "", url);
+	handleLocation();
+}
 
+const navigateToOnBootup = () => {
+	// Verificar si la página se ha cargado por primera vez
+	if (window.location.pathname === "/") {
+		navigateTo("/login");
+	}
+	else
+		handleLocation();
+}
+
+navigateToOnBootup();
+
+/* 
+renderInitialPage = () => {
+	navigateTo("/login");
+}
+ */
 // Inicializar el formulario de registro
-function initSignupForm() {
+/* function initSignupForm() {
 	const signupForm = document.querySelector("#signupForm");
 
 	if (signupForm) {
@@ -61,44 +92,4 @@ function initSignupForm() {
 			});
 		});
 	}
-}
-
-
-/* function loadPage(page) {
-	fetch(`pages/${page}.html`)
-		.then(response => response.text())
-		.then(data => {
-			document.getElementById('placeholder').innerHTML = data;
-			// Guardar la página actual en localStorage
-			localStorage.setItem('currentPage', page);
-		});
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-	// Verificar si hay una página guardada en localStorage
-	const savedPage = localStorage.getItem('currentPage') || 'login';
-	loadPage(savedPage);
-});
-
-// Ejemplos de funciones para cargar diferentes páginas
-function signupPage() {
-	loadPage('signup');
-}
-
-function loginPage() {
-	loadPage('login');
-} */
-
-/* fetch('pages/login.html')
-	.then(response => response.text())
-	.then(data => {
-		document.getElementById('placeholder').innerHTML = data;
-	});
-
-function	signupPage() {
-	fetch('pages/signup.html')
-		.then(response => response.text())
-		.then(data => {
-			document.getElementById('placeholder').innerHTML = data;
-		});
 } */

@@ -1,5 +1,5 @@
 
-document.addEventListener("DOMContentLoaded", () => {
+function initLoginForm() {
 	const loginForm = document.querySelector("#loginForm");
 
 	loginForm.addEventListener("submit", function(event) {
@@ -19,12 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
 			},
 			body: JSON.stringify(jsonData)
 		})
-		.then(response => {return (response.json)})
+		.then(response => response.json)
 		.then(data => {
 			console.log("Login successful", data);
+			navigateTo("/play");
 		})
 		.catch((error) => {
 			console.error("Login error: ", error);
 		})
 	})
-})
+}

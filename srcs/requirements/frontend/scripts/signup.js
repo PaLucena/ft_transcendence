@@ -1,33 +1,35 @@
-document.addEventListener("DOMContentLoaded", () => {
+
+function initSignupForm() {
 	const signupForm = document.querySelector("#signupForm");
-
+	
 	signupForm.addEventListener("submit", function(event) {
-		event.preventDefault();
+	event.preventDefault();
 
-		console.log("CHECKPOINT");
+	console.log("CHECKPOINT");
 
-		const formData = new FormData(event.target);
-		let jsonData = {};
+	const formData = new FormData(event.target);
+	let jsonData = {};
+	
+	formData.forEach((value, key) => {
+		jsonData[key] = value;
+	});
 
-		formData.forEach((value, key) => {
-			jsonData[key] = value;
-		});
-
-		fetch("/api/signup/", {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(jsonData)
-		})
+	fetch("/api/signup/", {
+		method: "POST",
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(jsonData)
+	})
 		.then(response => {
 			return response.json();
 		})
 		.then(data => {
 			console.log("Success", data);
+			navigateTo("/play");
 		})
 		.catch((error) => {
 			console.error("Error: ", error);
 		})
 	})
-})
+}
