@@ -21,6 +21,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
+import requests
 
 @api_view(["POST"])
 def signup(request):
@@ -298,3 +299,18 @@ def delete_account(request):
 	user.save()
 
 	return Response({'message': 'User account deleted sucessfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(["POST"])
+def ftapiLogin(request):
+	code = request.data.get("api-code");
+	print("code:", code)
+	ftapiresponse = requests.post("https://api.intra.42.fr/v2/oauth/token", params={
+		"grant_type": "authorization_code",
+		"client_id": "u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6",
+		"client_secret": "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",
+		"code": str(code),
+	})
+	if ftapiresponse == None:
+		return Response(status=status.HTTP_400_BAD_REQUEST)
+	loadedresponse = json.loads(ftapiresponse.content)
+	print(loadedresponse)

@@ -24,6 +24,7 @@ urlpatterns = [
 
 
 	path('api/login/', views.login),
+	path('api/42api-login/', views.ftapiLogin, name='ftapiLogin'),
 	path('api/signup/', views.signup),
 	path('api/test-view/', views.TestView),
 	path('api/logout/', views.logout),

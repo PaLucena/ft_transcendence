@@ -17,6 +17,7 @@ const routes = {
 	"/signup": "pages/signup.html",
 	"/play": "pages/play.html",
 	"/profile": "pages/profile.html",
+	"/auth": "pages/auth.html",
 };
 
 const handleLocation = async () => {
@@ -31,6 +32,9 @@ const handleLocation = async () => {
 	}
 	else if (path === "/login") {
 		initLoginForm();
+	}
+	else if (path === "/auth") {
+		getApiToken();
 	}
 }
 
