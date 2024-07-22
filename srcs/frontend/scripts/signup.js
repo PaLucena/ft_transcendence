@@ -5,8 +5,6 @@ function initSignupForm() {
 	signupForm.addEventListener("submit", function(event) {
 	event.preventDefault();
 
-	console.log("CHECKPOINT");
-
 	const formData = new FormData(event.target);
 	let jsonData = {};
 	
