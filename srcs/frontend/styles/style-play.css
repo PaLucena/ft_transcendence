@@ -1,10 +1,14 @@
 #navbar-placeholder {
 	height: 10vh;
+	margin: 0;
+	margin-bottom: 0;
+	padding: 0;
 }
 
-#root {
+#rootPlay {
 	box-sizing: border-box;
 	margin: 0;
+	margin-top: 0;
 	padding: 0;
 	background-size: 100% 100%;
 	height: 90vh;

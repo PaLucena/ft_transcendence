@@ -1,5 +1,5 @@
 
-document.addEventListener("DOMContentLoaded", () => {
+function initLoginForm() {
 	const loginForm = document.querySelector("#loginForm");
 
 	loginForm.addEventListener("submit", function(event) {
@@ -12,28 +12,20 @@ document.addEventListener("DOMContentLoaded", () => {
 			jsonData[key] = value;
 		});
 
-		fetch("/api/login/", {
+		fetch("/login/", {
 			method: "POST",
 			headers: {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(jsonData)
 		})
-		.then(response => {return (response.json)})
+		.then(response => response.json)
 		.then(data => {
-			console.log("Success", data);
+			console.log("Login successful", data);
+			navigateTo("/play");
 		})
 		.catch((error) => {
-			console.error("Error: ", error);
+			console.error("Login error: ", error);
 		})
 	})
-})
-
-function	forgotPassword() {
-	alert("Tough luck!");
-}
-
-function	goToSignUp() {
-	console.log("Changing to Sign Up"); // debug
-	window.location.href = "pages/signup.html";
 }
