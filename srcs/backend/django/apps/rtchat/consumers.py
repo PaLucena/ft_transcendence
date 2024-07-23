@@ -7,18 +7,20 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
+        user = self.scope["user"]
 
         print(f"SCOPE:: {self.scope}")
         print(
             f"HELP!: room_name: {self.room_name}, room_group_name: {self.room_group_name}"
         )
+        print(f"user: {user}")
 
-        # if not self.scope["user"].is_authenticated:
-        #     await self.send_json({"error": "User not authenticated"})
-        #     await self.close()
-        # else:
-        #     await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        if not user.is_authenticated:
+            await self.send_json({"error": "User not authenticated"})
+            await self.close()
+        else:
+            await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+
         await self.accept()
 
     async def disconnect(self, close_code):

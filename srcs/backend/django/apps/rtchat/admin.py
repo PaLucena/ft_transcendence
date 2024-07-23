@@ -1,3 +1,6 @@
 from django.contrib import admin
+from rtchat.models import ChatGroup, GroupMessage, Block
 
-# Register your models here.
+admin.site.register(ChatGroup)
+admin.site.register(GroupMessage)
+admin.site.register(Block)
