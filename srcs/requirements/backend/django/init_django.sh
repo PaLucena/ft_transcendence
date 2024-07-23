@@ -26,5 +26,6 @@ if [ "$djangouser" = "False" ]; then
 fi
 
 # Ejecutar el servidor
+python3 /app/manage.py create_random_users
 python3 /app/manage.py runserver 0.0.0.0:8000
 

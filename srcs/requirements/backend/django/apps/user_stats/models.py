@@ -1,5 +1,5 @@
 from django.db import models
-from ..user.models import AppUser
+from user.models import AppUser
 from django.utils import timezone
 
 class UserStats(models.Model):
