@@ -18,3 +18,122 @@
 #left, #right {
 	height: 100%;
 }
+
+#left {
+	position: relative;
+	align-items: center;
+	justify-content: center;
+}
+
+#btns {
+	position: absolute;
+	align-items: center;
+	width: 60%;
+	left: 20%;
+	top: 25%;
+	z-index: 1;
+}
+
+#btns #oneVSone {
+	margin-top: 7vh;
+	margin-left: 0;
+}
+
+#btns #tournament {
+	margin-top: 10vh;
+	margin-bottom: 5vh;
+	margin-left: 0;
+}
+
+#dropdownOne {
+	display: none;
+	position: absolute;
+	justify-content: center;
+	width: 80%;
+	height: 74%;
+	left: 10%;
+	top: 13%;
+	z-index: 2;
+	border-radius: 3%;
+}
+
+#dropdownOne #vsIA {
+	margin-top: 7vh;
+	margin-left: 0;
+}
+
+#dropdownOne #local {
+	margin-top: 7vh;
+	margin-left: 0;
+}
+
+#dropdownOne #online {
+	margin-top: 7vh;
+	margin-bottom: 0;
+	margin-left: 0;
+}
+
+#dropdownOne #back {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+#dropdownOne #back button {
+	background-color: #425f4b;
+}
+
+#dropdownTwo {
+	display: none;
+	position: absolute;
+	justify-content: center;
+	width: 80%;
+	height: 74%;
+	left: 10%;
+	top: 13%;
+	z-index: 2;
+	border-radius: 3%;
+}
+
+#dropdownTwo #create {
+	margin-top: 15vh;
+	margin-left: 0;
+}
+
+#dropdownTwo #join {
+	margin-top: 10vh;
+	margin-left: 0;
+}
+
+#dropdownTwo #back {
+	margin-top: 10vh;
+	margin-bottom: 0;
+}
+
+#dropdownTwo #back button {
+	background-color: #425f4b;
+}
+
+#pongGIF {
+	position: absolute;
+	margin-top: 40vh;
+}
+
+#dropdownOne #oneVSone {
+	margin-top: 7vh;
+	margin-left: 0;
+}
+
+#dropdownOne #tournament {
+	margin-top: 10vh;
+	margin-bottom: 5vh;
+	margin-left: 0;
+}
+
+#dropdownOne #back {
+	margin-top: 10vh;
+	margin-left: 0;
+}
+
+#left .btn {
+	background-color: #192e2f;
+}
