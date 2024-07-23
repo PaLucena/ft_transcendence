@@ -12,4 +12,7 @@ RUN apt-get -y install tree
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 RUN chmod +x init_django.sh
 
+# Create a shared directory between the blockchain and the backend
+RUN mkdir /blockchain_shared
+
 CMD ["./init_django.sh"]

@@ -45,14 +45,28 @@ services:
     depends_on:
       - postgres
       - redis
+      - blockchain
     volumes:
       - django_volume:/app
+      - blockchain_volume:/blockchain_shared
     ports:
       - "8000:8000"
     networks:
       - transcendence_net
     restart: on-failure
 
+  blockchain:
+    container_name: blockchain
+    build:
+      context: ./srcs/backend/blockchain
+    env_file: srcs/.env
+    volumes:
+      - blockchain_volume:/app/blockchain_shared
+    ports:
+      - "8545:8545"
+    networks:
+      - transcendence_net
+    restart: unless-stopped
 
 volumes:
   webcnt_volume:
@@ -82,6 +96,13 @@ volumes:
       device: ./srcs/backend/django/apps
       o: bind
 
+  blockchain_volume:
+    name: blockchain_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/backend/blockchain/blockchain_shared
+      o: bind
 
 networks:
   transcendence_net:
