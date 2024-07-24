@@ -26,8 +26,10 @@ const handleLocation = async () => {
 		initSignupForm();
 	else if (path === "/login")
 		initLoginForm();
-	else if (path === "/play" || path === "/profile")
+	else if (path === "/play" || path === "/profile") {
 		applyNavbar();
+		applyChat();
+	}
 }
 
 window.onpopstate = handleLocation;

@@ -6,3 +6,13 @@
 	height: 90vh;
 	background-repeat: no-repeat;
 }
+
+#chat-placeholder {
+	position: absolute;
+	display: flex;
+	justify-content: right;
+	z-index: 3;
+	bottom: 0;
+	right: 0.5%;
+	margin-bottom: 2vh;
+}

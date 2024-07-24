@@ -78,7 +78,7 @@
 }
 
 #dropdownOne #back {
-	margin-top: 0;
+	position: relative;
 	margin-bottom: 0;
 }
 
@@ -109,7 +109,6 @@
 }
 
 #dropdownTwo #back {
-	margin-top: 12vh;
 	margin-bottom: 0;
 }
 
@@ -126,4 +125,14 @@
 	margin-top: 10vh;
 	margin-left: 0;
 	margin-right: 5vh;
+}
+
+#chat-placeholder {
+	position: absolute;
+	display: flex;
+	justify-content: right;
+	z-index: 3;
+	bottom: 0;
+	right: 0.5%;
+	margin-bottom: 2vh;
 }
