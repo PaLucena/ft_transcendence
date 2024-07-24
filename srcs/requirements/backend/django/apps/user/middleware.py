@@ -10,8 +10,8 @@ class UpdateLastSeenMiddleware:
 
 	def __call__(self, request) -> Any:
 		response = self.get_response(request)
-		print("request:", request)
 		if request.user.is_authenticated:
 			User = get_user_model()
-			User.objects.filter(username=request['username']).update(last_seen=timezone.now())
+			user = User.objects.get(username=request.user)
+			user.last_seen = timezone.now()
 		return response

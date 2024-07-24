@@ -4,14 +4,18 @@ from user.models import AppUser
 from faker import Faker
 
 class Command(BaseCommand):
-	help = 'Create 8 random users'
-
 	def handle(self, *args, **kwargs):
 		fake = Faker()
-		for _ in range(8):
+		created_users = 0
+
+		while created_users < 8:
 			username = fake.user_name()
 			email = fake.email()
 			nickname = fake.first_name()
+
+			if AppUser.objects.filter(nickname=nickname).exists():
+				continue
+
 			user = AppUser.objects.create_user(
 				username=username,
 				email=email,
@@ -24,3 +28,4 @@ class Command(BaseCommand):
 				id_deleted=False
 			)
 			self.stdout.write(self.style.SUCCESS(f'User {username} created'))
+			created_users += 1
