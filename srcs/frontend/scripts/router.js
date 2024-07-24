@@ -13,6 +13,7 @@ const routes = {
 	"/signup": "pages/signup.html",
 	"/play": "pages/play.html",
 	"/profile": "pages/profile.html",
+	"/chat": "pages/chat.html",
 };
 
 const handleLocation = async () => {
@@ -28,6 +29,9 @@ const handleLocation = async () => {
 		initLoginForm();
 	else if (path === "/play" || path === "/profile")
 		applyNavbar();
+	// else if (path === "/chat") {
+	// 	initChat();
+	// }
 }
 
 window.onpopstate = handleLocation;
