@@ -308,9 +308,28 @@ def ftapiLogin(request):
 		"grant_type": "authorization_code",
 		"client_id": "u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6",
 		"client_secret": "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",
-		"code": str(code),
+		"code": code,
+		"redirect_uri": "https://localhost:8080/auth",
 	})
+	print(ftapiresponse)
 	if ftapiresponse == None:
 		return Response(status=status.HTTP_400_BAD_REQUEST)
-	loadedresponse = json.loads(ftapiresponse.content)
-	print(loadedresponse)
+	token42 = json.loads(ftapiresponse.content)
+	user_info_response = requests.get("https://api.intra.42.fr/v2/me", params={"access_token": token42["access_token"]})
+	user_json = json.loads(user_info_response.content)
+	if AppUser.objects.filter(email=user_json["email"]):
+		return Response(status=status.HTTP_409_CONFLICT)
+	if AppUser.objects.filter(username=user_json["login"]):
+		return Response(status=status.HTTP_409_CONFLICT)
+	NewuserJson = {
+		'username': user_json["login"],
+		'email': user_json["email"],
+		'avatar': user_json["image"]["link"]
+	}
+	user = AppUser.objects.create_user(**NewuserJson)
+
+	data = {
+		'message': "User successfully logged",
+		'user': NewuserJson
+	}
+	return Response(data, status=status.HTTP_201_CREATED)

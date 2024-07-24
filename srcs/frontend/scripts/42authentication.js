@@ -14,4 +14,11 @@ function getApiToken() {
 			"api-code": code,
 		}),
 	})
+	.then(response => {
+		return response.json()
+	})
+	.then(data => {
+		console.log(data)
+		navigateTo("/play");
+	})
 }
