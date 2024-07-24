@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "blockchain",
+    "rtchat",
 ]
 
 MIDDLEWARE = [
@@ -118,10 +119,9 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-       # "rest_framework.authentication.SessionAuthentication",  # For browsable API
-       # "rest_framework.authentication.TokenAuthentication",  # For API clients
-        'rest_framework.authentication.BasicAuthentication', 
-
+        # "rest_framework.authentication.SessionAuthentication",  # For browsable API
+        # "rest_framework.authentication.TokenAuthentication",  # For API clients
+        "rest_framework.authentication.BasicAuthentication",
     ],
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.IsAuthenticated',

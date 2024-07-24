@@ -13,7 +13,7 @@ PRIVATE_KEY = os.getenv('BC_PRIVATE_KEY')
 w3.eth.default_account = os.getenv('BC_OWNER_ADDRESS')
 
 # ABI and contract address
-contract_file_path = './blockchain_shared/pong_contract.json'
+contract_file_path = '../../blockchain_shared/pong_contract.json'
 with open(contract_file_path, 'r') as file:
     contract_data = json.load(file)
 CONTRACT_ADDRESS = contract_data['address']
