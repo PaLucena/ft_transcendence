@@ -3,7 +3,7 @@ CONTAINERS_DIR := /home/$(USER)/data
 
 all:
 	-@ mkdir -p $(CONTAINERS_DIR) $(CONTAINERS_DIR)/db_volume
-	-@ docker-compose -f docker-compose.yml up --build -d
+	-@ docker compose -f docker-compose.yml up --build -d
 
 up:
 	-@ docker-compose -f docker-compose.yml up -d

@@ -5,8 +5,6 @@ function initSignupForm() {
 	signupForm.addEventListener("submit", function(event) {
 	event.preventDefault();
 
-	console.log("CHECKPOINT");
-
 	const formData = new FormData(event.target);
 	let jsonData = {};
 	
@@ -22,7 +20,14 @@ function initSignupForm() {
 		body: JSON.stringify(jsonData)
 	})
 		.then(response => {
-			return response.json();
+			if (response.status === 201)
+				return response.json();
+			else { // Aqui tengo que manejar los códigos de error
+				return response.json().then(errData => {
+					console.error("Error ${response.status}:", errData);
+					throw new Error("Error ${response.status}");
+				});
+			}
 		})
 		.then(data => {
 			console.log("Success", data);

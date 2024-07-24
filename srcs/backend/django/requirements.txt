@@ -24,10 +24,12 @@ pycparser==2.22
 pyOpenSSL==24.1.0
 redis==5.0.7
 service-identity==24.1.0
+shortuuid==1.0.13
 six==1.16.0
 sqlparse==0.5.1
 Twisted==24.3.0
 txaio==23.1.1
 typing_extensions==4.12.2
+web3==6.0.0
 zope.interface==6.4.post2
 requests

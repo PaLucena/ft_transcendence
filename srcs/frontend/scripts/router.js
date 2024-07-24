@@ -1,7 +1,3 @@
-/* (function bootup() {
-	navigateToOnBootup();
-})(); */
-
 const route = (event) => {
 	event = event || window.event;
 	console.log(event);
@@ -17,6 +13,7 @@ const routes = {
 	"/signup": "pages/signup.html",
 	"/play": "pages/play.html",
 	"/profile": "pages/profile.html",
+	"/chat": "pages/chat.html",
 	"/auth": "pages/auth.html",
 };
 
@@ -27,15 +24,20 @@ const handleLocation = async () => {
 	const html = await fetch(route).then((data) => data.text());
 	document.getElementById("container").innerHTML = html;
 
-	if (path === "/signup") {
+	if (path === "/signup")
 		initSignupForm();
-	}
-	else if (path === "/login") {
+	else if (path === "/login")
 		initLoginForm();
+	else if (path === "/play" || path === "/profile") {
+		applyNavbar();
+		applyChat();
 	}
 	else if (path === "/auth") {
 		getApiToken();
 	}
+	// else if (path === "/chat") {
+	// 	initChat();
+	// }
 }
 
 window.onpopstate = handleLocation;
@@ -48,7 +50,6 @@ const navigateTo = (url) => {
 }
 
 const navigateToOnBootup = () => {
-	// Verificar si la página se ha cargado por primera vez
 	if (window.location.pathname === "/") {
 		navigateTo("/login");
 	}
@@ -57,43 +58,3 @@ const navigateToOnBootup = () => {
 }
 
 navigateToOnBootup();
-
-/* 
-renderInitialPage = () => {
-	navigateTo("/login");
-}
- */
-// Inicializar el formulario de registro
-/* function initSignupForm() {
-	const signupForm = document.querySelector("#signupForm");
-
-	if (signupForm) {
-		signupForm.addEventListener("submit", function(event) {
-			event.preventDefault();
-
-			const formData = new FormData(event.target);
-			let jsonData = {};
-
-			formData.forEach((value, key) => {
-				jsonData[key] = value;
-			});
-
-			fetch("/api/signup/", {
-				method: "POST",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(jsonData)
-			})
-			.then(response => response.json())
-			.then(data => {
-				console.log("Success", data);
-				// Si el registro es exitoso, redirigir a la página de login u otra página
-				loginPage();
-			})
-			.catch((error) => {
-				console.error("Error: ", error);
-			});
-		});
-	}
-} */
