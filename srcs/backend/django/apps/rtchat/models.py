@@ -2,10 +2,12 @@ from tkinter import CASCADE
 from django.db import models
 from user.models import AppUser
 import shortuuid
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
 class ChatGroup(models.Model):
-    group_name = models.CharField(max_length=128, unique=True, default=shortuuid.uuid)
+    group_name = models.CharField(max_length=128, unique=True, blank=True)
     users_online = models.ManyToManyField(
         AppUser, related_name="online_in_groups", blank=True
     )
@@ -54,3 +56,9 @@ class Block(models.Model):
 
     def __str__(self):
         return f"{self.blocker} blocked {self.blocked}"
+
+
+@receiver(pre_save, sender=ChatGroup)
+def set_group_name(sender, instance, **kwargs):
+    if not instance.group_name:
+        instance.group_name = shortuuid.uuid()
