@@ -33,9 +33,9 @@ const handleLocation = async () => {
 	else if (path === "/login") {
 		initLoginForm();
 	}
-	else if (path === "/chat") {
-		initChat();
-	}
+	// else if (path === "/chat") {
+	// 	initChat();
+	// }
 }
 
 window.onpopstate = handleLocation;

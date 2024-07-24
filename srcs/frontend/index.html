@@ -10,6 +10,23 @@
 	<link rel="stylesheet" href="styles/style-profile.css" />
 	<link rel="stylesheet" href="styles/style-play.css" />
 	<link rel="stylesheet" href="styles/style.css" />
+	<style>
+        #chat-container {
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #chat-log {
+            flex: 1;
+            overflow-y: auto;
+        }
+        #chat-message-input {
+            width: calc(100% - 90px);
+        }
+        #chat-message-submit {
+            width: 80px;
+        }
+    </style>
 </head>
 <body data-bs-theme="dark">
 	<div id="particles-js" ></div>
