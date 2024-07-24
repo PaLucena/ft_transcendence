@@ -1,5 +1,5 @@
 function applyChat() {
-	fetch('components/chat/chat.html')
+	fetch('components/chat/chatBtn.html')
 		.then(response => response.text())
 		.then(data => {
 			document.getElementById('chat-placeholder').innerHTML = data;
