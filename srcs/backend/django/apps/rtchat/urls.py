@@ -1,6 +1,6 @@
 from django.urls import path
-from rtchat.views import room
+from rtchat.views import chat_view
 
 urlpatterns = [
-    path("<str:room_name>/", room, name="room"),
+    path("<str:chatroom_name>/", chat_view, name="room"),
 ]

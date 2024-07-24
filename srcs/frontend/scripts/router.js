@@ -17,7 +17,7 @@ const routes = {
 	"/signup": "pages/signup.html",
 	"/play": "pages/play.html",
 	"/profile": "pages/profile.html",
-	"/chat": "pages/chatroom.html",
+	"/chat": "pages/chat.html",
 };
 
 const handleLocation = async () => {
@@ -32,6 +32,9 @@ const handleLocation = async () => {
 	}
 	else if (path === "/login") {
 		initLoginForm();
+	}
+	else if (path === "/chat") {
+		initChat();
 	}
 }
 
