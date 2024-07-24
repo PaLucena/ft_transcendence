@@ -1,0 +1,110 @@
+services:
+  nginx:
+    container_name: nginx
+    build:
+      context: ./srcs/backend/nginx
+    ports:
+      - "8080:8080"
+    volumes:
+      - webcnt_volume:/var/www/html
+      - ssl_volume:/etc/nginx/ssl
+    restart: always
+    env_file: srcs/.env
+    depends_on:
+      - django
+    networks:
+      - transcendence_net
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: on-failure
+    networks:
+      - transcendence_net
+    expose:
+      - "6379"
+    env_file: srcs/.env
+
+  postgres:
+    container_name: postgres
+    image: bitnami/postgresql:16.2.0-debian-12-r8
+    env_file: srcs/.env
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    expose:
+      - "5432"
+    networks:
+      - transcendence_net
+    restart: unless-stopped
+
+  django:
+    container_name: django
+    build:
+      context: ./srcs/backend/django
+    env_file: srcs/.env
+    depends_on:
+      - postgres
+      - redis
+      - blockchain
+    volumes:
+      - django_volume:/app
+      - blockchain_volume:/blockchain_shared
+    ports:
+      - "8000:8000"
+    networks:
+      - transcendence_net
+    restart: on-failure
+
+  blockchain:
+    container_name: blockchain
+    build:
+      context: ./srcs/backend/blockchain
+    env_file: srcs/.env
+    volumes:
+      - blockchain_volume:/app/blockchain_shared
+    ports:
+      - "8545:8545"
+    networks:
+      - transcendence_net
+    restart: unless-stopped
+
+volumes:
+  webcnt_volume:
+    name: webcnt_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/frontend
+      o: bind
+
+  db_volume:
+    name: db_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/${USER}/data/db_volume
+      o: bind
+
+  ssl_volume:
+    name: ssl_volume
+
+  django_volume:
+    name: django_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/backend/django/apps
+      o: bind
+
+  blockchain_volume:
+    name: blockchain_volume
+    driver: local
+    driver_opts:
+      type: none
+      device: ./srcs/backend/blockchain/blockchain_shared
+      o: bind
+
+networks:
+  transcendence_net:
+    name: transcendence_net
+    driver: bridge

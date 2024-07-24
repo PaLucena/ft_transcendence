@@ -1,0 +1,138 @@
+#navbar-placeholder {
+	height: 10vh;
+	margin: 0;
+	margin-bottom: 0;
+	padding: 0;
+}
+
+#rootPlay {
+	box-sizing: border-box;
+	margin: 0;
+	margin-top: 0;
+	padding: 0;
+	background-size: 100% 100%;
+	height: 90vh;
+	background-repeat: no-repeat;
+}
+
+#left, #right {
+	height: 100%;
+}
+
+#left {
+	position: relative;
+	align-items: center;
+	justify-content: center;
+}
+
+#left .btn {
+	background-color: #192e2f;
+}
+
+#btns {
+	position: absolute;
+	align-items: center;
+	width: 80%;
+	left: 10%;
+	top: 25%;
+	z-index: 1;
+}
+
+#btns #oneVSone {
+	margin-top: 7vh;
+	margin-left: 0;
+}
+
+#btns #tournament {
+	margin-top: 10vh;
+	margin-bottom: 5vh;
+	margin-left: 0;
+}
+
+#dropdownOne {
+	display: none;
+	position: absolute;
+	justify-content: center;
+	width: 80%;
+	height: 74%;
+	left: 10%;
+	top: 13%;
+	z-index: 2;
+	border-radius: 3%;
+}
+
+#dropdownOne #vsIA {
+	margin-top: 7vh;
+	margin-left: 0;
+}
+
+#dropdownOne #local {
+	margin-top: 7vh;
+	margin-left: 0;
+}
+
+#dropdownOne #online {
+	margin-top: 7vh;
+	margin-bottom: 0;
+	margin-left: 0;
+}
+
+#dropdownOne #back {
+	position: relative;
+	margin-bottom: 0;
+}
+
+#dropdownOne #back button {
+	background-color: #425f4b;
+}
+
+#dropdownTwo {
+	display: none;
+	position: absolute;
+	justify-content: center;
+	width: 80%;
+	height: 74%;
+	left: 10%;
+	top: 13%;
+	z-index: 2;
+	border-radius: 3%;
+}
+
+#dropdownTwo #create {
+	margin-top: 15vh;
+	margin-left: 0;
+}
+
+#dropdownTwo #join {
+	margin-top: 10vh;
+	margin-left: 0;
+}
+
+#dropdownTwo #back {
+	margin-bottom: 0;
+}
+
+#dropdownTwo #back button {
+	background-color: #425f4b;
+}
+
+#pongGIF {
+	position: absolute;
+}
+
+#pongGIF img {
+	height: 70vh;
+	margin-top: 10vh;
+	margin-left: 0;
+	margin-right: 5vh;
+}
+
+#chat-placeholder {
+	position: absolute;
+	display: flex;
+	justify-content: right;
+	z-index: 3;
+	bottom: 0;
+	right: 0.5%;
+	margin-bottom: 2vh;
+}
