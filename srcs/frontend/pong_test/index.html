@@ -1,0 +1,41 @@
+
+<!DOCTYPE html> 
+<html lang="en"> 
+  
+<head> 
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content= 
+        "width=device-width, initial-scale=1.0"> 
+    <title>PONG GAME</title> 
+    <link rel="stylesheet" href="style.css"> 
+</head> 
+  
+<body> 
+    <div class="scoreboard">
+        <h1 class="player_name player1_name">player1</h1>
+        <div><img class="avatar avatar_1" src="p1.jpg" alt="avatar 1"></div>
+        <div><h1 class="player_score score_1 color_1">0</h1></div>
+        <div><h1 class="score_text">Score<br>-<br>(<span class="goals">0</span>)</h1></div>
+        <div><h1 class="player_score score_2 color_2">0</h1></div>
+        <div><img class="avatar avatar_2" src="p2.jpg" alt="avatar 2"></div>
+        <h1 class="player_name player2_name">player2</h1>
+    </div>
+    <div class="board">
+        <div class='ball'>
+            <div class="ball_effect"></div>
+        </div>
+        <div class="paddle_1 paddle"></div> 
+        <div class="paddle_2 paddle"></div>
+        <div class="info_text">
+            <h1 class="message">Press Enter to Start</h1>
+            <div class="controls_container">
+                <h2 class="controls_1">W (up)<br>S (down)</h2>
+                <h2 class="controls_2">Arrow Up<br>Arrow Down</h2>
+            </div>
+        </div>
+    </div> 
+      
+    <script src="index.js"></script> 
+</body> 
+  
+</html> 
