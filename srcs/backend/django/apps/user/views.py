@@ -21,6 +21,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
+from django.conf import settings
+import os
 import requests
 
 @api_view(["POST"])
@@ -303,17 +307,17 @@ def delete_account(request):
 @api_view(["POST"])
 def ftapiLogin(request):
 	code = request.data.get("api-code");
-	print("code:", code)
 	ftapiresponse = requests.post("https://api.intra.42.fr/v2/oauth/token", params={
 		"grant_type": "authorization_code",
-		"client_id": "u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6",
-		"client_secret": "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",
+		"client_id": os.environ("42API_UID"),
+		"client_secret": os.environ("42API_SECRET"),
 		"code": code,
-		"redirect_uri": "https://localhost:8080/auth",
+		"redirect_uri": os.environ("42API_URI"),
 	})
-	print(ftapiresponse)
+
 	if ftapiresponse == None:
 		return Response(status=status.HTTP_400_BAD_REQUEST)
+
 	token42 = json.loads(ftapiresponse.content)
 	user_info_response = requests.get("https://api.intra.42.fr/v2/me", params={"access_token": token42["access_token"]})
 	user_json = json.loads(user_info_response.content)
@@ -321,10 +325,25 @@ def ftapiLogin(request):
 		return Response(status=status.HTTP_409_CONFLICT)
 	if AppUser.objects.filter(username=user_json["login"]):
 		return Response(status=status.HTTP_409_CONFLICT)
+
+	imageResponse = requests.get(user_json["image"]["link"])
+	if imageResponse.status_code == 200:
+		img_temporary = NamedTemporaryFile(delete=True)
+		img_temporary.write(imageResponse.content)
+		img_temporary.flush()
+		save_path = os.path.join(settings.MEDIA_ROOT, 'avatars', user_json["login"] + ".jpg")
+		if not os.path.exists(os.path.dirname(save_path)):
+			os.makedirs(os.path.dirname(save_path))
+		with open(save_path, 'wb') as f:
+			for chunck in imageResponse.iter_content(chunk_size=8192):
+				f.write(chunck)
+	else:
+		return Response(status=status.HTTP_409_CONFLICT)
+
 	NewuserJson = {
 		'username': user_json["login"],
 		'email': user_json["email"],
-		'avatar': user_json["image"]["link"]
+		'avatar': "avatars/" + user_json["login"] + ".jpg"
 	}
 	user = AppUser.objects.create_user(**NewuserJson)
 
