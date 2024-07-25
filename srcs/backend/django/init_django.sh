@@ -14,6 +14,14 @@ while [ $STATUS -ne 0 ]; do
     fi
 done
 
+# Esperar a que la blockchain esté lista
+echo "Waiting for blockchain to be ready..."
+while [ ! -f ./blockchain_shared/pong_contract.json ]; do
+    sleep 1
+done
+echo "Blockchain is ready"
+
+
 # Aplicar migraciones
 python3 /app/manage.py makemigrations
 python3 /app/manage.py migrate
