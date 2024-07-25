@@ -7,3 +7,6 @@ SELECT * FROM user_appuser;
 to start app:
 naviagte to dir where manage.py is located
 run: django-admin startapp name
+
+To login in as a RANDOM USER use password:
+123

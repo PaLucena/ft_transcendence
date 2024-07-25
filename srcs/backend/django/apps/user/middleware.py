@@ -14,4 +14,5 @@ class UpdateLastSeenMiddleware:
 			User = get_user_model()
 			user = User.objects.get(username=request.user)
 			user.last_seen = timezone.now()
+			user.save()
 		return response
