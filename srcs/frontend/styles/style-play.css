@@ -15,17 +15,36 @@
 	background-repeat: no-repeat;
 }
 
-#left, #right {
+#gifContainer {
+	background-color: black;
+	border-radius: 2%;
+	position: relative;
+	z-index: 1;
+	width: 90%;
+	height: 90%;
+	justify-content: center;
+}
+
+#pongGIF {
+	position: absolute;
+	height: 80%;
+	margin-top: 5%;
+}
+
+#pongGIF img {
 	height: 100%;
 }
 
-#left {
-	position: relative;
+#btnsContainer {
+	position: absolute;
+	display: flex;
+	height: 100%;
+	z-index: 2;
 	align-items: center;
 	justify-content: center;
 }
 
-#left .btn {
+#btnsContainer .btn {
 	background-color: #192e2f;
 }
 
@@ -35,7 +54,7 @@
 	width: 80%;
 	left: 10%;
 	top: 25%;
-	z-index: 1;
+	z-index: 2;
 }
 
 #btns #oneVSone {
@@ -57,7 +76,7 @@
 	height: 74%;
 	left: 10%;
 	top: 13%;
-	z-index: 2;
+	z-index: 3;
 	border-radius: 3%;
 }
 
@@ -72,17 +91,6 @@
 
 #dropdownOne #back button, #dropdownTwo #back button {
 	background-color: #425f4b;
-}
-
-#pongGIF {
-	position: absolute;
-}
-
-#pongGIF img {
-	height: 70vh;
-	margin-top: 10vh;
-	margin-left: 0;
-	margin-right: 5vh;
 }
 
 #chat-placeholder {
