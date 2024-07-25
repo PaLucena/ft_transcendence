@@ -23,16 +23,17 @@ class UserSerializerClass(ModelSerializer):
 			raise serializers.ValidationError({"error": "This email is already in use."})
 		return value
 
-	def validate_nickname(self, value):
-		if AppUser.objects.filter(nickname__iexact=value).exists():
-			raise serializers.ValidationError({"error": "This nickname is already in use."})
-		return value
+	#nickanme would be set before toeurnamet
+	# def validate_nickname(self, value):
+	# 	if AppUser.objects.filter(nickname__iexact=value).exists():
+	# 		raise serializers.ValidationError({"error": "This nickname is already in use."})
+	# 	return value
 
 	def validate_avatar(self, value):
 		if value:
 			if not value.content_type.startswith('image'):
 				raise serializers.ValidationError("Only image files are allowed.")
-			if value.size > 5 * 1024 * 1024:  # Limit file size to 5 MB
+			if value.size > 5 * 1024 * 1024:  # limit file size to 5 MB
 				raise serializers.ValidationError("Avatar size must not exceed 5 MB.")
 		return value
 
