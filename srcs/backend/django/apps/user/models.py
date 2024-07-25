@@ -10,12 +10,8 @@ class AppUser(AbstractUser):
 	last_seen = models.DateTimeField(null=True, blank=True)
 	online = models.CharField(max_length=100, default="offline")
 	image_link = models.URLField(null=True, blank=True)
-	games_played = models.IntegerField(default=0)
-	games_won = models.IntegerField(default=0)
-	games_lost = models.IntegerField(default=0)
 	id_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
-	# #updated = models.DateTimeField(auto_now=True)
 
 	def anonymize(self):
 		unique_suffix = get_random_string(length=6)

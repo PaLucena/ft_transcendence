@@ -98,11 +98,7 @@ volumes:
 
   blockchain_volume:
     name: blockchain_volume
-    driver: local
-    driver_opts:
-      type: none
-      device: ./srcs/backend/blockchain/blockchain_shared
-      o: bind
+
 
 networks:
   transcendence_net:

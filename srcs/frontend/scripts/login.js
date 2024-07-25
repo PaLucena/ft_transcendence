@@ -30,6 +30,7 @@ function initLoginForm() {
 		})
 		.then(data => {
 			console.log("Login successful", data);
+			localStorage.setItem("token", data.token);
 			navigateTo("/play");
 		})
 		.catch((error) => {

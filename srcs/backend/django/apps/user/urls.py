@@ -13,8 +13,6 @@ urlpatterns = [
 	path('signup/', views.signup),
 	path('test-view/', views.TestView),
 	path('logout/', views.logout),
-	path('setnickname/', views.set_nickname),
-	path('uploadavatar/', views.upload_avatar),
 	path('updateuserinfo/', views.update_user_info),
 	path('invite_friend/', views.invite_friend, name='invite_friend'),
 	path('accept_friend_request/', views.accept_friend_request, name='accept_friend_request'),

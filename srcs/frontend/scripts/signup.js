@@ -31,6 +31,7 @@ function initSignupForm() {
 		})
 		.then(data => {
 			console.log("Success", data);
+			localStorage.setItem("token", data.token);
 			navigateTo("/play");
 		})
 		.catch((error) => {

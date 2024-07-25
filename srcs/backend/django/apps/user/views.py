@@ -5,6 +5,7 @@ from urllib.robotparser import RequestRate
 from django.core import serializers
 from django.shortcuts import render
 from django.template import context
+from django.template.defaulttags import csrf_token
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import AbstractUser, User
 from rest_framework.response import Response
@@ -26,11 +27,10 @@ from django.core.files.temp import NamedTemporaryFile
 from django.conf import settings
 import os
 import requests
+from .utils import set_nickname, upload_avatar
 
 @api_view(["POST"])
 def signup(request):
-	print("REGISTER header:", request.headers)
-	print("REGISTER body:", request.data)
 	serializer = UserSerializerClass(data=request.data)
 	if serializer.is_valid():
 		try:
@@ -42,7 +42,6 @@ def signup(request):
 				'message': 'Signup successful',
 				'user': {
 					'username': user.username,
-					'nickname': user.nickname,
 					'avatar': user.avatar.url if user.avatar else None
 				}
 			}
@@ -64,16 +63,13 @@ def login(request):
 	authenticated_user: AbstractUser | None = authenticate(username=username, password=password)
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
-		user.online = 'online'
+		#user.online = 'online'
 		user.save()
-		#login(request, user)
 		response_data = {
 			'message': 'Login successful',
 			'user': {
 				'username': user.username,
-				'nickname': user.nickname,
 				'avatar': user.avatar.url,
-				#'score': getattr(user, 'score', '0'),
 				#'jwt_token': encoded_token,
 			}
 		}
@@ -99,47 +95,10 @@ def TestView(request):
 @permission_classes([IsAuthenticated])
 def logout(request):
 	user= request.user #delete later
-	user.online = 'offline' #delete later
+	#user.online = 'offline' #delete later
 	request.user.auth_token.delete()
 	user.save()
 	return Response({"message": "logout was successful"})
-
-
-@permission_classes([IsAuthenticated])
-def set_nickname(request):
-	nickname = request.data.get('nickname')
-
-	user = request.user
-	if AppUser.objects.filter(nickname__iexact=nickname).exclude(pk=user.pk).exists():
-		return Response({"error": "This nickname is already in use."}, status=status.HTTP_400_BAD_REQUEST)
-
-	if not nickname:
-		user.nickname = user.username
-
-	else:
-		user.nickname = nickname
-	user.save()
-	return Response({"message": nickname}, status=status.HTTP_200_OK) #???? might delete
-
-
-@login_required
-def upload_avatar(request):
-	try:
-		user = request.user
-		file = request.FILES.get('image')
-
-		if file.size == 0:
-			return Response({'error': 'File is empty'}, status=status.HTTP_400_BAD_REQUEST)
-		elif not file.content_type.startswith('image'):
-			return Response({'error': 'Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
-
-		user.avatar = file
-		user.save()
-		print("user avatar:", user.avatar)
-		return Response({'message': 'Avatar updated successfully.'}, status=status.HTTP_200_OK)
-
-	except Exception as e:
-		return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
 
 
 @api_view(["POST"])
