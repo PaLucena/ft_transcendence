@@ -44,7 +44,8 @@
 }
 
 #btnsContainer .btn {
-	background-color: #192e2f;
+	background-color: #3a595c;
+	border: 1px solid white;
 }
 
 #btns {
@@ -89,7 +90,8 @@
 }
 
 #dropdownOne #back button, #dropdownTwo #back button {
-	background-color: #425f4b;
+	background-color: #7ba9a9;
+	color: white;
 }
 
 #chat-placeholder {
