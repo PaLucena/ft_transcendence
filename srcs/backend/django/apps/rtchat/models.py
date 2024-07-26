@@ -4,6 +4,7 @@ from user.models import AppUser
 import shortuuid
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from channels.db import database_sync_to_async
 
 
 class ChatGroup(models.Model):
@@ -56,6 +57,11 @@ class Block(models.Model):
 
     def __str__(self):
         return f"{self.blocker} blocked {self.blocked}"
+
+    @staticmethod
+    @database_sync_to_async
+    def is_blocked(blocker, blocked):
+        return Block.objects.filter(blocker=blocker, blocked=blocked).exists()
 
 
 @receiver(pre_save, sender=ChatGroup)

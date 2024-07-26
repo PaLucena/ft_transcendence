@@ -1,7 +1,7 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
-from rtchat.models import ChatGroup, GroupMessage
-import json
+from user.models import AppUser
+from rtchat.models import ChatGroup, GroupMessage, Block
 
 
 class ChatroomConsumer(AsyncJsonWebsocketConsumer):
@@ -44,7 +44,7 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
                 "message_id": message.id,
                 "body": message.body,
                 "author": self.user.username,
-                "created": message.created.isoformat(),  # or any other date format
+                "created": message.created.isoformat(),
             },
         )
 
@@ -57,6 +57,11 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
         body = event["body"]
         author = event["author"]
         created = event["created"]
+
+        author_user = await database_sync_to_async(AppUser.objects.get)(username=author)
+
+        if await Block.is_blocked(self.user, author_user):
+            return
 
         await self.send_json(
             {
