@@ -33,15 +33,6 @@ class GroupMessage(models.Model):
     class Meta:
         ordering = ["-created"]
 
-    @staticmethod
-    def get_messages_for_user(user, group):
-        blocked_users = Block.objects.filter(blocker=user).values_list(
-            "blocked", flat=True
-        )
-        return GroupMessage.objects.filter(group=group).exclude(
-            author__in=blocked_users
-        )
-
 
 class Block(models.Model):
     blocker = models.ForeignKey(
