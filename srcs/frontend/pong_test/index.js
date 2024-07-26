@@ -22,10 +22,19 @@ let vy = 6;
 let dx = Math.random() < 0.5 ? -1 : 1;
 let dy = Math.random() < 0.5 ? -1 : 1;
 
+let player1_color = getComputedStyle(document.documentElement).getPropertyValue('--p1-color');
+let player2_color = getComputedStyle(document.documentElement).getPropertyValue('--p2-color');
+let ball_color = getComputedStyle(document.documentElement).getPropertyValue('--ball-color');
+
 let goals2win = 5;
 let goal_dif = 2;
 let goals = document.querySelector('.goals');
 goals.innerHTML = `${goals2win} + ${goal_dif}`;
+
+let init_velocity = 6;
+let inc_velocity = 0.5;
+
+let paddle_margin = 35;
 
 let paddle1Interval;
 let paddle2Interval;
@@ -169,11 +178,11 @@ function moveBall()
             return;
         }
         if (score_1_value >= goals2win - 1 && score_1_value - score_2_value >= goal_dif - 1) {
-            ball_effect.style.boxShadow = 'inset 0 0 20px #fff, 0 0 20px #318bf1';
+            ball_effect.style.boxShadow = `inset 0 0 20px #fff, 0 0 20px ${player1_color}`;
         } else if (score_2_value >= goals2win - 1 && score_2_value - score_1_value >= goal_dif - 1) {
-            ball_effect.style.boxShadow = 'inset 0 0 20px #fff, 0 0 20px #f15331';
+            ball_effect.style.boxShadow = `inset 0 0 20px #fff, 0 0 20px ${player2_color}`;
         } else {
-            ball_effect.style.boxShadow = 'inset 0 0 20px #fff';
+            ball_effect.style.boxShadow = `inset 0 0 20px ${ball_color}`;
         }
         resetGame();
         return;
@@ -186,16 +195,16 @@ function moveBall()
 }
 
 function increaseSpeed() {
-    vx += 0.5;
-    vy += 0.5;
+    vx += inc_velocity;
+    vy += inc_velocity;
 }
 
 function resetGame() {
     ball.style.top = `${initial_ball_coord.top}` + 'px';
     ball.style.left = `${initial_ball_coord.left}` + 'px';
 
-    vx = 6;
-    vy = 6;
+    vx = init_velocity;
+    vy = init_velocity;
     dx = Math.random() < 0.5 ? -1 : 1;
     dy = Math.random() < 0.5 ? -1 : 1;
 
