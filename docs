@@ -10,3 +10,12 @@ run: django-admin startapp name
 
 To login in as a RANDOM USER use password:
 123
+
+{
+    "message": "Login successful",
+    "user": {
+        "username": "emily01",
+        "avatar": "/media/default/default.jpg"
+    },
+    "token": "48ae604780aef59e3f0e9abfafc432e54c527123"  acces token 
+}

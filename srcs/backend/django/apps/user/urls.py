@@ -4,7 +4,7 @@ from . import consumers
 
 """ urlpatterns = [
 	
-    path('', views.members, name='members'),
+	path('', views.members, name='members'),
 	path('room/<str:pk>/', views.room, name="room"),
 ] """
 

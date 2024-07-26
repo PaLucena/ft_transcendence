@@ -1,3 +1,7 @@
+function getToken() {
+	return sessionStorage.getToken("token");
+}
+
 function initLoginForm() {
 	const loginForm = document.querySelector("#loginForm");
 
@@ -30,6 +34,7 @@ function initLoginForm() {
 		})
 		.then(data => {
 			console.log("Login successful", data);
+			//sessionStorage.setItem("token", data.token);
 			navigateTo("/play");
 		})
 		.catch((error) => {
@@ -37,3 +42,18 @@ function initLoginForm() {
 		})
 	})
 }
+
+// function getCSRFToken(csrftoken) {
+// 	var cookieValue = null;
+// 	if (document.cookie && document.cookie != '') {
+// 		var cookies = document.cookie.split(';');
+// 		for (var i = 0; i < cookies.length; i++) {
+// 			var cookie = jQuery.trim(cookies[i]);
+// 			if (cookie.substring(0, 10) == (csrftoken + '=')) {
+// 				cookieValue = decodeURIComponent(cookie.substring(10));
+// 				break;
+// 			}
+// 		}
+// 	}
+// 	return cookieValue;
+// }
