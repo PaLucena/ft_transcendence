@@ -1,4 +1,4 @@
-let gameState = 'ready';
+// Read info from CSS variables
 let paddle_1 = document.querySelector('.paddle_1');
 let player1_name = document.querySelector('.player1_name');
 let paddle_2 = document.querySelector('.paddle_2');
@@ -22,19 +22,24 @@ let vy = 6;
 let dx = Math.random() < 0.5 ? -1 : 1;
 let dy = Math.random() < 0.5 ? -1 : 1;
 
+
+let gameState = 'ready';
+
 let player1_color = getComputedStyle(document.documentElement).getPropertyValue('--p1-color');
 let player2_color = getComputedStyle(document.documentElement).getPropertyValue('--p2-color');
 let ball_color = getComputedStyle(document.documentElement).getPropertyValue('--ball-color');
 
+// Game settings
 let goals2win = 5;
 let goal_dif = 2;
+let init_velocity = 6;
+let inc_velocity = 0.5;
+let paddle_margin = 35;
+
+// Game settings (applying in frontend)
 let goals = document.querySelector('.goals');
 goals.innerHTML = `${goals2win} + ${goal_dif}`;
 
-let init_velocity = 6;
-let inc_velocity = 0.5;
-
-let paddle_margin = 35;
 
 let paddle1Interval;
 let paddle2Interval;
@@ -111,11 +116,11 @@ function movePaddle(paddle, direction) {
     let paddle_coord = paddle.getBoundingClientRect();
     if (direction === -1)
         paddle.style.top = Math.max(
-            board.getBoundingClientRect().top + 35,
+            board.getBoundingClientRect().top + paddle_margin,
             paddle_coord.top + direction * window.innerHeight * 0.004) + 'px';
     else
         paddle.style.top = Math.min(
-            board.getBoundingClientRect().bottom - paddle_common.height - 35,
+            board.getBoundingClientRect().bottom - paddle_common.height - paddle_margin,
             paddle_coord.top + direction * window.innerHeight * 0.004) + 'px';
 }
 
