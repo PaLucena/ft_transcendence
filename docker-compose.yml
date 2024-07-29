@@ -27,12 +27,6 @@ services:
     env_file: srcs/.env
     volumes:
       - redis_volume:/data
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: "256M"
-    privileged: true
 
   postgres:
     container_name: postgres
