@@ -96,11 +96,80 @@ function addMessageToChat(message) {
     messageElement.innerHTML = `
         <strong>${message.author}:</strong> ${message.body} <br>
         <span class="text-gray-500 text-sm">${new Date(message.created).toLocaleTimeString()}</span>
+        <button class="block-user btn btn-danger btn-sm" data-username="${message.author}">Block</button>
+        <button class="unblock-user btn btn-success btn-sm" data-username="${message.author}">Unblock</button>
     `;
     chatMessages.appendChild(messageElement);
+
+    messageElement.querySelector('.block-user').addEventListener('click', function() {
+        blockUser(message.author);
+    });
+
+    messageElement.querySelector('.unblock-user').addEventListener('click', function() {
+        unblockUser(message.author);
+    });
 }
 
 function scrollToBottom() {
     const container = document.getElementById("chat-log");
     container.scrollTop = container.scrollHeight;
+}
+
+function blockUser(username) {
+    const chatroomName = 'public-chat';
+    const csrfToken = getCookie('csrftoken');
+
+    fetch(`/api/chat/block_user/${chatroomName}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ blocked_username: username })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.detail);
+    })
+    .catch(error => {
+        console.error("Block user error:", error);
+        alert("Error on blocking user.");
+    });
+}
+
+function unblockUser(username) {
+    const chatroomName = 'public-chat';
+    const csrfToken = getCookie('csrftoken');
+
+    fetch(`/api/chat/unblock_user/${chatroomName}/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+        },
+        body: JSON.stringify({ blocked_username: username })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.detail);
+    })
+    .catch(error => {
+        console.error("Unblock user error:", error);
+        alert("Error on unblocking user.");
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }

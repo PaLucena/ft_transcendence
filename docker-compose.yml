@@ -17,13 +17,16 @@ services:
 
   redis:
     container_name: redis
-    image: redis:latest
+    build:
+      context: ./srcs/backend/redis
     restart: on-failure
     networks:
       - transcendence_net
     expose:
       - "6379"
     env_file: srcs/.env
+    volumes:
+      - redis_volume:/data
 
   postgres:
     container_name: postgres
@@ -86,7 +89,12 @@ volumes:
       o: bind
 
   ssl_volume:
+    driver: local
     name: ssl_volume
+
+  redis_volume:
+    driver: local
+    name: redis_volume
 
   django_volume:
     name: django_volume
@@ -97,6 +105,7 @@ volumes:
       o: bind
 
   blockchain_volume:
+    driver: local
     name: blockchain_volume
 
 
