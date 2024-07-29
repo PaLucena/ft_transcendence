@@ -32,9 +32,6 @@ const handleLocation = async () => {
 		applyNavbar();
 		applyChat();
 	}
-	// else if (path === "/chat") {
-	// 	initChat();
-	// }
 }
 
 window.onpopstate = handleLocation;
