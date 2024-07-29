@@ -286,17 +286,17 @@ def ftapiLogin(request):
 	try:
 		ExistingUser = AppUser.objects.get(username=user_json["login"])
 		if not ExistingUser.api42auth:
-			return Response(status=status.HTTP_409_CONFLICT)
+			return Response({'error': 'Username already in use'}, status=status.HTTP_409_CONFLICT)
 		userJson = {
 			'username': user_json["login"],
 			'email': user_json["email"],
 			'avatar': "avatars/" + user_json["login"] + ".jpg"
 		}
-		return Response(data=user_json, status=status.HTTP_201_CREATED)
+		return Response(data=user_json, status=status.HTTP_200_OK)
 	except AppUser.DoesNotExist:
 		pass
 	if AppUser.objects.filter(email=user_json["email"]):
-		return Response(status=status.HTTP_409_CONFLICT)
+		return Response({'error': 'Email already in use'}, status=status.HTTP_409_CONFLICT)
 
 	imageResponse = requests.get(user_json["image"]["link"])
 	if imageResponse.status_code == 200:
@@ -310,7 +310,7 @@ def ftapiLogin(request):
 			for chunck in imageResponse.iter_content(chunk_size=8192):
 				f.write(chunck)
 	else:
-		return Response(status=status.HTTP_409_CONFLICT)
+		return Response({'error': 'Error getting the user image'}, status=status.HTTP_409_CONFLICT)
 
 	NewuserJson = {
 		'username': user_json["login"],
