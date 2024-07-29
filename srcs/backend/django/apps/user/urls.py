@@ -19,6 +19,7 @@ urlpatterns = [
 	path('remove_friend/', views.remove_friend, name='remove_friend'),
 	path('get_friends/', views.get_friends, name='get_friends'),
 	path('delete_account/', views.delete_account, name='delete_account'),
+	path('42api-login/', views.ftapiLogin, name='ftapiLogin'),
 
 
 	path('api/login/', views.login),

@@ -268,11 +268,13 @@ def ftapiLogin(request):
 	code = request.data.get("api-code");
 	ftapiresponse = requests.post("https://api.intra.42.fr/v2/oauth/token", params={
 		"grant_type": "authorization_code",
-		"client_id": os.environ("42API_UID"),
-		"client_secret": os.environ("42API_SECRET"),
+		"client_id": os.getenv("API42_UID"),
+		"client_secret": os.getenv("API42_SECRET"),
 		"code": code,
-		"redirect_uri": os.environ("42API_URI"),
+		"redirect_uri": os.getenv("API42_URI"),
 	})
+
+	print(ftapiresponse)
 
 	if ftapiresponse == None:
 		return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -280,9 +282,20 @@ def ftapiLogin(request):
 	token42 = json.loads(ftapiresponse.content)
 	user_info_response = requests.get("https://api.intra.42.fr/v2/me", params={"access_token": token42["access_token"]})
 	user_json = json.loads(user_info_response.content)
+	
+	try:
+		ExistingUser = AppUser.objects.get(username=user_json["login"])
+		if not ExistingUser.api42auth:
+			return Response(status=status.HTTP_409_CONFLICT)
+		userJson = {
+			'username': user_json["login"],
+			'email': user_json["email"],
+			'avatar': "avatars/" + user_json["login"] + ".jpg"
+		}
+		return Response(data=user_json, status=status.HTTP_201_CREATED)
+	except AppUser.DoesNotExist:
+		pass
 	if AppUser.objects.filter(email=user_json["email"]):
-		return Response(status=status.HTTP_409_CONFLICT)
-	if AppUser.objects.filter(username=user_json["login"]):
 		return Response(status=status.HTTP_409_CONFLICT)
 
 	imageResponse = requests.get(user_json["image"]["link"])
@@ -305,7 +318,8 @@ def ftapiLogin(request):
 		'avatar': "avatars/" + user_json["login"] + ".jpg"
 	}
 	user = AppUser.objects.create_user(**NewuserJson)
-
+	user.api42auth = True
+	user.save()
 	data = {
 		'message': "User successfully logged",
 		'user': NewuserJson
