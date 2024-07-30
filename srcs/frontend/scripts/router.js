@@ -125,9 +125,9 @@ class Auth extends Page {
 }
 
 class Chat extends Page {
-	constructor() {
-		super("/pages/chat.html")
-	}
+    constructor(params = {}) {
+        super("/pages/chat.html", params);
+    }
 
 	async render() {
 		const html = await super.render();
