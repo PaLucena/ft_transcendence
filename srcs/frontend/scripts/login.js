@@ -1,7 +1,8 @@
 
+
 function	getBase64Img(url) {
 	fetch(url, {
-		
+
 	})
 }
 
@@ -46,3 +47,4 @@ function initLoginForm() {
 		})
 	})
 }
+
