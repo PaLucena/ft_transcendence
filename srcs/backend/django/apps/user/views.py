@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from .serializers import UserSerializerClass
 from .models import AppUser, Friend, Match
 from rest_framework import status
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, logout
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
@@ -60,19 +60,26 @@ def login(request):
 		user = AppUser.objects.get(username=username)
 		#user.online = 'online'
 		user.save()
-		response_data = {
-			'message': 'Login successful',
-			'user': {
-				'username': user.username,
-				'avatar': user.avatar.url,
-				#'jwt_token': encoded_token,
-			}
-		}
+		# response_data = {
+		# 	'message': 'Login successful',
+		# 	'user': {
+		# 		'username': user.username,
+		# 		'avatar': user.avatar.url,
+		# 		#'jwt_token': encoded_token,
+		# 	}
+		# }
 
-		token, _ = Token.objects.get_or_create(user=user)
-		response_data['token'] = token.key
+		# token, _ = Token.objects.get_or_create(user=user)
+		# response_data['token'] = token.key
 
-		return Response(response_data, status=status.HTTP_200_OK)
+		refresh = RefreshToken.for_user(user)
+		access = refresh.access_token
+		response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+		response.set_cookie('access_token', str(access), httponly=True, secure=True)
+		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+
+		print("REPONSE FROM LOGIN:", response)
+		return response
 	else:
 		return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 

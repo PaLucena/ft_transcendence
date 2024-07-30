@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken", #delete later
-    'rest_framework_simplejwt',
+    "rest_framework_simplejwt",
+	"rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "blockchain",
     "rtchat",
@@ -125,17 +126,17 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         # "rest_framework.authentication.SessionAuthentication",  # For browsable API
         # "rest_framework.authentication.TokenAuthentication",  # For API clients
+        #"rest_framework.authentication.BasicAuthentication", 
 	    'rest_framework_simplejwt.authentication.JWTAuthentication',
-        #"rest_framework.authentication.BasicAuthentication",
     ],
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'ALGORITHM': 'HS256',

@@ -1,7 +1,3 @@
-function getToken() {
-	return sessionStorage.getToken("token");
-}
-
 function initLoginForm() {
 	const loginForm = document.querySelector("#loginForm");
 
