@@ -210,8 +210,8 @@ class Auth extends Page {
 }
 
 class Chat extends Page {
-    constructor() {
-        super("/pages/chat.html")
+    constructor(params = {}) {
+        super("/pages/chat.html", params);
     }
 
     async render() {
@@ -267,9 +267,6 @@ async function router() {
         }
     });
 
-    console.log(matchedRoute);
-
-    console.log(matchedParams);
     const RouteClass = matchedRoute ? routes[matchedRoute] : routes["/404"];
     const page = new RouteClass(matchedParams);
     const html = await page.render();
