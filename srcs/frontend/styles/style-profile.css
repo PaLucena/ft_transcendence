@@ -23,14 +23,40 @@
 	justify-content: center;
 }
 
-#containerUser #user {
+#containerUser #userInfo {
 	background-color: #edeef0;
+	color: black;
 	margin-top: 10vh;
 	margin-left: 8%;
 	height: 90%;
 	width: 90%;
 	border-top-left-radius: 3%;
 	border-top-right-radius: 3%;
+}
+
+#user {
+	font-size: xx-large;
+}
+
+#userInfo #photo {
+	position: relative;
+	margin-top: 6%;
+	height: 20%;
+	justify-content: center;
+}
+
+#photo #photoContainer {
+	position: absolute;
+	height: 150%;
+	bottom: 0;
+}
+
+#photo #photoContainer img {
+	border: 2px solid #192e2f;
+}
+
+#edit button {
+	background-color: #3a595c;
 }
 
 #containerStats {

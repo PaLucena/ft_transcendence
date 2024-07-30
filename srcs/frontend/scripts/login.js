@@ -1,10 +1,3 @@
-
-function	getBase64Img(url) {
-	fetch(url, {
-		
-	})
-}
-
 function initLoginForm() {
 	const loginForm = document.querySelector("#loginForm");
 
