@@ -23,7 +23,8 @@ function initLoginForm() {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(jsonData)
+			body: JSON.stringify(jsonData),
+			credentials: 'include'
 		})
 		.then(response => {
 			if (response.status === 200)
@@ -38,7 +39,7 @@ function initLoginForm() {
 		.then(data => {
 			console.log("Login successful", data);
 			//localStorage.setItem("token", data.token);
-			localStorage.setItem("avatar", getBase64Img(data.user.avatar));
+			//localStorage.setItem("avatar", getBase64Img(data.user.avatar));
 			navigateTo("/play");
 		})
 		.catch((error) => {

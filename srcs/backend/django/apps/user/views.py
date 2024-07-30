@@ -16,7 +16,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, logout
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
@@ -31,6 +31,7 @@ from .utils import set_nickname, upload_avatar
 
 @api_view(["POST"])
 def signup(request):
+	#permission_classes = [AllowAny] might set up later
 	serializer = UserSerializerClass(data=request.data)
 	if serializer.is_valid():
 		try:
@@ -54,6 +55,7 @@ def signup(request):
 
 @api_view(["POST"])
 def login(request):
+	#permission_classes = [AllowAny]
 	username = request.data.get('username')
 	password = request.data.get('password')
 
@@ -84,6 +86,8 @@ def login(request):
 		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
 
 		print("REPONSE FROM LOGIN:", response)
+		print("Access Token Expiry:", access['exp'])
+		print("Refresh Token Expiry:", refresh['exp'])
 		return response
 	else:
 		return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
