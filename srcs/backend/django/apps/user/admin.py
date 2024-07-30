@@ -5,7 +5,7 @@ from django.utils.html import format_html
 
 class AppUserAdmin(UserAdmin):
 	model = AppUser
-	list_display = ['username', 'email', 'id', 'nickname', 'online', 'avatar', 'display_avatar']
+	list_display = ['username', 'email', 'id', 'nickname', 'online', 'avatar', 'display_avatar', 'api42auth']
 	fieldsets = UserAdmin.fieldsets + (
 		(None, {'fields': ('nickname', 'online', 'avatar')}),
 	)

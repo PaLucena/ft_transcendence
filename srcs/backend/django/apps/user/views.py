@@ -22,6 +22,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
+from django.conf import settings
+import os
+import requests
 from .utils import set_nickname, upload_avatar
 
 @api_view(["POST"])
@@ -264,3 +269,66 @@ def delete_account(request):
 	user.save()
 
 	return Response({'message': 'User account deleted sucessfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+@api_view(["POST"])
+def ftapiLogin(request):
+	code = request.data.get("api-code");
+	ftapiresponse = requests.post("https://api.intra.42.fr/v2/oauth/token", params={
+		"grant_type": "authorization_code",
+		"client_id": os.getenv("API42_UID"),
+		"client_secret": os.getenv("API42_SECRET"),
+		"code": code,
+		"redirect_uri": os.getenv("API42_URI"),
+	})
+
+	print(ftapiresponse)
+
+	if ftapiresponse == None:
+		return Response(status=status.HTTP_400_BAD_REQUEST)
+
+	token42 = json.loads(ftapiresponse.content)
+	user_info_response = requests.get("https://api.intra.42.fr/v2/me", params={"access_token": token42["access_token"]})
+	user_json = json.loads(user_info_response.content)
+	
+	try:
+		ExistingUser = AppUser.objects.get(username=user_json["login"])
+		if not ExistingUser.api42auth:
+			return Response({'error': 'Username already in use'}, status=status.HTTP_409_CONFLICT)
+		userJson = {
+			'username': user_json["login"],
+			'email': user_json["email"],
+			'avatar': "avatars/" + user_json["login"] + ".jpg"
+		}
+		return Response(data=user_json, status=status.HTTP_200_OK)
+	except AppUser.DoesNotExist:
+		pass
+	if AppUser.objects.filter(email=user_json["email"]):
+		return Response({'error': 'Email already in use'}, status=status.HTTP_409_CONFLICT)
+
+	imageResponse = requests.get(user_json["image"]["link"])
+	if imageResponse.status_code == 200:
+		img_temporary = NamedTemporaryFile(delete=True)
+		img_temporary.write(imageResponse.content)
+		img_temporary.flush()
+		save_path = os.path.join(settings.MEDIA_ROOT, 'avatars', user_json["login"] + ".jpg")
+		if not os.path.exists(os.path.dirname(save_path)):
+			os.makedirs(os.path.dirname(save_path))
+		with open(save_path, 'wb') as f:
+			for chunck in imageResponse.iter_content(chunk_size=8192):
+				f.write(chunck)
+	else:
+		return Response({'error': 'Error getting the user image'}, status=status.HTTP_409_CONFLICT)
+
+	NewuserJson = {
+		'username': user_json["login"],
+		'email': user_json["email"],
+		'avatar': "avatars/" + user_json["login"] + ".jpg"
+	}
+	user = AppUser.objects.create_user(**NewuserJson)
+	user.api42auth = True
+	user.save()
+	data = {
+		'message': "User successfully logged",
+		'user': NewuserJson
+	}
+	return Response(data, status=status.HTTP_201_CREATED)

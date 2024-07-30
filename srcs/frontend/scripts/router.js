@@ -12,8 +12,10 @@ const routes = {
 	"/login": "pages/login.html",
 	"/signup": "pages/signup.html",
 	"/play": "pages/play.html",
+	"/friends": "pages/friends.html",
 	"/profile": "pages/profile.html",
 	"/chat": "pages/chat.html",
+	"/auth": "pages/auth.html",
 };
 
 const handleLocation = async () => {
@@ -27,9 +29,12 @@ const handleLocation = async () => {
 		initSignupForm();
 	else if (path === "/login")
 		initLoginForm();
-	else if (path === "/play" || path === "/profile") {
+	else if (path === "/play" || path === "/profile" || path === "/friends") {
 		applyNavbar();
 		applyChat();
+	}
+	else if (path === "/auth") {
+		getApiToken();
 	}
 	// else if (path === "/chat") {
 	// 	initChat();

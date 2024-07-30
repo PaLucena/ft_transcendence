@@ -15,18 +15,38 @@
 	background-repeat: no-repeat;
 }
 
-#left, #right {
+#gifContainer {
+	background-color: black;
+	border-radius: 2%;
+	position: relative;
+	z-index: 1;
+	width: 90%;
+	height: 90%;
+	justify-content: center;
+}
+
+#pongGIF {
+	position: absolute;
+	height: 80%;
+	margin-top: 5%;
+}
+
+#pongGIF img {
 	height: 100%;
 }
 
-#left {
-	position: relative;
+#btnsContainer {
+	position: absolute;
+	display: flex;
+	height: 100%;
+	z-index: 2;
 	align-items: center;
 	justify-content: center;
 }
 
-#left .btn {
-	background-color: #192e2f;
+#btnsContainer .btn {
+	background-color: #3a595c;
+	border: 1px solid white;
 }
 
 #btns {
@@ -35,7 +55,7 @@
 	width: 80%;
 	left: 10%;
 	top: 25%;
-	z-index: 1;
+	z-index: 2;
 }
 
 #btns #oneVSone {
@@ -49,7 +69,7 @@
 	margin-left: 0;
 }
 
-#dropdownOne {
+#dropdownOne, #dropdownTwo {
 	display: none;
 	position: absolute;
 	justify-content: center;
@@ -57,74 +77,22 @@
 	height: 74%;
 	left: 10%;
 	top: 13%;
-	z-index: 2;
+	z-index: 3;
 	border-radius: 3%;
 }
 
-#dropdownOne #vsIA {
+#dropdownOne #vsIA, #dropdownOne #local, #dropdownOne #online, #dropdownTwo #createPub, #dropdownTwo #createPriv, #dropdownTwo #join {
 	margin-top: 7vh;
 	margin-left: 0;
 }
 
-#dropdownOne #local {
-	margin-top: 7vh;
-	margin-left: 0;
-}
-
-#dropdownOne #online {
-	margin-top: 7vh;
-	margin-bottom: 0;
-	margin-left: 0;
-}
-
-#dropdownOne #back {
-	position: relative;
+#dropdownOne #back, #dropdownTwo #back {
 	margin-bottom: 0;
 }
 
-#dropdownOne #back button {
-	background-color: #425f4b;
-}
-
-#dropdownTwo {
-	display: none;
-	position: absolute;
-	justify-content: center;
-	width: 80%;
-	height: 74%;
-	left: 10%;
-	top: 13%;
-	z-index: 2;
-	border-radius: 3%;
-}
-
-#dropdownTwo #create {
-	margin-top: 15vh;
-	margin-left: 0;
-}
-
-#dropdownTwo #join {
-	margin-top: 10vh;
-	margin-left: 0;
-}
-
-#dropdownTwo #back {
-	margin-bottom: 0;
-}
-
-#dropdownTwo #back button {
-	background-color: #425f4b;
-}
-
-#pongGIF {
-	position: absolute;
-}
-
-#pongGIF img {
-	height: 70vh;
-	margin-top: 10vh;
-	margin-left: 0;
-	margin-right: 5vh;
+#dropdownOne #back button, #dropdownTwo #back button {
+	background-color: #7ba9a9;
+	color: white;
 }
 
 #chat-placeholder {

@@ -12,6 +12,7 @@ class AppUser(AbstractUser):
 	image_link = models.URLField(null=True, blank=True)
 	id_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
+	api42auth = models.BooleanField(default=False)
 
 	def anonymize(self):
 		unique_suffix = get_random_string(length=6)

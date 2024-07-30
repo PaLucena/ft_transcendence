@@ -75,3 +75,5 @@ venv.bak/
 
 # bd dump data
 fixtures/
+
+srcs/backend/django/apps/media/avatars/*.jpg
