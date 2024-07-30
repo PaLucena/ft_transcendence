@@ -2,6 +2,10 @@ FROM node:20
 
 WORKDIR /app
 
+RUN groupadd -g ${GID} mygroup && useradd -m -u ${UID} -g ${GID} myuser
+
+USER myuser
+
 COPY /hardhat/package*.json ./
 
 RUN npm install

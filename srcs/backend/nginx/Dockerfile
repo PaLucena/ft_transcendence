@@ -1,5 +1,10 @@
 FROM nginx:bullseye
 
+RUN groupadd -g ${GID} mygroup && \
+    useradd -m -u ${UID} -g ${GID} myuser
+
+USER myuser
+
 RUN mkdir -p /var/www/html/
 RUN apt-get -y update && apt-get -y upgrade
 RUN apt-get -y install openssl wget unzip

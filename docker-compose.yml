@@ -3,6 +3,9 @@ services:
     container_name: nginx
     build:
       context: ./srcs/backend/nginx
+      args:
+        - UID=1000
+        - GID=1000
     ports:
       - "8080:8080"
     volumes:
@@ -19,6 +22,9 @@ services:
     container_name: redis
     build:
       context: ./srcs/backend/redis
+      args:
+        - UID=1000
+        - GID=1000
     restart: on-failure
     networks:
       - transcendence_net
@@ -44,6 +50,9 @@ services:
     container_name: django
     build:
       context: ./srcs/backend/django
+      args:
+        - UID=1000
+        - GID=1000
     env_file: srcs/.env
     depends_on:
       - postgres
@@ -62,6 +71,9 @@ services:
     container_name: blockchain
     build:
       context: ./srcs/backend/blockchain
+      args:
+        - UID=1000
+        - GID=1000
     env_file: srcs/.env
     volumes:
       - blockchain_volume:/app/blockchain_shared

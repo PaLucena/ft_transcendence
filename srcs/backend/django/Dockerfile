@@ -3,6 +3,11 @@ FROM python:3.10.12
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
+RUN groupadd -g ${GID} mygroup && \
+    useradd -m -u ${UID} -g ${GID} myuser
+
+USER myuser
+
 COPY requirements.txt requirements.txt
 COPY init_django.sh .
 
