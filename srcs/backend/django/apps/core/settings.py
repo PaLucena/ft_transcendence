@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "blockchain",
     "rtchat",
+	"django_otp",
+	"django_otp.plugins.otp_totp"
 ]
 
 MIDDLEWARE = [
@@ -64,6 +66,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 	'user.middleware.UpdateLastSeenMiddleware',
+	'django_otp.middleware.OTPMiddleware'
 ]
 
 ROOT_URLCONF = "core.urls"
