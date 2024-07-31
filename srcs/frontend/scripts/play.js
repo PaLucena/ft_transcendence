@@ -1,7 +1,3 @@
-socket.onerror = function(error) {
-	console.error(`[error] ${error.message}`);
-};
-
 function oneVSoneBtn() {
 	document.getElementById("btns").style.display = "none";
 	document.getElementById("dropdownOne").style.display = "block";

@@ -5,7 +5,7 @@ function	getBase64Img(url) {
 	})
 }
 
-function initializeWebSocket() {
+function initUserWebSocket() {
 	const socket = new WebSocket(`wss://${window.location.host}/ws/status/`);
 
 	socket.onopen = function(e) {
@@ -24,6 +24,10 @@ function initializeWebSocket() {
 		} else {
 			console.error('[close] Connection died');
 		}
+	};
+
+	socket.onerror = function(error) {
+		console.error(`[error] ${error.message}`);
 	};
 }
 
@@ -50,7 +54,7 @@ function initLoginForm() {
 		})
 		.then(response => {
 			if (response.status === 200) {
-				initializeWebSocket();
+				initUserWebSocket();
 				return response.json();
 			}
 			else { //TODO: Aqui tengo que manejar los códigos de error
