@@ -6,8 +6,7 @@ from channels.security.websocket import AllowedHostsOriginValidator
 from django.urls import path
 from user import consumers
 from user import routing as UserAppRouting
-
-# from YourAppHere import consumers
+from user.middleware import JWTAuthMiddleware 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 
@@ -17,7 +16,9 @@ application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),  # HTTP handling
         "websocket": AllowedHostsOriginValidator(  # WebSocket handling
-            AuthMiddlewareStack(URLRouter(UserAppRouting.websocket_urlpatterns))
-        ),
+            JWTAuthMiddleware(
+                URLRouter(UserAppRouting.websocket_urlpatterns)
+            )
+        )
     }
 )

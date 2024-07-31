@@ -1,23 +1,3 @@
-const socket = new WebSocket(`wss://${window.location.host}/ws/status/`);
-
-socket.onopen = function(e) {
-	console.log("[open] Connection established");
-	socket.send(JSON.stringify({ 'message': 'Hello Server!' }));
-	//setInterval(null, 3600)
-};
-
-socket.onmessage = function(event) {
-	console.log(`[message] Data received from server: ${event.data}`);
-};
-
-socket.onclose = function(event) {
-	if (event.wasClean) {
-		console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-	} else {
-		console.error('[close] Connection died');
-	}
-};
-
 socket.onerror = function(error) {
 	console.error(`[error] ${error.message}`);
 };

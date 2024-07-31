@@ -2,7 +2,6 @@ from django.core import serializers
 from rest_framework import serializers
 from .models import AppUser
 from rest_framework.serializers import ModelSerializer
-from rest_framework.authtoken.models import Token
 #from django.core.files.images import get_image_dimensions
 #to send data from database to user
 
@@ -23,7 +22,7 @@ class UserSerializerClass(ModelSerializer):
 			raise serializers.ValidationError({"error": "This email is already in use."})
 		return value
 
-	#nickanme would be set before toeurnamet
+	#nickname will be set before tournament
 	# def validate_nickname(self, value):
 	# 	if AppUser.objects.filter(nickname__iexact=value).exists():
 	# 		raise serializers.ValidationError({"error": "This nickname is already in use."})
@@ -50,12 +49,11 @@ class UserSerializerClass(ModelSerializer):
 			'username': validated_data['username'],
 			'email': validated_data['email'],
 			'password': validated_data['password'],
-			'nickname': validated_data.get('nickname', validated_data['username'])  
+			#'nickname': validated_data.get('nickname', validated_data['username'])  
 		}
 		if 'avatar' in validated_data:
 				user_data['avatar'] = validated_data['avatar']
 
 		new_user = AppUser.objects.create_user(**user_data)
-		new_token = Token.objects.create(user=new_user)
 
 		return new_user
