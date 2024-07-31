@@ -27,4 +27,5 @@ urlpatterns = [
     path("api/", include("user_stats.urls")),
     path("api/chat/", include("rtchat.urls")),
     path("api/blockchain/", include("blockchain.urls")),
+    path("api/2fa/", include("twofactor.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

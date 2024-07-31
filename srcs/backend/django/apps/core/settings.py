@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     "blockchain",
     "rtchat",
 	"django_otp",
-	"django_otp.plugins.otp_totp"
+	"django_otp.plugins.otp_totp",
+	"twofactor"
 ]
 
 MIDDLEWARE = [

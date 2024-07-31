@@ -25,4 +25,8 @@ clean: down
 
 re: clean all
 
-.PHONY: all stop down logs clean up re
+debug: all logs
+
+re-debug: clean debug
+
+.PHONY: all stop down logs clean up re debug re-debug
