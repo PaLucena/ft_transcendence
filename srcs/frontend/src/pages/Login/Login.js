@@ -1,14 +1,13 @@
-import { Page } from './Page.js';
-import { navigateTo } from './index.js'
+import { Page } from '../Page.js';
+import { navigateTo } from '../../scripts/router/router.js'
 
 export class Login extends Page {
 	constructor() {
-		super("/pages/login.html");
+		super("/pages/Login/login.html");
 	}
 
 	async render() {
-		const html = await super.render();
-		return html;
+		return await super.render();
 	}
 
 	init() {
@@ -18,7 +17,7 @@ export class Login extends Page {
 	initLoginForm() {
 		const loginForm = document.querySelector("#loginForm");
 
-		loginForm.addEventListener("submit", function(event) {
+		loginForm.addEventListener("submit", (event) => {
 			event.preventDefault();
 
 			const formData = new FormData(event.target);

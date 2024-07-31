@@ -1,13 +1,12 @@
-import { Page } from './Page.js';
+import { Page } from '../Page.js';
 
 export class Auth extends Page {
 	constructor() {
-		super("/pages/auth.html")
+		super("/pages/Auth/auth.html")
 	}
 
 	async render() {
-		const html = await super.render();
-		return html;
+		return await super.render();
 	}
 
 	init() {

@@ -7,7 +7,7 @@
 	background-repeat: no-repeat;
 }
 
-#chat-placeholder {
+#chatbtn-placeholder {
 	position: absolute;
 	display: flex;
 	z-index: 3;

@@ -1,14 +1,13 @@
-import { Page } from './Page.js';
-import { navigateTo } from './index.js';
+import { Page } from '../Page.js';
+import { navigateTo } from '../../scripts/router/router.js';
 
 export class Signup extends Page {
 	constructor() {
-		super("/pages/signup.html");
+		super("/pages/Signup/signup.html");
 	}
 
 	async render() {
-		const html = await super.render();
-		return html;
+		return await super.render();
 	}
 
 	init() {
@@ -19,7 +18,7 @@ export class Signup extends Page {
 		const signupForm = document.querySelector("#signupForm");
 
 		if (signupForm) {
-		signupForm.addEventListener("submit", function(event) {
+		signupForm.addEventListener("submit", (event) => {
 			event.preventDefault();
 
 			const formData = new FormData(event.target);
