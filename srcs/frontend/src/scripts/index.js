@@ -8,7 +8,6 @@ import { Friends } from './Friends.js';
 import { Profile } from './Profile.js';
 import { Auth } from './Auth.js';
 
-// Экспортируем функции
 export function navigateTo(url) {
   window.history.pushState({}, "", url);
   router();

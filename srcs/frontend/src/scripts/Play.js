@@ -1,4 +1,5 @@
 import { Page } from './Page.js';
+import { navigateTo } from './index.js'
 
 export class Play extends Page {
 	constructor() {

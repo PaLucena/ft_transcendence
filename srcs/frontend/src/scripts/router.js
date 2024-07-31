@@ -22,10 +22,10 @@ const routes = {
 };
 
 function extractParams(route, path) {
+  const params = {};
   const routeParts = route.split('/');
   const pathParts = path.split('/');
 
-  const params = {};
 
   routeParts.forEach((part, index) => {
     if (part.startsWith(':')) {
