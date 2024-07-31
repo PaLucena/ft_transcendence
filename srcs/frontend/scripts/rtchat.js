@@ -1,44 +1,39 @@
-
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname === '/chat') {
-        initChat();
-    }
-});
-
-
-async function initChat() {
-    const chatroomName = 'public-chat';
+async function initChat(chatroomName) {
     try {
-        const response = await fetch(`/api/chat/${chatroomName}/`);
+        if (chatroomName === undefined) {
+            chatroomName = "public-chat"
+        }
+        const response = await fetch(`/api/chat/chatroom/${chatroomName}/`);
 
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
 
         const data = await response.json();
+        const currentUser = data.current_user;
 
         console.log(data);
 
         if (data.chat_messages) {
             const chatMessages = document.querySelector('#chat-messages');
             data.chat_messages.forEach(message => {
-                addMessageToChat(message);
+                addMessageToChat(message, currentUser);
             });
             chatMessages.scrollTop = chatMessages.scrollHeight;
         } else {
             console.error('No chat messages found in response');
         }
 
+        initWebSocket(chatroomName, currentUser);
+        scrollToBottom()
+
     } catch (error) {
         console.error("Messages error: ", error);
     }
-
-    initWebSocket(chatroomName);
-    scrollToBottom()
 }
 
-function initWebSocket(chatroomName) {
-    const chatSocket = new WebSocket(`ws/chatroom/${chatroomName}/`);
+function initWebSocket(chatroomName, currentUser) {
+    const chatSocket = new WebSocket(`/ws/chatroom/${chatroomName}/`);
 
     console.log("Opened Socket:", chatSocket)
 
@@ -53,7 +48,7 @@ function initWebSocket(chatroomName) {
             return;
         }
 
-        addMessageToChat(data);
+        addMessageToChat(data, currentUser);
         scrollToBottom()
     };
 
@@ -76,7 +71,6 @@ function initWebSocket(chatroomName) {
         }
     };
 
-
     document.querySelector('#chat-message-submit').onclick = function(e) {
         const messageInputDom = document.querySelector('#chat-message-input');
         const message = messageInputDom.value;
@@ -89,25 +83,56 @@ function initWebSocket(chatroomName) {
     };
 }
 
-function addMessageToChat(message) {
+function addMessageToChat(message, currentUser) {
     const chatMessages = document.querySelector('#chat-messages');
     const messageElement = document.createElement('li');
     messageElement.className = 'bg-gray-700 p-2 rounded-lg';
     messageElement.innerHTML = `
         <strong>${message.author}:</strong> ${message.body} <br>
         <span class="text-gray-500 text-sm">${new Date(message.created).toLocaleTimeString()}</span>
-        <button class="block-user btn btn-danger btn-sm" data-username="${message.author}">Block</button>
-        <button class="unblock-user btn btn-success btn-sm" data-username="${message.author}">Unblock</button>
     `;
+
+    if (message.author !== currentUser) {
+        messageElement.innerHTML += `
+            <button class="start-private-chat btn btn-primary btn-sm" data-username="${message.author}">Start Private Chat</button>
+            <button class="block-user btn btn-danger btn-sm" data-username="${message.author}">Block</button>
+            <button class="unblock-user btn btn-success btn-sm" data-username="${message.author}">Unblock</button>
+        `;
+
+        messageElement.querySelector('.start-private-chat').addEventListener('click', function() {
+            startPrivateChat(message.author);
+        });
+
+        messageElement.querySelector('.block-user').addEventListener('click', function() {
+            blockUser(message.author);
+        });
+
+        messageElement.querySelector('.unblock-user').addEventListener('click', function() {
+            unblockUser(message.author);
+        });
+    }
+
     chatMessages.appendChild(messageElement);
+}
 
-    messageElement.querySelector('.block-user').addEventListener('click', function() {
-        blockUser(message.author);
-    });
 
-    messageElement.querySelector('.unblock-user').addEventListener('click', function() {
-        unblockUser(message.author);
-    });
+function startPrivateChat(username) {
+    fetch(`/api/chat/${username}/`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+
+            if (data.chatroom_name) {
+                alert(`Private chat created with ${username}.`);
+                window.location.href = `/chat/${data.chatroom_name}`;
+            } else {
+                alert("Error creating private chat.");
+            }
+        })
+        .catch(error => {
+            console.error("Error starting private chat:", error);
+            alert("Error starting private chat.");
+        });
 }
 
 function scrollToBottom() {
