@@ -1,4 +1,4 @@
-function initLoginForm() {
+function	initLoginForm() {
 	const loginForm = document.querySelector("#loginForm");
 
 	loginForm.addEventListener("submit", function(event) {
@@ -21,17 +21,15 @@ function initLoginForm() {
 		.then(response => {
 			if (response.status === 200)
 				return response.json();
-			else { // 					TODO: Aqui tengo que manejar los códigos de error
+			else { //TODO: Aqui tengo que manejar los códigos de error
 				return response.json().then(errData => {
-					console.error("Error ${response.status}:", errData);
+					document.getElementById("errorPlaceholder").innerHTML = "Error: " + errData.error;
 					throw new Error("Error ${response.status}");
 				});
 			}
 		})
 		.then(data => {
 			console.log("Login successful", data);
-			localStorage.setItem("token", data.token);
-			localStorage.setItem("avatar", getBase64Img(data.user.avatar));
 			navigateTo("/play");
 		})
 		.catch((error) => {

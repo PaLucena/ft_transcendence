@@ -1,15 +1,9 @@
-
-document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname === '/chat') {
-        initChat();
-    }
-});
-
-
-async function initChat() {
-    const chatroomName = 'public-chat';
+async function initChat(chatroomName) {
     try {
-        const response = await fetch(`/api/chat/${chatroomName}/`);
+        if (chatroomName === undefined) {
+            chatroomName = "public-chat"
+        }
+        const response = await fetch(`/api/chat/room/${chatroomName}`);
 
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
