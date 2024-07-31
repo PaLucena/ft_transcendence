@@ -21,10 +21,10 @@ function	initLoginForm() {
 		.then(response => {
 			if (response.status === 200)
 				return response.json();
-			else { //TODO: Aqui tengo que manejar los códigos de error
+			else {
 				return response.json().then(errData => {
 					document.getElementById("errorPlaceholder").innerHTML = "Error: " + errData.error;
-					throw new Error("Error ${response.status}");
+					throw new Error(errData.error);
 				});
 			}
 		})

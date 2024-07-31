@@ -25,7 +25,7 @@ function	initSignupForm() {
 		else {
 			return response.json().then(errData => {
 			document.getElementById("errorPlaceholder").innerHTML = "Error: " + errData.error;
-			throw new Error(`Error ${response.status}`);
+			throw new Error(errData.error);
 			});
 		}
 		})
