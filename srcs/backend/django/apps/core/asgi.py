@@ -9,7 +9,7 @@ from django.urls import path
 from user import consumers
 from user import routing as UserAppRouting
 from rtchat import routing as RtchatAppRouting
-from user.middleware import JWTAuthMiddleware 
+from user.middleware import JWTAuthMiddleware
 # from YourAppHere import consumers
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
@@ -21,10 +21,10 @@ websocket_urlpatterns = (
 # ProtocolTypeRouter for routing different protocols
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),  # HTTP handling
-        "websocket": AllowedHostsOriginValidator(  # WebSocket handling
+        "http": get_asgi_application(),
+        "websocket": AllowedHostsOriginValidator(
             JWTAuthMiddleware(
-                URLRouter(UserAppRouting.websocket_urlpatterns)
+                URLRouter(websocket_urlpatterns)
             )
         )
     }

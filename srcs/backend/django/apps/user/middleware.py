@@ -34,7 +34,7 @@ class CheckAccessTokenMiddleware(MiddlewareMixin):
 				return None
 			except TokenError:
 				pass
-			
+
 		if refresh_token:
 			try:
 				new_access_token = slef.create_access_token(refresh_token)
@@ -81,12 +81,12 @@ class JWTAuthMiddleware(BaseMiddleware):
 				if name == 'access_token':  # Adjust..
 					token_key = value
 					break
-
 		if token_key:
 			scope['user'] = await get_user_from_token(token_key)
 		else:
 			scope['user'] = AnonymousUser()
-		
+			
+		print("USER FROM MIDDLEWARE  ", scope['user'])
 		if isinstance(scope['user'], AnonymousUser):
 			await send({
 				'type': 'websocket.close',
