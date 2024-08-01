@@ -9,12 +9,9 @@ from rtchat.serializers import GroupMessageSerializer
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
 def chat_view(request, chatroom_name="public-chat"):
     try:
         chat_group = get_object_or_404(ChatGroup, group_name=chatroom_name)
-
-        # Check for private chat and user membership
         other_user = None
         if chat_group.is_private:
             if request.user not in chat_group.members.all():
@@ -47,7 +44,6 @@ def chat_view(request, chatroom_name="public-chat"):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
 def get_or_create_chatroom(request, username):
     print("HEKLEKLEELELE")
     if request.user.username == username:
@@ -82,7 +78,6 @@ def get_or_create_chatroom(request, username):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
 def block_user_view(request, chatroom_name):
     try:
         blocker = request.user
@@ -115,7 +110,6 @@ def block_user_view(request, chatroom_name):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
 def unblock_user_view(request, chatroom_name):
     try:
         blocker = request.user
