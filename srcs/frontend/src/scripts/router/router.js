@@ -7,6 +7,7 @@ import { NotFound } from '../../pages/NotFound/NotFound.js';
 import { Friends } from '../../../pages/Friends/Friends.js';
 import { Profile } from '../../../pages/Profile/Profile.js';
 import { Auth } from '../../../pages/Auth/Auth.js';
+import { Pong } from '../../../pages/Pong/pong.js';
 
 const routes = {
   "/404": NotFound,
@@ -19,6 +20,7 @@ const routes = {
   "/auth": Auth,
   "/chat": Chat,
   "/chat/:chatId": Chat,
+  "/pong": Pong,
 };
 
 export async function router() {
