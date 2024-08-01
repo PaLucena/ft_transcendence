@@ -33,11 +33,14 @@ export class Signup extends Page {
 					headers: {
 					'Content-Type': 'application/json'
 					},
-					body: JSON.stringify(jsonData)
+					body: JSON.stringify(jsonData),
+					credentials: 'include'
 				})
 				.then(response => {
-					if (response.status === 201)
+					if (response.status === 201) {
+						//initUserWebSocket();
 						return response.json();
+					}
 					else {
 						return response.json().then(errData => {
 							document.getElementById("errorPlaceholder").innerHTML = "Error: " + errData.error;

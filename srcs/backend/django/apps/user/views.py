@@ -42,7 +42,6 @@ def signup(request):
 			data = {
 				'message': 'Signup successful',
 				'user': {
-					'username': user.username,
 					'avatar': user.avatar.url if user.avatar else None
 				}
 			}
@@ -50,7 +49,8 @@ def signup(request):
 		except IntegrityError as e:
 			return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-	return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+	error_field, error_message = next(iter(serializer.errors.items()))
+	return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST"])
@@ -65,19 +65,7 @@ def login(request):
 	authenticated_user: AbstractUser | None = authenticate(username=username, password=password)
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
-		#user.online = 'online'
 		user.save()
-		# response_data = {
-		# 	'message': 'Login successful',
-		# 	'user': {
-		# 		'username': user.username,
-		# 		'avatar': user.avatar.url,
-		# 		#'jwt_token': encoded_token,
-		# 	}
-		# }
-
-		# token, _ = Token.objects.get_or_create(user=user)
-		# response_data['token'] = token.key
 
 		refresh = RefreshToken.for_user(user)
 		access = refresh.access_token
