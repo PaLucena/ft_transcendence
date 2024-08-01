@@ -27,10 +27,10 @@ module.exports = {
   context: path.resolve(__dirname, 'src'),
   mode,
   entry: {
-    main: ['@babel/polyfill', './scripts/index.js'],
+    main: ['@babel/polyfill', './index.js'],
   },
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'docs'),
     filename: fileName('js'),
     assetModuleFilename: 'assets/[hash][ext][query]',
     clean: true,
@@ -45,7 +45,7 @@ module.exports = {
       filename: fileName('css'),
     }),
     new HtmlWebpackPlugin({
-      template: './index.html',
+      template: '../public/index.html',
       minify: {
         collapseWhitespace: !isDev,
       },

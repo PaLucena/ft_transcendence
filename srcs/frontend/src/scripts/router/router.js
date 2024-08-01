@@ -1,12 +1,12 @@
 import { Home } from '../../pages/Home/Home.js';
-import { Login } from '../../../pages/Login/Login.js';
-import { Play } from '../../../pages/Play/Play.js';
-import { Signup } from '../../../pages/Signup/Signup.js';
-import { Chat } from '../../../pages/Chat/Chat.js';
+import { Login } from '../../pages/Login/Login.js';
+import { Play } from '../../pages/Play/Play.js';
+import { Signup } from '../../pages/Signup/Signup.js';
+import { Chat } from '../../pages/Chat/Chat.js';
 import { NotFound } from '../../pages/NotFound/NotFound.js';
-import { Friends } from '../../../pages/Friends/Friends.js';
-import { Profile } from '../../../pages/Profile/Profile.js';
-import { Auth } from '../../../pages/Auth/Auth.js';
+import { Friends } from '../../pages/Friends/Friends.js';
+import { Profile } from '../../pages/Profile/Profile.js';
+import { Auth } from '../../pages/Auth/Auth.js';
 
 const routes = {
   "/404": NotFound,

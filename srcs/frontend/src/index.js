@@ -1,6 +1,5 @@
-import { router, navigateTo, navigateToOnBootup } from './router/router.js';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap';
+import './styles/main.scss';
+import { router, navigateTo, navigateToOnBootup } from './scripts/router/router.js';
 
 window.addEventListener("DOMContentLoaded", navigateToOnBootup);
 window.addEventListener("popstate", router);
@@ -11,3 +10,5 @@ document.addEventListener("click", (event) => {
     navigateTo(event.target.href);
   }
 });
+
+console.log(123)

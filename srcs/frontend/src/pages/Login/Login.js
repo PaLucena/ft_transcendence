@@ -43,8 +43,8 @@ export class Login extends Page {
 			})
 			.then(response => {
 				if (response.status === 200) {
-					this.initUserWebSocket();
-					return response.json();
+					// this.initUserWebSocket();
+					// return response.json();
 				}
 				else { //TODO: Aqui tengo que manejar los códigos de error
 					return response.json().then(errData => {
@@ -63,31 +63,31 @@ export class Login extends Page {
 		})
 	}
 
-	initUserWebSocket() {
-		const socket = new WebSocket(`wss://${window.location.host}/ws/status/`);
+	// initUserWebSocket() {
+	// 	const socket = new WebSocket(`wss://${window.location.host}/ws/status/`);
 
-		socket.onopen = (e) => {
-			console.log("[open] Connection established");
-			socket.send(JSON.stringify({ 'message': 'Hello Server!' }));
-			//setInterval(null, 3600)
-		};
+	// 	socket.onopen = (e) => {
+	// 		console.log("[open] Connection established");
+	// 		socket.send(JSON.stringify({ 'message': 'Hello Server!' }));
+	// 		//setInterval(null, 3600)
+	// 	};
 
-		socket.onmessage = (event) => {
-			console.log(`[message] Data received from server: ${event.data}`);
-		};
+	// 	socket.onmessage = (event) => {
+	// 		console.log(`[message] Data received from server: ${event.data}`);
+	// 	};
 
-		socket.onclose = (event) => {
-			if (event.wasClean) {
-				console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-			} else {
-				console.error('[close] Connection died');
-			}
-		};
+	// 	socket.onclose = (event) => {
+	// 		if (event.wasClean) {
+	// 			console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+	// 		} else {
+	// 			console.error('[close] Connection died');
+	// 		}
+	// 	};
 
-		socket.onerror = (error) => {
-			console.error(`[error] ${error.message}`);
-		};
-	}
+	// 	socket.onerror = (error) => {
+	// 		console.error(`[error] ${error.message}`);
+	// 	};
+	// }
 
 	// function getCSRFToken(csrftoken) {
 	// 	var cookieValue = null;

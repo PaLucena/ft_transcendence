@@ -1,15 +1,16 @@
 services:
-  nginx_frontend:
-    container_name: nginx_frontend
-    build:
-      context: ./srcs/frontend
-    expose:
-      - "80"
-    volumes:
-      - webcnt_volume:/var/www/html
-    networks:
-      - transcendence_net
-    restart: always
+  # nginx_frontend:
+  #   container_name: nginx_frontend
+  #   build:
+  #     context: ./srcs/frontend
+  #   expose:
+  #     - "4000"
+  #   volumes:
+  #     - webcnt_volume:/var/www/html
+  #   env_file: srcs/.env
+  #   networks:
+  #     - transcendence_net
+  #   restart: always
 
   nginx:
     container_name: nginx
@@ -60,7 +61,7 @@ services:
       - postgres
       - redis
       - blockchain
-      - nginx_frontend
+      # - nginx_frontend
     volumes:
       - django_volume:/app
       - blockchain_volume:/blockchain_shared
@@ -89,7 +90,9 @@ services:
     working_dir: /app
     volumes:
       - ./srcs/frontend:/app
-    command: bash -c "npm install"
+    expose:
+      - 4000
+    command: bash -c "npm install && npm start"
     networks:
       - transcendence_net
 
