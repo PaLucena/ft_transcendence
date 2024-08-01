@@ -2,7 +2,7 @@ services:
   nginx_frontend:
     container_name: nginx_frontend
     build:
-      context: ./srcs/frontend/nginx
+      context: ./srcs/frontend
     expose:
       - "80"
     volumes:
@@ -82,6 +82,16 @@ services:
     networks:
       - transcendence_net
     restart: unless-stopped
+
+  node_worker:
+    image: node:18
+    container_name: node_worker
+    working_dir: /app
+    volumes:
+      - ./srcs/frontend:/app
+    command: bash -c "npm install"
+    networks:
+      - transcendence_net
 
 volumes:
   webcnt_volume:

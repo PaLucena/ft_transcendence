@@ -9,6 +9,10 @@ __pycache__/
 # https://docs.djangoproject.com/en/5.0/topics/migrations/
 # migrations/
 
+# Font #
+node_modules/
+
+
 # Backup files #
 *.bak
 
@@ -72,6 +76,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
 
 # bd dump data
 fixtures/
