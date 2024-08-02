@@ -8,10 +8,6 @@ import { Home } from '../../pages/Home/Home';
 import { Profile } from '../../pages/Profile/Profile';
 // import { Auth } from '../../pages/Auth/Auth.js';
 
-export function hello() {
-  console.log("HY tehre!!")
-}
-
 const routes = {
   "/profile": Profile,
   "/": Home,
@@ -91,7 +87,7 @@ export function navigateTo(url) {
 
 export function navigateToOnBootup() {
   if (window.location.pathname === "/") {
-    navigateTo("/login");
+    navigateTo("/");
   } else {
     router();
   }

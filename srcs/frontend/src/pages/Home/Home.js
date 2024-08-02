@@ -2,12 +2,50 @@ import { Page } from '../Page.js';
 
 export class Home extends Page {
 	constructor() {
-		super("../../src/pages/Home/home.html");
+		super();
 	}
 
 
 	async render() {
-		return `<h1>heelllo</h1>`
+		return `<div id="rootLogin" class="d-flex justify-content-center align-items-center">
+	<div id="body" class="row align-items-center rounded">
+		<div class="d-flex justify-content-center pb-4 " style="align-content: center;">
+			<h1 class="display-3 mt-3" style="letter-spacing: 2rem; text-align: center;">PONG</h1>
+		</div>
+		<form id="loginForm">
+			<div class="row mb-3">
+				<div class="col-sm-8" id="form">
+					<input type="text" id="username" name="username" required>
+					<label for="username">Username</label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-8" id="form">
+					<input type="password" id="password" name="password" required>
+					<label for="password">Password</label>
+				</div>
+			</div>
+			<div class="row mb-1 justify-content-center">
+				<a class="btn btn-link" href="#">Forgot your password?</a>
+			</div>
+			<div class="text-center">
+				<span id="errorPlaceholder" class="bg-danger"></span>
+			</div>
+			<div class="row text-center col-sm-8 mx-auto mb-2 justify-content-center">
+				<button type="submit" class="btn btn-success fw-bold shadow">LOGIN</button>
+			</div>
+		</form>
+		<div class="d-flex text-center col-12 mx-auto justify-content-center">
+			<p>Don't have an account? <a href="/signup">Sign up</a></p>
+		</div>
+		<hr>
+		<div class="d-flex text-center col-8 mx-auto pt-2 pb-4 justify-content-center">
+			<button type="button" class="btn btn-primary" onclick="window.location.href='https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fauth&response_type=code'">
+				<img src="./docs/resource/images/42.png" id="fortytwo" alt="42 Logo">
+			</button>
+		</div>
+	</div>
+</div>`
 	}
 
 	init() {

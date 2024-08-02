@@ -1,10 +1,11 @@
 import './styles/main.scss';
-import { router, navigateTo, navigateToOnBootup, hello } from './scripts/router/router';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import { router, navigateTo, navigateToOnBootup } from './scripts/router/router';
 
 window.addEventListener("DOMContentLoaded", navigateToOnBootup);
 window.addEventListener("popstate", router);
 
-hello();
 
 document.addEventListener("click", (event) => {
   if (event.target.tagName === "A") {
