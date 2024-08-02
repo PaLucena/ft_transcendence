@@ -1,4 +1,5 @@
 import { Page } from '../Page.js';
+import { navigateTo } from '../../scripts/router/router.js';
 
 export class Auth extends Page {
 	constructor() {
