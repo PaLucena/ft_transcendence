@@ -15,26 +15,47 @@ export class Play extends Page {
 	async init() {
 		await this.renderComponent(Navbar, 'navbar-placeholder');
 		await this.renderComponent(ChatBtn, 'chatbtn-placeholder');
+		this.oneVSoneBtn();
+		this.tournamentBtn();
+		this.hideDropdownOne();
+		this.hideDropdownTwo();
 	}
 
 	oneVSoneBtn() {
-		document.getElementById("btns").style.display = "none";
-		document.getElementById("dropdownOne").style.display = "block";
+		let oneVSone = document.getElementById("oneVSoneBtn");
+
+		oneVSone.addEventListener("click", () => {
+			document.getElementById("btns").style.display = "none";
+			document.getElementById("dropdownOne").style.display = "block";
+		});
 	}
 
 
 	tournamentBtn() {
-		document.getElementById("btns").style.display = "none";
-		document.getElementById("dropdownTwo").style.display = "block";
+		let tournament = document.getElementById("tournamentBtn");
+
+		tournament.addEventListener("click", () => {
+			document.getElementById("btns").style.display = "none";
+			document.getElementById("dropdownTwo").style.display = "block";
+		});
 	}
 
 
-	hideDropdown() {
-		document.getElementById("dropdownOne").style.display = "none";
-		document.getElementById("dropdownTwo").style.display = "none";
-		document.getElementById("btns").style.display = "block";
+	hideDropdownOne() {
+		let backOne = document.getElementById("backOne");
+
+		backOne.addEventListener("click", () => {
+			document.getElementById("dropdownOne").style.display = "none";
+			document.getElementById("btns").style.display = "block";
+		});
+	}
+
+	hideDropdownTwo() {
+		let backTwo = document.getElementById("backTwo");
+
+		backTwo.addEventListener("click", () => {
+			document.getElementById("dropdownTwo").style.display = "none";
+			document.getElementById("btns").style.display = "block";
+		});
 	}
 }
-
-
-
