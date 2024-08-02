@@ -1,27 +1,31 @@
-import { Home } from '../../pages/Home/Home.js';
-import { Login } from '../../pages/Login/Login.js';
-import { Play } from '../../pages/Play/Play.js';
-import { Signup } from '../../pages/Signup/Signup.js';
-import { Chat } from '../../pages/Chat/Chat.js';
-import { NotFound } from '../../pages/NotFound/NotFound.js';
-import { Friends } from '../../pages/Friends/Friends.js';
-import { Profile } from '../../pages/Profile/Profile.js';
-import { Auth } from '../../pages/Auth/Auth.js';
+import { Login } from '../../pages/Login/Login';
+import { Home } from '../../pages/Home/Home';
+// import { Play } from '../../pages/Play/Play.js';
+// import { Signup } from '../../pages/Signup/Signup.js';
+// import { Chat } from '../../pages/Chat/Chat.js';
+// import { NotFound } from '../../pages/NotFound/NotFound.js';
+// import { Friends } from '../../pages/Friends/Friends.js';
+import { Profile } from '../../pages/Profile/Profile';
+// import { Auth } from '../../pages/Auth/Auth.js';
+
+export function hello() {
+  console.log("HY tehre!!")
+}
 
 const routes = {
-  "/404": NotFound,
+  "/profile": Profile,
   "/": Home,
   "/login": Login,
-  "/signup": Signup,
-  "/play": Play,
-  "/friends": Friends,
-  "/profile": Profile,
-  "/auth": Auth,
-  "/chat": Chat,
-  "/chat/:chatId": Chat,
+  // "/404": NotFound,
+  // "/signup": Signup,
+  // "/play": Play,
+  // "/friends": Friends,
+  // "/auth": Auth,
+  // "/chat": Chat,
+  // "/chat/:chatId": Chat,
 };
 
-export async function router() {
+export default async function router() {
   const path = window.location.pathname;
 
   let matchedRoute = null;
@@ -35,14 +39,33 @@ export async function router() {
     }
   });
 
-  console.log(matchedRoute);
-  console.log(matchedParams);
-  const RouteClass = matchedRoute ? routes[matchedRoute] : routes["/404"];
-  const page = new RouteClass(matchedParams);
-  const html = await page.render();
-  document.getElementById("container").innerHTML = html;
+  // console.log(matchedRoute);
+  // console.log(matchedParams);
+  // const RouteClass = matchedRoute ? routes[matchedRoute] : routes["/404"];
+  // const page = new RouteClass(matchedParams);
+  // const html = await page.render();
+  // document.getElementById("container").innerHTML = html;
 
-  page.init();
+  // page.init();
+
+  console.log("Matched route:", matchedRoute);
+  console.log("Matched params:", matchedParams);
+
+  const RouteClass = matchedRoute ? routes[matchedRoute] : null;
+
+  if (typeof RouteClass === 'function') {
+    try {
+      const page = new RouteClass(matchedParams);
+      const html = await page.render();
+      document.getElementById("root").innerHTML = html;
+      page.init();
+    } catch (error) {
+      console.error('Error during rendering:', error);
+    }
+  } else {
+    console.error('RouteClass is not a constructor or is null:', RouteClass);
+    document.getElementById("root").innerHTML = "<h1>404 Not Found</h1>";
+  }
 }
 
 function extractParams(route, path) {

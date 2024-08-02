@@ -2,8 +2,9 @@
   "name": "ft_transcendence",
   "version": "1.0.0",
   "main": "index.js",
-    "scripts": {
-
+  "scripts": {
+    "start": "cross-env NODE_ENV=development webpack-dev-server --mode development",
+    "build": "cross-env NODE_ENV=production webpack --mode production"
   },
   "repository": {
     "type": "git",

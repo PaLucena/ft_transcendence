@@ -4,11 +4,11 @@ import { ChatBtn } from '../../components/ChatBtn/ChatBtn.js'
 
 export class Profile extends Page {
 	constructor() {
-		super("/pages/Profile/profile.html")
+		super("./profile.html")
 	}
 
 	async render() {
-		return await super.render();
+		return "<h1>Profile Page</h1>";
 	}
 
 	async init() {

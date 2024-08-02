@@ -2,11 +2,15 @@ import { Page } from '../Page.js';
 
 export class Home extends Page {
 	constructor() {
-		super("/index.html");
+		super("../../src/pages/Home/home.html");
 	}
 
-	
+
+	async render() {
+		return `<h1>heelllo</h1>`
+	}
+
 	init() {
-		// Function for Init Home
+		console.log("Home page initialized.");
 	}
 }

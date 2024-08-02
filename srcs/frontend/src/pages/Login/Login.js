@@ -3,7 +3,7 @@ import { navigateTo } from '../../scripts/router/router.js'
 
 export class Login extends Page {
 	constructor() {
-		super("/pages/Login/login.html");
+		super("/login.html");
 	}
 
 	async render() {

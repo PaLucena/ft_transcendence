@@ -1,8 +1,10 @@
 import './styles/main.scss';
-import { router, navigateTo, navigateToOnBootup } from './scripts/router/router.js';
+import { router, navigateTo, navigateToOnBootup, hello } from './scripts/router/router';
 
 window.addEventListener("DOMContentLoaded", navigateToOnBootup);
 window.addEventListener("popstate", router);
+
+hello();
 
 document.addEventListener("click", (event) => {
   if (event.target.tagName === "A") {
@@ -11,4 +13,3 @@ document.addEventListener("click", (event) => {
   }
 });
 
-console.log(123)
