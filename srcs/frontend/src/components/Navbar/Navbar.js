@@ -10,6 +10,6 @@ export class Navbar extends Component {
 	}
 
 	init() {
-		// Navbar inti logic
+		// Navbar init logic
 	}
 }
