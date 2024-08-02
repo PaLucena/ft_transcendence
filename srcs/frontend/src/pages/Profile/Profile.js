@@ -22,9 +22,6 @@ export class Profile extends Page {
 		let	logoutBtn = document.getElementById("logoutBtn");
 
 		logoutBtn.addEventListener("click", (event) => {
-
-			console.log("logout clicked"); // TODO: esto fuera
-
 			fetch("/api/logout/", {
 				method: "GET",
 			})
