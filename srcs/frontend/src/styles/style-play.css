@@ -50,7 +50,7 @@
 }
 
 #btns {
-	display: none;
+	display: block;
 	position: absolute;
 	align-items: center;
 	width: 80%;
@@ -74,15 +74,11 @@
 	z-index: 3;
 }
 
-#dropdownOne {
-	display: block;
-}
-
 #dropdownOne #vsIA, #dropdownTwo #createPub {
 	margin-left: 0;
 }
 
-#dropdownOne #local, #dropdownOne #online, #dropdownOne #back, #dropdownTwo #createPriv, #dropdownTwo #join, #dropdownTwo #back {
+#dropdownOne #local, #dropdownOne #online, #dropdownOne #backOne, #dropdownTwo #createPriv, #dropdownTwo #join, #dropdownTwo #backTwo {
 	margin-top: 7vh;
 	margin-left: 0;
 }
@@ -92,7 +88,7 @@
 	color: white;
 }
 
-#chat-placeholder {
+#chatbtn-placeholder {
 	position: absolute;
 	display: flex;
 	justify-content: right;

@@ -30,7 +30,8 @@
 	margin-left: 8%;
 	height: 90%;
 	width: 90%;
-	border-radius: 30px;
+	border-top-right-radius: 30px;
+	border-top-left-radius: 30px;
 }
 
 #user {
@@ -54,7 +55,7 @@
 	border: 2px solid #192e2f;
 }
 
-#edit button {
+#editBtn button, #logoutBtn button {
 	background-color: #3a595c;
 }
 
@@ -69,7 +70,8 @@
 	margin-left: 5%;
 	height: 90%;
 	width: 90%;
-	border-radius: 30px;
+	border-top-right-radius: 30px;
+	border-top-left-radius: 30px;
 }
 
 #chat-placeholder {

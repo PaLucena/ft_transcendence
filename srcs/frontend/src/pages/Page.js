@@ -1,23 +1,24 @@
 export class Page {
 	constructor(route, params = {}) {
-	  this.route = route;
-	  this.params = params;
+		this.route = route;
+		this.params = params;
 	}
 
 	async render() {
 		if (this.route) {
-		  try {
-			const response = await fetch(this.route);
-			if (response.ok) {
-			  return await response.text();
-			} else {
-			  console.error(`Failed to load Page at ${this.route}: ${response.status}`);
-			  return `<div>Error loading Page.</div>`;
+			try {
+				const response = await fetch(this.route);
+				if (response.ok)
+					return await response.text();
+				else {
+					console.error(`Failed to load Page at ${this.route}: ${response.status}`);
+					return `<div>Error loading Page.</div>`;
+				}
 			}
-		  } catch (error) {
-			console.error(`Error fetching Page at ${this.route}:`, error);
-			return `<div>Error loading Page.</div>`;
-		  }
+			catch (error) {
+				console.error(`Error fetching Page at ${this.route}:`, error);
+				return `<div>Error loading Page.</div>`;
+			}
 		}
 		return `<div>Page route not defined.</div>`;
 	}
@@ -38,6 +39,6 @@ export class Page {
 	}
 
 	init() {
-	  // Function for init  URL
+		// Function for init  URL
 	}
-  }
+}
