@@ -17,6 +17,7 @@ from django.contrib.auth.models import AnonymousUser
 
 class CheckAccessTokenMiddleware(MiddlewareMixin):
 	def check_cookie(slef,request):
+		print("USER IN MIDDLEWARE: ")
 		exempt_views = ['login', 'signup']
 		current_view = resolve(request.path_info).url_name
 

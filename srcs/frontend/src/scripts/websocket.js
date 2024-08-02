@@ -28,7 +28,7 @@ export function initUserWebSocket() {
 		console.error(`[error] ${error.message}`);
 	};
 }
-// call from logout.js
+// call from logout
 export function closeUserWebSocket() {
 	if (socket) {
 		socket.close();

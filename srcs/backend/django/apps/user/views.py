@@ -92,11 +92,10 @@ def TestView(request):
 @api_view(["GET"])
 def logout(request):
 	user= request.user #delete later
-	print("user in llogout: ", user)
+	print("USER in logout: ", user)
 	response = Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
 	response.delete_cookie('access_token')
 	response.delete_cookie('refresh_token')
-	user.save()
 	return response
 
 

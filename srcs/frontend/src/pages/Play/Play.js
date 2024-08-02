@@ -2,6 +2,7 @@ import { Page } from '../Page.js';
 import { navigateTo } from '../../scripts/router/router.js'
 import { Navbar } from '../../components/Navbar/Navbar.js';
 import { ChatBtn } from '../../components/ChatBtn/ChatBtn.js';
+import { closeUserWebSocket } from '../../scripts/websocket.js';
 
 export class Play extends Page {
 	constructor() {
@@ -19,6 +20,26 @@ export class Play extends Page {
 		this.tournamentBtn();
 		this.hideDropdownOne();
 		this.hideDropdownTwo();
+		this.logout();
+	}
+
+	logout() {
+		let	logoutBtn = document.getElementById("logoutBtn");
+
+		logoutBtn.addEventListener("click", (event) => {
+			fetch("/api/logout/", {
+				method: "GET",
+				credentials: 'include'
+			})
+			.then(response => {
+				console.log("Respuesta a logout: ", response); // TODO: esto es debuggeo
+				closeUserWebSocket()
+				navigateTo("/login");
+			})
+			.catch((error) => {
+				console.log("Logout error: ", error);
+			})
+		});
 	}
 
 	oneVSoneBtn() {
