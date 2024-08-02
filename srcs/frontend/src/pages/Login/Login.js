@@ -1,5 +1,6 @@
 import { Page } from '../Page.js';
 import { navigateTo } from '../../scripts/router/router.js'
+import { initUserWebSocket } from '../../scripts/websocket.js'
 
 export class Login extends Page {
 	constructor() {
@@ -43,7 +44,7 @@ export class Login extends Page {
 			})
 			.then(response => {
 				if (response.status === 200) {
-					this.initUserWebSocket();
+					initUserWebSocket();
 					return response.json();
 				}
 				else { //TODO: Aqui tengo que manejar los códigos de error
@@ -61,32 +62,6 @@ export class Login extends Page {
 				console.error("Login error: ", error);
 			})
 		})
-	}
-
-	initUserWebSocket() {
-		const socket = new WebSocket(`wss://${window.location.host}/ws/status/`);
-
-		socket.onopen = (e) => {
-			console.log("[open] Connection established");
-			socket.send(JSON.stringify({ 'message': 'Hello Server!' }));
-			//setInterval(null, 3600)
-		};
-
-		socket.onmessage = (event) => {
-			console.log(`[message] Data received from server: ${event.data}`);
-		};
-
-		socket.onclose = (event) => {
-			if (event.wasClean) {
-				console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-			} else {
-				console.error('[close] Connection died');
-			}
-		};
-
-		socket.onerror = (error) => {
-			console.error(`[error] ${error.message}`);
-		};
 	}
 
 	// function getCSRFToken(csrftoken) {

@@ -39,13 +39,13 @@ def signup(request):
 			user = AppUser.objects.get(username=request.data['username'])
 			serializer = UserSerializerClass(user)
 
-			data = {
-				'message': 'Signup successful',
-				'user': {
-					'avatar': user.avatar.url if user.avatar else None
-				}
-			}
-			return Response(data, status=status.HTTP_201_CREATED)
+			refresh = RefreshToken.for_user(user)
+			access = refresh.access_token
+			response = Response({"message": "Signup successful"}, status=status.HTTP_201_CREATED)
+			response.set_cookie('access_token', str(access), httponly=True, secure=True)
+			response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+
+			return response
 		except IntegrityError as e:
 			return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -90,14 +90,14 @@ def TestView(request):
 
 
 @api_view(["GET"])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated])
 def logout(request):
 	user= request.user #delete later
-	#user.online = 'offline' #delete later
-	request.user.auth_token.delete()
+	print("user in llogout: ", user)
+	response = Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
+	response.delete_cookie('access_token')
+	response.delete_cookie('refresh_token')
 	user.save()
-	return Response({"message": "logout was successful"})
+	return response
 
 
 @api_view(["POST"])

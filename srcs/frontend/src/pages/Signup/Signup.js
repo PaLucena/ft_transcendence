@@ -1,5 +1,6 @@
 import { Page } from '../Page.js';
 import { navigateTo } from '../../scripts/router/router.js';
+import { initUserWebSocket } from '../../scripts/websocket.js';
 
 export class Signup extends Page {
 	constructor() {
@@ -38,7 +39,7 @@ export class Signup extends Page {
 				})
 				.then(response => {
 					if (response.status === 201) {
-						//initUserWebSocket();
+						initUserWebSocket();
 						return response.json();
 					}
 					else {
