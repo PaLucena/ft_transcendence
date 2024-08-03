@@ -28,6 +28,7 @@ from django.conf import settings
 import os
 import requests
 from .utils import set_nickname, upload_avatar
+from django.contrib.auth import logout as auth_logout
 
 @api_view(["POST"])
 def signup(request):
@@ -62,6 +63,7 @@ def login(request):
 	if not all ([username, password]):
 		return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
+	print("GFFVGFVFVFVFVFVFVFVF")
 	authenticated_user: AbstractUser | None = authenticate(username=username, password=password)
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
@@ -96,6 +98,7 @@ def logout(request):
 	response = Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
 	response.delete_cookie('access_token')
 	response.delete_cookie('refresh_token')
+	auth_logout(request)
 	return response
 
 

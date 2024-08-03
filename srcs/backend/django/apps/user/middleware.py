@@ -16,29 +16,38 @@ from django.contrib.auth.models import AnonymousUser
 
 
 class CheckAccessTokenMiddleware(MiddlewareMixin):
-	def check_cookie(slef,request):
-		print("USER IN MIDDLEWARE: ")
+	def __init__(self, get_response):
+		self.get_response = get_response
+
+	def __call__(self, request):
 		exempt_views = ['login', 'signup']
-		current_view = resolve(request.path_info).url_name
+		api_prefix = '/api/'
+		admin_prefix = '/admin/'
 
+		if request.path_info.startswith(admin_prefix):
+			return self.get_response(request)
+		if request.path_info.startswith(api_prefix):
+			current_view = request.path_info[len(api_prefix):].strip('/')
+		else:
+			current_view = ''
 		if current_view in exempt_views:
-			return None
+			return self.get_response(request)
 
-		access_token = request.COOKIE.get('access_token')
+		access_token = request.COOKIES.get('access_token')
 		refresh_token = request.COOKIES.get('refresh_token')
-
 		if access_token:
 			jwt_auth = JWTAuthentication()
 			try:
 				validated_token = jwt_auth.get_validated_token(access_token)
 				request.user = jwt_auth.get_user(validated_token)
-				return None
+				#response = self.get_response(request)
+				print("USER IN MIDDLEWARE: ", request.user)
 			except TokenError:
 				pass
 
 		if refresh_token:
 			try:
-				new_access_token = slef.create_access_token(refresh_token)
+				new_access_token = self.create_access_token(refresh_token)
 				response = JsonResponse({'message': 'Token refreshed'})
 				response.set_cookie('access_token', new_access_token, secure=True, httponly=True)
 				request.COOKIES['access_token'] = new_access_token
@@ -71,6 +80,16 @@ def get_user_from_token(token_key):
 
 class JWTAuthMiddleware(BaseMiddleware):
 	async def __call__(self, scope, receive, send):
+		exempt_views = ['login', 'signup']
+		api_prefix = '/api/'		
+		path = scope.get('path', '')
+		if path.startswith(api_prefix):
+			current_view = path[len(api_prefix):].strip('/')
+		else:
+			current_view = ''
+		if current_view in exempt_views:
+			return await super().__call__(scope, receive, send)
+
 		headers = dict(scope['headers'])
 		cookie_header = headers.get(b'cookie', None)
 		token_key = None
