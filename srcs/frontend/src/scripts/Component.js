@@ -1,22 +1,25 @@
-export class Page {
-	constructor(route, params = {}) {
-		this.route = route;
+export class Component {
+	constructor(rout, params = {}) {
+		this.rout = rout;
 		this.params = params;
-	}
+	};
 
 	async render() {
-		if (this.route) {
+		const html = await this.fetchHtmlFromFile(this.rout);
+		return html;
+	}
+
+	async fetchHtmlFromFile(route) {
+		if (route) {
 			try {
-				const response = await fetch(this.route);
-				if (response.ok)
-					return await response.text();
+				const response = await fetch(route);
+				if (response.ok) return await response.text();
 				else {
-					console.error(`Failed to load Page at ${this.route}: ${response.status}`);
+					console.error(`Failed to load Page at ${route}: ${response.status}`);
 					return `<div>Error loading Page.</div>`;
 				}
-			}
-			catch (error) {
-				console.error(`Error fetching Page at ${this.route}:`, error);
+			} catch (error) {
+				console.error(`Error fetching Page at ${route}:`, error);
 				return `<div>Error loading Page.</div>`;
 			}
 		}
@@ -30,6 +33,9 @@ export class Page {
 			const placeholder = document.getElementById(placeholderId);
 			if (placeholder) {
 				placeholder.innerHTML = componentHtml;
+				if (typeof component.init === 'function') {
+					await component.init();
+				}
 			} else {
 				console.warn(`Placeholder with id "${placeholderId}" not found.`);
 			}
@@ -38,7 +44,8 @@ export class Page {
 		}
 	}
 
-	init() {
-		// Function for init  URL
+	async init() {
+
 	}
-}
+  }
+

@@ -1,15 +1,11 @@
-import { Page } from '../Page.js';
-import { navigateTo } from '../../scripts/router/router.js'
+import { Component } from '../../scripts/Component.js';
+import { navigateTo } from '../../scripts/router.js'
 import { Navbar } from '../../components/Navbar/Navbar.js';
 import { ChatBtn } from '../../components/ChatBtn/ChatBtn.js';
 
-export class Profile extends Page {
+export class Profile extends Component {
 	constructor() {
-		super("/pages/Profile/profile.html")
-	}
-
-	async render() {
-		return super.render();
+		super('/pages/Profile/profile.html')
 	}
 
 	async init() {

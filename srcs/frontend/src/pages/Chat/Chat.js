@@ -1,14 +1,10 @@
-import { Page } from '../Page.js';
+import { Component } from "../../scripts/Component.js";
 import { Navbar } from '../../components/Navbar/Navbar.js';
 
-export class Chat extends Page {
+export class Chat extends Component {
     constructor(params = {}) {
-        super("/pages/Chat/chat.html", params);
+        super('/pages/Chat/chat.html', params);
     }
-
-	async render() {
-		return await super.render();
-	}
 
 	async init() {
 		await this.renderComponent(Navbar, 'navbar-placeholder');
@@ -21,7 +17,9 @@ export class Chat extends Page {
             if (chatroomName === undefined) {
                 chatroomName = "public-chat";
             }
-            const response = await fetch(`/api/chat/chatroom/${chatroomName}/`);
+            const response = await fetch(`/api/chat/chatroom/${chatroomName}/`, {
+                credentials: 'include'
+            });
 
             if (!response.ok) {
                 throw new Error(`Response status: ${response.status}`);
@@ -143,7 +141,7 @@ export class Chat extends Page {
     }
 
     startPrivateChat(username) {
-        fetch(`/api/chat/${username}/`)
+        fetch(`/api/chat/${username}/`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -180,7 +178,8 @@ export class Chat extends Page {
                 "Content-Type": "application/json",
                 "X-CSRFToken": csrfToken
             },
-            body: JSON.stringify({ blocked_username: username })
+            body: JSON.stringify({ blocked_username: username }),
+            credentials: 'include'
         })
         .then(response => response.json())
         .then(data => {
@@ -202,7 +201,8 @@ export class Chat extends Page {
                 "Content-Type": "application/json",
                 "X-CSRFToken": csrfToken
             },
-            body: JSON.stringify({ blocked_username: username })
+            body: JSON.stringify({ blocked_username: username }),
+            credentials: 'include'
         })
         .then(response => response.json())
         .then(data => {

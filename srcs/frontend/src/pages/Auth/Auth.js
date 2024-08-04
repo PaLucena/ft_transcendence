@@ -1,16 +1,12 @@
-import { Page } from '../Page.js';
-import { navigateTo } from '../../scripts/router/router.js';
+import { Component } from "../../scripts/Component.js";
+import { navigateTo } from '../../scripts/router.js';
 
-export class Auth extends Page {
+export class Auth extends Component {
 	constructor() {
 		super("/pages/Auth/auth.html")
 	}
 
-	async render() {
-		return await super.render();
-	}
-
-	init() {
+	async init() {
 		this.getApiToken()
 	}
 
