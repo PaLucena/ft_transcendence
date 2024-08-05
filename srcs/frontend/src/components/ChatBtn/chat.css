@@ -1,0 +1,14 @@
+#chat {
+	position: relative;
+	width: 10vh;
+	height: 10vh;
+}
+
+#chat #popUp {
+	display: block;
+
+}
+
+#chat #chatBtn {
+	position: absolute;
+}

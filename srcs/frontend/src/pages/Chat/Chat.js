@@ -1,33 +1,36 @@
-import { Page } from '../Page.js';
+import { Component } from "../../scripts/Component.js";
 import { Navbar } from '../../components/Navbar/Navbar.js';
 
-export class Chat extends Page {
+export class Chat extends Component {
     constructor(params = {}) {
-        super("/pages/Chat/chat.html", params);
+        super('/pages/Chat/chat.html', params);
     }
 
-	async render() {
-		return await super.render();
-	}
-
-	async init() {
-		await this.renderComponent(Navbar, 'navbar-placeholder');
-
+	init() {
 		this.initChat(this.params.chatId);
 	}
 
-    async initChat(chatroomName) {
-        try {
-            if (chatroomName === undefined) {
-                chatroomName = "public-chat";
-            }
-            const response = await fetch(`/api/chat/chatroom/${chatroomName}/`);
+    initChat(chatroomName) {
+        if (chatroomName === undefined) {
+            chatroomName = "public-chat";
+        }
 
+        fetch(`/api/chat/chatroom/${chatroomName}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+        })
+        .then(response => {
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`);
+                return response.json().then(errorData => {
+                    throw new Error(errorData.detail || `Response status: ${response.status}`);
+                });
             }
-
-            const data = await response.json();
+            return response.json();
+        })
+        .then(data => {
             const currentUser = data.current_user;
 
             console.log("DATA: ", data);
@@ -48,41 +51,58 @@ export class Chat extends Page {
 
             this.initWebSocket(chatroomName, currentUser);
             this.scrollToBottom();
-
-        } catch (error) {
+        })
+        .catch(error => {
             console.error("Messages error: ", error);
-        }
+            alert(`Error initializing chat: ${error.message}`);
+        });
     }
 
     initWebSocket(chatroomName, currentUser) {
-        const chatSocket = new WebSocket(`/ws/chatroom/${chatroomName}/`);
+        let chatSocket;
 
-        console.log("Opened Socket:", chatSocket);
+        try {
+            chatSocket = new WebSocket(`/ws/chatroom/${chatroomName}/`);
+
+            console.log("Opened Socket:", chatSocket);
+        } catch (error) {
+            console.error('Failed to create WebSocket:', error);
+            alert('Error initializing WebSocket connection. Please try again later.');
+            return;
+        }
 
         chatSocket.onmessage = (e) => {
-            const data = JSON.parse(e.data);
-            console.log('Received message:', data);
+            try {
+                const data = JSON.parse(e.data);
+                console.log('Received message:', data);
 
-            if (data.error) {
-                alert(data.error);
-                chatSocket.close();
-                console.error('Chat socket closed due to error:', data.error);
-                return;
+                if (data.error) {
+                    alert(data.error);
+                    chatSocket.close();
+                    console.error('Chat socket closed due to error:', data.error);
+                    return;
+                }
+
+                this.addMessageToChat(data, currentUser);
+                this.scrollToBottom();
+            } catch (error) {
+                console.error('Error processing message:', error);
             }
-
-            this.addMessageToChat(data, currentUser);
-            this.scrollToBottom();
         };
 
         chatSocket.onerror = (e) => {
-            console.error('WebSocket error:', e.message);
+            console.error('WebSocket error:', e);
+            alert('WebSocket error occurred. Please try again later.');
         };
+
 
         chatSocket.onclose = (e) => {
             if (e.wasClean) {
                 console.log('Chat socket closed cleanly:', e.code, e.reason);
             } else {
                 console.error('Chat socket closed unexpectedly:', e.reason);
+                alert('Connection lost. Trying to reconnect...');
+                setTimeout(() => this.initWebSocket(chatroomName, currentUser), 5000);
             }
         };
 
@@ -95,18 +115,21 @@ export class Chat extends Page {
 
         document.querySelector('#chat-message-submit').onclick = () => {
             const messageInputDom = document.querySelector('#chat-message-input');
-            const message = messageInputDom.value;
-            if (message.trim()) {
+            const message = messageInputDom.value.trim();
+            if (message) {
                 chatSocket.send(JSON.stringify({
                     'body': message
                 }));
                 messageInputDom.value = '';
+            } else {
+                console.warn('Cannot send empty message');
             }
         };
     }
 
     addMessageToChat(message, currentUser) {
         console.log("message.author: ", message.author, "CURRENT_USER: ", currentUser)
+
         const chatMessages = document.querySelector('#chat-messages');
         if (chatMessages) {
             const messageElement = document.createElement('li');
@@ -123,16 +146,32 @@ export class Chat extends Page {
                     <button class="unblock-user btn btn-success btn-sm" data-username="${message.author}">Unblock</button>
                 `;
 
-                messageElement.querySelector('.start-private-chat').addEventListener('click', () => {
+                const startPrivateChatButton = messageElement.querySelector('.start-private-chat');
+                const blockUserButton = messageElement.querySelector('.block-user');
+                const unblockUserButton = messageElement.querySelector('.unblock-user');
+
+                startPrivateChatButton.addEventListener('click', () => {
                     this.startPrivateChat(message.author);
                 });
 
-                messageElement.querySelector('.block-user').addEventListener('click', () => {
-                    this.blockUser(message.author);
+                blockUserButton.addEventListener('click', () => {
+                    if (confirm(`Are you sure you want to block ${message.author}?`)) {
+                        this.handleUserAction('block', message.author)
+                            .finally(() => {
+                                blockUserButton.disabled = true;
+                                unblockUserButton.disabled = false;
+                            });
+                    }
                 });
 
-                messageElement.querySelector('.unblock-user').addEventListener('click', () => {
-                    this.unblockUser(message.author);
+                unblockUserButton.addEventListener('click', () => {
+                    if (confirm(`Are you sure you want to unblock ${message.author}?`)) {
+                        this.handleUserAction('unblock', message.author)
+                            .finally(() => {
+                                unblockUserButton.disabled = true;
+                                blockUserButton.disabled = false;
+                            });
+                    }
                 });
             }
 
@@ -143,22 +182,35 @@ export class Chat extends Page {
     }
 
     startPrivateChat(username) {
-        fetch(`/api/chat/${username}/`)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
+        fetch(`/api/chat/${username}/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.detail || `Response status: ${response.status}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
 
-                if (data.chatroom_name) {
-                    alert(`Private chat created with ${username}.`);
-                    window.location.href = `/chat/${data.chatroom_name}`;
-                } else {
-                    alert("Error creating private chat.");
-                }
-            })
-            .catch(error => {
-                console.error("Error starting private chat:", error);
-                alert("Error starting private chat.");
-            });
+            if (data.chatroom_name) {
+                alert(`Private chat created with ${username}.`);
+                window.location.href = `/chat/${data.chatroom_name}`;
+            } else {
+                alert(`Error creating private chat. ${data.detail ? data.detail : ''}`);
+            }
+        })
+        .catch(error => {
+            console.error("Error starting private chat:", error);
+            alert(`Error starting private chat: ${error.message}`);
+        });
     }
 
     scrollToBottom() {
@@ -170,62 +222,33 @@ export class Chat extends Page {
         }
     }
 
-    blockUser(username) {
+    handleUserAction(action, username) {
         const chatroomName = 'public-chat';
-        const csrfToken = this.getCookie('csrftoken');
+        const endpoint = action === 'block' ? 'block_user' : 'unblock_user';
+        const method = 'POST';
 
-        fetch(`/api/chat/block_user/${chatroomName}/`, {
-            method: "POST",
+        fetch(`/api/chat/${endpoint}/${chatroomName}/`, {
+            method: method,
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken
             },
-            body: JSON.stringify({ blocked_username: username })
+            body: JSON.stringify({ blocked_username: username }),
+            credentials: 'include'
         })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.detail);
-        })
-        .catch(error => {
-            console.error("Block user error:", error);
-            alert("Error on blocking user.");
-        });
-    }
-
-    unblockUser(username) {
-        const chatroomName = 'public-chat';
-        const csrfToken = this.getCookie('csrftoken');
-
-        fetch(`/api/chat/unblock_user/${chatroomName}/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken
-            },
-            body: JSON.stringify({ blocked_username: username })
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.detail);
-        })
-        .catch(error => {
-            console.error("Unblock user error:", error);
-            alert("Error on unblocking user.");
-        });
-    }
-
-    getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    throw new Error(errorData.detail || `Response status: ${response.status}`);
+                });
             }
-        }
-        return cookieValue;
+            return response.json();
+        })
+        .then(data => {
+            alert(data.detail || `User has been ${action === 'block' ? 'blocked' : 'unblocked'} successfully.`);
+        })
+        .catch(error => {
+            console.error(`${action.charAt(0).toUpperCase() + action.slice(1)} user error:`, error);
+            alert(`Error ${action === 'block' ? 'blocking' : 'unblocking'} user: ${error.message}`);
+        });
     }
 }
