@@ -39,7 +39,6 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "daphne",
-    "user",
     "user_stats",
     "django_redis",
     "django.contrib.admin",
@@ -52,6 +51,7 @@ INSTALLED_APPS = [
     #"rest_framework.authtoken", #delete later
     "rest_framework_simplejwt",
 	"rest_framework_simplejwt.token_blacklist",
+    "user",
     "corsheaders",
     "blockchain",
     "rtchat",
@@ -63,13 +63,12 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "user.middleware.CheckAccessTokenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-	'user.middleware.CheckAccessTokenMiddleware',
-	'user.middleware.UpdateLastSeenMiddleware',
+    'user.middleware.UpdateLastSeenMiddleware',
 ]
-
 ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [

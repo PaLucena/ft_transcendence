@@ -6,10 +6,11 @@ from django.contrib.auth import get_user_model
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.http import JsonResponse
 from django.urls import resolve
-
+from .models import AppUser
 from channels.middleware import BaseMiddleware
 from asgiref.sync import sync_to_async
 from django.contrib.auth.models import AnonymousUser
@@ -40,23 +41,22 @@ class CheckAccessTokenMiddleware(MiddlewareMixin):
 			try:
 				validated_token = jwt_auth.get_validated_token(access_token)
 				request.user = jwt_auth.get_user(validated_token)
-				#response = self.get_response(request)
-				print("USER IN MIDDLEWARE: ", request.user)
+				print("1 USER IN MIDDLEWARE: ", request.user)
 			except TokenError:
-				pass
+				print("EXPIRED IN MIDDLEWARE: ", request.user)
+				access_token = None
 
-		if refresh_token:
-			try:
-				new_access_token = self.create_access_token(refresh_token)
-				response = JsonResponse({'message': 'Token refreshed'})
+		if refresh_token and not access_token:
+			new_access_token = self.refresh_access_token(refresh_token)
+			if new_access_token:
+				request.user = jwt_auth.get_user(jwt_auth.get_validated_token(new_access_token))
+				response = self.get_response(request)
 				response.set_cookie('access_token', new_access_token, secure=True, httponly=True)
-				request.COOKIES['access_token'] = new_access_token
+				print("2 USER IN MIDDLEWARE: ", request.user)
 				return response
-			except InvalidToken:
-				#handle blacklist refresh token
-				return JsonResponse({'error': 'Invalid refresh token'}, status=401)
-		else:
-			return JsonResponse({'error': 'Access token expired and no refresh token provided'}, status=401)
+
+		print("1111 USER IN MIDDLEWARE: ", request.user)
+		return self.get_response(request)
 
 	def create_access_token(self, refresh_token):
 		refresh = RefreshToken(refresh_token)
@@ -80,6 +80,7 @@ def get_user_from_token(token_key):
 
 class JWTAuthMiddleware(BaseMiddleware):
 	async def __call__(self, scope, receive, send):
+		print("4 USER IN MIDDLEWARE: ")
 		exempt_views = ['login', 'signup']
 		api_prefix = '/api/'		
 		path = scope.get('path', '')
@@ -123,6 +124,7 @@ class UpdateLastSeenMiddleware:
 	def __call__(self, request) -> Any:
 		response = self.get_response(request)
 		if request.user.is_authenticated:
+			print("5 USER IN MIDDLEWARE: ")
 			User = get_user_model()
 			user = User.objects.get(username=request.user)
 			user.last_seen = timezone.now()
