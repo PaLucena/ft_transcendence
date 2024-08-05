@@ -68,12 +68,10 @@
 }
 
 #dropdownTwo {
-	display: block;
 	color: black;
-	height: 70%;
+	height: 75%;
 	background-color: #edeef0;
 }
-#btns {display: none;}
 
 #dropdownOne #vsIA, #dropdownTwo #createPub {
 	margin-left: 0;
