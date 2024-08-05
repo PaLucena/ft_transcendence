@@ -10,6 +10,7 @@ export class Profile extends Component {
 
 	init() {
 		this.logout();
+		this.enable2fa();
 	}
 
 	logout() {
@@ -27,5 +28,27 @@ export class Profile extends Component {
 				console.log("Logout error: ", error);
 			})
 		});
+	}
+
+	enable2fa() {
+		let twofaBtn = document.getElementById("2faBtn");
+
+		twofaBtn.addEventListener("click", (event) => {
+			const response = fetch("/api/2fa/enable2fa/", {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					"user": "ealgar-c",
+				}),
+			})
+			.then(response => {
+				return response.json()
+			})
+			.then(data => {
+				console.log(data)
+			})
+		})
 	}
 }
