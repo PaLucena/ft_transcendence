@@ -64,14 +64,14 @@ export default async function router() {
 		try {
 			const page = new RouteClass(params);
 			const html = await page.render();
-			document.getElementById('root').innerHTML = html;
+			document.getElementById('content').innerHTML = html;
 
 			if (typeof page.init === 'function') {
 				await page.init();
 			}
 		} catch (error) {
 		  console.error("Error rendering page:", error);
-		  document.getElementById('root').innerHTML = '<h1>Error rendering page.</h1>';
+		  document.getElementById('content').innerHTML = '<h1>Error rendering page.</h1>';
 		}
 	}
 }

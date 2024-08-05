@@ -10,6 +10,14 @@ body {
 	background-color: #7ba9a9;
 }
 
+.navbar {
+	height: 10vh;
+	margin: 0;
+	margin-bottom: 0;
+	padding: 0;
+	background-color: #3a595c;
+}
+
 #particles-js {
 	position: absolute;
 	top: 0;

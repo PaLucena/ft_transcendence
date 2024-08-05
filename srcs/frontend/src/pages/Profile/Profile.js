@@ -8,9 +8,7 @@ export class Profile extends Component {
 		super('/pages/Profile/profile.html')
 	}
 
-	async init() {
-		await this.renderComponent(Navbar, 'navbar-placeholder');
-		await this.renderComponent(ChatBtn, 'chatbtn-placeholder');
+	init() {
 		this.logout();
 	}
 

@@ -6,7 +6,7 @@ export class Auth extends Component {
 		super("/pages/Auth/auth.html")
 	}
 
-	async init() {
+	init() {
 		this.getApiToken()
 	}
 
@@ -16,7 +16,7 @@ export class Auth extends Component {
 
 		console.log("code: ", code)
 
-		const response = fetch("/api/42api-login/", {
+		fetch("/api/42api-login/", {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

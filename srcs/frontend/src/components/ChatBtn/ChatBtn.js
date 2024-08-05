@@ -5,7 +5,7 @@ export class ChatBtn extends Component {
 		super('/components/ChatBtn/chatbtn.html')
 	}
 
-	async init() {
+	init() {
 		this.openClosePopUp();
 	}
 

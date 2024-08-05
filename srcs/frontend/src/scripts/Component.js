@@ -26,7 +26,7 @@ export class Component {
 		return `<div>Page route not defined.</div>`;
 	}
 
-	async renderComponent(ComponentClass, placeholderId) {
+	static async renderComponent(ComponentClass, placeholderId) {
 		try {
 			const component = new ComponentClass();
 			const componentHtml = await component.render();
