@@ -1,11 +1,23 @@
-import { router, navigateTo, navigateToOnBootup } from './router/router.js';
+import router, { navigateTo, navigateToOnBootup } from './router.js';
+import { renderNoRouterComponents } from './utils/noRouterRender.js'
 
-window.addEventListener("DOMContentLoaded", navigateToOnBootup);
-window.addEventListener("popstate", router);
+
+window.addEventListener("DOMContentLoaded", async () => {
+	renderNoRouterComponents();
+    navigateToOnBootup();
+});
+
+window.addEventListener("popstate", () => {
+	console.log("popstate event triggered");
+	router();
+});
 
 document.addEventListener("click", (event) => {
-  if (event.target.tagName === "A") {
-    event.preventDefault();
-    navigateTo(event.target.href);
-  }
+	console.log("Clicked element:", event.target);
+	const anchor = event.target.closest("a");
+	if (anchor) {
+		event.preventDefault();
+		console.log("Navigating to:", anchor.href);
+		navigateTo(anchor.href);
+	}
 });

@@ -1,13 +1,9 @@
-import { Page } from '../Page.js';
-import { navigateTo } from '../../scripts/router/router.js';
+import { Component } from "../../scripts/Component.js";
+import { navigateTo } from '../../scripts/router.js';
 
-export class Auth extends Page {
+export class Auth extends Component {
 	constructor() {
 		super("/pages/Auth/auth.html")
-	}
-
-	async render() {
-		return await super.render();
 	}
 
 	init() {
@@ -20,7 +16,7 @@ export class Auth extends Page {
 
 		console.log("code: ", code)
 
-		const response = fetch("/api/42api-login/", {
+		fetch("/api/42api-login/", {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

@@ -1,82 +1,48 @@
-import { Page } from '../Page.js';
-import { navigateTo } from '../../scripts/router/router.js'
+import { Component } from '../../scripts/Component.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
 import { ChatBtn } from '../../components/ChatBtn/ChatBtn.js';
 import { closeUserWebSocket } from '../../scripts/websocket.js';
 
-export class Play extends Page {
+export class Play extends Component {
 	constructor() {
-		super("/pages/Play/play.html")
+		super('/pages/Play/play.html');
 	}
 
-	async render() {
-		return super.render();
-	}
+	init() {
+		this.setupEventListeners();
+	  }
 
-	async init() {
-		await this.renderComponent(Navbar, 'navbar-placeholder');
-		await this.renderComponent(ChatBtn, 'chatbtn-placeholder');
-		this.oneVSoneBtn();
-		this.tournamentBtn();
-		this.hideDropdownOne();
-		this.hideDropdownTwo();
-		this.logout();
-	}
+	  setupEventListeners() {
+		const oneVSoneBtn = document.getElementById("oneVSoneBtn");
+		if (oneVSoneBtn) {
+			oneVSoneBtn.addEventListener("click", () => {
+				document.getElementById("btns").style.display = "none";
+				document.getElementById("dropdownOne").style.display = "block";
+			});
+		}
 
-	logout() {
-		let	logoutBtn = document.getElementById("logoutBtn");
+		const tournamentBtn = document.getElementById("tournamentBtn");
+		if (tournamentBtn) {
+			tournamentBtn.addEventListener("click", () => {
+				document.getElementById("btns").style.display = "none";
+				document.getElementById("dropdownTwo").style.display = "block";
+			});
+		}
 
-		logoutBtn.addEventListener("click", (event) => {
-			fetch("/api/logout/", {
-				method: "GET",
-				credentials: 'include'
-			})
-			.then(response => {
-				console.log("Respuesta a logout: ", response); // TODO: esto es debuggeo
-				closeUserWebSocket()
-				navigateTo("/login");
-			})
-			.catch((error) => {
-				console.log("Logout error: ", error);
-			})
-		});
-	}
+		const backOne = document.getElementById("backOne");
+		if (backOne) {
+			backOne.addEventListener("click", () => {
+				document.getElementById("dropdownOne").style.display = "none";
+				document.getElementById("btns").style.display = "block";
+			});
+		}
 
-	oneVSoneBtn() {
-		let oneVSone = document.getElementById("oneVSoneBtn");
-
-		oneVSone.addEventListener("click", () => {
-			document.getElementById("btns").style.display = "none";
-			document.getElementById("dropdownOne").style.display = "block";
-		});
-	}
-
-
-	tournamentBtn() {
-		let tournament = document.getElementById("tournamentBtn");
-
-		tournament.addEventListener("click", () => {
-			document.getElementById("btns").style.display = "none";
-			document.getElementById("dropdownTwo").style.display = "block";
-		});
-	}
-
-
-	hideDropdownOne() {
-		let backOne = document.getElementById("backOne");
-
-		backOne.addEventListener("click", () => {
-			document.getElementById("dropdownOne").style.display = "none";
-			document.getElementById("btns").style.display = "block";
-		});
-	}
-
-	hideDropdownTwo() {
-		let backTwo = document.getElementById("backTwo");
-
-		backTwo.addEventListener("click", () => {
-			document.getElementById("dropdownTwo").style.display = "none";
-			document.getElementById("btns").style.display = "block";
-		});
+		const backTwo = document.getElementById("backTwo");
+		if (backTwo) {
+			backTwo.addEventListener("click", () => {
+				document.getElementById("dropdownTwo").style.display = "none";
+				document.getElementById("btns").style.display = "block";
+			});
+		}
 	}
 }
