@@ -1,6 +1,12 @@
 import router, { navigateTo, navigateToOnBootup } from './router.js';
+import { renderNoRouterComponents } from './utils/noRouterRender.js'
 
-window.addEventListener("DOMContentLoaded", navigateToOnBootup);
+
+window.addEventListener("DOMContentLoaded", async () => {
+	renderNoRouterComponents();
+    navigateToOnBootup();
+});
+
 window.addEventListener("popstate", () => {
 	console.log("popstate event triggered");
 	router();

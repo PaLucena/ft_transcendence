@@ -6,9 +6,7 @@ export class Chat extends Component {
         super('/pages/Chat/chat.html', params);
     }
 
-	async init() {
-		await this.renderComponent(Navbar, 'navbar-placeholder');
-
+	init() {
 		this.initChat(this.params.chatId);
 	}
 

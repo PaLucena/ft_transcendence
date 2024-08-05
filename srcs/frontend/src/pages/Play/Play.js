@@ -7,10 +7,7 @@ export class Play extends Component {
 		super('/pages/Play/play.html');
 	}
 
-	async init() {
-		await this.renderComponent(Navbar, 'navbar-placeholder');
-		await this.renderComponent(ChatBtn, 'chatbtn-placeholder');
-
+	init() {
 		this.setupEventListeners();
 	  }
 

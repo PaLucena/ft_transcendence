@@ -6,9 +6,4 @@ export class Friends extends Component {
 	constructor() {
 		super('/pages/Friends/friends.html')
 	}
-
-	async init() {
-		await this.renderComponent(Navbar, 'navbar-placeholder');
-		await this.renderComponent(ChatBtn, 'chatbtn-placeholder');
-	}
 }
