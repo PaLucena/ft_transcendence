@@ -10,12 +10,14 @@ body {
 	background-color: #7ba9a9;
 }
 
-.navbar {
+nav {
 	height: 10vh;
 	margin: 0;
 	margin-bottom: 0;
 	padding: 0;
-	background-color: #3a595c;
+	background-color: #425f4b;
+	border-bottom-left-radius: 20px;
+	border-bottom-right-radius: 20px;
 }
 
 #particles-js {

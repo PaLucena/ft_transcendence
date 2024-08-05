@@ -26,12 +26,10 @@
 #containerUser #userInfo {
 	background-color: #edeef0;
 	color: black;
-	margin-top: 10vh;
+	margin-top: 5vh;
 	margin-left: 8%;
 	height: 90%;
 	width: 90%;
-	border-top-right-radius: 30px;
-	border-top-left-radius: 30px;
 }
 
 #user {
@@ -66,12 +64,10 @@
 
 #containerStats #stats {
 	background-color: #edeef0;
-	margin-top: 10vh;
+	margin-top: 5vh;
 	margin-left: 5%;
 	height: 90%;
 	width: 90%;
-	border-top-right-radius: 30px;
-	border-top-left-radius: 30px;
 }
 
 #chat-placeholder {
