@@ -7,8 +7,10 @@ import { NotFound } from '../pages/NotFound/NotFound.js';
 import { Friends } from '../pages/Friends/Friends.js';
 import { Profile } from '../pages/Profile/Profile.js';
 import { Auth } from '../pages/Auth/Auth.js';
+import renderStaticComponents from './utils/renderStaticComponents.js';
 
-const routes = {
+
+export const routes = {
 	"/404": NotFound,
 	"/": Home,
 	"/login": Login,
@@ -62,6 +64,8 @@ export default async function router() {
 
 	async function renderPage(RouteClass, params) {
 		try {
+			console.log(1232131212321321)
+			await renderStaticComponents();
 			const page = new RouteClass(params);
 			const html = await page.render();
 			document.getElementById('content').innerHTML = html;
