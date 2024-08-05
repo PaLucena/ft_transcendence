@@ -64,6 +64,7 @@ export default async function router() {
 
 	async function renderPage(RouteClass, params) {
 		try {
+			console.log(1232131212321321)
 			await renderStaticComponents();
 			const page = new RouteClass(params);
 			const html = await page.render();
