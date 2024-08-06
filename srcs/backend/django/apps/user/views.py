@@ -63,7 +63,6 @@ def login(request):
 	if not all ([username, password]):
 		return Response({"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST)
 
-	print("GFFVGFVFVFVFVFVFVFVF")
 	authenticated_user: AbstractUser | None = authenticate(username=username, password=password)
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)

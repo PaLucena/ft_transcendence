@@ -18,6 +18,7 @@ export class Profile extends Component {
 		logoutBtn.addEventListener("click", (event) => {
 			fetch("/api/logout/", {
 				method: "GET",
+				credentials: 'include'
 			})
 			.then(response => {
 				console.log("Respuesta a logout: ", response); // TODO: esto es debuggeo

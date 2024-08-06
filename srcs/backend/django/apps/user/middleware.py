@@ -59,9 +59,15 @@ class CheckAccessTokenMiddleware(MiddlewareMixin):
 		return self.get_response(request)
 
 	def create_access_token(self, refresh_token):
-		refresh = RefreshToken(refresh_token)
-		new_access_token = str(refresh.access_token)
-		return new_access_token
+		try:
+			refresh = RefreshToken(refresh_token)
+			new_access_token = str(refresh.access_token)
+			# Blacklist the old refresh token
+			refresh.blacklist()
+			return new_access_token
+		except TokenError as e:
+			print(f"Token error: {e}")
+			return None
 
 
 User = get_user_model()

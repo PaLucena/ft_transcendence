@@ -9,12 +9,7 @@ export function initUserWebSocket() {
 	socket.onopen = (e) => {
 		console.log("[open] Connection established");
 		socket.send(JSON.stringify({ 'message': 'Hello Server!' }));
-		//setInterval(null, 3600)
 	};
-
-	// socket.onmessage = (event) => {
-	// 	console.log(`[message] Data received from server: ${event.data}`);
-	// };
 
 	socket.onclose = (event) => {
 		if (event.wasClean) {

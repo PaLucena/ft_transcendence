@@ -1,3 +1,4 @@
+import re
 from rest_framework.decorators import api_view
 from rest_framework import status
 from django.contrib.auth.decorators import login_required
@@ -13,15 +14,21 @@ def create_tournament(request):
 		creator = request.user
 		name = request.data.get('name')
 		type = request.data.get('type')
-		participants = request.data.getlist('participants') if type==Tournament.PRIVATE else []
+		pending_invitations = request.data.getlist('participants') if type==Tournament.PRIVATE else []
+
+		if len(pending_invitations) > 8:
+			return Response({"error": "Too many participants in the invitation list"}, status=status.HTTP_400_BAD_REQUEST)
 		
 		tournament = Tournament.objects.create(
 			creator=creator,
 			name=name,
-			type=type
+			type=type,
+			pending_invitations=pending_invitations
 		)
 
-		return Response('')
+		
+
+		return Response({"message": "Created successfully"}, status=status.HTTP_200_OK)
 
 	except Exception as e:
 	        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -41,3 +48,5 @@ def close_tournament(request):
 @login_required
 @api_view(["POST"])
 def join_tournament(request, tournament_id):
+	user = request.user
+	Tournament.objects.filter(pk=tournament_id)
