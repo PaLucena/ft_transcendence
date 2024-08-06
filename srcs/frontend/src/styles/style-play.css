@@ -67,11 +67,17 @@
 	z-index: 3;
 }
 
+#dropdownTwo {
+	color: black;
+	height: 75%;
+	background-color: #edeef0;
+}
+
 #dropdownOne #vsIA, #dropdownTwo #createPub {
 	margin-left: 0;
 }
 
-#dropdownOne #local, #dropdownOne #online, #dropdownOne #backOne, #dropdownTwo #createPriv, #dropdownTwo #join, #dropdownTwo #backTwo {
+#dropdownOne #local, #dropdownOne #online, #dropdownOne #backOne, #dropdownTwo #createPriv, #dropdownTwo #join {
 	margin-top: 7vh;
 	margin-left: 0;
 }

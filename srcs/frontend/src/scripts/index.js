@@ -1,9 +1,6 @@
 import router, { navigateTo, navigateToOnBootup } from './router.js';
-import { renderNoRouterComponents } from './utils/noRouterRender.js'
 
-
-window.addEventListener("DOMContentLoaded", async () => {
-	renderNoRouterComponents();
+window.addEventListener("DOMContentLoaded", () => {
     navigateToOnBootup();
 });
 
