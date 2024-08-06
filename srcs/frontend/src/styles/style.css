@@ -20,6 +20,10 @@ nav {
 	border-bottom-right-radius: 20px;
 }
 
+.btn-success {
+	background-color: #3a595c;
+}
+
 #particles-js {
 	position: absolute;
 	top: 0;
