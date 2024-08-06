@@ -63,11 +63,11 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "user.middleware.CheckAccessTokenMiddleware",
+    #"user.middleware.CheckAccessTokenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'user.middleware.UpdateLastSeenMiddleware',
+    #'user.middleware.UpdateLastSeenMiddleware',
 ]
 ROOT_URLCONF = "core.urls"
 
@@ -124,10 +124,10 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        #"rest_framework.authentication.SessionAuthentication",  # For browsable API
+        "rest_framework.authentication.SessionAuthentication",  # For browsable API
         # "rest_framework.authentication.TokenAuthentication",  # For API clients
-        #"rest_framework.authentication.BasicAuthentication", 
-	    'rest_framework_simplejwt.authentication.JWTAuthentication',
+        "rest_framework.authentication.BasicAuthentication", 
+	    #'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
      #  'rest_framework.permissions.IsAuthenticated',

@@ -49,4 +49,5 @@ def close_tournament(request):
 @api_view(["POST"])
 def join_tournament(request, tournament_id):
 	user = request.user
-	Tournament.objects.filter(pk=tournament_id)
+	tournament = Tournament.objects.filter(pk=tournament_id)
+	if

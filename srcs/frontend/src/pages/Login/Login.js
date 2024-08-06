@@ -1,6 +1,7 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
 import { initUserWebSocket } from '../../scripts/websocket.js'
+//import { getCSRFToken } from '../../scripts/utils/csrf.js'
 
 export class Login extends Component {
 	constructor() {
@@ -25,13 +26,16 @@ export class Login extends Component {
 				jsonData[key] = value;
 			});
 
+			//const csrftoken = getCSRFToken('csrftoken');
+
 			fetch("/api/login/", {
 				method: "POST",
+				credentials: 'include',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
+					//'X-CSRFToken': csrftoken
 				},
-				body: JSON.stringify(jsonData),
-				credentials: 'include'
+				body: JSON.stringify(jsonData)
 			})
 			.then(response => {
 				if (response.status === 200) {
@@ -55,7 +59,7 @@ export class Login extends Component {
 		})
 	}
 
-	intraLogin() {
+	intraLoimportgin() {
 		const btn = document.getElementById("intraLogin");
 		btn.addEventListener('click', () => {
 			window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fauth&response_type=code";
@@ -88,19 +92,4 @@ export class Login extends Component {
 			console.error(`[error] ${error.message}`);
 		};
 	}
-
-	// function getCSRFToken(csrftoken) {
-	// 	var cookieValue = null;
-	// 	if (document.cookie && document.cookie != '') {
-	// 		var cookies = document.cookie.split(';');
-	// 		for (var i = 0; i < cookies.length; i++) {
-	// 			var cookie = jQuery.trim(cookies[i]);
-	// 			if (cookie.substring(0, 10) == (csrftoken + '=')) {
-	// 				cookieValue = decodeURIComponent(cookie.substring(10));
-	// 				break;
-	// 			}
-	// 		}
-	// 	}
-	// 	return cookieValue;
-	// }
 }

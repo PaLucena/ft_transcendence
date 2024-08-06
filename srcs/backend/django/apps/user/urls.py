@@ -9,6 +9,7 @@ from . import consumers
 ] """
 
 urlpatterns = [
+	path('get_user_data/', views.get_user_data, name='get_user_data'),
 	path('login/', views.login),
 	path('signup/', views.signup),
 	path('test-view/', views.TestView),
@@ -27,8 +28,6 @@ urlpatterns = [
 	path('api/signup/', views.signup),
 	path('api/test-view/', views.TestView),
 	path('api/logout/', views.logout),
-	path('api/setnickname/', views.set_nickname),
-	path('api/uploadavatar/', views.upload_avatar),
 	path('api/updateuserinfo/', views.update_user_info),
 	path('api/invite_friend/', views.invite_friend, name='invite_friend'),
 	path('api/accept_friend_request/', views.accept_friend_request, name='accept_friend_request'),

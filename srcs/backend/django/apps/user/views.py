@@ -27,8 +27,25 @@ from django.core.files.temp import NamedTemporaryFile
 from django.conf import settings
 import os
 import requests
-from .utils import set_nickname, upload_avatar
+from .utils import set_nickname, upload_avatar, get_friend_count
 from django.contrib.auth import logout as auth_logout
+
+
+@api_view(["GET"])
+def get_user_data(request):
+	print("USER:", request.user)
+
+	try:
+		user = request.user
+		user_data = {
+			'username': user.username,
+			'avatar': user.avatar,
+			'email': user.email,
+			'number_of_friends': user.get_friend_count(user)
+		}
+		return Response(user_data, status=status.HTTP_200_OK)
+	except Exception as e:
+		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["POST"])
 def signup(request):
@@ -159,7 +176,6 @@ def invite_friend(request):
 
 	Friend.objects.create(from_user=request.user, to_user=friend)
 	return Response({'message': 'Friend request sent successfully.'}, status=status.HTTP_200_OK)
-
 
 
 @api_view (["DELETE"])
