@@ -29,6 +29,7 @@ import os
 import requests
 from .utils import set_nickname, upload_avatar, get_friend_count
 from django.contrib.auth import logout as auth_logout
+from django.views.decorators.csrf import csrf_exempt
 
 
 @api_view(["GET"])
@@ -70,7 +71,7 @@ def signup(request):
 	error_field, error_message = next(iter(serializer.errors.items()))
 	return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
-
+#@csrf_exempt
 @api_view(["POST"])
 def login(request):
 	#permission_classes = [AllowAny]
@@ -84,7 +85,7 @@ def login(request):
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
 		user.save()
-
+		login(request, authenticated_user)
 		refresh = RefreshToken.for_user(user)
 		access = refresh.access_token
 		response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)

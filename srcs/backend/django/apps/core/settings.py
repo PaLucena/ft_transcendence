@@ -60,10 +60,10 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    #"user.middleware.CheckAccessTokenMiddleware",
+    "user.middleware.CheckAccessTokenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -124,10 +124,10 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",  # For browsable API
+       # "rest_framework.authentication.SessionAuthentication",  # For browsable API
         # "rest_framework.authentication.TokenAuthentication",  # For API clients
-        "rest_framework.authentication.BasicAuthentication", 
-	    #'rest_framework_simplejwt.authentication.JWTAuthentication',
+       # "rest_framework.authentication.BasicAuthentication", 
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
      #  'rest_framework.permissions.IsAuthenticated',
@@ -168,9 +168,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Or another backend of your choice
-SESSION_COOKIE_AGE = 1209600  # Two weeks, for example
-SESSION_SAVE_EVERY_REQUEST = True
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Set to True if you want the session to expire when the browser closes
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 

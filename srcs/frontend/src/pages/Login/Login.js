@@ -1,7 +1,7 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
 import { initUserWebSocket } from '../../scripts/websocket.js'
-//import { getCSRFToken } from '../../scripts/utils/csrf.js'
+import { getCSRFToken } from '../../scripts/utils/csrf.js'
 
 export class Login extends Component {
 	constructor() {
@@ -26,14 +26,14 @@ export class Login extends Component {
 				jsonData[key] = value;
 			});
 
-			//const csrftoken = getCSRFToken('csrftoken');
+			const csrftoken = getCSRFToken('csrftoken');
 
 			fetch("/api/login/", {
 				method: "POST",
 				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
-					//'X-CSRFToken': csrftoken
+					'X-CSRFToken': csrftoken
 				},
 				body: JSON.stringify(jsonData)
 			})
@@ -59,7 +59,7 @@ export class Login extends Component {
 		})
 	}
 
-	intraLoimportgin() {
+	intraLogin() {
 		const btn = document.getElementById("intraLogin");
 		btn.addEventListener('click', () => {
 			window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fauth&response_type=code";

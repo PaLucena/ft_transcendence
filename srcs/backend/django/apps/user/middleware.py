@@ -8,7 +8,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import resolve
 from .models import AppUser
 from channels.middleware import BaseMiddleware
@@ -21,6 +21,7 @@ class CheckAccessTokenMiddleware(MiddlewareMixin):
 		self.get_response = get_response
 
 	def __call__(self, request):
+		#print(f"Scope: {json.dumps(request, default=str)}")
 		exempt_views = ['login', 'signup']
 		api_prefix = '/api/'
 		admin_prefix = '/admin/'
@@ -84,9 +85,9 @@ def get_user_from_token(token_key):
 		print(f"Failed to retrieve user: {e}")
 		return AnonymousUser()
 
+
 class JWTAuthMiddleware(BaseMiddleware):
 	async def __call__(self, scope, receive, send):
-		print("4 USER IN MIDDLEWARE: ")
 		exempt_views = ['login', 'signup']
 		api_prefix = '/api/'		
 		path = scope.get('path', '')
@@ -112,7 +113,7 @@ class JWTAuthMiddleware(BaseMiddleware):
 			scope['user'] = await get_user_from_token(token_key)
 		else:
 			scope['user'] = AnonymousUser()
-			
+
 		if isinstance(scope['user'], AnonymousUser):
 			await send({
 				'type': 'websocket.close',
