@@ -31,7 +31,7 @@
 #btnsContainer {
 	position: absolute;
 	display: flex;
-	height: 100%;
+	height: 90%;
 	z-index: 2;
 	align-items: center;
 	justify-content: center;
