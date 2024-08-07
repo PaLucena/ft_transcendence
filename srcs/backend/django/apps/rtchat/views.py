@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from rtchat.models import ChatGroup, Block
 from user.models import AppUser
@@ -10,6 +9,12 @@ from rtchat.serializers import GroupMessageSerializer
 
 @api_view(["GET"])
 def chat_view(request, chatroom_name="public-chat"):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
     try:
         chat_group = get_object_or_404(ChatGroup, group_name=chatroom_name)
         other_user = None
@@ -45,12 +50,18 @@ def chat_view(request, chatroom_name="public-chat"):
 
 @api_view(["GET"])
 def get_or_create_chatroom(request, username):
-    print("HEKLEKLEELELE")
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
     if request.user.username == username:
         return Response(
             {"detail": "You cannot create a private chat with yourself."},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
     try:
         other_user = get_object_or_404(AppUser, username=username)
     except AppUser.DoesNotExist:
@@ -60,8 +71,8 @@ def get_or_create_chatroom(request, username):
         )
 
     my_chatrooms = request.user.chat_group.filter(is_private=True)
-
     chatroom = None
+
     for room in my_chatrooms:
         if other_user in room.members.all():
             chatroom = room
@@ -79,6 +90,12 @@ def get_or_create_chatroom(request, username):
 
 @api_view(["POST"])
 def block_user_view(request, chatroom_name):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
     try:
         blocker = request.user
         blocked_username = request.data.get("blocked_username")
@@ -111,6 +128,12 @@ def block_user_view(request, chatroom_name):
 
 @api_view(["POST"])
 def unblock_user_view(request, chatroom_name):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
     try:
         blocker = request.user
         blocked_username = request.data.get("blocked_username")

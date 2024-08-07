@@ -2,7 +2,7 @@ services:
   nginx_frontend:
     container_name: nginx_frontend
     build:
-      context: ./srcs/frontend/nginx
+      context: ./srcs/frontend
     expose:
       - "80"
     volumes:

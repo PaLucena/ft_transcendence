@@ -1,12 +1,7 @@
-import { Page } from '../Page.js';
+import { Component } from "../../scripts/Component.js";
 
-export class Home extends Page {
+export class Home extends Component {
 	constructor() {
-		super("/index.html");
-	}
-
-	
-	init() {
-		// Function for Init Home
+		super();
 	}
 }

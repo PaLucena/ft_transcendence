@@ -86,11 +86,10 @@ class JWTAuthMiddleware(BaseMiddleware):
 		else:
 			scope['user'] = AnonymousUser()
 			
-		print("USER FROM MIDDLEWARE  ", scope['user'])
 		if isinstance(scope['user'], AnonymousUser):
 			await send({
 				'type': 'websocket.close',
-				'code': 4001,  # Custom close code indicating authentication failure
+				'code': 4001,  # may change
 			})
 		else:
 			return await super().__call__(scope, receive, send)

@@ -11,7 +11,7 @@ class UserSerializerClass(ModelSerializer):
 	
 	class Meta:
 		model = AppUser
-		fields = ['id', 'username', 'email', 'password', 'nickname', 'confirm_password', 'avatar']
+		fields = ['id', 'username', 'email', 'password', 'confirm_password', 'avatar']
 		extra_kwargs = {
 			'password': {'write_only': True},
 			'email': {'required': True},
@@ -19,7 +19,7 @@ class UserSerializerClass(ModelSerializer):
 
 	def validate_email(self, value):
 		if AppUser.objects.filter(email__iexact=value).exists():
-			raise serializers.ValidationError({"error": "This email is already in use."})
+			raise serializers.ValidationError("This email is already in use.")
 		return value
 
 	#nickname will be set before tournament
@@ -38,18 +38,16 @@ class UserSerializerClass(ModelSerializer):
 
 	def validate(self, data) -> None:
 		if data['password'] != data['confirm_password']:
-			raise serializers.ValidationError({"error": "Passwords don't match."})
+			raise serializers.ValidationError("Passwords don't match.")
 		return data
 
 	def save(self, **kwargs):
-		print("SELF validated_data :", self.validated_data)
 		validated_data = {key: value for key, value in self.validated_data.items() if key != 'confirm_password'}
 
 		user_data = {
 			'username': validated_data['username'],
 			'email': validated_data['email'],
 			'password': validated_data['password'],
-			#'nickname': validated_data.get('nickname', validated_data['username'])  
 		}
 		if 'avatar' in validated_data:
 				user_data['avatar'] = validated_data['avatar']

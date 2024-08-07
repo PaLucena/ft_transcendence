@@ -1,23 +1,15 @@
-import { Page } from '../Page.js';
-import { navigateTo } from '../../scripts/router/router.js'
+import { Component } from '../../scripts/Component.js';
+import { navigateTo } from '../../scripts/router.js'
+import { initUserWebSocket } from '../../scripts/websocket.js'
 
-export class Login extends Page {
+export class Login extends Component {
 	constructor() {
-		super("/pages/Login/login.html");
+		super('/pages/Login/login.html');
 	}
 
-	async render() {
-		return await super.render();
-	}
-
-	init() {
+	async init() {
 		this.initLoginForm();
-	}
-
-	getBase64Img(url) {
-		fetch(url, {
-
-		})
+		this.intraLogin();
 	}
 
 	initLoginForm() {
@@ -43,13 +35,13 @@ export class Login extends Page {
 			})
 			.then(response => {
 				if (response.status === 200) {
-					this.initUserWebSocket();
+					initUserWebSocket();
 					return response.json();
 				}
-				else { //TODO: Aqui tengo que manejar los códigos de error
+				else {
 					return response.json().then(errData => {
 						document.getElementById("errorPlaceholder").innerHTML = "Error: " + errData.error;
-						throw new Error("Error ${response.status}");
+						throw new Error(errData.error);
 					});
 				}
 			})
@@ -62,6 +54,14 @@ export class Login extends Page {
 			})
 		})
 	}
+
+	intraLogin() {
+		const btn = document.getElementById("intraLogin");
+		btn.addEventListener('click', () => {
+			window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fauth&response_type=code";
+		});
+	}
+
 
 	initUserWebSocket() {
 		const socket = new WebSocket(`wss://${window.location.host}/ws/status/`);

@@ -1,10 +1,3 @@
-#navbar-placeholder {
-	height: 10vh;
-	margin: 0;
-	margin-bottom: 0;
-	padding: 0;
-}
-
 #rootPlay {
 	box-sizing: border-box;
 	margin: 0;
@@ -17,7 +10,7 @@
 
 #gifContainer {
 	background-color: black;
-	border-radius: 2%;
+	border-radius: 20px;
 	position: relative;
 	z-index: 1;
 	width: 90%;
@@ -38,7 +31,7 @@
 #btnsContainer {
 	position: absolute;
 	display: flex;
-	height: 100%;
+	height: 90%;
 	z-index: 2;
 	align-items: center;
 	justify-content: center;
@@ -50,22 +43,19 @@
 }
 
 #btns {
+	display: block;
 	position: absolute;
 	align-items: center;
 	width: 80%;
-	left: 10%;
-	top: 25%;
 	z-index: 2;
 }
 
 #btns #oneVSone {
-	margin-top: 7vh;
 	margin-left: 0;
 }
 
 #btns #tournament {
 	margin-top: 10vh;
-	margin-bottom: 5vh;
 	margin-left: 0;
 }
 
@@ -74,20 +64,22 @@
 	position: absolute;
 	justify-content: center;
 	width: 80%;
-	height: 74%;
-	left: 10%;
-	top: 13%;
 	z-index: 3;
-	border-radius: 3%;
 }
 
-#dropdownOne #vsIA, #dropdownOne #local, #dropdownOne #online, #dropdownTwo #createPub, #dropdownTwo #createPriv, #dropdownTwo #join {
-	margin-top: 7vh;
+#dropdownTwo {
+	color: black;
+	height: 75%;
+	background-color: #edeef0;
+}
+
+#dropdownOne #vsIA, #dropdownTwo #createPub {
 	margin-left: 0;
 }
 
-#dropdownOne #back, #dropdownTwo #back {
-	margin-bottom: 0;
+#dropdownOne #local, #dropdownOne #online, #dropdownOne #backOne, #dropdownTwo #createPriv, #dropdownTwo #join {
+	margin-top: 7vh;
+	margin-left: 0;
 }
 
 #dropdownOne #back button, #dropdownTwo #back button {
@@ -95,10 +87,11 @@
 	color: white;
 }
 
-#chat-placeholder {
+#chatbtn-placeholder {
 	position: absolute;
 	display: flex;
 	justify-content: right;
+	align-items: baseline;
 	z-index: 3;
 	bottom: 0;
 	right: 0.5%;

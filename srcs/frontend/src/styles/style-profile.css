@@ -23,14 +23,38 @@
 	justify-content: center;
 }
 
-#containerUser #user {
+#containerUser #userInfo {
 	background-color: #edeef0;
-	margin-top: 10vh;
+	color: black;
+	margin-top: 5vh;
 	margin-left: 8%;
 	height: 90%;
 	width: 90%;
-	border-top-left-radius: 3%;
-	border-top-right-radius: 3%;
+}
+
+#user {
+	font-size: xx-large;
+}
+
+#userInfo #photo {
+	position: relative;
+	margin-top: 6%;
+	height: 20%;
+	justify-content: center;
+}
+
+#photo #photoContainer {
+	position: absolute;
+	height: 150%;
+	bottom: 0;
+}
+
+#photo #photoContainer img {
+	border: 2px solid #192e2f;
+}
+
+#editBtn button, #logoutBtn button {
+	background-color: #3a595c;
 }
 
 #containerStats {
@@ -40,12 +64,10 @@
 
 #containerStats #stats {
 	background-color: #edeef0;
-	margin-top: 10vh;
+	margin-top: 5vh;
 	margin-left: 5%;
 	height: 90%;
 	width: 90%;
-	border-top-left-radius: 3% 4%;
-	border-top-right-radius: 3% 4%;
 }
 
 #chat-placeholder {

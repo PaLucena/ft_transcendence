@@ -1,13 +1,10 @@
-import { Page } from '../Page.js';
-import { navigateTo } from '../../scripts/router/router.js';
+import { Component } from '../../scripts/Component.js';
+import { navigateTo } from '../../scripts/router.js';
+import { initUserWebSocket } from '../../scripts/websocket.js';
 
-export class Signup extends Page {
+export class Signup extends Component {
 	constructor() {
-		super("/pages/Signup/signup.html");
-	}
-
-	async render() {
-		return await super.render();
+		super('/pages/Signup/signup.html');
 	}
 
 	init() {
@@ -33,15 +30,18 @@ export class Signup extends Page {
 					headers: {
 					'Content-Type': 'application/json'
 					},
-					body: JSON.stringify(jsonData)
+					body: JSON.stringify(jsonData),
+					credentials: 'include'
 				})
 				.then(response => {
-					if (response.status === 201)
+					if (response.status === 201) {
+						initUserWebSocket();
 						return response.json();
+					}
 					else {
 						return response.json().then(errData => {
 							document.getElementById("errorPlaceholder").innerHTML = "Error: " + errData.error;
-							throw new Error(`Error ${response.status}`);
+							throw new Error(errData.error);
 						});
 					}
 				})

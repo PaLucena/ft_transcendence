@@ -1,15 +1,7 @@
-import { Page } from "../Page.js";
+import { Component } from "../../scripts/Component.js";
 
-export class NotFound extends Page {
+export class NotFound extends Component {
 	constructor() {
-		super("/pages/NotFound/404.html");
-	}
-
-	render() {
-		return super.render()
-	}
-
-	init() {
-		// Function for Init NotFound
+		super('/pages/NotFound/404.html');
 	}
 }
