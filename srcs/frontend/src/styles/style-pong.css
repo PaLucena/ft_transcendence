@@ -51,17 +51,13 @@
 
 .color-score_text { color: var(--text-score); }
 
-.container {
+.containerPong {
     height: var(--size-canvas-height);
     width: var(--size-canvas-width);
     border-radius: calc(var(--container-border-radius) * var(--responsive));
     margin-top: calc(50px * var(--responsive));
     background-color: var(--color-background);
     align-items: center;
-}
-
-.container div {
-    //border: 1px solid #000;
 }
 
 .score-board {

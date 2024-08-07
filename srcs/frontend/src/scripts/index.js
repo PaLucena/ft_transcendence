@@ -10,11 +10,11 @@ window.addEventListener("popstate", () => {
 });
 
 document.addEventListener("click", (event) => {
-	console.log("Clicked element:", event.target);
-	const anchor = event.target.closest("a");
-	if (anchor) {
+	const clickableElement = event.target.closest("a, button");
+
+	if (clickableElement && clickableElement.hasAttribute("href")) {
 		event.preventDefault();
-		console.log("Navigating to:", anchor.href);
-		navigateTo(anchor.href);
+		console.log("Navigating to:", clickableElement.getAttribute("href"));
+		navigateTo(clickableElement.getAttribute("href"));
 	}
 });

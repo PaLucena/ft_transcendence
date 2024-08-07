@@ -32,7 +32,7 @@ export class Pong extends Component {
 		const p_2_color = getComputedStyle(document.documentElement).getPropertyValue('--p2-color');
 		const ball_color = getComputedStyle(document.documentElement).getPropertyValue('--ball-color');
 		// Capture - Containers
-		const container = document.querySelector('.container');
+		const container = document.querySelector('.containerPong');
 		const board = document.querySelector('.board');
 		// Capture - Score board elements
 		const p_1_name = document.querySelector('.player_1_name');
