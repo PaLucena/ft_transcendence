@@ -35,9 +35,8 @@ from .authenticate import DefaultAuthentication
 from .decorators import default_authentication_required
 
 @api_view(["GET"])
+@default_authentication_required
 def get_user_data(request):
-	print("USER:", request.user)
-
 	try:
 		user = request.user
 		user_data = {
@@ -52,7 +51,6 @@ def get_user_data(request):
 
 @api_view(["POST"])
 def signup(request):
-	#permission_classes = [AllowAny] might set up later
 	serializer = UserSerializerClass(data=request.data)
 	if serializer.is_valid():
 		try:
@@ -73,7 +71,7 @@ def signup(request):
 	error_field, error_message = next(iter(serializer.errors.items()))
 	return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
-#@csrf_exempt
+
 @api_view(["POST"])
 def login(request):
 	username = request.data.get('username')
@@ -122,7 +120,7 @@ def logout(request):
 
 
 @api_view(["POST"])
-@login_required
+@default_authentication_required
 def update_user_info(request):
 	print("Request User:", request.headers)
 
@@ -163,7 +161,7 @@ def update_user_info(request):
 
 #CBV has to be created to not repeat code
 @api_view (["POST"])
-@login_required
+@default_authentication_required
 def invite_friend(request):
 	username = request.data.get('username')
 	if not username:
@@ -182,7 +180,7 @@ def invite_friend(request):
 
 
 @api_view (["DELETE"])
-@login_required
+@default_authentication_required
 def remove_friend(request):
 	friend_username = request.data.get('username')
 	if not friend_username:
@@ -207,7 +205,7 @@ def remove_friend(request):
 
 
 @api_view (["POST"])
-@login_required
+@default_authentication_required
 def accept_friend_request(request):
 	try:
 		friendship_request = Friend.objects.get(to_user=request.user)
@@ -231,7 +229,7 @@ def accept_friend_request(request):
 
 
 @api_view (["GET"])
-@login_required
+@default_authentication_required
 def get_friends(request):
 	user = request.user
 	all_friends = []
@@ -260,7 +258,7 @@ def get_friends(request):
 
 
 @api_view (["GET"])
-@login_required
+@default_authentication_required
 def delete_account(request):
 	user = request.user
 	matches = Match.objects.filter(Q(user=user) | Q(opponent=user))

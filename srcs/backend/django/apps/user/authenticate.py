@@ -33,8 +33,7 @@ class DefaultAuthentication:
 
 		user = self.jwt_auth.get_user(validated_token)
 		request.user = user
-		print("USER: ", user)
-		print("USER: ", request.user)
+
 		return user, request.COOKIES.get('access_token')
 
 
