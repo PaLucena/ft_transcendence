@@ -18,4 +18,5 @@ class Tournament(models.Model):
 	participants = models.ManyToManyField(AppUser, related_name='participants') #if deleting, needs to marked as "deleted user"
 	invitation_time_out =  models.DateTimeField(default=lambda: timezone.now() + timedelta(minutes=10))
 	type = models.CharField(max_length=10, choices=TOURNAMENT_TYPES, default=PUBLIC)
+	pending_invitations = models.ManyToManyField(AppUser, related_name='pending')
 	is_active = models.BooleanField(default=False)
