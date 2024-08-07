@@ -20,8 +20,8 @@ class GameLogic:
     BALL_SPEED_INC = 0.5
     COUNTDOWN = 3
     GOAL_MARGIN = 25
-    GOALS_TO_WIN = 3
-    GOALS_DIFF = 1
+    GOALS_TO_WIN = 6
+    GOALS_DIFF = 2
     FPS = 64
 
     # Initial positions

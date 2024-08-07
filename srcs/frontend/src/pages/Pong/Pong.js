@@ -1,12 +1,8 @@
-import { Page } from '../Page.js';
+import { Component} from "../../scripts/Component.js";
 
-export class Pong extends Page {
+export class Pong extends Component {
 	constructor() {
 		super("/pages/Pong/pong.html");
-	}
-
-	async render() {
-		return await super.render();
 	}
 
 	init() {
