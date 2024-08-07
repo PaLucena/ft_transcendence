@@ -184,7 +184,7 @@ contract PongTournament {
 
         // Aux containers
         uint256[] memory winnersBracket = new uint256[](4);
-        uint256[] memory loosersBracket = new uint256[](4);
+        uint256[] memory losersBracket = new uint256[](4);
 
         // Initial round - 8 players
         for (uint256 i = 0; i < 4; i++) {
@@ -195,24 +195,24 @@ contract PongTournament {
             tournaments_[testTournamentCounter].matchIds_.push(rnd_match.matchId_);
             if (rnd_match.winnerId_ == local) {
                 winnersBracket[i] = local;
-                loosersBracket[i] = visitor;
+                losersBracket[i] = visitor;
             } else {
                 winnersBracket[i] = visitor;
-                loosersBracket[i] = local;
+                losersBracket[i] = local;
             }
         }
 
         // Loosers bracket - First round - 4 players
         for (uint256 i = 0; i < 2; i++) {
-            local = loosersBracket[i * 2];
-            visitor = loosersBracket[i * 2 + 1];
+            local = losersBracket[i * 2];
+            visitor = losersBracket[i * 2 + 1];
             rnd_match = randomMatch(local, visitor);
             matches_[rnd_match.matchId_] = rnd_match;
             tournaments_[testTournamentCounter].matchIds_.push(rnd_match.matchId_);
             if (rnd_match.winnerId_ == local) {
-                loosersBracket[i * 2 + 1] = local;
+                losersBracket[i * 2 + 1] = local;
             } else {
-                loosersBracket[i * 2 + 1] = visitor;
+                losersBracket[i * 2 + 1] = visitor;
             }
         }
 
@@ -225,37 +225,37 @@ contract PongTournament {
             tournaments_[testTournamentCounter].matchIds_.push(rnd_match.matchId_);
             if (rnd_match.winnerId_ == local) {
                 winnersBracket[i] = local;
-                loosersBracket[i * 2] = visitor;
+                losersBracket[i * 2] = visitor;
             } else {
                 winnersBracket[i] = visitor;
-                loosersBracket[i * 2] = local;
+                losersBracket[i * 2] = local;
             }
         }
 
         // Loosers bracket - Second round - 4 players
         for (uint256 i = 0; i < 2; i++) {
-            local = loosersBracket[i * 2];
-            visitor = loosersBracket[i * 2 + 1];
+            local = losersBracket[i * 2];
+            visitor = losersBracket[i * 2 + 1];
             rnd_match = randomMatch(local, visitor);
             matches_[rnd_match.matchId_] = rnd_match;
             tournaments_[testTournamentCounter].matchIds_.push(rnd_match.matchId_);
             if (rnd_match.winnerId_ == local) {
-                loosersBracket[i] = local;
+                losersBracket[i] = local;
             } else {
-                loosersBracket[i] = visitor;
+                losersBracket[i] = visitor;
             }
         }
 
         // Loosers bracket - Third round - 2 players
-        local = loosersBracket[0];
-        visitor = loosersBracket[1];
+        local = losersBracket[0];
+        visitor = losersBracket[1];
         rnd_match = randomMatch(local, visitor);
         matches_[rnd_match.matchId_] = rnd_match;
         tournaments_[testTournamentCounter].matchIds_.push(rnd_match.matchId_);
         if (rnd_match.winnerId_ == local) {
-            loosersBracket[1] = local;
+            losersBracket[1] = local;
         } else {
-            loosersBracket[1] = visitor;
+            losersBracket[1] = visitor;
         }
 
         // Winners bracket - Second round - 2 players
@@ -266,27 +266,27 @@ contract PongTournament {
         tournaments_[testTournamentCounter].matchIds_.push(rnd_match.matchId_);
         if (rnd_match.winnerId_ == local) {
             winnersBracket[0] = local;
-            loosersBracket[0] = visitor;
+            losersBracket[0] = visitor;
         } else {
             winnersBracket[0] = visitor;
-            loosersBracket[0] = local;
+            losersBracket[0] = local;
         }
 
         // Loosers bracket - Fourth round - 2 players
-        local = loosersBracket[0];
-        visitor = loosersBracket[1];
+        local = losersBracket[0];
+        visitor = losersBracket[1];
         rnd_match = randomMatch(local, visitor);
         matches_[rnd_match.matchId_] = rnd_match;
         tournaments_[testTournamentCounter].matchIds_.push(rnd_match.matchId_);
         if (rnd_match.winnerId_ == local) {
-            loosersBracket[0] = local;
+            losersBracket[0] = local;
         } else {
-            loosersBracket[0] = visitor;
+            losersBracket[0] = visitor;
         }
 
         // Final
         local = winnersBracket[0];
-        visitor = loosersBracket[0];
+        visitor = losersBracket[0];
         rnd_match = randomMatch(local, visitor);
         matches_[rnd_match.matchId_] = rnd_match;
         tournaments_[testTournamentCounter].matchIds_.push(rnd_match.matchId_);

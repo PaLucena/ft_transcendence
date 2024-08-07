@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "blockchain",
     "rtchat",
+    "ponggame",
 ]
 
 MIDDLEWARE = [

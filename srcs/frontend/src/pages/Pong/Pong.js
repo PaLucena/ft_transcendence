@@ -1,5 +1,4 @@
 import { Page } from '../Page.js';
-import { navigateTo } from "../../scripts/router/router.js";
 
 export class Pong extends Page {
 	constructor() {
@@ -16,32 +15,24 @@ export class Pong extends Page {
 
 
 	initPong() {
-		// Game settings
-		const goals_win = 6;
-		const goals_diff = 2;
-		let ball_init_vel = 6;
-		let ball_inc_vel = 0.5;
-		let paddle_margin = 35;
-		let paddle_speed = 3;
-		const countdown = 3;
-
 		// Variables
-		let p_1_score_value = 0;
-		let p_1_hits = 0;
-		let p_2_score_value = 0;
-		let p_2_hits = 0;
-		let keysPressed = {};
-		let gameState = 'ready';
-
-		// Backend - Players elements
-		// TODO
 		let name_1 = 'Player 1';
 		let name_2 = 'Player 2';
+		const pad_width = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--size-pad-width'));
+		const pad_height = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--size-pad-height'));
+		const pad_margin = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--size-pad-margin'));
+		const ball_size = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--size-ball'));
+
+		let keysPressed = {};
+		let paddle1Interval;
+		let paddle2Interval;
+
+		let factor = 1;
 
 		// Capture - responsive value
 		let responsiveValue = getComputedStyle(document.documentElement).getPropertyValue('--responsive');
 		// Capture - CSS environment
-		const p_1_color = getComputedStyle(document.documentElement).getPropertyValue('--p1-color');
+		const p_1_color = getComputedStyle(document.documentElement).getPropertyValue('--color-p1');
 		const p_2_color = getComputedStyle(document.documentElement).getPropertyValue('--p2-color');
 		const ball_color = getComputedStyle(document.documentElement).getPropertyValue('--ball-color');
 		// Capture - Containers
@@ -68,19 +59,53 @@ export class Pong extends Page {
 		// Apply game settings
 		p_1_name.innerHTML = name_1;
 		p_2_name.innerHTML = name_2;
-		win_goals.innerHTML = `${goals_win} (dif.${goals_diff})`;
-		let vel_x = ball_init_vel;
-		let vel_y = ball_init_vel;
 
-		// Config - Ball initial direction
-		let dir_x = Math.random() < 0.5 ? -1 : 1;
-		let dir_y = Math.random() < 0.5 ? -1 : 1;
+		// Websocket setup
+		const socket = new WebSocket('ws/ponggame/');
+
+		socket.onopen = function(event) {
+			console.log("Connection established");
+		};
+
+		socket.onmessage = function(event) {
+			const gameState = JSON.parse(event.data);
+			if (gameState.type === 'positions') {
+				updatePositions(gameState);
+			} else if (gameState.type === 'score') {
+				updateScore(gameState);
+			} else if (gameState.type === 'game_state') {
+				updateGameState(gameState);
+			} else if (gameState.type === 'config') {
+				updateGameConfig(gameState);
+			} else if (gameState.type === 'theme') {
+				document.documentElement.style.setProperty('--color-board-gradient-start', gameState.gradient_start);
+				document.documentElement.style.setProperty('--color-board-gradient-end', gameState.gradient_end);
+				document.documentElement.style.setProperty('--ball-border-radius', gameState.ball_border_radius);
+				document.documentElement.style.setProperty('--color-p1', gameState.color_p1);
+				document.documentElement.style.setProperty('--color-p2', gameState.color_p2);
+				document.documentElement.style.setProperty('--paddle-border-radius', gameState.paddle_border_radius);
+				document.documentElement.style.setProperty('--paddle-color', gameState.paddle_color);
+				document.documentElement.style.setProperty('--color-background', gameState.color_background);
+				document.documentElement.style.setProperty('--container-border-radius', gameState.container_border_radius);
+				document.documentElement.style.setProperty('--board-border-radius', gameState.board_border_radius);
+				document.documentElement.style.setProperty('--ball-color-theme', gameState.ball_color_theme);
+			}
+		}
+
+		socket.onclose = function(event) {
+			if (event.wasClean) {
+				console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+			} else {
+				console.log('Connection died');
+			}
+		}
+
+		socket.onerror = function(error) {
+			console.log(`Error: ${error.message}`);
+		}
 
 
-		// Paddles movement
-		let paddle_1_interval;
-		let paddle_2_interval;
-
+		// Handle key presses
 		document.addEventListener('keydown', (e) => {
 			keysPressed[e.key] = true;
 			handleKeyPresses();
@@ -92,193 +117,93 @@ export class Pong extends Page {
 
 		function handleKeyPresses() {
 			if (keysPressed['Enter']) {
-				if (gameState === 'ready') {
-					resetGame();
-					gameState = 'playing';
-					message.innerHTML = '';
-					controls_1.innerHTML = '';
-					controls_2.innerHTML = '';
-				}
-				if (gameState === 'gameover') {
-					gameState = 'ready';
-					ball_effect.style.boxShadow = 'inset 0 0 20px #fff';
-					score_1_value = 0;
-					score_1.innerHTML = `${score_1_value}`;
-					score_2_value = 0;
-					score_2.innerHTML = `${score_2_value}`;
-					resetGame();
-				}
+				socket.send(JSON.stringify({ type: 'start' }));
+				message.innerHTML = '';
+				controls_1.innerHTML = '';
+				controls_2.innerHTML = '';
+			}
+			if (keysPressed['q']) {
+				socket.send(JSON.stringify({ type: 'quit' }));
+			}
+			if (keysPressed['t']) {
+				socket.send(JSON.stringify({ type: 'theme' }));
 			}
 
 			if (keysPressed['w'] && !keysPressed['s']) {
-				if (!paddle_1_interval) {
-					clearInterval(paddle_1_interval);
-					paddle_1_interval = setInterval(() => movePaddle(p_1_paddle, -1), 10);
+				if (!paddle1Interval) {
+					clearInterval(paddle1Interval);
+					paddle1Interval = setInterval(() => {
+						socket.send(JSON.stringify({ type: 'move', player: 1, direction: -1 }));
+					}, 10);
 				}
 			} else if (keysPressed['s'] && !keysPressed['w']) {
-				if (!paddle_1_interval) {
-					clearInterval(paddle_1_interval);
-					paddle_1_interval = setInterval(() => movePaddle(p_1_paddle, 1), 10);
+				if (!paddle1Interval) {
+					clearInterval(paddle1Interval);
+					paddle1Interval = setInterval(() => {
+						socket.send(JSON.stringify({ type: 'move', player: 1, direction: 1 }));
+					}, 10);
 				}
 			} else {
-				clearInterval(paddle_1_interval);
-				paddle_1_interval = null;
+				clearInterval(paddle1Interval);
+				paddle1Interval = null;
 			}
 
 			if (keysPressed['ArrowUp'] && !keysPressed['ArrowDown']) {
-				if (!paddle_2_interval) {
-					clearInterval(paddle_2_interval);
-					paddle_2_interval = setInterval(() => movePaddle(p_2_paddle, -1), 10);
+				if (!paddle2Interval) {
+					clearInterval(paddle2Interval);
+					paddle2Interval = setInterval(() => {
+						socket.send(JSON.stringify({ type: 'move', player: 2, direction: -1 }));
+					}, 10);
 				}
 			} else if (keysPressed['ArrowDown'] && !keysPressed['ArrowUp']) {
-				if (!paddle_2_interval) {
-					clearInterval(paddle_2_interval);
-					paddle_2_interval = setInterval(() => movePaddle(p_2_paddle, 1), 10);
+				if (!paddle2Interval) {
+					clearInterval(paddle2Interval);
+					paddle2Interval = setInterval(() => {
+						socket.send(JSON.stringify({ type: 'move', player: 2, direction: 1 }));
+					}, 10);
 				}
 			} else {
-				clearInterval(paddle_2_interval);
-				paddle_2_interval = null;
+				clearInterval(paddle2Interval);
+				paddle2Interval = null;
 			}
 		}
 
-		function movePaddle(paddle, direction) {
-			const boardHeight = board.offsetHeight;
-			const paddleHeight = paddle.offsetHeight;
-			const paddleTop = paddle.offsetTop;
-			if (direction === -1) {
-				paddle.style.top = Math.max(
-					paddleTop - paddle_speed * responsiveValue,
-					paddle_margin * responsiveValue) + 'px';
-			} else {
-				paddle.style.top = Math.min(
-					paddleTop + paddle_speed * responsiveValue,
-					(boardHeight - paddleHeight - paddle_margin) * responsiveValue) + 'px';
-			}
+		function updateGameConfig(gameState) {
+			p_1_name.innerHTML = `${gameState.player_1_name}`;
+			p_2_name.innerHTML = `${gameState.player_2_name}`;
+			win_goals.innerHTML = gameState.goals_to_win + ' (dif.' + gameState.goals_diff + ')';
+		}
+		function updatePositions(gameState) {
+			let responsiveValue = getComputedStyle(document.documentElement).getPropertyValue('--responsive');
+			ball.style.left = `${gameState.ball_x * responsiveValue}px`;
+			ball.style.top = `${gameState.ball_y * responsiveValue}px`;
+			p_1_paddle.style.top = `${gameState.pad_1_y * responsiveValue}px`;
+			p_2_paddle.style.top = `${gameState.pad_2_y * responsiveValue}px`;
 		}
 
-		function moveBall()
-		{
-			if (gameState !== 'playing')
-				return;
-
-			let ball_coord = ball.getBoundingClientRect();
-			let board_coord = board.getBoundingClientRect();
-
-			let paddle_1_coord = p_1_paddle.getBoundingClientRect();
-			let paddle_2_coord = p_2_paddle.getBoundingClientRect();
-
-			if (ball_coord.top <= board_coord.top || ball_coord.bottom >= board_coord.bottom)
-				dir_y *= -1;
-
-			if (
-				ball_coord.left <= paddle_1_coord.right &&
-				ball_coord.right >= paddle_1_coord.left &&
-				ball_coord.top <= paddle_1_coord.bottom &&
-				ball_coord.bottom >= paddle_1_coord.top
-			) {
-				let impactPoint = (ball_coord.top + ball_coord.bottom) / 2 - paddle_1_coord.top;
-				let relativeImpact = (impactPoint / paddle_1_coord.height) - 0.5;
-				dir_y = relativeImpact * 2;
-				dir_x *= -1;
-				p_1_hits++;
-				increaseSpeed();
-			}
-			if (ball_coord.left <= paddle_2_coord.right &&
-				ball_coord.right >= paddle_2_coord.left &&
-				ball_coord.top <= paddle_2_coord.bottom &&
-				ball_coord.bottom >= paddle_2_coord.top
-			) {
-				let impactPoint = (ball_coord.top + ball_coord.bottom) / 2 - paddle_2_coord.top;
-				let relativeImpact = (impactPoint / paddle_2_coord.height) - 0.5;
-				dir_y = relativeImpact * 2;
-				dir_x *= -1;
-				p_2_hits++;
-				increaseSpeed();
-			}
-
-			if (ball_coord.left <= board_coord.left + 20 || ball_coord.right >= board_coord.right - 20) {
-				if (ball_coord.left <= paddle_1_coord.right) {
-					p_2_score_value++;
-					p_2_score.innerHTML = `${p_2_score_value}`;
-				} else {
-					p_1_score_value++;
-					p_1_score.innerHTML = `${p_1_score_value}`;
-				}
-				if (p_1_score_value >= goals_win && p_1_score_value - p_2_score_value >= goals_diff) {
-					gameState = 'gameover';
-					message.innerHTML = `PLAYER 1 WINS!!<br>(hits: ${p_1_hits})<br><br>Enter to restart`;
-					return;
-				}
-				if (p_2_score_value >= goals_win && p_2_score_value - p_1_score_value >= goals_diff) {
-					gameState = 'gameover';
-					message.innerHTML = `PLAYER 2 WINS!!<br>(hits: ${p_2_hits})<br><br>Enter to restart`;
-					return;
-				}
-				if (p_1_score_value >= goals_win - 1 && p_1_score_value - p_2_score_value >= goals_diff - 1) {
-					ball_effect.style.boxShadow = `inset 0 0 20px #fff, 0 0 20px ${p_1_color}`;
-				} else if (p_2_score_value >= goals_win - 1 && p_2_score_value - p_1_score_value >= goals_diff - 1) {
-					ball_effect.style.boxShadow = `inset 0 0 20px #fff, 0 0 20px ${p_2_color}`;
-				} else {
-					ball_effect.style.boxShadow = `inset 0 0 20px ${ball_color}`;
-				}
-				resetGame();
-				return;
-			}
-
-			ball.style.top = (ball_coord.top - board_coord.top + dir_y * vel_y) + 'px';
-			ball.style.left = (ball_coord.left - board_coord.left + dir_x * vel_x) + 'px';
-
-			requestAnimationFrame(() => moveBall());
+		function updateScore(gameState) {
+			p_1_score.innerHTML = `${gameState.score_1}`;
+			p_2_score.innerHTML = `${gameState.score_2}`;
 		}
 
-		function increaseSpeed() {
-			vel_x += ball_inc_vel;
-			vel_y += ball_inc_vel;
-		}
-
-		function resetGame() {
-			let board_coord = board.getBoundingClientRect();
-			ball.style.top = (board_coord.height / 2 - ball.offsetHeight / 2) + 'px';
-			ball.style.left = (board_coord.width / 2 - ball.offsetWidth / 2) + 'px';
-
-			vel_x = ball_init_vel;
-			vel_y = ball_init_vel;
-			dir_x = Math.random() < 0.5 ? -1 : 1;
-			dir_y = Math.random() < 0.5 ? -1 : 1;
-
-			let count = countdown + 1;
-
-			let countdownInterval = setInterval(() => {
-				count--;
-				if (count > 0) {
-					message.innerHTML = `Ready in ${count} ...`;
-				} else {
-					clearInterval(countdownInterval);
-					message.innerHTML = '';
-					gameState = 'playing';
-					requestAnimationFrame(() => moveBall());
-				}
-			}, 1000);
-		}
-
-
-
-		function updateResizePositions() {
-			let NewResponsiveValue = getComputedStyle(document.documentElement).getPropertyValue('--responsive');
-			if (responsiveValue !== NewResponsiveValue) {
-				let factor = NewResponsiveValue / responsiveValue;
-				responsiveValue = NewResponsiveValue;
-				const p1_top = p_1_paddle.offsetTop;
-				p_1_paddle.style.top = `${p1_top * factor}px`;
-				const p2_top = p_2_paddle.offsetTop;
-				p_2_paddle.style.top = `${p2_top * factor}px`;
-				const ball_top = ball.offsetTop;
-				ball.style.top = `${ball_top * factor}px`;
-				const ball_left = ball.offsetLeft;
-				ball.style.left = `${ball_left * factor}px`;
+		function updateGameState(gameState) {
+			if (gameState.state === 'playing') {
+				message.innerHTML = '';
+				controls_1.innerHTML = '';
+				controls_2.innerHTML = '';
+			} else if (gameState.state === 'ready') {
+				message.innerHTML = 'Press Enter to start the game';
+				controls_1.innerHTML = 'Player 1: W, S';
+				controls_2.innerHTML = 'Player 2: Arrow Up, Arrow Down';
+			} else if (gameState.state === 'countdown') {
+				message.innerHTML = `Ready in ${gameState.countdown}...`;
+				controls_1.innerHTML = '';
+				controls_2.innerHTML = '';
+			} else if (gameState.state === 'game_over') {
+				message.innerHTML = 'Game Over';
+				controls_1.innerHTML = '';
+				controls_2.innerHTML = '';
 			}
 		}
-
-		window.addEventListener('resize', updateResizePositions);
 	}
 }
