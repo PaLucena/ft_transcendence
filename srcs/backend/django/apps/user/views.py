@@ -31,6 +31,8 @@ from .utils import set_nickname, upload_avatar, get_friend_count
 from django.contrib.auth import logout as auth_logout
 from django.views.decorators.csrf import csrf_exempt
 
+from .authenticate import DefaultAuthentication
+from .decorators import default_authentication_required
 
 @api_view(["GET"])
 def get_user_data(request):
@@ -61,8 +63,8 @@ def signup(request):
 			refresh = RefreshToken.for_user(user)
 			access = refresh.access_token
 			response = Response({"message": "Signup successful"}, status=status.HTTP_201_CREATED)
-			response.set_cookie('access_token', str(access), httponly=True, secure=True)
 			response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+			response.set_cookie('access_token', str(access), httponly=True, secure=True)
 
 			return response
 		except IntegrityError as e:
@@ -74,7 +76,6 @@ def signup(request):
 #@csrf_exempt
 @api_view(["POST"])
 def login(request):
-	#permission_classes = [AllowAny]
 	username = request.data.get('username')
 	password = request.data.get('password')
 
@@ -85,12 +86,12 @@ def login(request):
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
 		user.save()
-		login(request, authenticated_user)
+		#login(request, authenticated_user)
 		refresh = RefreshToken.for_user(user)
 		access = refresh.access_token
 		response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-		response.set_cookie('access_token', str(access), httponly=True, secure=True)
 		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+		response.set_cookie('access_token', str(access), httponly=True, secure=True)
 
 		print("REPONSE FROM LOGIN:", response)
 		print("Access Token Expiry:", access['exp'])
@@ -109,6 +110,7 @@ def TestView(request):
 
 
 @api_view(["GET"])
+@default_authentication_required
 def logout(request):
 	user= request.user #delete later
 	print("USER in logout: ", user)

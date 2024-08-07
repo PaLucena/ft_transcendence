@@ -14,61 +14,63 @@ from .models import AppUser
 from channels.middleware import BaseMiddleware
 from asgiref.sync import sync_to_async
 from django.contrib.auth.models import AnonymousUser
+from django.utils.decorators import sync_and_async_middleware
 
 
-class CheckAccessTokenMiddleware(MiddlewareMixin):
-	def __init__(self, get_response):
-		self.get_response = get_response
+#@sync_and_async_middleware
+# class CheckAccessTokenMiddleware(MiddlewareMixin):
 
-	def __call__(self, request):
-		#print(f"Scope: {json.dumps(request, default=str)}")
-		exempt_views = ['login', 'signup']
-		api_prefix = '/api/'
-		admin_prefix = '/admin/'
+# 	def __call__(self, request):
+# 		exempt_views = ['login', 'signup']
+# 		api_prefix = '/api/'
+# 		admin_prefix = '/admin/'
+# 		fav_icon = '/favicon.ico'
+# 		if request.path_info.startswith(admin_prefix) or request.path_info.startswith(fav_icon):
+# 			return (self.get_response)(request)
 
-		if request.path_info.startswith(admin_prefix):
-			return self.get_response(request)
-		if request.path_info.startswith(api_prefix):
-			current_view = request.path_info[len(api_prefix):].strip('/')
-		else:
-			current_view = ''
-		if current_view in exempt_views:
-			return self.get_response(request)
+# 		if request.path_info.startswith(api_prefix):
+# 			current_view = request.path_info[len(api_prefix):].strip('/')
+# 		else:
+# 			current_view = ''
 
-		access_token = request.COOKIES.get('access_token')
-		refresh_token = request.COOKIES.get('refresh_token')
-		if access_token:
-			jwt_auth = JWTAuthentication()
-			try:
-				validated_token = jwt_auth.get_validated_token(access_token)
-				request.user = jwt_auth.get_user(validated_token)
-				print("1 USER IN MIDDLEWARE: ", request.user)
-			except TokenError:
-				print("EXPIRED IN MIDDLEWARE: ", request.user)
-				access_token = None
+# 		if current_view in exempt_views:
+# 			return (self.get_response)(request)
 
-		if refresh_token and not access_token:
-			new_access_token = self.refresh_access_token(refresh_token)
-			if new_access_token:
-				request.user = jwt_auth.get_user(jwt_auth.get_validated_token(new_access_token))
-				response = self.get_response(request)
-				response.set_cookie('access_token', new_access_token, secure=True, httponly=True)
-				print("2 USER IN MIDDLEWARE: ", request.user)
-				return response
+# 		access_token = request.COOKIES.get('access_token')
+# 		refresh_token = request.COOKIES.get('refresh_token')
 
-		print("1111 USER IN MIDDLEWARE: ", request.user)
-		return self.get_response(request)
+# 		if access_token:
+# 			jwt_auth = JWTAuthentication()
+# 			try:
+# 				validated_token = jwt_auth.get_validated_token(access_token)
+# 				request.user = jwt_auth.get_user(validated_token)
+# 				print("1 USER IN MIDDLEWARE: ", request.user)
+# 			except TokenError:
+# 				print("EXPIRED IN MIDDLEWARE: ", request.user)
+# 				access_token = None
 
-	def create_access_token(self, refresh_token):
-		try:
-			refresh = RefreshToken(refresh_token)
-			new_access_token = str(refresh.access_token)
-			# Blacklist the old refresh token
-			refresh.blacklist()
-			return new_access_token
-		except TokenError as e:
-			print(f"Token error: {e}")
-			return None
+# 		if refresh_token and not access_token:
+# 			new_access_token = self.refresh_access_token(refresh_token)
+# 			if new_access_token:
+# 				request.user =(jwt_auth.get_user)(jwt_auth.get_validated_token(new_access_token))
+# 				response = (self.get_response)(request)
+# 				response.set_cookie('access_token', new_access_token, secure=True, httponly=True)
+# 				print("2 USER IN MIDDLEWARE: ", request.user)
+# 				return response
+
+# 		print("1111 USER IN MIDDLEWARE: ", request.user)
+# 		return (self.get_response)(request)
+
+# 	def refresh_access_token(self, refresh_token):
+# 		try:
+# 			refresh = RefreshToken(refresh_token)
+# 			new_access_token = str(refresh.access_token)
+# 			# Blacklist the old refresh token
+# 			refresh.blacklist()
+# 			return new_access_token
+# 		except TokenError as e:
+# 			print(f"Token error: {e}")
+# 			return None
 
 
 User = get_user_model()

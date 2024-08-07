@@ -2,6 +2,7 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
 import { Navbar } from '../../components/Navbar/Navbar.js';
 import { ChatBtn } from '../../components/ChatBtn/ChatBtn.js';
+import { closeUserWebSocket } from '../../scripts/websocket.js';
 
 export class Profile extends Component {
 	constructor() {
@@ -21,6 +22,7 @@ export class Profile extends Component {
 				credentials: 'include'
 			})
 			.then(response => {
+				closeUserWebSocket();
 				console.log("Respuesta a logout: ", response); // TODO: esto es debuggeo
 				navigateTo("/login");
 			})
