@@ -38,7 +38,6 @@
 }
 
 #btnsContainer .btn {
-	background-color: #3a595c;
 	border: 1px solid white;
 }
 
@@ -70,21 +69,19 @@
 #dropdownTwo {
 	color: black;
 	height: 75%;
-	background-color: #edeef0;
 }
 
 #dropdownOne #vsIA, #dropdownTwo #createPub {
 	margin-left: 0;
 }
 
-#dropdownOne #local, #dropdownOne #online, #dropdownOne #backOne, #dropdownTwo #createPriv, #dropdownTwo #join {
+#dropdownOne #local, #dropdownOne #online, #dropdownOne #backOne {
 	margin-top: 7vh;
 	margin-left: 0;
 }
 
-#dropdownOne #back button, #dropdownTwo #back button {
-	background-color: #7ba9a9;
-	color: white;
+#dropdownTwo .btn {
+	border: 1px solid black;
 }
 
 #chatbtn-placeholder {

@@ -11,6 +11,27 @@ export class Profile extends Component {
 
 	init() {
 		this.logout();
+		this.editUserBtn();
+		this.saveInfoBtn();
+	}
+
+	editUserBtn() {
+		let editBtn = document.getElementById("editBtn");
+
+		editBtn.addEventListener("click", (event) => {
+			document.getElementById("userInfo").style.display = "none";
+			document.getElementById("userEdit").style.display = "block";
+		});
+	}
+
+	saveInfoBtn() {
+		let saveInfo = document.getElementById("saveInfo");
+
+		saveInfo.addEventListener("click", (event) => {
+			//TODO: aquí falta hacer un fetch con post para guardar la información de usuario
+			document.getElementById("userEdit").style.display = "none"; // Esto es solo si la información
+			document.getElementById("userInfo").style.display = "block";  // nueva es válida
+		});
 	}
 
 	logout() {

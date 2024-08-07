@@ -41,3 +41,15 @@ nav {
 	padding: 0;
 	font-family: monospace;
 }
+
+#chatbtn {
+	right: 1%;
+}
+
+.btn-green, .bg-green {
+	background-color: #3a595c;
+}
+
+.btn-light, .bg-light {
+	background-color: #edeef0;
+}
