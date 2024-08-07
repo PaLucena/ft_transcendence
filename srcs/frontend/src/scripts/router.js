@@ -7,6 +7,7 @@ import { NotFound } from '../pages/NotFound/NotFound.js';
 import { Friends } from '../pages/Friends/Friends.js';
 import { Profile } from '../pages/Profile/Profile.js';
 import { Auth } from '../pages/Auth/Auth.js';
+import { Pong } from '../pages/Pong/Pong.js';
 import renderStaticComponents from './utils/renderStaticComponents.js';
 
 
@@ -21,6 +22,7 @@ export const routes = {
 	"/auth": Auth,
 	"/chat": Chat,
 	"/chat/:chatId": Chat,
+	"/pong": Pong,
 };
 
 export default async function router() {
