@@ -42,6 +42,7 @@ export class Profile extends Component {
 				body: JSON.stringify({
 					"user": "ealgar-c",
 				}),
+				credentials: 'include'
 			})
 			.then(response => {
 				return response.json()

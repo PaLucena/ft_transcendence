@@ -291,7 +291,7 @@ def ftapiLogin(request):
 			'email': user_json["email"],
 			'avatar': "avatars/" + user_json["login"] + ".jpg"
 		}
-		return Response(data=user_json, status=status.HTTP_200_OK)
+		return Response(data=userJson, status=status.HTTP_200_OK)
 	except AppUser.DoesNotExist:
 		pass
 	if AppUser.objects.filter(email=user_json["email"]):
