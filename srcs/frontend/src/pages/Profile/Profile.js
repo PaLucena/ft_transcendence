@@ -3,6 +3,7 @@ import { navigateTo } from '../../scripts/router.js'
 import { Navbar } from '../../components/Navbar/Navbar.js';
 import { ChatBtn } from '../../components/ChatBtn/ChatBtn.js';
 import { closeUserWebSocket } from '../../scripts/websocket.js';
+import { getCSRFToken } from '../../scripts/utils/csrf.js'
 
 export class Profile extends Component {
 	constructor() {
@@ -60,13 +61,13 @@ export class Profile extends Component {
 		twofaBtn.addEventListener("click", (event) => {
 			const response = fetch("/api/2fa/enable2fa/", {
 				method: 'POST',
+				credentials: 'include',
 				headers: {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
 					"user": "ealgar-c",
 				}),
-				credentials: 'include'
 			})
 			.then(response => {
 				return response.json()
