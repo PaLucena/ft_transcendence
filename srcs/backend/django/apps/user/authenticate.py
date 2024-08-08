@@ -12,16 +12,22 @@ class DefaultAuthentication:
 		access_token = request.COOKIES.get('access_token')
 		refresh_token = request.COOKIES.get('refresh_token')
 		validated_token = None
-
+		print("REQUEST!!!!!!!!!!!!!!!!!!")
 		if access_token:
 			try:
 				validated_token = self.jwt_auth.get_validated_token(access_token)
-			except TokenError:
-				pass
+				print("0 HERE : ", validated_token)
+			except TokenError as e:
+				print("Access token is invalid: ", e)
 
+		print("1 HERE : ", validated_token)
+		print("1 HERE : ", access_token)
+		print("1 HERE : ", refresh_token)
 		if not validated_token and refresh_token:
 			try:
+				print("2 HERE : ", validated_token)
 				refresh = RefreshToken(refresh_token)
+				refresh_token.blacklist()
 				new_access_token = str(refresh.access_token)
 				validated_token = self.jwt_auth.get_validated_token(new_access_token)
 				request.COOKIES['access_token'] = new_access_token

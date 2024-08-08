@@ -2,7 +2,9 @@ from django.core.exceptions import ValidationError
 from .models import AppUser, Friend
 from rest_framework.response import Response
 from rest_framework import status
-
+from datetime import datetime, timedelta
+from django.conf import settings
+from django.utils.timezone import utc
 
 def get_friend_count(user):
 	from_user_count = Friend.objects.filter(from_user=user, status=Friend.ACCEPTED).count()
@@ -43,3 +45,13 @@ def upload_avatar(request):
 
 	except Exception as e:
 		return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+
+
+# def get_token_expiry_times():
+# 	access_token_lifetime = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']
+# 	refresh_token_lifetime = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']
+	
+# 	access_token_expiry = (datetime.utcnow() + access_token_lifetime).replace(tzinfo=utc)
+# 	refresh_token_expiry = (datetime.utcnow() + refresh_token_lifetime).replace(tzinfo=utc)
+	
+# 	return access_token_expiry, refresh_token_expiry

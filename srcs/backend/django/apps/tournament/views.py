@@ -2,8 +2,7 @@ import re
 from rest_framework.decorators import api_view
 from rest_framework import status
 from django.contrib.auth.decorators import login_required
-from srcs.requirements.backend.django.apps import user
-from srcs.requirements.backend.django.apps.user.models import AppUser
+from .models import AppUser
 from .models import Tournament, UserStats
 from rest_framework.response import Response
 
