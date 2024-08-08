@@ -1,6 +1,7 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js';
 import { initUserWebSocket } from '../../scripts/websocket.js';
+import { getCSRFToken } from '../../scripts/utils/csrf.js'
 
 export class Signup extends Component {
 	constructor() {
@@ -25,13 +26,16 @@ export class Signup extends Component {
 					jsonData[key] = value;
 				});
 
+				const csrftoken = getCSRFToken('csrftoken');
+
 				fetch("/api/signup/", {
 					method: "POST",
+					credentials: 'include',
 					headers: {
-					'Content-Type': 'application/json'
+						'Content-Type': 'application/json',
+						'X-CSRFToken': csrftoken
 					},
-					body: JSON.stringify(jsonData),
-					credentials: 'include'
+					body: JSON.stringify(jsonData)
 				})
 				.then(response => {
 					if (response.status === 201) {

@@ -39,7 +39,6 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "daphne",
-    "user",
     "user_stats",
     "django_redis",
     "django.contrib.admin",
@@ -49,12 +48,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    #"rest_framework.authtoken", #delete later
     "rest_framework_simplejwt",
 	"rest_framework_simplejwt.token_blacklist",
+    "user",
     "corsheaders",
     "blockchain",
     "rtchat",
+    "ponggame",
 	"django_otp",
 	"django_otp.plugins.otp_totp",
 	"twofactor"
@@ -64,16 +64,14 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-	'user.middleware.CheckAccessTokenMiddleware',
-	'user.middleware.UpdateLastSeenMiddleware',
+#	'user.middleware.UpdateLastSeenMiddleware',
 	'django_otp.middleware.OTPMiddleware'
 ]
-
 ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
@@ -129,10 +127,9 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        # "rest_framework.authentication.SessionAuthentication",  # For browsable API
+       # "rest_framework.authentication.SessionAuthentication",  # For browsable API
         # "rest_framework.authentication.TokenAuthentication",  # For API clients
-        #"rest_framework.authentication.BasicAuthentication", 
-	    'rest_framework_simplejwt.authentication.JWTAuthentication',
+        #'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
      #  'rest_framework.permissions.IsAuthenticated',
@@ -152,6 +149,13 @@ SIMPLE_JWT = {
     'USER_ID_CLAIM': 'user_id',
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
+    'AUTH_COOKIE': 'access_token',
+    'REFRESH_COOKIE': 'refresh_token',
+    'AUTH_COOKIE_DOMAIN': None,
+    'AUTH_COOKIE_SECURE': True,
+    'AUTH_COOKIE_HTTP_ONLY': True,
+    'AUTH_COOKIE_PATH': '/',
+    'AUTH_COOKIE_SAMESITE': 'Lax',
 }
 
 # Password validation
@@ -172,6 +176,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Or another backend of your choice
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -198,6 +203,21 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
     "https://localhost:8080",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
 
 CSRF_TRUSTED_ORIGINS = [
     "https://localhost:8080",

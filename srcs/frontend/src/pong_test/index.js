@@ -25,7 +25,7 @@ let dy = Math.random() < 0.5 ? -1 : 1;
 
 let gameState = 'ready';
 
-let player1_color = getComputedStyle(document.documentElement).getPropertyValue('--p1-color');
+let player1_color = getComputedStyle(document.documentElement).getPropertyValue('--color-p1');
 let player2_color = getComputedStyle(document.documentElement).getPropertyValue('--p2-color');
 let ball_color = getComputedStyle(document.documentElement).getPropertyValue('--ball-color');
 

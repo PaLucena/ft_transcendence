@@ -27,11 +27,30 @@ from django.core.files.temp import NamedTemporaryFile
 from django.conf import settings
 import os
 import requests
-from .utils import set_nickname, upload_avatar
+from .utils import set_nickname, upload_avatar, get_friend_count
+from django.contrib.auth import logout as auth_logout
+from django.views.decorators.csrf import csrf_exempt
+
+from .authenticate import DefaultAuthentication
+from .decorators import default_authentication_required
+
+@api_view(["GET"])
+@default_authentication_required
+def get_user_data(request):
+	try:
+		user = request.user
+		user_data = {
+			'username': user.username,
+			'avatar': user.avatar,
+			'email': user.email,
+			'number_of_friends': user.get_friend_count(user)
+		}
+		return Response(user_data, status=status.HTTP_200_OK)
+	except Exception as e:
+		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["POST"])
 def signup(request):
-	#permission_classes = [AllowAny] might set up later
 	serializer = UserSerializerClass(data=request.data)
 	if serializer.is_valid():
 		try:
@@ -42,8 +61,8 @@ def signup(request):
 			refresh = RefreshToken.for_user(user)
 			access = refresh.access_token
 			response = Response({"message": "Signup successful"}, status=status.HTTP_201_CREATED)
-			response.set_cookie('access_token', str(access), httponly=True, secure=True)
 			response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+			response.set_cookie('access_token', str(access), httponly=True, secure=True)
 
 			return response
 		except IntegrityError as e:
@@ -55,7 +74,6 @@ def signup(request):
 
 @api_view(["POST"])
 def login(request):
-	#permission_classes = [AllowAny]
 	username = request.data.get('username')
 	password = request.data.get('password')
 
@@ -66,12 +84,12 @@ def login(request):
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
 		user.save()
-
+		#login(request, authenticated_user)
 		refresh = RefreshToken.for_user(user)
 		access = refresh.access_token
 		response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-		response.set_cookie('access_token', str(access), httponly=True, secure=True)
 		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+		response.set_cookie('access_token', str(access), httponly=True, secure=True)
 
 		print("REPONSE FROM LOGIN:", response)
 		print("Access Token Expiry:", access['exp'])
@@ -90,18 +108,19 @@ def TestView(request):
 
 
 @api_view(["GET"])
+@default_authentication_required
 def logout(request):
 	user= request.user #delete later
-	print("user in llogout: ", user)
+	print("USER in logout: ", user)
 	response = Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
 	response.delete_cookie('access_token')
 	response.delete_cookie('refresh_token')
-	user.save()
+	auth_logout(request)
 	return response
 
 
 @api_view(["POST"])
-@login_required
+@default_authentication_required
 def update_user_info(request):
 	print("Request User:", request.headers)
 
@@ -142,7 +161,7 @@ def update_user_info(request):
 
 #CBV has to be created to not repeat code
 @api_view (["POST"])
-@login_required
+@default_authentication_required
 def invite_friend(request):
 	username = request.data.get('username')
 	if not username:
@@ -160,9 +179,8 @@ def invite_friend(request):
 	return Response({'message': 'Friend request sent successfully.'}, status=status.HTTP_200_OK)
 
 
-
 @api_view (["DELETE"])
-@login_required
+@default_authentication_required
 def remove_friend(request):
 	friend_username = request.data.get('username')
 	if not friend_username:
@@ -187,7 +205,7 @@ def remove_friend(request):
 
 
 @api_view (["POST"])
-@login_required
+@default_authentication_required
 def accept_friend_request(request):
 	try:
 		friendship_request = Friend.objects.get(to_user=request.user)
@@ -211,7 +229,7 @@ def accept_friend_request(request):
 
 
 @api_view (["GET"])
-@login_required
+@default_authentication_required
 def get_friends(request):
 	user = request.user
 	all_friends = []
@@ -240,7 +258,7 @@ def get_friends(request):
 
 
 @api_view (["GET"])
-@login_required
+@default_authentication_required
 def delete_account(request):
 	user = request.user
 	matches = Match.objects.filter(Q(user=user) | Q(opponent=user))

@@ -7,16 +7,6 @@
 	background-repeat: no-repeat;
 }
 
-#profileBackground {
-	position: absolute;
-	display: flex;
-	background-color: #bcd9d7;
-	z-index: 1;
-	width: 100%;
-	height: 40%;
-	margin-top: 60vh;
-}
-
 #containerUser {
 	z-index: 2;
 	height: 100%;
@@ -24,39 +14,33 @@
 }
 
 #containerUser #userInfo {
-	background-color: #edeef0;
+	display: block;
+	margin: 0 auto;
 	color: black;
-	margin-top: 10vh;
+	margin-top: 5vh;
 	margin-left: 8%;
 	height: 90%;
 	width: 90%;
-	border-top-right-radius: 30px;
-	border-top-left-radius: 30px;
 }
 
-#user {
+#username {
 	font-size: xx-large;
 }
 
 #userInfo #photo {
 	position: relative;
-	margin-top: 6%;
 	height: 20%;
 	justify-content: center;
 }
 
 #photo #photoContainer {
 	position: absolute;
-	height: 150%;
+	height: 120%;
 	bottom: 0;
 }
 
 #photo #photoContainer img {
 	border: 2px solid #192e2f;
-}
-
-#editBtn button, #logoutBtn button {
-	background-color: #3a595c;
 }
 
 #containerStats {
@@ -65,13 +49,19 @@
 }
 
 #containerStats #stats {
-	background-color: #edeef0;
-	margin-top: 10vh;
+	margin-top: 5vh;
 	margin-left: 5%;
 	height: 90%;
 	width: 90%;
-	border-top-right-radius: 30px;
-	border-top-left-radius: 30px;
+}
+
+#containerUser #userEdit {
+	display: none;
+	color: black;
+	margin-top: 5vh;
+	margin-left: 8%;
+	height: 90%;
+	width: 90%;
 }
 
 #chat-placeholder {

@@ -1,7 +1,14 @@
 from django.core.exceptions import ValidationError
-from .models import AppUser
+from .models import AppUser, Friend
 from rest_framework.response import Response
 from rest_framework import status
+
+
+def get_friend_count(user):
+	from_user_count = Friend.objects.filter(from_user=user, status=Friend.ACCEPTED).count()
+	to_user_count = Friend.objects.filter(to_user=user, status=Friend.ACCEPTED).count()
+	return from_user_count + to_user_count
+
 
 def set_nickname(request):
 	nickname = request.data.get('nickname')

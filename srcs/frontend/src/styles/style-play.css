@@ -31,14 +31,13 @@
 #btnsContainer {
 	position: absolute;
 	display: flex;
-	height: 100%;
+	height: 90%;
 	z-index: 2;
 	align-items: center;
 	justify-content: center;
 }
 
 #btnsContainer .btn {
-	background-color: #3a595c;
 	border: 1px solid white;
 }
 
@@ -67,18 +66,22 @@
 	z-index: 3;
 }
 
+#dropdownTwo {
+	color: black;
+	height: 75%;
+}
+
 #dropdownOne #vsIA, #dropdownTwo #createPub {
 	margin-left: 0;
 }
 
-#dropdownOne #local, #dropdownOne #online, #dropdownOne #backOne, #dropdownTwo #createPriv, #dropdownTwo #join, #dropdownTwo #backTwo {
+#dropdownOne #local, #dropdownOne #online, #dropdownOne #backOne {
 	margin-top: 7vh;
 	margin-left: 0;
 }
 
-#dropdownOne #back button, #dropdownTwo #back button {
-	background-color: #7ba9a9;
-	color: white;
+#dropdownTwo .btn {
+	border: 1px solid black;
 }
 
 #chatbtn-placeholder {
