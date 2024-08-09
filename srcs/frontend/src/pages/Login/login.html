@@ -3,35 +3,38 @@
 		<div class="d-flex justify-content-center pb-4 " style="align-content: center;">
 			<h1 class="display-2 mt-3" style="text-align: center;">PONG</h1>
 		</div>
-		<form id="loginForm">
-			<div class="row mb-3">
-				<div class="col-sm-8" id="form">
-					<input type="text" id="username" name="username" required>
+		<form id="login_form" class="needs-validation" novalidate>
+			<div class="d-flex flex-column gap-3 mb-4">
+				<div class="form-floating">
+					<input type="text" class="form-control" id="username" name="username" placeholder="Username" autofocus required>
 					<label for="username">Username</label>
+					<div class="invalid-feedback">
+						Please enter a username.
+					</div>
 				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-8" id="form">
-					<input type="password" id="password" name="password" required>
-					<label for="password">Password</label>
+				<div class="form-floating">
+					<input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+					<label for="username">Password</label>
+					<div class="invalid-feedback">
+						Please enter a password.
+					</div>
 				</div>
-			</div>
-			<div class="row mb-1 justify-content-center">
-				<a class="btn btn-link" href="#">Forgot your password?</a>
-			</div>
-			<div class="text-center">
-				<span id="errorPlaceholder" class="bg-danger"></span>
-			</div>
-			<div class="row text-center col-sm-8 mx-auto mb-2 justify-content-center">
-				<button type="submit" class="btn btn-success fw-bold shadow">LOGIN</button>
+				<div class="text-center">
+					<span id="errorPlaceholder" class="bg-danger"></span>
+				</div>
+				<div class="row text-center col-sm-8 mx-auto mb-2 justify-content-center">
+					<button type="submit" class="btn btn-success fw-bold shadow">LOGIN</button>
+				</div>
 			</div>
 		</form>
 		<div class="d-flex text-center col-12 mx-auto justify-content-center">
 			<p class="mb-0">Don't have an account? <a href="/signup">Sign up</a></p>
 		</div>
-		<div class="col-12 mt-0"><hr></div>
+		<div class="col-12 mt-0"><hr class=""></div>
 		<div class="d-flex text-center col-8 mx-auto pt-2 pb-4 justify-content-center">
-			<button id="intraLogin" type="button" class="btn btn-primary"><img src="../assets/images/42.png" id="fortytwo"></img></button>
+			<button id="intra_login" type="button" class="btn fw-bold btn-primary d-flex justify-content-center align-items-center position-relative">
+				LOGIN WITH 42
+			</button>
 		</div>
 	</div>
 </div>

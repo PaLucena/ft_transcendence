@@ -7,10 +7,6 @@
 	padding: 0;
 }
 
-.btn {
-	width: 90%;
-}
-
 #body {
 	color: black;
 	background-color: white;
@@ -18,14 +14,7 @@
 	justify-content: center;
 }
 
-#form {
-	margin: 0 auto;
-	position: relative;
-	background-color: white;
-	justify-content: center;
-}
-
-input {
+.custom-input {
 	z-index: inherit;
 	color: black;
 	background-color: white;
@@ -37,12 +26,12 @@ input {
 	height: 35px;
 }
 
-input:focus {
+.custom-input:focus {
 	border-color: rgb(19, 87, 54);
 	outline: 1px solid rgb(19, 87, 54);
 }
 
-label {
+.custom-label {
 	position: absolute;
 	color: #999;
 	z-index: 2;
@@ -55,19 +44,11 @@ label {
 	font-size: 14px;
 }
 
-input:focus + label, input:valid + label {
+.custom-input:focus + .custom-label, .custom-input:valid + .costom-label {
 	font-size: 11px;
 	top: -5px;
 }
 
-input:focus + label {
+.custom-input:focus + .costom-label {
 	color: rgb(19, 87, 54);
-}
-
-button {
-	z-index: inherit;
-}
-
-#fortytwo {
-	height: 5vh;
 }

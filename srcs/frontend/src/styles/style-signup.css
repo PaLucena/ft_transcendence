@@ -4,10 +4,6 @@
 	height: 100vh;
 }
 
-.btn {
-	width: 90%;
-}
-
 #body {
 	color: black;
 	background-color: white;
@@ -15,14 +11,7 @@
 	justify-content: center;
 }
 
-#form {
-	margin: 0 auto;
-	position: relative;
-	background-color: white;
-	justify-content: center;
-}
-
-input {
+/* .signup-custom-input {
 	color: black;
 	background: transparent;
 	background-color: white;
@@ -34,12 +23,12 @@ input {
 	height: 35px;
 }
 
-input:focus {
+.signup-custom-input:focus {
 	border-color: blue;
 	outline: 1px solid blue;
 }
 
-label {
+.signup-custom-label {
 	position: absolute;
 	color: #999;
 	z-index: 2;
@@ -59,4 +48,4 @@ input:focus + label, input:valid + label {
 
 input:focus + label {
 	color: blue;
-}
+} */

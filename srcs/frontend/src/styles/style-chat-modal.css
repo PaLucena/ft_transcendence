@@ -1,0 +1,131 @@
+#chat_modal {
+	z-index: 9999;
+	position: relative;
+}
+
+.other-message {
+	border-bottom-right-radius: 0.5rem !important;
+}
+.my-message {
+	background-color: #BBF7D0;
+	border-bottom-left-radius: 0.5rem !important;
+}
+
+.message-field {
+    height: 60px;
+    max-height: 120px;
+    overflow-y: auto;
+    resize: none;
+    display: flex;
+    justify-content: center;
+}
+
+.message-field::placeholder {
+    color: #888;
+    font-style: italic;
+}
+
+
+.message-field::-webkit-scrollbar {
+	width: 10px;
+}
+
+
+.message-field::-webkit-scrollbar-track {
+	background: #f1f1f1;
+}
+
+
+.message-field::-webkit-scrollbar-thumb {
+	background: #888;
+}
+
+
+.message-field::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}
+
+.chat-modal-btn {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+	font-size: 24px;
+	border: none;
+}
+
+.send-button i {
+    font-size: 1.5em;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-window-action {
+	width: 25px;
+	height: 25px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1;
+}
+
+.green-dot {
+	padding: 0.375rem;
+	border-radius: 9999px;
+	background-color: #22c55e;
+}
+
+.gray-light-dot {
+	padding: 0.375rem;
+	border-radius: 9999px;
+	background-color: #d1d5db;
+}
+
+.gray-dot {
+	padding: 0.375rem;
+	border-radius: 9999px;
+	background-color: #6b7280;
+}
+
+
+/*  First Chat modal  */
+
+.circle-container {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+  }
+
+  .circle-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+
+.chat-element .btn > img {
+	opacity: 1;
+	transition: opacity 0.3s;
+}
+
+.chat-element:hover .btn > img {
+	opacity: 0.7;
+}
+
+.bounce {
+    animation: bounce 3s ease forwards;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-15px); }
+    60% { transform: translateY(-8px); }
+}
