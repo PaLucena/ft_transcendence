@@ -2,6 +2,7 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
 import { initUserWebSocket } from '../../scripts/websocket.js'
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
+import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Login extends Component {
 	constructor() {
@@ -24,6 +25,8 @@ export class Login extends Component {
 			}
 
 			if (formIsValid) {
+				event.preventDefault();
+
 				const formData = new FormData(event.target);
 				const jsonData = {};
 
@@ -43,24 +46,20 @@ export class Login extends Component {
 					body: JSON.stringify(jsonData)
 				})
 				.then(response => {
-					if (response.status === 200) {
-						initUserWebSocket();
-						return response.json();
-					}
-					else {
+					if (!response.ok) {
 						return response.json().then(errData => {
-							document.getElementById("errorPlaceholder").innerHTML = "Error: " + errData.error;
-							throw new Error(errData.error);
+							throw new Error(errData.error || `Response status: ${response.status}`);
 						});
 					}
+					return response.json();
 				})
 				.then(data => {
-					console.log("Login successful", data);
+					customAlert('success', 'Login successful', 3000);
 					navigateTo("/play");
 				})
-				.catch((error) => {
-					console.error("Login error: ", error);
-				})
+				.catch(error => {
+					customAlert('danger', `Login error: ${error.message}`, 3000);
+				});
 			}
 
 			this.classList.add('was-validated')

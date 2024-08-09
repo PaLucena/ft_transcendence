@@ -7,7 +7,7 @@
  * @param {string} [customStyle=''] - An optional custom style class to apply to the alert (e.g., 'transparent-blur').
  */
 
-export const customAlert = (type, text, time, customStyle = '') => {
+export default function customAlert (type, text, time, customStyle = '') {
     const customAlert = document.querySelector('#alert');
 	if (customAlert) {
 		let icon = '';
