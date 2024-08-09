@@ -70,7 +70,7 @@ export class Signup extends Component {
 					navigateTo("/play");
 				})
 				.catch(error => {
-					customAlert('danger', `Error during signup: ${error.message}`, 3000);
+					customAlert('danger', `Error: ${error.message}`, '');
 				});
 			}
 

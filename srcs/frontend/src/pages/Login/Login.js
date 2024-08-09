@@ -58,7 +58,7 @@ export class Login extends Component {
 					navigateTo("/play");
 				})
 				.catch(error => {
-					customAlert('danger', `Login error: ${error.message}`, 3000);
+					customAlert('danger', `Error: ${error.message}`, '');
 				});
 			}
 
