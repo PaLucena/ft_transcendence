@@ -23,7 +23,7 @@
 	color: #000;
 	padding: 20px;
 	border-radius: 8px;
-	position: relative; /* Required for positioning the close button */
+	position: relative;
 }
 
 .custom-alert.active {
