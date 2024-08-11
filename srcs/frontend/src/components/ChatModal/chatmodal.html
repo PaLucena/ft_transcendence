@@ -1,0 +1,338 @@
+<button class="btn btn-primary rounded-circle chat-modal-btn" data-bs-toggle="modal" data-bs-target="#first_chat_modal">
+        <i class="fas fa-comments"></i>
+</button>
+
+<div class="modal fade" id="first_chat_modal" aria-labelledby="chatModalToggleLabel1" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-scrollable">
+		<div class="modal-content bg-transparent position-relative h-100 d-flex flex-column border-0">
+		<!-- Контент чата -->
+			<div id="chat_window" class="d-flex position-relative flex-column rounded-4 bg-dark p-2 h-100">
+				<div class="position-relative d-flex justify-content-end bg-dark p-2" style="color: #34d399">
+					<div class="btn-group gap-2">
+						<button type="button" class="btn btn-danger rounded-circle p-0 btn-window-action" data-bs-dismiss="modal" aria-label="Close">
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+					</div>
+				</div>
+				<div id='chat_container' class="overflow-auto flex-grow-1 m-0 p-3">
+					<div class="container">
+						<div class="row">
+							<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
+								<button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative" style="width: 102px; height: 102px;" data-bs-target="#second_chat_modal" data-bs-toggle="modal">
+									<img src="https://via.placeholder.com/800" style="width: 100px; height: 100px;"  class="rounded-circle" alt="Circle Image">
+									<span class="position-absolute translate-middle" style="top:0%; left:10%;">
+										<span class="bounce bounce-animation position-absolute p-2 bg-danger border border-1 border-light rounded-circle"></span>
+									</span>
+									</span>
+								</button>
+								<p class="text-light mt-2">Public chat</p>
+							</div>
+							<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
+								<button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative" style="width: 102px; height: 102px;" data-bs-target="#second_chat_modal" data-bs-toggle="modal">
+									<img src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg" style="width: 100px; height: 100px;"  class="rounded-circle" alt="Circle Image">
+									<div class="position-absolute translate-middle border border-3 border-dark green-dot p-2" style="top:90%; left:85%;"></div>
+									<span class="position-absolute translate-middle" style="top:0%; left:10%;">
+										<span class="bounce bounce-animation position-absolute p-2 bg-danger border border-1 border-light rounded-circle"></span>
+									</span>
+								</button>
+								<p class="text-light mt-2">Bart</p>
+							</div>
+							<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
+								<button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative" style="width: 102px; height: 102px;" data-bs-target="#second_chat_modal" data-bs-toggle="modal">
+									<img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" style="width: 100px; height: 100px;"  class="rounded-circle" alt="Circle Image">
+									<div class="position-absolute translate-middle border border-3 border-dark gray-dot p-2" style="top:90%; left:85%;"></div>
+									<span class="position-absolute translate-middle p-2 bg-danger border border-1 border-light rounded-circle visually-hidden" style="top:10%; left:10%;">
+									</span>
+								</button>
+								<p class="text-light mt-2">Lilly</p>
+							</div>
+							<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
+								<button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative" style="width: 102px; height: 102px;" data-bs-target="#second_chat_modal" data-bs-toggle="modal">
+									<img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" style="width: 100px; height: 100px;"  class="rounded-circle" alt="Circle Image">
+									<div class="position-absolute translate-middle border border-3 border-dark gray-dot p-2" style="top:90%; left:85%;"></div>
+									<span class="position-absolute translate-middle p-2 bg-danger border border-1 border-light rounded-circle visually-hidden" style="top:10%; left:10%;">
+									</span>
+								</button>
+								<p class="text-light mt-2">Lilly</p>
+							</div>
+							<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
+								<button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative" style="width: 102px; height: 102px;" data-bs-target="#second_chat_modal" data-bs-toggle="modal">
+									<img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" style="width: 100px; height: 100px;"  class="rounded-circle" alt="Circle Image">
+									<div class="position-absolute translate-middle border border-3 border-dark gray-dot p-2" style="top:90%; left:85%;"></div>
+									<span class="position-absolute translate-middle p-2 bg-danger border border-1 border-light rounded-circle visually-hidden" style="top:10%; left:10%;">
+									</span>
+								</button>
+								<p class="text-light mt-2">Lilly</p>
+							</div>
+							<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
+								<button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative" style="width: 102px; height: 102px;" data-bs-target="#second_chat_modal" data-bs-toggle="modal">
+									<img src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png" style="width: 100px; height: 100px;"  class="rounded-circle" alt="Circle Image">
+									<div class="position-absolute translate-middle border border-3 border-dark gray-dot p-2" style="top:90%; left:85%;"></div>
+									<span class="position-absolute translate-middle p-2 bg-danger border border-1 border-light rounded-circle visually-hidden" style="top:10%; left:10%;">
+									</span>
+								</button>
+								<p class="text-light mt-2">Lilly</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="sticky-bottom w-100 rounded-bottom-5 p-4 bg-dark">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Second Chat modal -->
+<div class="modal fade" id="second_chat_modal" aria-labelledby="chatModalToggleLabel1" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-scrollable">
+		<div class="modal-content bg-transparent position-relative h-100 d-flex flex-column border-0">
+			<!-- Контент чата -->
+				<div id="chat_window" class="d-flex position-relative flex-column rounded-4 bg-dark shadow-lg p-2 h-100">
+				   <div class="position-relative d-flex justify-content-end bg-dark p-2 " style="color: #34d399">
+					   <span id="online-count" class="pr-1 position-absolute top-50 start-50" style="transform: translate(-50%, -50%);">3 online</span>
+					   <div class="btn-group gap-2">
+						   <button class="btn btn-secondary rounded-circle p-0 btn-window-action" data-bs-target="#first_chat_modal" data-bs-toggle="modal">
+								<i class="fa-solid fa-minus"></i>
+						   </button>
+						   <button type="button" class="btn btn-danger rounded-circle p-0 btn-window-action" data-bs-dismiss="modal" aria-label="Close">
+							   <i class="fa-solid fa-xmark"></i>
+						   </button>
+					   </div>
+				   </div>
+				   <div id='chat_container' class="overflow-auto flex-grow-1">
+					   <ul id='chat_messages' class="d-flex flex-column gap-2 justify-end list-unstyled mb-0 p-3">
+						   <li class="d-flex justify-content-end mb-2">
+							   <div class="my-message rounded-top-3 p-3" style="max-width: 75%;">
+								   <span>Hi, how is everybody?</span>
+							   </div>
+							   <div class="d-flex align-items-end">
+								   <svg height="13" width="8">
+									   <path fill="#bbf7d0" d="M6.3,10.4C1.5,8.7,0.9,5.5,0,0.2L0,13l5.2,0C7,13,9.6,11.5,6.3,10.4z"/>
+								   </svg>
+							   </div>
+						   </li>
+						   <li class="d-flex justify-content-end mb-2">
+							   <div class="my-message rounded-top-3 p-3" style="max-width: 75%;">
+								   <span>Hi, how is everybody?</span>
+							   </div>
+							   <div class="d-flex align-items-end">
+								   <svg height="13" width="8">
+									   <path fill="#bbf7d0" d="M6.3,10.4C1.5,8.7,0.9,5.5,0,0.2L0,13l5.2,0C7,13,9.6,11.5,6.3,10.4z"/>
+								   </svg>
+							   </div>
+						   </li>
+						   <li class="d-flex flex-column justify-start mb-2">
+							   <div class="d-flex align-items-end">
+								   <div class="d-flex align-items-end me-2 dropup">
+									   <button type="button" class="btn p-0" data-bs-toggle="dropdown">
+										   <div class="position-relative">
+											   <div class="position-absolute translate-middle border border-3 border-dark green-dot" style="top:90%; left:90%;"></div>
+											   <img class="rounded-circle" style="width: 32px; height: 32px;" src="https://pbs.twimg.com/profile_images/508601156767997952/fFTdKUf2_400x400.jpeg">
+										   </div>
+									   </button>
+									   <ul class="dropdown-menu dropdown-menu-dark">
+										   <li><a href="" class="dropdown-item">Profile</a></li>
+										   <li><hr class="dropdown-divider"></li>
+										   <li><a class="dropdown-item" href="#">Invite to Play</a></li>
+										   <li><a class="dropdown-item" href="#">Unblock</a></li>
+									   </ul>
+								   </div>
+								   <div class="d-flex align-items-end">
+									   <svg height="13" width="8">
+										   <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
+									   </svg>
+								   </div>
+								   <div class="other-message bg-white rounded-top-3 p-3" style="max-width: 75%;">
+								   <span>Not bad, thanks for asking! My day has been quite productive so far.
+									   I've been diving into fixing some bugs in the codebase, which can be a nightmare sometimes,
+									   but I got them at the end. It's always satisfying to track down those buggers and make the application
+									   finally work. How about you? How's your day been?</span>
+							   </div>
+						   </div>
+						   <div class="text-muted small py-1 ml-4 mt-2">
+							   <span class="text-white">Bart</span>
+							   <span class="text-muted">@bart</span>
+						   </div>
+						   </li>
+						   <li class="d-flex flex-column justify-start mb-2">
+							   <div class="d-flex align-items-end">
+								   <div class="d-flex align-items-end me-2 dropup">
+									   <button type="button" class="btn p-0" data-bs-toggle="dropdown">
+										   <div class="position-relative">
+											   <div class="position-absolute translate-middle border border-3 border-dark gray-dot" style="top:90%; left:90%;"></div>
+											   <img class="rounded-circle" style="width: 32px; height: 32px;" src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png">
+										   </div>
+									   </button>
+									   <ul class="dropdown-menu dropdown-menu-dark">
+										   <li><a href="" class="dropdown-item">Profile</a></li>
+										   <li><hr class="dropdown-divider"></li>
+										   <li><a class="dropdown-item" href="#">Invite to Play</a></li>
+										   <li><a class="dropdown-item" href="#">Unblock</a></li>
+									   </ul>
+								   </div>
+								   <div class="d-flex align-items-end">
+									   <svg height="13" width="8">
+										   <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
+									   </svg>
+								   </div>
+								   <div class="other-message bg-white rounded-top-3 p-3" style="max-width: 75%;">
+									   <span>Wonderful!</span>
+								   </div>
+							   </div>
+							   <div class="text-muted small py-1 ml-4 mt-2">
+								   <span class="text-white">Lilly</span>
+								   <span class="text-muted">@lilly</span>
+							   </div>
+						   </li>
+						   <li class="d-flex justify-content-end mb-2">
+							<div class="my-message rounded-top-3 p-3" style="max-width: 75%;">
+								<span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas, dolores quibusdam doloribus ad repellat pariatur est asperiores vitae? Nam vitae numquam inventore doloremque fugit incidunt dolor exercitationem explicabo minus perferendis!</span>
+							</div>
+							<div class="d-flex align-items-end">
+								<svg height="13" width="8">
+									<path fill="#bbf7d0" d="M6.3,10.4C1.5,8.7,0.9,5.5,0,0.2L0,13l5.2,0C7,13,9.6,11.5,6.3,10.4z"/>
+								</svg>
+							</div>
+						</li>
+						   <li class="d-flex flex-column justify-start mb-2">
+							   <div class="d-flex align-items-end">
+								   <div class="d-flex align-items-end me-2 dropup">
+									   <button type="button" class="btn p-0" data-bs-toggle="dropdown">
+										   <div class="position-relative">
+											   <div class="position-absolute translate-middle border border-3 border-dark gray-dot" style="top:90%; left:90%;"></div>
+											   <img class="rounded-circle" style="width: 32px; height: 32px;" src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png">
+										   </div>
+									   </button>
+									   <ul class="dropdown-menu dropdown-menu-dark">
+										   <li><a href="" class="dropdown-item">Profile</a></li>
+										   <li><hr class="dropdown-divider"></li>
+										   <li><a class="dropdown-item" href="#">Invite to Play</a></li>
+										   <li><a class="dropdown-item" href="#">Unblock</a></li>
+									   </ul>
+								   </div>
+								   <div class="d-flex align-items-end">
+									   <svg height="13" width="8">
+										   <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
+									   </svg>
+								   </div>
+								   <div class="other-message bg-white rounded-top-3 p-3" style="max-width: 75%;">
+									   <span>Wonderful!</span>
+								   </div>
+							   </div>
+							   <div class="text-muted small py-1 ml-4 mt-2">
+								   <span class="text-white">Lilly</span>
+								   <span class="text-muted">@lilly</span>
+							   </div>
+						   </li>
+						   <li class="d-flex flex-column justify-start mb-2">
+							   <div class="d-flex align-items-end">
+								   <div class="d-flex align-items-end me-2 dropup">
+									   <button type="button" class="btn p-0" data-bs-toggle="dropdown">
+										   <div class="position-relative">
+											   <div class="position-absolute translate-middle border border-3 border-dark gray-dot" style="top:90%; left:90%;"></div>
+											   <img class="rounded-circle" style="width: 32px; height: 32px;" src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png">
+										   </div>
+									   </button>
+									   <ul class="dropdown-menu dropdown-menu-dark">
+										   <li><a href="" class="dropdown-item">Profile</a></li>
+										   <li><hr class="dropdown-divider"></li>
+										   <li><a class="dropdown-item" href="#">Invite to Play</a></li>
+										   <li><a class="dropdown-item" href="#">Unblock</a></li>
+									   </ul>
+								   </div>
+								   <div class="d-flex align-items-end">
+									   <svg height="13" width="8">
+										   <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
+									   </svg>
+								   </div>
+								   <div class="other-message bg-white rounded-top-3 p-3" style="max-width: 75%;">
+									   <span>Wonderful!</span>
+								   </div>
+							   </div>
+							   <div class="text-muted small py-1 ml-4 mt-2">
+								   <span class="text-white">Lilly</span>
+								   <span class="text-muted">@lilly</span>
+							   </div>
+						   </li>
+						   <li class="d-flex flex-column justify-start mb-2">
+							   <div class="d-flex align-items-end">
+								   <div class="d-flex align-items-end me-2 dropup">
+									   <button type="button" class="btn p-0" data-bs-toggle="dropdown">
+										   <div class="position-relative">
+											   <div class="position-absolute translate-middle border border-3 border-dark gray-dot" style="top:90%; left:90%;"></div>
+											   <img class="rounded-circle" style="width: 32px; height: 32px;" src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png">
+										   </div>
+									   </button>
+									   <ul class="dropdown-menu dropdown-menu-dark">
+										   <li><a href="" class="dropdown-item">Profile</a></li>
+										   <li><hr class="dropdown-divider"></li>
+										   <li><a class="dropdown-item" href="#">Invite to Play</a></li>
+										   <li><a class="dropdown-item" href="#">Unblock</a></li>
+									   </ul>
+								   </div>
+								   <div class="d-flex align-items-end">
+									   <svg height="13" width="8">
+										   <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
+									   </svg>
+								   </div>
+								   <div class="other-message bg-white rounded-top-3 p-3" style="max-width: 75%;">
+									   <span>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Eveniet accusamus at unde quia reprehenderit molestias iusto eaque porro est culpa optio nihil totam aliquid repellendus vel voluptates deserunt corporis veniam veritatis rerum, minima dolore? Natus dicta porro accusantium necessitatibus! Aperiam ullam molestias velit iusto ab in molestiae blanditiis repellat dolore magni! Doloremque doloribus molestiae ipsum dignissimos dicta tempora ut in quibusdam autem earum, reiciendis quasi dolor aut consequuntur impedit nam, obcaecati laborum, natus debitis inventore ipsam sed tenetur maxime. Aspernatur, voluptate cupiditate facilis quae nobis deserunt culpa illum expedita vero labore beatae fugiat, modi cum omnis fugit? Soluta, possimus ratione.</span>
+								   </div>
+							   </div>
+							   <div class="text-muted small py-1 ml-4 mt-2">
+								   <span class="text-white">Lilly</span>
+								   <span class="text-muted">@lilly</span>
+							   </div>
+						   </li>
+						   <li class="d-flex flex-column justify-start mb-2">
+							   <div class="d-flex align-items-end">
+								   <div class="d-flex align-items-end me-2 dropup">
+									   <button type="button" class="btn p-0" data-bs-toggle="dropdown">
+										   <div class="position-relative">
+											   <div class="position-absolute translate-middle border border-3 border-dark gray-dot" style="top:90%; left:90%;"></div>
+											   <img class="rounded-circle" style="width: 32px; height: 32px;" src="https://cdn.dribbble.com/userupload/12910688/file/original-d33b34f28a79a4b085edec17d83870ba.png">
+										   </div>
+									   </button>
+									   <ul class="dropdown-menu dropdown-menu-dark">
+										   <li><a href="" class="dropdown-item">Profile</a></li>
+										   <li><hr class="dropdown-divider"></li>
+										   <li><a class="dropdown-item" href="#">Invite to Play</a></li>
+										   <li><a class="dropdown-item" href="#">Unblock</a></li>
+									   </ul>
+								   </div>
+								   <div class="d-flex align-items-end">
+									   <svg height="13" width="8">
+										   <path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
+									   </svg>
+								   </div>
+								   <div class="other-message bg-white rounded-top-3 p-3" style="max-width: 75%;">
+									   <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam est libero consequuntur praesentium. A iure quos quae praesentium eveniet dolorum!</span>
+								   </div>
+							   </div>
+							   <div class="text-muted small py-1 ml-4 mt-2">
+								   <span class="text-white">Lilly</span>
+								   <span class="text-muted">@lilly</span>
+							   </div>
+						   </li>
+					   </ul>
+				   </div>
+				   <div class="sticky-bottom w-100 rounded-bottom-5 p-2 bg-dark">
+					   <div class="message-input-container">
+						   <form id="chat_message_form" method='POST' class="w-100 d-flex align-items-center">
+							   <div class="input-group">
+								   <div class="form-floating">
+									   <textarea name="message" autofocus placeholder="Add message..." id="floating_textarea" class="form-control message-field"></textarea>
+									   <label for="floating_textarea">Add message...</label>
+								   </div>
+								   <button type="submit" class="btn btn-primary send-button">
+									   <i class="fa-regular fa-paper-plane"></i>
+								   </button>
+							   </div>
+						   </form>
+					   </div>
+				   </div>
+			   </div>
+		</div>
+	</div>
+</div>

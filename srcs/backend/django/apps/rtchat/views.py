@@ -5,9 +5,10 @@ from django.shortcuts import get_object_or_404
 from rtchat.models import ChatGroup, Block
 from user.models import AppUser
 from rtchat.serializers import GroupMessageSerializer
-
+from user.decorators import default_authentication_required
 
 @api_view(["GET"])
+@default_authentication_required
 def chat_view(request, chatroom_name="public-chat"):
     if not request.user.is_authenticated:
         return Response(
@@ -49,6 +50,7 @@ def chat_view(request, chatroom_name="public-chat"):
 
 
 @api_view(["GET"])
+@default_authentication_required
 def get_or_create_chatroom(request, username):
     if not request.user.is_authenticated:
         return Response(
@@ -89,6 +91,7 @@ def get_or_create_chatroom(request, username):
 
 
 @api_view(["POST"])
+@default_authentication_required
 def block_user_view(request, chatroom_name):
     if not request.user.is_authenticated:
         return Response(
@@ -127,6 +130,7 @@ def block_user_view(request, chatroom_name):
 
 
 @api_view(["POST"])
+@default_authentication_required
 def unblock_user_view(request, chatroom_name):
     if not request.user.is_authenticated:
         return Response(

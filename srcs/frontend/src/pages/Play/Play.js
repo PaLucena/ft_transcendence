@@ -1,6 +1,4 @@
 import { Component } from '../../scripts/Component.js';
-import { Navbar } from '../../components/Navbar/Navbar.js';
-import { ChatBtn } from '../../components/ChatBtn/ChatBtn.js';
 
 export class Play extends Component {
 	constructor() {

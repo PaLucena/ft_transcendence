@@ -1,0 +1,42 @@
+.custom-alert {
+	position: absolute;
+	top: -110px;
+	left: 50%;
+	transform: translateX(-50%);
+	min-width: 200px;
+	opacity: 0;
+	z-index: 2;
+	text-align: center;
+	overflow: hidden;
+	transition-property: opacity, top;
+	transition-duration: .4s;
+	transition-timing-function: ease-in-out;
+}
+
+.transparent-blur {
+	border: none;
+	box-shadow: inset 1px 1px rgb(255 255 255 / 20%), inset -1px -1px rgb(255 255 255 / 10%), 1px 3px 24px -1px rgb(0 0 0 / 15%);
+	background-color: transparent;
+	background-image: linear-gradient(125deg,rgba(255,255,255,.3),rgba(255,255,255,.1) 70%);
+	-webkit-backdrop-filter: blur(5px);
+	backdrop-filter: blur(5px);
+	color: #000;
+	padding: 20px;
+	border-radius: 8px;
+	position: relative;
+}
+
+.custom-alert.active {
+	top: 30px;
+	opacity: 1;
+}
+
+.transparent-blur::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 0.5rem;
+	height: 100%;
+	background-color: #66C4A4;
+}

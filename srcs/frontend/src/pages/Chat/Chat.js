@@ -1,5 +1,4 @@
 import { Component } from "../../scripts/Component.js";
-import { Navbar } from '../../components/Navbar/Navbar.js';
 
 export class Chat extends Component {
     constructor(params = {}) {
