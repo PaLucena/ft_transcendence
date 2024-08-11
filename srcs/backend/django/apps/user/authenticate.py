@@ -17,31 +17,23 @@ class DefaultAuthentication:
 			try:
 				validated_token = self.jwt_auth.get_validated_token(access_token)
 			except Exception as e:
-				print("Access token is not invalid")
-			print("1 HERE : ", validated_token)
-			print("1 HERE : ", access_token)
-			print("1 HERE : ", refresh_token)
-
-		elif validated_token is None and refresh_token is not None:
-			try:
-				print("1 : ", refresh_token)
-				refresh = RefreshToken.for_user(refresh_token.user)
-				print("2 : ", refresh)
-				#refresh_token.blacklist()
-				print("3 : ", refresh)
-				new_access_token = str(refresh.access_token)
-				print("4 : ", new_access_token)
-				validated_token = self.jwt_auth.get_validated_token(new_access_token)
-				print("5 : ", validated_token)
-				request.COOKIES['access_token'] = new_access_token
-				print("NEW ACCESS : ", new_access_token)
-				print("NEW REFRESH : ", refresh)
-			except (TokenError, InvalidToken) as e:
-				print("5 : ")
-				raise exceptions.AuthenticationFailed('Invalid token: %s' % e)
+				print("Access token is invalid or expired")
+				if refresh_token:
+					try:
+						print("ACCESS TOKEN: ", access_token)
+						print("REFRESH TOKEN: ", refresh_token)
+						refresh = RefreshToken(refresh_token)
+						new_access_token = str(refresh.access_token)
+						validated_token = self.jwt_auth.get_validated_token(new_access_token)
+						request.COOKIES['access_token'] = new_access_token
+						print("NEW ACCESS TOKEN GENERATED: ", new_access_token)
+					except (TokenError, InvalidToken) as e:
+						raise exceptions.AuthenticationFailed(f'Invalid refresh token: {e}')
+				else:
+					raise exceptions.AuthenticationFailed('No refresh token provided')
 
 		else:
-			raise exceptions.AuthenticationFailed('Invalid token and no refresh token provided')
+			raise exceptions.AuthenticationFailed('No access token provided')
 
 		user = self.jwt_auth.get_user(validated_token)
 		request.user = user

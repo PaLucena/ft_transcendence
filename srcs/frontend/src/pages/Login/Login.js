@@ -65,31 +65,4 @@ export class Login extends Component {
 			window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fauth&response_type=code";
 		});
 	}
-
-
-	initUserWebSocket() {
-		const socket = new WebSocket(`wss://${window.location.host}/ws/status/`);
-
-		socket.onopen = (e) => {
-			console.log("[open] Connection established");
-			socket.send(JSON.stringify({ 'message': 'Hello Server!' }));
-			//setInterval(null, 3600)
-		};
-
-		socket.onmessage = (event) => {
-			console.log(`[message] Data received from server: ${event.data}`);
-		};
-
-		socket.onclose = (event) => {
-			if (event.wasClean) {
-				console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-			} else {
-				console.error('[close] Connection died');
-			}
-		};
-
-		socket.onerror = (error) => {
-			console.error(`[error] ${error.message}`);
-		};
-	}
 }

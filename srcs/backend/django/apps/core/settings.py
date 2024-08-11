@@ -39,7 +39,6 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "daphne",
-    "user_stats",
     "django_redis",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -51,6 +50,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
 	"rest_framework_simplejwt.token_blacklist",
     "user",
+    "user_stats",
+    "tournament",
     "corsheaders",
     "blockchain",
     "rtchat",
@@ -200,8 +201,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://localhost:8080",
 ]
 
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ALLOW_CREDENTIALS = True
+# CORS_ORIGIN_ALLOW_ALL = True
 
 
 CSRF_TRUSTED_ORIGINS = [

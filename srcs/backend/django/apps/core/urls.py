@@ -29,6 +29,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("user.urls")),
     path("api/", include("user_stats.urls")),
+    path("api/", include("tournament.urls")),
     path("api/chat/", include("rtchat.urls")),
     path("api/blockchain/", include("blockchain.urls")),
     

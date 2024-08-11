@@ -2,11 +2,11 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from django.db.models import Q
 from .models import AppUser
-from .models import Tournament, UserStats
+from .models import Tournament
 from rest_framework.response import Response
 from user.decorators import default_authentication_required
 import random
-from blockchain import create_tournament as bc_create_tournament
+from blockchain.views import create_tournament as bc_create_tournament
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -128,7 +128,7 @@ def join_tournament(request, tournament_id):
 			code = request.data.get('code', '').strip()
 			if code != tournament.invitation_code:
 				return Response({"error": "Invalid invitation code."}, status=status.HTTP_403_FORBIDDEN)
-			if user  in tournament.participants.all():
+			if user in tournament.participants.all():
 				return Response({"error": "You are already in."}, status=status.HTTP_400_BAD_REQUEST)
 			tournament.participants.add(user)
 
