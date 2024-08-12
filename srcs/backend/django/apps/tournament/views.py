@@ -29,7 +29,8 @@ def create_tournament(request):
 		name = request.data.get('name')
 		nickname = request.data.get('nickname')
 		type = request.data.get('type')
-		creator.nickname=nickname
+		invitation_code = None
+		creator.nickname = nickname
 		creator.save()
 
 		if type == Tournament.PRIVATE:
@@ -39,7 +40,6 @@ def create_tournament(request):
 			name=name,
 			creator=creator,
 			type=type,
-			participants=creator,
 			invitation_code=invitation_code
 		)
 
@@ -49,7 +49,7 @@ def create_tournament(request):
 		return Response({"message": "Created successfully"}, status=status.HTTP_200_OK)
 
 	except Exception as e:
-	        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 #call blockchain to save data when the tournament is complete
