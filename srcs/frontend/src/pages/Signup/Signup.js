@@ -66,6 +66,7 @@ export class Signup extends Component {
 					return response.json();
 				})
 				.then(data => {
+					initUserWebSocket();
 					customAlert('success', 'Account was created successfully', 3000);
 					navigateTo("/play");
 				})

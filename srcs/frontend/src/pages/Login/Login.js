@@ -54,6 +54,7 @@ export class Login extends Component {
 					return response.json();
 				})
 				.then(data => {
+					initUserWebSocket();
 					customAlert('success', 'Login successful', 3000);
 					navigateTo("/play");
 				})

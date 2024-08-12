@@ -1,13 +1,11 @@
 from pickletools import read_uint1
 from sqlite3 import IntegrityError
 from urllib import response
-from urllib.robotparser import RequestRate
-from django.core import serializers
 from django.shortcuts import render
 from django.template import context
 from django.template.defaulttags import csrf_token
 from rest_framework.decorators import api_view
-from django.contrib.auth.models import AbstractUser, User
+from django.contrib.auth.models import AbstractUser
 from rest_framework.response import Response
 from .serializers import UserSerializerClass
 from .models import AppUser, Friend, Match
@@ -18,8 +16,6 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
 from django.core.files import File
@@ -29,9 +25,8 @@ import os
 import requests
 from .utils import set_nickname, upload_avatar, get_friend_count
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import login as auth_login
 from django.views.decorators.csrf import csrf_exempt
-
-from .authenticate import DefaultAuthentication
 from .decorators import default_authentication_required
 
 @api_view(["GET"])
@@ -57,7 +52,7 @@ def signup(request):
 			serializer.save()
 			user = AppUser.objects.get(username=request.data['username'])
 			serializer = UserSerializerClass(user)
-
+			auth_login(request, user)
 			refresh = RefreshToken.for_user(user)
 			access = refresh.access_token
 			response = Response({"message": "Signup successful"}, status=status.HTTP_201_CREATED)
@@ -84,14 +79,13 @@ def login(request):
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
 		user.save()
-		#login(request, authenticated_user)
+		auth_login(request, user)
 		refresh = RefreshToken.for_user(user)
 		access = refresh.access_token
 		response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
 		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
 		response.set_cookie('access_token', str(access), httponly=True, secure=True)
 
-		print("REPONSE FROM LOGIN:", response)
 		print("Access Token Expiry:", access['exp'])
 		print("Refresh Token Expiry:", refresh['exp'])
 		return response
@@ -122,8 +116,6 @@ def logout(request):
 @api_view(["POST"])
 @default_authentication_required
 def update_user_info(request):
-	print("Request User:", request.headers)
-
 	try:
 		user = request.user
 		new_username = request.data.get('new_username')

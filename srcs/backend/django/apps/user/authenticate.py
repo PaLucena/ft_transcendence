@@ -26,7 +26,7 @@ class DefaultAuthentication:
 						new_access_token = str(refresh.access_token)
 						validated_token = self.jwt_auth.get_validated_token(new_access_token)
 						request.COOKIES['access_token'] = new_access_token
-						print("NEW ACCESS TOKEN GENERATED: ", new_access_token)
+						print("NEW ACCESS TOKEN GENERATED: ", request.COOKIES['access_token'])
 					except (TokenError, InvalidToken) as e:
 						raise exceptions.AuthenticationFailed(f'Invalid refresh token: {e}')
 				else:
@@ -37,7 +37,7 @@ class DefaultAuthentication:
 
 		user = self.jwt_auth.get_user(validated_token)
 		request.user = user
-		print("DONE : ")
+		print("DONE")
 
 		return user, request.COOKIES.get('access_token')
 
