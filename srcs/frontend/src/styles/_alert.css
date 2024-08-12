@@ -1,4 +1,6 @@
 .custom-alert {
+	display: flex;
+	align-items: center;
 	position: absolute;
 	top: -110px;
 	left: 50%;
