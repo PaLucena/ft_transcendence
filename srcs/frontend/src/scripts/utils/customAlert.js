@@ -10,6 +10,19 @@
 export default function customAlert(type, text, time, customStyle = '') {
     const customAlert = document.querySelector('#alert');
     if (customAlert) {
+     const baseClasses = ['custom-alert'];
+
+     const classesToRemove = [];
+        customAlert.classList.forEach(className => {
+            if (!baseClasses.includes(className)) {
+                classesToRemove.push(className);
+            }
+        });
+
+        classesToRemove.forEach(className => {
+            customAlert.classList.remove(className);
+        });
+
         let icon = '';
         let closeButton = '';
 
