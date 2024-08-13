@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
+from django.contrib.auth.decorators import login_required
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -96,6 +97,7 @@ def display_tournaments(request):
 		def serialize_tournament(tournament):
 			return {
 				'name': tournament.name,
+				'id': tournament.id,
 				'players': [
 					{
 						'username': 'you' if player == user else player.userame,
@@ -121,7 +123,7 @@ def join_tournament(request, tournament_id):
 	try:
 		user = request.user
 		tournament = Tournament.objects.filter(pk=tournament_id)
-		if len(tournament.participants) < 8:
+		if len(tournament.participants) > 7:
 			return Response({"Oops! Tournament is full!"}, status=status.HTTP_400_BAD_REQUEST)
 
 		if tournament.type == Tournament.PRIVATE:

@@ -2,6 +2,7 @@ from rest_framework import exceptions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from django.shortcuts import render
 
 class DefaultAuthentication:
 
@@ -34,6 +35,7 @@ class DefaultAuthentication:
 
 		else:
 			raise exceptions.AuthenticationFailed('No access token provided')
+			#return redirect('login')
 
 		user = self.jwt_auth.get_user(validated_token)
 		request.user = user

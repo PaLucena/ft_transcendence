@@ -15,9 +15,9 @@ class Tournament(models.Model):
 	name = models.CharField(max_length=100, blank=False)
 	creator = models.ForeignKey(AppUser, on_delete=models.SET_NULL, blank=True, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
-	participants = models.ManyToManyField(AppUser, related_name='participants', default=list) #if deleting, needs to marked as "deleted user"
-	invitation_time_out =  models.DateTimeField(default=lambda: timezone.now() + timedelta(minutes=10))
+	participants = models.ManyToManyField(AppUser, related_name='participants') #if deleting, needs to marked as "deleted user"
 	type = models.CharField(max_length=10, choices=TOURNAMENT_TYPES, default=PUBLIC)
 	invitation_code = models.CharField(max_length=10, null=True, blank=True)
 	is_active = models.BooleanField(default=False)
+	#invitation_time_out =  models.DateTimeField(default=lambda: timezone.now() + timedelta(minutes=10))
 	#pending_invitations = models.ManyToManyField(AppUser, related_name='pending', default=list)

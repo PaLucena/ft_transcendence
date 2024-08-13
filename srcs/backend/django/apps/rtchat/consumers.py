@@ -16,7 +16,7 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
             return
 
-        if not self.user.is_authenticated:
+        if self.user is None or not self.user.is_authenticated:
             await self.send_json({"error": "User not authenticated"})
             await self.close()
             return
