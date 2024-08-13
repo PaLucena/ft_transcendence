@@ -203,12 +203,12 @@ def accept_friend_request(request):
 		friendship_request = Friend.objects.get(to_user=request.user)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
-	
+
 	action = request.data.get('action')
 
 	if friendship_request is None:
 		return Response({'error': 'Missing friendship ID.'}, status=status.HTTP_400_BAD_REQUEST)
-	
+
 	if friendship_request.to_user == request.user:
 		# friendship_request.to_user.friends.add(friendship_request.from_user)
 		# friendship_request.user.from_user.add(friendship_request.to_user)
@@ -220,33 +220,44 @@ def accept_friend_request(request):
 		return Response({'message': 'Friend request not accepted.'}, status=status.HTTP_200_OK)
 
 
-@api_view (["GET"])
+@api_view(["GET"])
 @default_authentication_required
 def get_friends(request):
-	user = request.user
-	all_friends = []
-	online_friends = []
+    user = request.user
+    all_friends = []
+    online_friends = []
 
-	friendships = Friend.objects.filter(
-		Q(from_user=user) | Q(to_user=user),
-		status=Friend.ACCEPTED
-	)
-	
-	for friendship in friendships:
-		friend = friendship.to_user if friendship.from_user == user else friendship.from_user
-		all_friends.append(friend)
-		if friend.online == 'online':
-			online_friends.append(friend)
+    friendships = Friend.objects.filter(
+        Q(from_user=user) | Q(to_user=user), status=Friend.ACCEPTED
+    )
 
-	all_friends_data = [{'username': friend.username, 'status': friend.online} for friend in all_friends]
-	online_friends_data = [{'username': friend.username} for friend in online_friends]
+    for friendship in friendships:
+        friend = (
+            friendship.to_user if friendship.from_user == user else friendship.from_user
+        )
+        all_friends.append(friend)
+        if friend.online == "online":
+            online_friends.append(friend)
 
-	response_data = {
-		'all_friends': all_friends_data,
-		'online_friends': online_friends_data
-	}
+    all_friends_data = [
+        {
+            "username": friend.username,
+            "status": friend.online,
+        }
+        for friend in all_friends
+    ]
+    online_friends_data = [
+        {"username": friend.username}
+        for friend in online_friends
+    ]
 
-	return Response(response_data, status=status.HTTP_200_OK)
+    response_data = {
+        "all_friends": all_friends_data,
+        "online_friends": online_friends_data,
+    }
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
 
 
 @api_view (["GET"])
@@ -291,7 +302,7 @@ def ftapiLogin(request):
 	token42 = json.loads(ftapiresponse.content)
 	user_info_response = requests.get("https://api.intra.42.fr/v2/me", params={"access_token": token42["access_token"]})
 	user_json = json.loads(user_info_response.content)
-	
+
 	try:
 		ExistingUser = AppUser.objects.get(username=user_json["login"])
 		if not ExistingUser.api42auth:

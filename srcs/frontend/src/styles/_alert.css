@@ -7,7 +7,7 @@
 	transform: translateX(-50%);
 	min-width: 200px;
 	opacity: 0;
-	z-index: 2;
+	z-index: 1056;
 	text-align: center;
 	overflow: hidden;
 	transition-property: opacity, top;

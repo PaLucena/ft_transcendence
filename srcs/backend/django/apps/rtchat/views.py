@@ -4,8 +4,9 @@ from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from rtchat.models import ChatGroup, Block
 from user.models import AppUser
-from rtchat.serializers import GroupMessageSerializer
+from rtchat.serializers import GroupMessageSerializer, UserSerializer
 from user.decorators import default_authentication_required
+
 
 @api_view(["GET"])
 @default_authentication_required
@@ -19,6 +20,8 @@ def chat_view(request, chatroom_name="public-chat"):
     try:
         chat_group = get_object_or_404(ChatGroup, group_name=chatroom_name)
         other_user = None
+        other_user_data = None
+
         if chat_group.is_private:
             if request.user not in chat_group.members.all():
                 return Response(
@@ -28,6 +31,7 @@ def chat_view(request, chatroom_name="public-chat"):
             for member in chat_group.members.all():
                 if member != request.user:
                     other_user = member
+                    other_user_data = UserSerializer(other_user).data
                     break
 
         chat_messages = chat_group.chat_messages.order_by("created")
@@ -37,7 +41,7 @@ def chat_view(request, chatroom_name="public-chat"):
             "chat_messages": message_data,
             "chatroom_name": chatroom_name,
             "current_user": request.user.username,
-            "other_user": other_user.username if other_user else None,
+            "other_user": other_user_data,
         }
 
         return Response(context, status=status.HTTP_200_OK)
@@ -88,6 +92,45 @@ def get_or_create_chatroom(request, username):
         {"chatroom_name": chatroom.group_name},
         status=status.HTTP_200_OK,
     )
+
+
+@api_view(["GET"])
+@default_authentication_required
+def get_all_private_chats_view(request):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    try:
+        private_chats = ChatGroup.objects.filter(
+            is_private=True,
+            members=request.user,
+        )
+
+        chat_data = []
+        for chat in private_chats:
+            other_user = chat.members.exclude(id=request.user.id).first()
+
+            if other_user:
+                chat_info = {
+                    "chatroom_name": chat.group_name,
+                    "other_user_username": other_user.username,
+                    "other_user_online_status": other_user.online,
+                    "other_user_avatar_url": (
+                        other_user.avatar.url if other_user.avatar else None
+                    ),
+                }
+                chat_data.append(chat_info)
+
+        return Response(chat_data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+            {"detail": f"An error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 @api_view(["POST"])

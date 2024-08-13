@@ -46,20 +46,21 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content, **kwargs):
         body = content.get("body")
-        print(f"body: {body}")
         if not body:
             await self.send_json({"error": "Message body is empty"})
             return
 
         try:
             message = await self.create_message(body, self.user, self.chatroom)
+            author_data = await self.get_author_data(self.user)
+
             await self.channel_layer.group_send(
                 self.chatroom_name,
                 {
                     "type": "message_handler",
                     "message_id": message.id,
                     "body": message.body,
-                    "author": self.user.username,
+                    "author": author_data,
                     "created": message.created.isoformat(),
                 },
             )
@@ -77,13 +78,21 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
         except Exception as e:
             raise e
 
+    @database_sync_to_async
+    def get_author_data(self, user):
+        return {
+            "username": user.username,
+            "avatar": user.avatar.url if user.avatar else None,
+            "online": user.online,
+        }
+
     async def message_handler(self, event):
         message_id = event["message_id"]
         body = event["body"]
         author = event["author"]
         created = event["created"]
 
-        author_user = await self.get_author_user(author)
+        author_user = await self.get_author_user(author["username"])
         if author_user is None:
             await self.send_json({"type": "error", "message": "Author user not found"})
             return
