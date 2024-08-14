@@ -1,39 +1,24 @@
-import { Component } from "../../scripts/Component.js";
+import {Component} from '../../scripts/Component.js'
+import { ChatLoader } from './ChatLoader.js';
+import { ChatRenderer } from './ChatRenderer.js';
+import { WebSocketHandler } from './WebSocketHandler.js';
+import { UISetup } from './UISetup.js';
 
 export class ChatModal extends Component {
+    constructor() {
+        super('/components/ChatModal/chatmodal.html');
+        this.chatRenderer = new ChatRenderer(this);
+        this.chatLoader = new ChatLoader(this);
+        this.webSocketHandler = new WebSocketHandler(this);
+        this.uiSetup = new UISetup(this);
+    }
 
-	constructor() {
-		super('/components/ChatModal/chatmodal.html')
-	}
-
-	init() {
-		this.initChatModal();
-	}
-
-	initChatModal() {
-		$('.modal').on('shown.bs.modal', function() {
-			$(this).find('[autofocus]').focus();
-		});
-
-		$('#chat_container').on('scroll', function() {
-			const expandedButton = $('button[aria-expanded="true"]');
-
-			if (expandedButton.length) {
-				expandedButton.click();
-			}
-		});
-
-		function triggerAnimation() {
-			$('.bounce-animation').each(function() {
-				var $element = $(this);
-				$element.removeClass('bounce');
-				setTimeout(function() {
-					$element.addClass('bounce');
-				}, 0);
-			});
-		}
-
-		setInterval(triggerAnimation, 3000);
-		triggerAnimation();
-	}
+    init() {
+        this.uiSetup.setupChatModal();
+        this.uiSetup.setupMessagesModal();
+        this.uiSetup.setupCloseMessagesModal();
+        this.uiSetup.setupScrollEvent();
+        this.uiSetup.setupAnimation();
+        this.uiSetup.setupChatRender();
+    }
 }

@@ -1,13 +1,17 @@
 from rest_framework import serializers
-from rtchat.models import GroupMessage
+from .models import GroupMessage
+from user.models import AppUser
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppUser
+        fields = ("username", "avatar", "online")
 
 
 class GroupMessageSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField()
+    author = UserSerializer(read_only=True)
 
     class Meta:
         model = GroupMessage
-        fields = ["body", "author", "created"]
-
-    def get_author(self, obj):
-        return obj.author.username
+        fields = ["id", "author", "body", "created"]
