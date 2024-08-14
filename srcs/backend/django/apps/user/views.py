@@ -28,6 +28,17 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
 from django.views.decorators.csrf import csrf_exempt
 from .decorators import default_authentication_required
+from django.http import JsonResponse
+
+
+@csrf_exempt
+@api_view(['GET'])
+@default_authentication_required
+def check_auth(request):
+	if request.user.is_authenticated:
+		return JsonResponse({'authenticated': True})
+	else:
+		return JsonResponse({'authenticated': False}, status=401)
 
 @api_view(["GET"])
 @default_authentication_required
@@ -289,6 +300,7 @@ def ftapiLogin(request):
 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
 	token42 = json.loads(ftapiresponse.content)
+	# needs adjustment 
 	user_info_response = requests.get("https://api.intra.42.fr/v2/me", params={"access_token": token42["access_token"]})
 	user_json = json.loads(user_info_response.content)
 	
