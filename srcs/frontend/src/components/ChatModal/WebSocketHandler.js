@@ -20,8 +20,7 @@ export class WebSocketHandler {
                 console.log('Received message:', data);
 
                 if (data.error) {
-                    this.chatModal.chatSocket.close();
-                    console.error('Chat socket closed due to error:', data.error);
+                    this.handleError(data.errorCode, data.errorMessage);
                     return;
                 }
 
@@ -30,11 +29,13 @@ export class WebSocketHandler {
                 this.chatModal.chatRenderer.scrollToBottom();
             } catch (error) {
                 console.error('Error processing message:', error);
+                this.handleError(null, 'Error processing message');
             }
         };
 
         this.chatModal.chatSocket.onerror = (e) => {
             console.error('WebSocket error:', e);
+            this.handleError(null, 'WebSocket error occurred');
         };
 
         this.chatModal.chatSocket.onclose = (e) => {
@@ -42,37 +43,68 @@ export class WebSocketHandler {
                 console.log('Chat socket closed cleanly:', e.code, e.reason);
             } else {
                 console.error('Chat socket closed unexpectedly:', e.reason);
+                this.handleError(null, 'Chat socket closed unexpectedly');
                 setTimeout(() => this.initWebSocket(chatroomName, currentUser), 5000);
             }
         };
 
         const messageInputDom = document.querySelector('#chat_message_input');
-        messageInputDom.focus();
+        if (messageInputDom) {
+            messageInputDom.focus();
+            messageInputDom.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const messageSubmit = document.querySelector('#chat_message_submit')
+                    if (messageSubmit) {
+                        messageSubmit.click();
+                    }
+                }
+            });
+        }
 
-        messageInputDom.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+
+
+        const messageForm = document.querySelector('#chat_message_form')
+        if (messageForm) {
+            messageForm.onsubmit = (e) => {
                 e.preventDefault();
-                document.querySelector('#chat_message_submit').click();
-            }
-        });
+                const message = messageInputDom.value.trim();
 
-        document.querySelector('#chat_message_form').onsubmit = (e) => {
-            e.preventDefault();
-            const message = messageInputDom.value.trim();
+                if (message.length > 300) {
+                    customAlert('warning', 'Message cannot be longer than 300 characters.', 3000);
+                    return;
+                }
 
-            if (message.length > 300) {
-                customAlert('warning', 'Message cannot be longer than 300 characters.', 3000);
-                return;
-            }
+                if (message) {
+                    try {
+                        this.chatModal.chatSocket.send(JSON.stringify({ 'body': message }));
+                        if (messageInputDom) {
+                            messageInputDom.value = '';
+                            messageInputDom.focus();
+                        }
+                    } catch (error) {
+                        console.error('Failed to send message:', error);
+                        this.handleError(null, 'Failed to send message');
+                    }
+                }
+            };
+        }
 
-            if (message) {
-                this.chatModal.chatSocket.send(JSON.stringify({
-                    'body': message
-                }));
-                messageInputDom.value = '';
-                messageInputDom.focus();
-            }
-        };
+    }
+
+    handleError(errorCode, errorMessage) {
+        switch (errorCode) {
+            case 1001:
+                customAlert('info', errorMessage, 3000);
+                break;
+            case 1002:
+                customAlert('info', errorMessage, 3000);
+                break;
+            default:
+                console.error('Critical error:', errorMessage);
+                this.closeWebSocket();
+                break;
+        }
     }
 
     closeWebSocket() {

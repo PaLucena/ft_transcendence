@@ -8,25 +8,25 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.user = self.scope["user"]
         self.chatroom_name = self.scope["url_route"]["kwargs"]["chatroom_name"]
-        self.chatroom = await self.get_chatroom(self.chatroom_name)
-        await self.accept()
-
-        if self.chatroom is None:
-            await self.send_json({"error": "Chatroom not found"})
-            await self.close()
-            return
-
-        if self.user is None or not self.user.is_authenticated:
-            await self.send_json({"error": "User not authenticated"})
-            await self.close()
-            return
 
         try:
+            self.chatroom = await self.get_chatroom(self.chatroom_name)
+
+            if self.chatroom is None:
+                await self.send_error(404, "Chatroom not found")
+                await self.close()
+                return
+
+            if not self.user.is_authenticated:
+                await self.send_error(401, "User not authenticated")
+                await self.close()
+                return
+
             await self.channel_layer.group_add(self.chatroom_name, self.channel_name)
+            await self.accept()
+
         except Exception as e:
-            await self.send_json(
-                {"error": f"Failed to join chatroom: {str(e)}"},
-            )
+            await self.send_error(500, f"Failed to connect: {str(e)}")
             await self.close()
 
     @database_sync_to_async
@@ -42,15 +42,28 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
                 self.chatroom_name, self.channel_name
             )
         except Exception as e:
-            await self.send_json({"error": f"Failed to leave chatroom: {str(e)}"})
+            await self.send_error(500, f"Failed to leave chatroom: {str(e)}")
+
+    async def send_error(self, code, message):
+        await self.send_json(
+            {"error": True, "errorCode": code, "errorMessage": message}
+        )
 
     async def receive_json(self, content, **kwargs):
         body = content.get("body")
         if not body:
-            await self.send_json({"error": "Message body is empty"})
+            await self.send_error(400, "Message body is empty")
             return
 
         try:
+            block_status = await self.check_blocked_status(self.user, self.chatroom)
+            if block_status == "blocked":
+                await self.send_error(1001, "You are blocked by this user")
+                return
+            elif block_status == "blocker":
+                await self.send_error(1002, "You have blocked this user")
+                return
+
             message = await self.create_message(body, self.user, self.chatroom)
             author_data = await self.get_author_data(self.user)
 
@@ -65,7 +78,7 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
                 },
             )
         except Exception as e:
-            await self.send_json({"error": f"Failed to send message: {str(e)}"})
+            await self.send_error(500, f"Failed to send message: {str(e)}")
 
     @database_sync_to_async
     def create_message(self, body, author, group):
@@ -87,28 +100,28 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
         }
 
     async def message_handler(self, event):
-        message_id = event["message_id"]
-        body = event["body"]
-        author = event["author"]
-        created = event["created"]
+        try:
+            message_id = event["message_id"]
+            body = event["body"]
+            author = event["author"]
+            created = event["created"]
 
-        author_user = await self.get_author_user(author["username"])
-        if author_user is None:
-            await self.send_json({"type": "error", "message": "Author user not found"})
-            return
+            author_user = await self.get_author_user(author["username"])
+            if author_user is None:
+                await self.send_error(404, "Author user not found")
+                return
 
-        if await Block.is_blocked(self.user, author_user):
-            return
-
-        await self.send_json(
-            {
-                "type": "chat_message",
-                "message_id": message_id,
-                "body": body,
-                "author": author,
-                "created": created,
-            }
-        )
+            await self.send_json(
+                {
+                    "type": "chat_message",
+                    "message_id": message_id,
+                    "body": body,
+                    "author": author,
+                    "created": created,
+                }
+            )
+        except Exception as e:
+            await self.send_error(500, f"Failed to handle message: {str(e)}")
 
     @database_sync_to_async
     def get_author_user(self, author_username):
@@ -118,3 +131,15 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
             return None
         except Exception as e:
             raise e
+
+    @database_sync_to_async
+    def check_blocked_status(self, user, chatroom):
+        if chatroom.is_private:
+            other_user = chatroom.members.exclude(id=user.id).first()
+            if not other_user:
+                return None
+            if Block.objects.filter(blocker=other_user, blocked=user).exists():
+                return "blocked"
+            elif Block.objects.filter(blocker=user, blocked=other_user).exists():
+                return "blocker"
+        return None

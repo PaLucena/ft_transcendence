@@ -12,7 +12,10 @@ export class UISetup {
     setupMessagesModal() {
         $('#messages_modal').on('shown.bs.modal', () => {
             document.activeElement.blur();
-            $('#chat_message_input').focus();
+            const messageInput = $('#chat_message_input')
+            if (messageInput) {
+                messageInput.focus()
+            }
         });
     }
 

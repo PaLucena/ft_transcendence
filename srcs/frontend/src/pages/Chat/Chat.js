@@ -226,7 +226,7 @@ export class Chat extends Component {
         const endpoint = action === 'block' ? 'block_user' : 'unblock_user';
         const method = 'POST';
 
-        fetch(`/api/chat/${endpoint}/${chatroomName}/`, {
+        fetch(`/api/chat/${endpoint}/`, {
             method: method,
             headers: {
                 "Content-Type": "application/json",

@@ -21,6 +21,7 @@ def chat_view(request, chatroom_name="public-chat"):
         chat_group = get_object_or_404(ChatGroup, group_name=chatroom_name)
         other_user = None
         other_user_data = None
+        block_status = None
 
         if chat_group.is_private:
             if request.user not in chat_group.members.all():
@@ -34,6 +35,13 @@ def chat_view(request, chatroom_name="public-chat"):
                     other_user_data = UserSerializer(other_user).data
                     break
 
+            if Block.objects.filter(blocker=request.user, blocked=other_user).exists():
+                block_status = "blocker"
+            elif Block.objects.filter(
+                blocker=other_user, blocked=request.user
+            ).exists():
+                block_status = "blocked"
+
         chat_messages = chat_group.chat_messages.order_by("created")
         message_data = GroupMessageSerializer(chat_messages, many=True).data
 
@@ -42,6 +50,7 @@ def chat_view(request, chatroom_name="public-chat"):
             "chatroom_name": chatroom_name,
             "current_user": request.user.username,
             "other_user": other_user_data,
+            "block_status": block_status,
         }
 
         return Response(context, status=status.HTTP_200_OK)
@@ -135,7 +144,7 @@ def get_all_private_chats_view(request):
 
 @api_view(["POST"])
 @default_authentication_required
-def block_user_view(request, chatroom_name):
+def block_or_unblock_user_view(request):
     if not request.user.is_authenticated:
         return Response(
             {"detail": "Authentication required."},
@@ -145,6 +154,7 @@ def block_user_view(request, chatroom_name):
     try:
         blocker = request.user
         blocked_username = request.data.get("blocked_username")
+        action = request.data.get("action")
 
         if not blocked_username:
             return Response(
@@ -152,59 +162,41 @@ def block_user_view(request, chatroom_name):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        blocked_user = get_object_or_404(AppUser, username=blocked_username)
-
-        if Block.objects.filter(blocker=blocker, blocked=blocked_user).exists():
+        if action not in ["block", "unblock"]:
             return Response(
-                {"detail": "User already blocked"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        Block.objects.create(blocker=blocker, blocked=blocked_user)
-        return Response(
-            {"detail": "User blocked successfully"},
-            status=status.HTTP_201_CREATED,
-        )
-    except Exception as e:
-        return Response(
-            {"detail": f"An error occurred: {str(e)}"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-
-@api_view(["POST"])
-@default_authentication_required
-def unblock_user_view(request, chatroom_name):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required."},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
-    try:
-        blocker = request.user
-        blocked_username = request.data.get("blocked_username")
-
-        if not blocked_username:
-            return Response(
-                {"detail": "No username provided"},
+                {"detail": "Invalid action. Action must be 'block' or 'unblock'."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         blocked_user = get_object_or_404(AppUser, username=blocked_username)
 
-        block = Block.objects.filter(blocker=blocker, blocked=blocked_user).first()
-        if not block:
+        if action == "block":
+            if Block.objects.filter(blocker=blocker, blocked=blocked_user).exists():
+                return Response(
+                    {"detail": "User already blocked"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            Block.objects.create(blocker=blocker, blocked=blocked_user)
             return Response(
-                {"detail": "User not blocked"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": "User blocked successfully"},
+                status=status.HTTP_201_CREATED,
             )
 
-        block.delete()
-        return Response(
-            {"detail": "User unblocked successfully"},
-            status=status.HTTP_200_OK,
-        )
+        elif action == "unblock":
+            block = Block.objects.filter(blocker=blocker, blocked=blocked_user).first()
+            if not block:
+                return Response(
+                    {"detail": "User not blocked"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            block.delete()
+            return Response(
+                {"detail": "User unblocked successfully"},
+                status=status.HTTP_200_OK,
+            )
+
     except Exception as e:
         return Response(
             {"detail": f"An error occurred: {str(e)}"},
