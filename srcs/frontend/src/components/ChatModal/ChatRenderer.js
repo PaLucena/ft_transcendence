@@ -31,7 +31,7 @@ export class ChatRenderer {
         button.append(avatarImg);
 
         const greenDot = $('<div>', {
-            class: `position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status === 'online' ? 'green' : 'gray'}-dot p-2`,
+            class: `position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status ? 'green' : 'gray'}-dot p-2`,
             style: 'top:90%; left:85%;'
         });
         button.append(greenDot);
@@ -104,7 +104,7 @@ export class ChatRenderer {
 					<div class="d-flex align-items-end me-2 dropup">
 						<button type="button" class="btn p-0" data-bs-toggle="dropdown">
 							<div class="position-relative">
-								<div class="position-absolute translate-middle border border-3 border-dark ${message.author.online === 'online' ? 'green' : 'gray'}-dot" style="top:90%; left:90%;"></div>
+								<div class="position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" style="top:90%; left:90%;"></div>
 								<img class="rounded-circle" style="width: 32px; height: 32px;" src="${message.author.avatar}">
 							</div>
 						</button>

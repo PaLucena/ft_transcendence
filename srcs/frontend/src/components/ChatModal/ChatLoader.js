@@ -51,7 +51,7 @@ export class ChatLoader {
                 userAvatarImg.src = data.other_user.avatar || '';
             }
             if (statusDot) {
-                statusDot.className = `position-absolute translate-middle border border-3 border-dark ${data.other_user.online === 'online' ? 'green' : 'gray'}-dot`;
+                statusDot.className = `position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot`;
             }
         }
     }

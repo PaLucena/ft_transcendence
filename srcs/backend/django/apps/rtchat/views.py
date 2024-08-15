@@ -126,7 +126,7 @@ def get_all_private_chats_view(request):
                 chat_info = {
                     "chatroom_name": chat.group_name,
                     "other_user_username": other_user.username,
-                    "other_user_online_status": other_user.online,
+                    "other_user_online_status": other_user.is_online,
                     "other_user_avatar_url": (
                         other_user.avatar.url if other_user.avatar else None
                     ),

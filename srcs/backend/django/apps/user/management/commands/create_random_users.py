@@ -23,7 +23,7 @@ class Command(BaseCommand):
 				nickname=nickname,
 				avatar='default/default.jpg',
 				last_seen=fake.date_time_this_year(),
-				online="offline",
+				is_online=False,
 				image_link=fake.url(),
 				id_deleted=False
 			)

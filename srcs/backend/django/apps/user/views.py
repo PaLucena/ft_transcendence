@@ -247,13 +247,13 @@ def get_friends(request):
             friendship.to_user if friendship.from_user == user else friendship.from_user
         )
         all_friends.append(friend)
-        if friend.online == "online":
+        if friend.is_online:
             online_friends.append(friend)
 
     all_friends_data = [
         {
             "username": friend.username,
-            "status": friend.online,
+            "status": friend.is_online,
         }
         for friend in all_friends
     ]
@@ -311,7 +311,7 @@ def ftapiLogin(request):
 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
 	token42 = json.loads(ftapiresponse.content)
-	# needs adjustment 
+	# needs adjustment
 	user_info_response = requests.get("https://api.intra.42.fr/v2/me", params={"access_token": token42["access_token"]})
 	user_json = json.loads(user_info_response.content)
 

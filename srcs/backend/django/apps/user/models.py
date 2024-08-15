@@ -8,7 +8,7 @@ class AppUser(AbstractUser):
 	nickname = models.CharField(max_length=100, null=True, blank=True, unique=True)
 	avatar = models.FileField(upload_to='avatars/', default='default/default.jpg', null=True, blank=True)
 	last_seen = models.DateTimeField(null=True, blank=True)
-	online = models.CharField(max_length=100, default="offline")
+	is_online = models.BooleanField(default=False)
 	image_link = models.URLField(null=True, blank=True)
 	id_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
@@ -22,7 +22,7 @@ class AppUser(AbstractUser):
 		self.nickname = f"Deleted User {unique_suffix}"
 		self.avatar = None
 		self.last_seen = None
-		self.online = "offline"
+		self.is_online = False
 		self.image_link = None
 		self.games_played = 0
 		self.games_won = 0
