@@ -39,7 +39,6 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "daphne",
-    "user_stats",
     "django_redis",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -51,6 +50,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
 	"rest_framework_simplejwt.token_blacklist",
     "user",
+    "user_stats",
+    "tournament",
     "corsheaders",
     "blockchain",
     "rtchat",
@@ -137,7 +138,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
@@ -204,20 +205,9 @@ CORS_ALLOWED_ORIGINS = [
     "https://localhost:8080",
 ]
 
-CORS_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ALLOW_CREDENTIALS = True
+# CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ALLOW_HEADERS = (
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-)
 
 CSRF_TRUSTED_ORIGINS = [
     "https://localhost:8080",

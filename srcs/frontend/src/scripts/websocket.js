@@ -21,6 +21,7 @@ export function initUserWebSocket() {
 
 	usersocket.onerror = (error) => {
 		console.error(`[error] ${error.message}`);
+		//setTimeout(initUserWebSocket, 2000);
 	};
 }
 // call from logout

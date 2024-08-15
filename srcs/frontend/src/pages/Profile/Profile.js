@@ -1,7 +1,5 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
-import { Navbar } from '../../components/Navbar/Navbar.js';
-import { ChatBtn } from '../../components/ChatBtn/ChatBtn.js';
 import { closeUserWebSocket } from '../../scripts/websocket.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
 

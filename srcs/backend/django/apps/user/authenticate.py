@@ -2,6 +2,7 @@ from rest_framework import exceptions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from django.shortcuts import render
 
 class DefaultAuthentication:
 
@@ -16,23 +17,29 @@ class DefaultAuthentication:
 		if access_token:
 			try:
 				validated_token = self.jwt_auth.get_validated_token(access_token)
-			except TokenError:
-				pass
+			except Exception as e:
+				print("Access token is invalid or expired")
+				if refresh_token:
+					try:
+						print("ACCESS TOKEN: ", access_token)
+						print("REFRESH TOKEN: ", refresh_token)
+						refresh = RefreshToken(refresh_token)
+						new_access_token = str(refresh.access_token)
+						validated_token = self.jwt_auth.get_validated_token(new_access_token)
+						request.COOKIES['access_token'] = new_access_token
+						print("NEW ACCESS TOKEN GENERATED: ", request.COOKIES['access_token'])
+					except (TokenError, InvalidToken) as e:
+						raise exceptions.AuthenticationFailed(f'Invalid refresh token: {e}')
+				else:
+					raise exceptions.AuthenticationFailed('No refresh token provided')
 
-		if not validated_token and refresh_token:
-			try:
-				refresh = RefreshToken(refresh_token)
-				new_access_token = str(refresh.access_token)
-				validated_token = self.jwt_auth.get_validated_token(new_access_token)
-				request.COOKIES['access_token'] = new_access_token
-			except (TokenError, InvalidToken) as e:
-				raise exceptions.AuthenticationFailed('Invalid token: %s' % e)
-
-		if not validated_token:
-			raise exceptions.AuthenticationFailed('Invalid token and no refresh token provided')
+		else:
+			raise exceptions.AuthenticationFailed('No access token provided')
+			#return redirect('login')
 
 		user = self.jwt_auth.get_user(validated_token)
 		request.user = user
+		print("DONE")
 
 		return user, request.COOKIES.get('access_token')
 
