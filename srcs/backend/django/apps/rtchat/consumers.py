@@ -96,7 +96,7 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
         return {
             "username": user.username,
             "avatar": user.avatar.url if user.avatar else None,
-            "online": user.online,
+            "is_online": user.is_online,
         }
 
     async def message_handler(self, event):
