@@ -5,8 +5,6 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-USER appuser
-
 COPY requirements.txt requirements.txt
 COPY init_django.sh .
 
@@ -18,5 +16,4 @@ RUN chmod +x init_django.sh
 
 # Create a shared directory between the blockchain and the backend
 RUN mkdir /blockchain_shared
-
 CMD ["./init_django.sh"]
