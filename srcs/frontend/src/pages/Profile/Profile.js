@@ -63,15 +63,12 @@ export class Profile extends Component {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({
-					"user": "ealgar-c",
-				}),
 			})
 			.then(response => {
 				return response.json()
 			})
 			.then(data => {
-				console.log(data)
+				console.log(data.qrpath)
 			})
 		})
 	}

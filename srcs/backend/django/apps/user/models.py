@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 class AppUser(AbstractUser):
 	nickname = models.CharField(max_length=100, null=True, blank=True, unique=True)
@@ -13,6 +14,9 @@ class AppUser(AbstractUser):
 	id_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	api42auth = models.BooleanField(default=False)
+	has_2fa_enabled = models.BooleanField(default=False)
+	tf_fk = models.ForeignKey(TOTPDevice, on_delete=models.SET_NULL, null=True, blank=True, related_name='app_users')
+
 
 	def anonymize(self):
 		unique_suffix = get_random_string(length=6)

@@ -36,4 +36,6 @@ zope.interface==6.4.post2
 Faker>=9.9.0 #to create test users
 requests
 django-otp
+django-two-factor-auth
 qrcode
+pillow
