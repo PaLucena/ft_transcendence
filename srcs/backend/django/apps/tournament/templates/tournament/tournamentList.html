@@ -1,0 +1,8 @@
+<ul id="tournament-list">
+	{% for tournament in tournaments %}
+	  <li data-tournament-id="{{ tournament.id }}">
+		{{ tournament.name }}
+		<button class="join-button">Join</button>
+	  </li>
+	{% endfor %}
+  </ul>

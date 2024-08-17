@@ -44,12 +44,11 @@ export default async function router() {
 
 	const RouteClass = matchedRoute ? routes[matchedRoute] : routes["/404"];
 
-	const isAuthenticated = await checkAuthentication();
 	const isProtectedRoute = matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
 	if (isProtectedRoute)
 		isAuthenticated = await checkAuthentication();
 
-	if (isAuthenticated && (!usersocket || usersocket.readyState === WebSocket.CLOSED))
+	if (isAuthenticated && (!usersocket || usersocket.readyState === WebSocket.CLOSED) && isProtectedRoute)
 		initUserWebSocket();
 
 	if (!isAuthenticated && isProtectedRoute) {

@@ -2,13 +2,12 @@ USER := $(shell echo $$USER)
 CONTAINERS_DIR := /home/$(USER)/data
 DJANGO_MEDIA := ./srcs/backend/django/apps/media
 
-GID := $(shell id -g)
-UID := $(shell id -u)
+#GID := $(shell id -g)
+#UID := $(shell id -u)
 
 all:
-	-@ echo GID: $(GID), UID: $(UID)
 	-@ mkdir -p $(CONTAINERS_DIR) $(CONTAINERS_DIR)/db_volume
-	-@ UID=$(UID) GID=$(GID) docker-compose -f docker-compose.yml up --build -d
+	-@ docker-compose -f docker-compose.yml up --build -d
 
 up:
 	-@ docker-compose -f docker-compose.yml up -d
