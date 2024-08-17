@@ -2,6 +2,7 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
 import { initUserWebSocket } from '../../scripts/websocket.js'
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
+import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Login extends Component {
 	constructor() {
@@ -14,82 +15,64 @@ export class Login extends Component {
 	}
 
 	initLoginForm() {
-		const loginForm = document.querySelector("#loginForm");
-
-		loginForm.addEventListener("submit", (event) => {
+		var TwoFactorModal = new bootstrap.Modal(document.getElementById('twoFactorModal'), {keyboard: true})
+		$('#username').find('[autofocus]').focus();
+		$('#login_form').on('submit', function (event) {
 			event.preventDefault();
+			let formIsValid = true;
+			if (!this.checkValidity()) {
+				formIsValid = false
+			}
 
-			const formData = new FormData(event.target);
-			const jsonData = {};
+			if (formIsValid) {
+				event.preventDefault();
 
-			formData.forEach((value, key) => {
-				jsonData[key] = value;
-			});
+				const formData = new FormData(event.target);
+				const jsonData = {};
 
-			const csrftoken = getCSRFToken('csrftoken');
+				formData.forEach((value, key) => {
+					jsonData[key] = value;
+				});
 
-			fetch("/api/login/", {
-				method: "POST",
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-CSRFToken': csrftoken
-				},
-				body: JSON.stringify(jsonData)
-			})
-			.then(response => {
-				if (response.status === 200) {
-					initUserWebSocket();
+				const csrftoken = getCSRFToken('csrftoken');
+				fetch("/api/login/", {
+					method: "POST",
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': csrftoken
+					},
+					body: JSON.stringify(jsonData)
+				})
+				.then(response => {
+					if (!response.ok) {
+						return response.json().then(errData => {
+							throw new Error(errData.error || `Response status: ${response.status}`);
+						});
+					}
 					return response.json();
-				}
-				else {
-					return response.json().then(errData => {
-						document.getElementById("errorPlaceholder").innerHTML = "Error: " + errData.error;
-						throw new Error(errData.error);
-					});
-				}
-			})
-			.then(data => {
-				console.log("Login successful", data);
-				navigateTo("/play");
-			})
-			.catch((error) => {
-				console.error("Login error: ", error);
-			})
+				})
+				.then(data => {
+					if (data.has_2fa == true) {
+						TwoFactorModal.show();
+					} else {
+						initUserWebSocket();
+						customAlert('success', 'Login successful', 3000);
+						navigateTo("/play");
+					}
+				})
+				.catch(error => {
+					customAlert('danger', `Error: ${error.message}`, '');
+				});
+			}
+
+			this.classList.add('was-validated')
 		})
 	}
 
 	intraLogin() {
-		const btn = document.getElementById("intraLogin");
-		btn.addEventListener('click', () => {
+		$('#intra_login').on('click', function() {
 			window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fauth&response_type=code";
-		});
-	}
-
-
-	initUserWebSocket() {
-		const socket = new WebSocket(`wss://${window.location.host}/ws/status/`);
-
-		socket.onopen = (e) => {
-			console.log("[open] Connection established");
-			socket.send(JSON.stringify({ 'message': 'Hello Server!' }));
-			//setInterval(null, 3600)
-		};
-
-		socket.onmessage = (event) => {
-			console.log(`[message] Data received from server: ${event.data}`);
-		};
-
-		socket.onclose = (event) => {
-			if (event.wasClean) {
-				console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-			} else {
-				console.error('[close] Connection died');
-			}
-		};
-
-		socket.onerror = (error) => {
-			console.error(`[error] ${error.message}`);
-		};
+		})
 	}
 }

@@ -43,11 +43,37 @@ export default async function router() {
 
 	const RouteClass = matchedRoute ? routes[matchedRoute] : routes["/404"];
 
+	const isAuthenticated = await checkAuthentication();
+	const isProtectedRoute = matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
+
+	if (!isAuthenticated && isProtectedRoute) {
+		navigateTo("/login");
+		return;
+	}
+
 	if (RouteClass) {
 		await renderPage(RouteClass, matchedParams);
 	} else {
 		console.error('RouteClass is not a constructor or is null:', RouteClass);
 		document.getElementById('root').innerHTML = '<h1>Error: 404</h1>';
+	}
+
+	async function checkAuthentication() {
+		try {
+			const response = await fetch('api/check-auth/', {
+				method: 'GET',
+				credentials: 'include'
+			});
+			if (response.ok) {
+				const data = await response.json();
+				return data.authenticated;
+			} else {
+				return false;
+			}
+		} catch (error) {
+			console.error("Error checking authentication:", error);
+			return false;
+		}
 	}
 
 	function extractParams(route, path) {

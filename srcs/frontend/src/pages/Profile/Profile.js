@@ -1,8 +1,7 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
-import { Navbar } from '../../components/Navbar/Navbar.js';
-import { ChatBtn } from '../../components/ChatBtn/ChatBtn.js';
 import { closeUserWebSocket } from '../../scripts/websocket.js';
+import { getCSRFToken } from '../../scripts/utils/csrf.js'
 
 export class Profile extends Component {
 	constructor() {
@@ -32,6 +31,7 @@ export class Profile extends Component {
 			document.getElementById("userEdit").style.display = "none"; // Esto es solo si la información
 			document.getElementById("userInfo").style.display = "block";  // nueva es válida
 		});
+		this.enable2fa();
 	}
 
 	logout() {
@@ -51,5 +51,25 @@ export class Profile extends Component {
 				console.log("Logout error: ", error);
 			})
 		});
+	}
+
+	enable2fa() {
+		let twofaBtn = document.getElementById("2faBtn");
+
+		twofaBtn.addEventListener("click", (event) => {
+			const response = fetch("/api/2fa/enable2fa/", {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+			.then(response => {
+				return response.json()
+			})
+			.then(data => {
+				console.log(data.qrpath)
+			})
+		})
 	}
 }

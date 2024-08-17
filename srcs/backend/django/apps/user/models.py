@@ -3,16 +3,20 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 class AppUser(AbstractUser):
 	nickname = models.CharField(max_length=100, null=True, blank=True, unique=True)
 	avatar = models.FileField(upload_to='avatars/', default='default/default.jpg', null=True, blank=True)
 	last_seen = models.DateTimeField(null=True, blank=True)
-	online = models.CharField(max_length=100, default="offline")
+	is_online = models.BooleanField(default=False)
 	image_link = models.URLField(null=True, blank=True)
 	id_deleted = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	api42auth = models.BooleanField(default=False)
+	has_2fa_enabled = models.BooleanField(default=False)
+	tf_fk = models.ForeignKey(TOTPDevice, on_delete=models.SET_NULL, null=True, blank=True, related_name='app_users')
+
 
 	def anonymize(self):
 		unique_suffix = get_random_string(length=6)
@@ -22,7 +26,7 @@ class AppUser(AbstractUser):
 		self.nickname = f"Deleted User {unique_suffix}"
 		self.avatar = None
 		self.last_seen = None
-		self.online = "offline"
+		self.is_online = False
 		self.image_link = None
 		self.games_played = 0
 		self.games_won = 0

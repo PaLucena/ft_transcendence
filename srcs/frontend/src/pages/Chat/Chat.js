@@ -1,5 +1,4 @@
 import { Component } from "../../scripts/Component.js";
-import { Navbar } from '../../components/Navbar/Navbar.js';
 
 export class Chat extends Component {
     constructor(params = {}) {
@@ -227,7 +226,7 @@ export class Chat extends Component {
         const endpoint = action === 'block' ? 'block_user' : 'unblock_user';
         const method = 'POST';
 
-        fetch(`/api/chat/${endpoint}/${chatroomName}/`, {
+        fetch(`/api/chat/${endpoint}/`, {
             method: method,
             headers: {
                 "Content-Type": "application/json",

@@ -1,13 +1,11 @@
 from pickletools import read_uint1
 from sqlite3 import IntegrityError
 from urllib import response
-from urllib.robotparser import RequestRate
-from django.core import serializers
 from django.shortcuts import render
 from django.template import context
 from django.template.defaulttags import csrf_token
 from rest_framework.decorators import api_view
-from django.contrib.auth.models import AbstractUser, User
+from django.contrib.auth.models import AbstractUser
 from rest_framework.response import Response
 from .serializers import UserSerializerClass
 from .models import AppUser, Friend, Match
@@ -18,8 +16,6 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
 from django.core.files import File
@@ -29,10 +25,20 @@ import os
 import requests
 from .utils import set_nickname, upload_avatar, get_friend_count
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth import login as auth_login
 from django.views.decorators.csrf import csrf_exempt
-
-from .authenticate import DefaultAuthentication
 from .decorators import default_authentication_required
+from django.http import JsonResponse
+
+
+@csrf_exempt
+@api_view(['GET'])
+@default_authentication_required
+def check_auth(request):
+	if request.user.is_authenticated:
+		return JsonResponse({'authenticated': True})
+	else:
+		return JsonResponse({'authenticated': False}, status=401)
 
 @api_view(["GET"])
 @default_authentication_required
@@ -57,7 +63,7 @@ def signup(request):
 			serializer.save()
 			user = AppUser.objects.get(username=request.data['username'])
 			serializer = UserSerializerClass(user)
-
+			auth_login(request, user)
 			refresh = RefreshToken.for_user(user)
 			access = refresh.access_token
 			response = Response({"message": "Signup successful"}, status=status.HTTP_201_CREATED)
@@ -84,14 +90,13 @@ def login(request):
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
 		user.save()
-		#login(request, authenticated_user)
+		auth_login(request, user)
 		refresh = RefreshToken.for_user(user)
 		access = refresh.access_token
-		response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+		response = Response({"message": "Login successful", "has_2fa": True if user.has_2fa_enabled else False}, status=status.HTTP_200_OK)
 		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
 		response.set_cookie('access_token', str(access), httponly=True, secure=True)
 
-		print("REPONSE FROM LOGIN:", response)
 		print("Access Token Expiry:", access['exp'])
 		print("Refresh Token Expiry:", refresh['exp'])
 		return response
@@ -122,8 +127,6 @@ def logout(request):
 @api_view(["POST"])
 @default_authentication_required
 def update_user_info(request):
-	print("Request User:", request.headers)
-
 	try:
 		user = request.user
 		new_username = request.data.get('new_username')
@@ -211,12 +214,12 @@ def accept_friend_request(request):
 		friendship_request = Friend.objects.get(to_user=request.user)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
-	
+
 	action = request.data.get('action')
 
 	if friendship_request is None:
 		return Response({'error': 'Missing friendship ID.'}, status=status.HTTP_400_BAD_REQUEST)
-	
+
 	if friendship_request.to_user == request.user:
 		# friendship_request.to_user.friends.add(friendship_request.from_user)
 		# friendship_request.user.from_user.add(friendship_request.to_user)
@@ -228,33 +231,44 @@ def accept_friend_request(request):
 		return Response({'message': 'Friend request not accepted.'}, status=status.HTTP_200_OK)
 
 
-@api_view (["GET"])
+@api_view(["GET"])
 @default_authentication_required
 def get_friends(request):
-	user = request.user
-	all_friends = []
-	online_friends = []
+    user = request.user
+    all_friends = []
+    online_friends = []
 
-	friendships = Friend.objects.filter(
-		Q(from_user=user) | Q(to_user=user),
-		status=Friend.ACCEPTED
-	)
-	
-	for friendship in friendships:
-		friend = friendship.to_user if friendship.from_user == user else friendship.from_user
-		all_friends.append(friend)
-		if friend.online == 'online':
-			online_friends.append(friend)
+    friendships = Friend.objects.filter(
+        Q(from_user=user) | Q(to_user=user), status=Friend.ACCEPTED
+    )
 
-	all_friends_data = [{'username': friend.username, 'status': friend.online} for friend in all_friends]
-	online_friends_data = [{'username': friend.username} for friend in online_friends]
+    for friendship in friendships:
+        friend = (
+            friendship.to_user if friendship.from_user == user else friendship.from_user
+        )
+        all_friends.append(friend)
+        if friend.is_online:
+            online_friends.append(friend)
 
-	response_data = {
-		'all_friends': all_friends_data,
-		'online_friends': online_friends_data
-	}
+    all_friends_data = [
+        {
+            "username": friend.username,
+            "status": friend.is_online,
+        }
+        for friend in all_friends
+    ]
+    online_friends_data = [
+        {"username": friend.username}
+        for friend in online_friends
+    ]
 
-	return Response(response_data, status=status.HTTP_200_OK)
+    response_data = {
+        "all_friends": all_friends_data,
+        "online_friends": online_friends_data,
+    }
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
 
 
 @api_view (["GET"])
@@ -282,6 +296,7 @@ def delete_account(request):
 
 @api_view(["POST"])
 def ftapiLogin(request):
+	print("im in")
 	code = request.data.get("api-code");
 	ftapiresponse = requests.post("https://api.intra.42.fr/v2/oauth/token", params={
 		"grant_type": "authorization_code",
@@ -292,24 +307,24 @@ def ftapiLogin(request):
 	})
 
 	print(ftapiresponse)
-
 	if ftapiresponse == None:
 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
 	token42 = json.loads(ftapiresponse.content)
+	# needs adjustment
 	user_info_response = requests.get("https://api.intra.42.fr/v2/me", params={"access_token": token42["access_token"]})
 	user_json = json.loads(user_info_response.content)
-	
+
 	try:
 		ExistingUser = AppUser.objects.get(username=user_json["login"])
 		if not ExistingUser.api42auth:
 			return Response({'error': 'Username already in use'}, status=status.HTTP_409_CONFLICT)
-		userJson = {
-			'username': user_json["login"],
-			'email': user_json["email"],
-			'avatar': "avatars/" + user_json["login"] + ".jpg"
-		}
-		return Response(data=user_json, status=status.HTTP_200_OK)
+		refresh = RefreshToken.for_user(ExistingUser)
+		access = refresh.access_token
+		response = Response({"mesage": "Login successful"}, status=status.HTTP_200_OK)
+		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+		response.set_cookie('access_token', str(access), httponly=True, secure=True)
+		return response
 	except AppUser.DoesNotExist:
 		pass
 	if AppUser.objects.filter(email=user_json["email"]):
@@ -337,8 +352,9 @@ def ftapiLogin(request):
 	user = AppUser.objects.create_user(**NewuserJson)
 	user.api42auth = True
 	user.save()
-	data = {
-		'message': "User successfully logged",
-		'user': NewuserJson
-	}
-	return Response(data, status=status.HTTP_201_CREATED)
+	refresh = RefreshToken.for_user(user)
+	access = refresh.access_token
+	response = Response({"mesage": "Signup successful"}, status=status.HTTP_201_CREATED)
+	response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+	response.set_cookie('access_token', str(access), httponly=True, secure=True)
+	return response

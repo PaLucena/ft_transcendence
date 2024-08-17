@@ -19,7 +19,8 @@ def create_tournament(request):
             tx_hash = bc_create_tournament(tournament_id, player_ids)
             return JsonResponse({
                 'message': 'Tournament created successfully',
-                'tx_hash': tx_hash.hex()})
+                'tx_hash': tx_hash.hex()
+            }, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
@@ -44,7 +45,8 @@ def record_match(request):
             tx_hash = bc_record_match(tourn_id, match_id, p1_id, p2_id, p1_sc, p2_sc, win_id)
             return JsonResponse({
                 'message': 'Match recorded successfully',
-                'tx_hash': tx_hash.hex()})
+                'tx_hash': tx_hash.hex()
+            }, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
@@ -103,6 +105,7 @@ def load_test_data(request):
         tx_hash = bc_load_test_data()
         return JsonResponse({
             'message': 'Tournaments recorded successfully',
-            'tx_hash': tx_hash.hex()})
+            'tx_hash': tx_hash.hex()
+        }, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
