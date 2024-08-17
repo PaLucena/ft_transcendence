@@ -100,7 +100,7 @@ def display_tournaments(request):
 				'id': tournament.id,
 				'players': [
 					{
-						'username': 'you' if player == user else player.userame,
+						'nickname': 'you' if player == user else player.nickname,
 	  					'avatar': player.avatar
 					} 
 					for player in tournament.participants.all()
