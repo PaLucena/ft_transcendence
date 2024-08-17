@@ -31,7 +31,7 @@ export class ChatRenderer {
         button.append(avatarImg);
 
         const greenDot = $('<div>', {
-            class: `position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status === 'online' ? 'green' : 'gray'}-dot p-2`,
+            class: `position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status ? 'green' : 'gray'}-dot p-2`,
             style: 'top:90%; left:85%;'
         });
         button.append(greenDot);
@@ -62,14 +62,11 @@ export class ChatRenderer {
 		console.log(isPublicChat);
 
 		const chatMessages = document.querySelector('#chat_messages');
-		if (!chatMessages) {
-			console.error('Element #chat_messages not found');
-			return;
+		if (chatMessages) {
+			const messageElement = this.createMessageElement(message, currentUser, isPublicChat);
+			chatMessages.appendChild(messageElement);
+			this.scrollToBottom();
 		}
-
-		const messageElement = this.createMessageElement(message, currentUser, isPublicChat);
-		chatMessages.appendChild(messageElement);
-		this.scrollToBottom();
 	}
 
 	createMessageElement(message, currentUser, isPublicChat) {
@@ -89,7 +86,7 @@ export class ChatRenderer {
 
 	createCurrentUserMessageContent(body) {
 		return `
-			<div class="my-message rounded-top-3 p-3" style="max-width: 75%;">
+			<div class="my-message text-break rounded-top-3 p-3" style="max-width: 75%;">
 				<span>${body}</span>
 			</div>
 			<div class="d-flex align-items-end">
@@ -107,7 +104,7 @@ export class ChatRenderer {
 					<div class="d-flex align-items-end me-2 dropup">
 						<button type="button" class="btn p-0" data-bs-toggle="dropdown">
 							<div class="position-relative">
-								<div class="position-absolute translate-middle border border-3 border-dark ${message.author.online === 'online' ? 'green' : 'gray'}-dot" style="top:90%; left:90%;"></div>
+								<div class="position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" style="top:90%; left:90%;"></div>
 								<img class="rounded-circle" style="width: 32px; height: 32px;" src="${message.author.avatar}">
 							</div>
 						</button>
@@ -123,7 +120,7 @@ export class ChatRenderer {
 							<path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
 						</svg>
 					</div>
-					<div class="other-message bg-white rounded-top-3 p-3" style="max-width: 75%;">
+					<div class="other-message text-break bg-white rounded-top-3 p-3" style="max-width: 75%;">
 						<span>${message.body}</span>
 					</div>
 				</div>

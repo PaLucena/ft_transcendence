@@ -56,6 +56,10 @@ INSTALLED_APPS = [
     "blockchain",
     "rtchat",
     "ponggame",
+	"django_otp",
+	"django_otp.plugins.otp_totp",
+	"twofactor",
+	"qrcode",
 ]
 
 MIDDLEWARE = [
@@ -68,6 +72,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 #	'user.middleware.UpdateLastSeenMiddleware',
+	'django_otp.middleware.OTPMiddleware'
 ]
 ROOT_URLCONF = "core.urls"
 

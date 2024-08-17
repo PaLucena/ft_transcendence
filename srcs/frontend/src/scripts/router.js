@@ -44,7 +44,8 @@ export default async function router() {
 
 	const RouteClass = matchedRoute ? routes[matchedRoute] : routes["/404"];
 
-	const isProtectedRoute = matchedRoute !== "/login" && matchedRoute !== "/signup";
+	const isAuthenticated = await checkAuthentication();
+	const isProtectedRoute = matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
 	if (isProtectedRoute)
 		isAuthenticated = await checkAuthentication();
 

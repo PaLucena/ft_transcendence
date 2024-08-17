@@ -93,7 +93,7 @@ def login(request):
 		auth_login(request, user)
 		refresh = RefreshToken.for_user(user)
 		access = refresh.access_token
-		response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+		response = Response({"message": "Login successful", "has_2fa": True if user.has_2fa_enabled else False}, status=status.HTTP_200_OK)
 		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
 		response.set_cookie('access_token', str(access), httponly=True, secure=True)
 
@@ -247,13 +247,13 @@ def get_friends(request):
             friendship.to_user if friendship.from_user == user else friendship.from_user
         )
         all_friends.append(friend)
-        if friend.online == "online":
+        if friend.is_online:
             online_friends.append(friend)
 
     all_friends_data = [
         {
             "username": friend.username,
-            "status": friend.online,
+            "status": friend.is_online,
         }
         for friend in all_friends
     ]
@@ -296,6 +296,7 @@ def delete_account(request):
 
 @api_view(["POST"])
 def ftapiLogin(request):
+	print("im in")
 	code = request.data.get("api-code");
 	ftapiresponse = requests.post("https://api.intra.42.fr/v2/oauth/token", params={
 		"grant_type": "authorization_code",
@@ -306,12 +307,11 @@ def ftapiLogin(request):
 	})
 
 	print(ftapiresponse)
-
 	if ftapiresponse == None:
 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
 	token42 = json.loads(ftapiresponse.content)
-	# needs adjustment 
+	# needs adjustment
 	user_info_response = requests.get("https://api.intra.42.fr/v2/me", params={"access_token": token42["access_token"]})
 	user_json = json.loads(user_info_response.content)
 
@@ -319,12 +319,12 @@ def ftapiLogin(request):
 		ExistingUser = AppUser.objects.get(username=user_json["login"])
 		if not ExistingUser.api42auth:
 			return Response({'error': 'Username already in use'}, status=status.HTTP_409_CONFLICT)
-		userJson = {
-			'username': user_json["login"],
-			'email': user_json["email"],
-			'avatar': "avatars/" + user_json["login"] + ".jpg"
-		}
-		return Response(data=user_json, status=status.HTTP_200_OK)
+		refresh = RefreshToken.for_user(ExistingUser)
+		access = refresh.access_token
+		response = Response({"mesage": "Login successful"}, status=status.HTTP_200_OK)
+		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+		response.set_cookie('access_token', str(access), httponly=True, secure=True)
+		return response
 	except AppUser.DoesNotExist:
 		pass
 	if AppUser.objects.filter(email=user_json["email"]):
@@ -352,8 +352,9 @@ def ftapiLogin(request):
 	user = AppUser.objects.create_user(**NewuserJson)
 	user.api42auth = True
 	user.save()
-	data = {
-		'message': "User successfully logged",
-		'user': NewuserJson
-	}
-	return Response(data, status=status.HTTP_201_CREATED)
+	refresh = RefreshToken.for_user(user)
+	access = refresh.access_token
+	response = Response({"mesage": "Signup successful"}, status=status.HTTP_201_CREATED)
+	response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+	response.set_cookie('access_token', str(access), httponly=True, secure=True)
+	return response

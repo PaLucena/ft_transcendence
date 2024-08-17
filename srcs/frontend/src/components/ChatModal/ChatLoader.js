@@ -1,6 +1,9 @@
+import handleBlockUnblock from '../../scripts/utils/handleBlockUnblock.js'
+
 export class ChatLoader {
     constructor(chatModal) {
         this.chatModal = chatModal;
+        this.chatroomName = null;
     }
 
     loadChats() {
@@ -41,17 +44,21 @@ export class ChatLoader {
             const userAvatarImg = document.getElementById('user_avatar_img');
             const statusDot = document.getElementById('status_dot');
 
-            userNickname.textContent = data.other_user.username || 'Unknown User';
-            userAvatarImg.src = data.other_user.avatar || '';
-            statusDot.className = `position-absolute translate-middle border border-3 border-dark ${data.other_user.online === 'online' ? 'green' : 'gray'}-dot`;
+            if (userNickname) {
+                userNickname.textContent = data.other_user.username || 'Unknown User';
+            }
+            if (userAvatarImg) {
+                userAvatarImg.src = data.other_user.avatar || '';
+            }
+            if (statusDot) {
+                statusDot.className = `position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot`;
+            }
         }
     }
 
 
-    async initChatroom(chatroomName) {
-        if (chatroomName === undefined) {
-            chatroomName = "public-chat";
-        }
+    async initChatroom(chatroomName = 'public-chat') {
+        this.chatroomName = chatroomName;
 
         try {
             const response = await fetch(`/api/chat/chatroom/${chatroomName}/`, {
@@ -73,6 +80,7 @@ export class ChatLoader {
             console.log("DATA: ", data);
 
             this.updateChatHeader(isPublicChat, data);
+            this.updateMessageInputContainer(data.block_status, data.other_user);
 
             if (data.chat_messages) {
                 const chatMessages = document.querySelector('#chat_messages');
@@ -84,17 +92,59 @@ export class ChatLoader {
                     }
 
                     chatMessages.appendChild(fragment);
-                } else {
-                    console.error('Element #chat_messages not found');
                 }
             } else {
                 console.error('No chat messages found in response');
             }
 
             this.chatModal.webSocketHandler.initWebSocket(chatroomName, currentUser);
-            this.chatModal.chatRenderer.scrollToBottom(100);
+            this.chatModal.chatRenderer.scrollToBottom(200);
         } catch (error) {
             console.error("Messages error: ", error);
         }
+    }
+
+    updateMessageInputContainer(blockStatus, otherUser) {
+        const messageInputContainer = document.querySelector('.message-input-container');
+
+        if (messageInputContainer) {
+            const existingMessage = messageInputContainer.querySelector('.block-status-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            let blockMessage = '';
+            if (blockStatus === "blocker") {
+                blockMessage = `<div class="text-light block-status-message mb-2">You have blocked this user. <a id="unblock_btn" class="unblock-btn">Unblock</a>.</div>`;
+            } else if (blockStatus === "blocked") {
+                blockMessage = `<div class="text-light block-status-message mb-2">You are blocked by this user.</div>`;
+            }
+
+            if (blockMessage) {
+                messageInputContainer.insertAdjacentHTML('afterbegin', blockMessage);
+
+                if (blockStatus === "blocker" && otherUser) {
+                    const unblockBtn = document.getElementById('unblock_btn');
+                    if (unblockBtn) {
+                        unblockBtn.addEventListener('click', () => {
+                            handleBlockUnblock('unblock', otherUser.username, () => {
+                                removeBlockStatusMessage();
+                            });
+                        });
+                    }
+                }
+            }
+        }
+
+        function removeBlockStatusMessage() {
+            const messageInputContainer = document.querySelector('.message-input-container');
+            if (messageInputContainer) {
+                const blockStatusMessage = messageInputContainer.querySelector('.block-status-message');
+                if (blockStatusMessage) {
+                    blockStatusMessage.remove();
+                }
+            }
+        }
+
     }
 }

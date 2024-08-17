@@ -6,7 +6,7 @@ from user.models import AppUser
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AppUser
-        fields = ("username", "avatar", "online")
+        fields = ("username", "avatar", "is_online")
 
 
 class GroupMessageSerializer(serializers.ModelSerializer):

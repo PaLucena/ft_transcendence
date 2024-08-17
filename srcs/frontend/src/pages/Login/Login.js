@@ -15,11 +15,11 @@ export class Login extends Component {
 	}
 
 	initLoginForm() {
+		var TwoFactorModal = new bootstrap.Modal(document.getElementById('twoFactorModal'), {keyboard: true})
 		$('#username').find('[autofocus]').focus();
 		$('#login_form').on('submit', function (event) {
 			event.preventDefault();
 			let formIsValid = true;
-
 			if (!this.checkValidity()) {
 				formIsValid = false
 			}
@@ -35,7 +35,6 @@ export class Login extends Component {
 				});
 
 				const csrftoken = getCSRFToken('csrftoken');
-
 				fetch("/api/login/", {
 					method: "POST",
 					credentials: 'include',
@@ -54,9 +53,13 @@ export class Login extends Component {
 					return response.json();
 				})
 				.then(data => {
-					initUserWebSocket();
-					customAlert('success', 'Login successful', 3000);
-					navigateTo("/play");
+					if (data.has_2fa == true) {
+						TwoFactorModal.show();
+					} else {
+						initUserWebSocket();
+						customAlert('success', 'Login successful', 3000);
+						navigateTo("/play");
+					}
 				})
 				.catch(error => {
 					customAlert('danger', `Error: ${error.message}`, '');
