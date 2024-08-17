@@ -8,7 +8,7 @@ import { Friends } from '../pages/Friends/Friends.js';
 import { Profile } from '../pages/Profile/Profile.js';
 import { Auth } from '../pages/Auth/Auth.js';
 import { Pong } from '../pages/Pong/Pong.js';
-import renderStaticComponents from './utils/renderStaticComponents.js';
+import { renderStaticComponents } from './utils/renderStaticComponents.js';
 import { initUserWebSocket, usersocket } from './websocket.js';
 
 export const routes = {

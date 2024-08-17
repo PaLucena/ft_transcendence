@@ -1,11 +1,13 @@
+<!-- Btn for show Chats modal  -->
 <button class="btn btn-primary rounded-circle chat-modal-btn" data-bs-toggle="modal" data-bs-target="#chats_modal">
         <i class="fas fa-comments"></i>
 </button>
 
+<!-- Chats modal -->
 <div class="modal fade" id="chats_modal" aria-labelledby="chatModalToggleLabel1" tabindex="-1" aria-hidden="true">
 	<div class="modal-dialog modal-lg modal-dialog-scrollable">
 		<div class="modal-content bg-transparent position-relative h-100 d-flex flex-column border-0">
-		<!-- Контент чата -->
+		<!-- Chat Content -->
 			<div id="chat_window" class="d-flex position-relative flex-column rounded-4 bg-dark p-2 h-100">
 				<div class="position-relative d-flex justify-content-end bg-dark p-2" style="color: #34d399">
 					<div class="btn-group gap-2">
@@ -34,56 +36,24 @@
 	</div>
 </div>
 
-<!-- Second Chat modal -->
+<!-- Messages modal -->
 <div class="modal fade" id="messages_modal" aria-labelledby="chatModalToggleLabel1" tabindex="-1" aria-hidden="true">
 	<div class="modal-dialog modal-lg modal-dialog-scrollable">
 		<div class="modal-content bg-transparent position-relative h-100 d-flex flex-column border-0">
-			<!-- Контент чата -->
 				<div id="chat_window" class="d-flex position-relative flex-column rounded-4 bg-dark shadow-lg p-2 h-100">
-					<div id="chat_header">
-						<!-- Public Chat Header -->
-						<div id="public_chat_header" class="position-relative d-flex justify-content-end bg-dark p-2 d-none">
-							<span id="online_count" class="pr-1 position-absolute top-50 start-50" style="transform: translate(-50%, -50%); color: #34d399">Public chat</span>
-							<div class="btn-group gap-2">
-								<button class="btn btn-secondary rounded-circle p-0 btn-window-action" data-bs-target="#chats_modal" data-bs-toggle="modal">
-									<i class="fa-solid fa-minus"></i>
-								</button>
-								<button type="button" class="btn btn-danger rounded-circle p-0 btn-window-action" data-bs-dismiss="modal" aria-label="Close">
-									<i class="fa-solid fa-xmark"></i>
-								</button>
-							</div>
+					<div class="position-relative d-flex justify-content-between bg-dark p-2">
+						<div id="chat_header_content">
+							<!-- Chats Header Content -->
 						</div>
-
-						<!-- Private Chat Header -->
-						<div id="private_chat_header" class="position-relative d-flex justify-content-between bg-dark p-2 d-none">
-							<div id="chat_header_info" class="d-flex align-items-center">
-								<div class="d-flex align-items-end me-2 dropup">
-									<button type="button" class="btn p-0" data-bs-toggle="dropdown">
-										<div id="user_avatar" class="position-relative">
-											<div id="status_dot" class="position-absolute translate-middle border border-3 border-dark gray-dot" style="top:90%; left:90%;"></div>
-											<img id="user_avatar_img" class="rounded-circle" src="" style="width: 32px; height: 32px;">
-										</div>
-									</button>
-									<ul class="dropdown-menu dropdown-menu-dark">
-										<li><a href="" class="dropdown-item">Profile</a></li>
-										<li><hr class="dropdown-divider"></li>
-										<li><a class="dropdown-item" href="#">Invite to Play</a></li>
-										<li><a class="dropdown-item" href="#">Unblock</a></li>
-									</ul>
-								</div>
-								<span id="user_nickname" class="text-light"></span>
-							</div>
-							<div class="btn-group gap-2">
-								<button class="btn btn-secondary rounded-circle p-0 btn-window-action" data-bs-target="#chats_modal" data-bs-toggle="modal">
-									<i class="fa-solid fa-minus"></i>
-								</button>
-								<button type="button" class="btn btn-danger rounded-circle p-0 btn-window-action" data-bs-dismiss="modal" aria-label="Close">
-									<i class="fa-solid fa-xmark"></i>
-								</button>
-							</div>
+						<div class="btn-group gap-2">
+							<button class="btn btn-secondary rounded-circle p-0 btn-window-action" data-bs-target="#chats_modal" data-bs-toggle="modal">
+								<i class="fa-solid fa-minus"></i>
+							</button>
+							<button type="button" class="btn btn-danger rounded-circle p-0 btn-window-action" data-bs-dismiss="modal" aria-label="Close">
+								<i class="fa-solid fa-xmark"></i>
+							</button>
 						</div>
 					</div>
-
 				   <div id='chat_messages_container' class="overflow-auto flex-grow-1">
 					   <ul id='chat_messages' class="d-flex flex-column gap-2 justify-end list-unstyled mb-0 p-3">
 						   <!-- Messages here -->
