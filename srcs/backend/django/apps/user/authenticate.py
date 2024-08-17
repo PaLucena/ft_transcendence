@@ -38,8 +38,8 @@ class DefaultAuthentication:
 
 		user = self.jwt_auth.get_user(validated_token)
 
-		if user.is_authenticated:
-			raise exceptions.AuthenticationFailed('User not authenticated')
+		#if not user.is_authenticated:
+		#	raise exceptions.AuthenticationFailed('User not authenticated')
 
 		request.user = user
 		print("DONE")
