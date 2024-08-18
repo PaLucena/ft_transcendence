@@ -4,4 +4,16 @@ export class Friends extends Component {
 	constructor() {
 		super('/pages/Friends/friends.html')
 	}
+
+	init() {
+		this.focusPage();
+	}
+
+	focusPage() {
+		let navItems = document.querySelectorAll('[id^="navItem"]');
+		navItems.forEach(navItem => {
+			navItem.style.border = "";
+		});
+		document.getElementById("navItemFriends").style.border = "2px solid #edeef0";
+	}
 }

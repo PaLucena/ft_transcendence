@@ -1,4 +1,4 @@
-#rootPlay {
+.rootPlay {
 	box-sizing: border-box;
 	margin: 0;
 	margin-top: 0;
@@ -8,7 +8,19 @@
 	background-repeat: no-repeat;
 }
 
-#gifContainer {
+.h-10p {
+	height: 10%;
+}
+
+.h-45p {
+	height: 45%;
+}
+
+.h-90p {
+	height: 90%;
+}
+
+.gifContainer {
 	background-color: black;
 	border-radius: 20px;
 	position: relative;
@@ -17,17 +29,17 @@
 	justify-content: center;
 }
 
-#pongGIF {
+.pongGIF {
 	position: absolute;
 	height: 80%;
 	margin-top: 5%;
 }
 
-#pongGIF img {
+.pongGIF img {
 	height: 100%;
 }
 
-#btnsContainer {
+.btnsContainer {
 	position: absolute;
 	display: flex;
 	height: 90%;
@@ -36,11 +48,11 @@
 	justify-content: center;
 }
 
-#btnsContainer .btn {
+.btnsContainer .btn {
 	border: 1px solid white;
 }
 
-#btns {
+.btns {
 	display: block;
 	position: absolute;
 	align-items: center;
@@ -48,16 +60,16 @@
 	z-index: 2;
 }
 
-#btns #oneVSone {
+.btns .oneVSone {
 	margin-left: 0;
 }
 
-#btns #tournament {
+.btns .tournament {
 	margin-top: 10vh;
 	margin-left: 0;
 }
 
-#dropdownOne, #dropdownTwo {
+.dropdownOneVsOne, .dropdownTournaments, .dropdownCreateTournament {
 	display: none;
 	position: absolute;
 	justify-content: center;
@@ -65,25 +77,25 @@
 	z-index: 3;
 }
 
-#dropdownTwo {
+.dropdownTournaments, .dropdownCreateTournament {
 	color: black;
 	height: 75%;
 }
 
-#dropdownOne #vsIA, #dropdownTwo #createPub {
+.dropdownOneVsOne .vsIA, .dropdownTournaments .createPub {
 	margin-left: 0;
 }
 
-#dropdownOne #local, #dropdownOne #online, #dropdownOne #backOne {
+.dropdownOneVsOne .local, .dropdownOneVsOne .online, .dropdownOneVsOne .backOne {
 	margin-top: 7vh;
 	margin-left: 0;
 }
 
-#dropdownTwo .btn {
+.dropdownTournaments .btn, .dropdownCreateTournament .btn {
 	border: 1px solid black;
 }
 
-#chatbtn-placeholder {
+.chatbtn-placeholder {
 	position: absolute;
 	display: flex;
 	justify-content: right;
@@ -92,4 +104,8 @@
 	bottom: 0;
 	right: 0.5%;
 	margin-bottom: 2vh;
+}
+
+.dropdownCreateTournament {
+	display: block;
 }

@@ -9,9 +9,18 @@ export class Profile extends Component {
 	}
 
 	init() {
+		this.focusPage();
 		this.logout();
 		this.editUserBtn();
 		this.saveInfoBtn();
+	}
+
+	focusPage() {
+		let navItems = document.querySelectorAll('[id^="navItem"]');
+		navItems.forEach(navItem => {
+			navItem.style.border = "";
+		});
+		document.getElementById("navItemProfile").style.border = "2px solid #edeef0";
 	}
 
 	editUserBtn() {
