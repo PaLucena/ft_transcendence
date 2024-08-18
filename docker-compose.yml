@@ -56,10 +56,10 @@ services:
     build:
       context: ./srcs/backend/django
     env_file: srcs/.env
-    user: "${UID}:${GID}"
-    environment:
-      - UID=${UID}
-      - GID=${GID}
+    #user: "${UID}:${GID}"
+    #environment:
+    # - UID=${UID}
+    # - GID=${GID}
     depends_on:
       - postgres
       - redis

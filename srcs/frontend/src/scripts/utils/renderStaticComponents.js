@@ -1,8 +1,9 @@
 import { Component } from '../Component.js';
-import { staticComponents } from './staticComponents.js';
+import { Navbar } from "../../components/Navbar/Navbar.js";
+import { ChatModal } from '../../components/ChatModal/ChatModal.js';
 import { routes } from '../router.js';
 
-export default async function renderStaticComponents() {
+export async function renderStaticComponents() {
     const currentPath = window.location.pathname.replace(/\/+$/, '');
     const isValidRoute = Object.keys(routes).some(route => {
         const routeRegex = new RegExp(`^${route.replace(/:\w+/g, '[^/]+')}/?$`);
@@ -29,4 +30,9 @@ export default async function renderStaticComponents() {
         }
     }
 }
+
+export const staticComponents = [
+    { ComponentClass: Navbar, containerId: 'navbar', routesToExclude: ["/login", "/signup", "/auth", "/404", "/pong"] },
+    { ComponentClass: ChatModal, containerId: 'chat_modal', routesToExclude: ["/login", "/signup", "/auth", "/404"] },
+];
 

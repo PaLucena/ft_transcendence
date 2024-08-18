@@ -7,22 +7,19 @@ import json
 
 
 @csrf_exempt
-def create_tournament(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
+def create_tournament(data):
+    try:
         tournament_id = data.get('tournament_id')
         player_ids = data.get('player_ids')
         if not (tournament_id and player_ids):
             return JsonResponse({'error': 'Invalid input'}, status=400)
-
-        try:
-            tx_hash = bc_create_tournament(tournament_id, player_ids)
-            return JsonResponse({
-                'message': 'Tournament created successfully',
-                'tx_hash': tx_hash.hex()
-            }, status=200)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+        tx_hash = bc_create_tournament(tournament_id, player_ids)
+        return JsonResponse({
+            'message': 'Tournament created successfully',
+            'tx_hash': tx_hash.hex()
+        }, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 @csrf_exempt

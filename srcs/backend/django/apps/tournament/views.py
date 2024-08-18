@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework import status
 from django.db.models import Q
-from .models import AppUser
+from user.models import AppUser
 from .models import Tournament
 from rest_framework.response import Response
 from user.decorators import default_authentication_required
@@ -15,9 +15,11 @@ from django.contrib.auth.decorators import login_required
 def get_code(request, tournament_id):
 	try:
 		user = request.user
+		tournament = Tournament.objects.get(pk=tournament_id)
 		if user == tournament.creator:
-			tournament = Tournament.objects.filter(pk=tournament_id)
 			return Response({"code": tournament.invitation_code}, status=status.HTTP_200_OK)
+		else:
+			return Response({"error": "Code not available."}, status=status.HTTP_400_BAD_REQUEST)
 	except Exception as e:
 		return Response({"error": "Code not available."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -31,10 +33,19 @@ def create_tournament(request):
 		nickname = request.data.get('nickname')
 		type = request.data.get('type')
 		invitation_code = None
+
+		if Tournament.objects.filter(name=name).exists():
+			return Response({"error": "Tournament name is already taken."}, status=status.HTTP_400_BAD_REQUEST)
+		if AppUser.objects.filter(nickname=nickname).exists():
+			return Response({"error": "Nickname is already taken."}, status=status.HTTP_400_BAD_REQUEST)
+
 		creator.nickname = nickname
 		creator.save()
 
 		if type == Tournament.PRIVATE:
+			private_tournament_count = Tournament.objects.filter(creator=creator, type=Tournament.PRIVATE).count()
+			if private_tournament_count >= 3:
+				return Response({"error": "You can only create up to 3 private tournaments."}, status=status.HTTP_400_BAD_REQUEST)
 			invitation_code = str(random.randint(1000, 9999))
 
 		tournament = Tournament.objects.create(
@@ -59,7 +70,7 @@ def create_tournament(request):
 def close_tournament(request, tournament_id):
 	try:
 		user = request.user
-		tournament = Tournament.objects.filter(pk=tournament_id)
+		tournament = Tournament.objects.get(pk=tournament_id)
 
 		if (user != tournament.creator):
 			return Response({"error": "You can't close this tournament."}, status=status.HTTP_403_FORBIDDEN)
@@ -67,10 +78,13 @@ def close_tournament(request, tournament_id):
 		player_ids = list(tournament.participants.values_list('pk', flat=True))
 		
 		try:
-			bc_response= bc_create_tournament({
+			data = {
 				'tournament_id': tournament_id,
 				'player_ids': player_ids
-			})
+			}
+			bc_response = bc_create_tournament(data)
+			
+			print("HERE, ", user)
 			if bc_response.status_code == 200:
 				tournament.delete()
 				return Response({"message": "Tournament closed and processed on blockchain successfully."},
@@ -84,7 +98,7 @@ def close_tournament(request, tournament_id):
 		return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 @default_authentication_required
 def display_tournaments(request):
 	try:
@@ -100,7 +114,7 @@ def display_tournaments(request):
 				'id': tournament.id,
 				'players': [
 					{
-						'username': 'you' if player == user else player.userame,
+						'nickname': 'you' if player == user else player.nickname,
 	  					'avatar': player.avatar
 					} 
 					for player in tournament.participants.all()
@@ -122,8 +136,8 @@ def display_tournaments(request):
 def join_tournament(request, tournament_id):
 	try:
 		user = request.user
-		tournament = Tournament.objects.filter(pk=tournament_id)
-		if len(tournament.participants) > 7:
+		tournament = Tournament.objects.get(pk=tournament_id)
+		if tournament.participants.count() > 7:
 			return Response({"Oops! Tournament is full!"}, status=status.HTTP_400_BAD_REQUEST)
 
 		if tournament.type == Tournament.PRIVATE:
@@ -150,7 +164,7 @@ def join_tournament(request, tournament_id):
 def remove_participation(request, tournament_id):
 	try:
 		user = request.user
-		tournament = Tournament.objects.filter(pk=tournament_id)
+		tournament = Tournament.objects.get(pk=tournament_id)
 		if tournament.is_active == True:
 			return Response({"Oops! Tournament is closed!"}, status=status.HTTP_400_BAD_REQUEST)
 		if user in tournament.participants.all():
