@@ -3,8 +3,6 @@ FROM python:3.10.12
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-RUN groupadd -r appuser && useradd -r -g appuser appuser
-
 COPY requirements.txt requirements.txt
 COPY init_django.sh .
 
