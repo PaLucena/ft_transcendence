@@ -15,7 +15,7 @@ def default_authentication_required(view_func):
 				return JsonResponse({'detail': str(e)}, status=401)
 
 		response =  view_func(request, *args, **kwargs)
-		if new_access_token:
+		if new_access_token and response:
 			response.set_cookie('access_token', new_access_token, httponly=True, secure=True)
 
 		return response

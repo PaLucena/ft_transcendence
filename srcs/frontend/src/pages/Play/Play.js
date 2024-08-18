@@ -7,9 +7,11 @@ export class Play extends Component {
 
 	init() {
 		this.setupEventListeners();
-	  }
+		//this.createTournament();
+		//this.joinTournament();
+	}
 
-	  setupEventListeners() {
+	setupEventListeners() {
 		const oneVSoneBtn = document.getElementById("oneVSoneBtn");
 		if (oneVSoneBtn) {
 			oneVSoneBtn.addEventListener("click", () => {

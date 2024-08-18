@@ -1,7 +1,7 @@
 // this function is called after the user has successfully logged in and closed when logged out.
 // used for online/offline status.
 
-let usersocket;
+export let usersocket;
 
 export function initUserWebSocket() {
 	usersocket = new WebSocket(`wss://${window.location.host}/ws/status/`);

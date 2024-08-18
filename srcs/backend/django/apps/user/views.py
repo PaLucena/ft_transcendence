@@ -2,8 +2,6 @@ from pickletools import read_uint1
 from sqlite3 import IntegrityError
 from urllib import response
 from django.shortcuts import render
-from django.template import context
-from django.template.defaulttags import csrf_token
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import AbstractUser
 from rest_framework.response import Response

@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from rtchat.models import ChatGroup, Block
 from user.models import AppUser
@@ -10,7 +11,7 @@ from user.decorators import default_authentication_required
 
 @api_view(["GET"])
 @default_authentication_required
-def chat_view(request, chatroom_name="public-chat"):
+def chat_view(request, chatroom_name):
     if not request.user.is_authenticated:
         return Response(
             {"detail": "Authentication required."},
@@ -18,7 +19,14 @@ def chat_view(request, chatroom_name="public-chat"):
         )
 
     try:
-        chat_group = get_object_or_404(ChatGroup, group_name=chatroom_name)
+        chat_group = ChatGroup.objects.filter(group_name=chatroom_name).first()
+
+        if not chat_group:
+            return Response(
+                {"detail": f"Chatroom '{chatroom_name}' does not exist."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         other_user = None
         other_user_data = None
         block_status = None
@@ -54,6 +62,12 @@ def chat_view(request, chatroom_name="public-chat"):
         }
 
         return Response(context, status=status.HTTP_200_OK)
+
+    except ObjectDoesNotExist as e:
+        return Response(
+            {"detail": f"Object does not exist: {str(e)}"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
     except Exception as e:
         return Response(
