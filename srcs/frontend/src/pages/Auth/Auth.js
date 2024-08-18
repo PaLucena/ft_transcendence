@@ -1,5 +1,6 @@
 import { Component } from "../../scripts/Component.js";
 import { navigateTo } from '../../scripts/router.js';
+import { initUserWebSocket } from '../../scripts/websocket.js'
 
 export class Auth extends Component {
 	constructor() {
@@ -29,7 +30,7 @@ export class Auth extends Component {
 			return response.json()
 		})
 		.then(data => {
-			console.log(data)
+			initUserWebSocket();
 			navigateTo("/play");
 		})
 	}

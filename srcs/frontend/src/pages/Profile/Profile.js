@@ -2,6 +2,7 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
 import { closeUserWebSocket } from '../../scripts/websocket.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
+import { showQRmodal } from '../../components/Show2faQRModal'
 
 export class Profile extends Component {
 	constructor() {
@@ -69,6 +70,7 @@ export class Profile extends Component {
 			})
 			.then(data => {
 				console.log(data.qrpath)
+				showQRmodal(data.qrpath)
 			})
 		})
 	}
