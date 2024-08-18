@@ -91,6 +91,7 @@ def login(request):
 		auth_login(request, user)
 		refresh = RefreshToken.for_user(user)
 		access = refresh.access_token
+		print(True if user.has_2fa_enabled else False)
 		response = Response({"message": "Login successful", "has_2fa": True if user.has_2fa_enabled else False}, status=status.HTTP_200_OK)
 		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
 		response.set_cookie('access_token', str(access), httponly=True, secure=True)

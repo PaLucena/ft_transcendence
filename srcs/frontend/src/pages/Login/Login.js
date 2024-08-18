@@ -15,7 +15,7 @@ export class Login extends Component {
 	}
 
 	initLoginForm() {
-		var TwoFactorModal = new bootstrap.Modal(document.getElementById('twoFactorModal'), {keyboard: true})
+		var TwoFactorModal = new bootstrap.Modal(document.getElementById('twoFactorModal'), {backdrop: false, keyboard: true})
 		$('#username').find('[autofocus]').focus();
 		$('#login_form').on('submit', function (event) {
 			event.preventDefault();

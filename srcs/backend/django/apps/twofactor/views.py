@@ -13,12 +13,11 @@ from core import settings
 @api_view(["POST"])
 @default_authentication_required
 def	enable2fa(request):
-	print("HEY")
 	if request.method == "POST":
 		userlogin = request.user
 		user=userModel.objects.get(username=userlogin)
 		device, created = TOTPDevice.objects.get_or_create(user=request.user, confirmed=False)
-		print("login:", userlogin)
+		print("user:", userlogin, flush=True)
 		if created or not device.confirmed:
 			otp_uri = device.config_url
 			qr = qrcode.make(otp_uri)
