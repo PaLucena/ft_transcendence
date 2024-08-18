@@ -8,6 +8,18 @@ from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
 from django.contrib.auth.decorators import login_required
+from django.utils.text import slugify
+import random
+
+AI_NICKNAMES = ['AI_pablo', 'AI_davyd', 'AI_enrique', 'AI_gabriela', 'AI_lucena', 'AI_sara']
+AI_IMAGES = [
+    'ai_images/ai1.jpg',
+    'ai_images/ai2.jpg',
+    'ai_images/ai3.jpg',
+    'ai_images/ai4.jpg',
+    'ai_images/ai5.jpg',
+    'ai_images/ai6.jpg'
+]
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -71,27 +83,30 @@ def close_tournament(request, tournament_id):
 	try:
 		user = request.user
 		tournament = Tournament.objects.get(pk=tournament_id)
+		participant_count = tournament.participants.count()
 
-		if (user != tournament.creator):
+		if (user != tournament.creator) or participant_count < 2:
 			return Response({"error": "You can't close this tournament."}, status=status.HTTP_403_FORBIDDEN)
 
+		if participant_count < 8:
+			add_ai_players(tournament, participant_count)
 		player_ids = list(tournament.participants.values_list('pk', flat=True))
-		
+
 		try:
 			data = {
 				'tournament_id': tournament_id,
 				'player_ids': player_ids
 			}
 			bc_response = bc_create_tournament(data)
-			
+
 			print("HERE, ", user)
 			if bc_response.status_code == 200:
-				tournament.delete()
+				#tournament.delete()
 				return Response({"message": "Tournament closed and processed on blockchain successfully."},
 					status=status.HTTP_200_OK)
 			else:
 				return Response({"error": "Blockchain process failed."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-		
+
 		except Exception as e:
 			return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 	except Exception as e:
@@ -181,3 +196,35 @@ def remove_participation(request, tournament_id):
 
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+	
+
+def generate_unique_username(base_username):
+	username = base_username
+	counter = 1
+	while AppUser.objects.filter(username=username).exists():
+		username = f"{base_username}_{counter}"
+		counter += 1
+	return username
+
+
+def add_ai_players(tournament, current_player_count):
+	while (current_player_count < 8):
+		nickname = random.choice(AI_NICKNAMES)
+		avatar = random.choice(AI_IMAGES)
+
+		while AppUser.objects.filter(nickname=nickname).exists():
+			nickname = random.choice(AI_NICKNAMES)
+		base_username = slugify(f'{nickname.lower()}')
+		unique_username = generate_unique_username(base_username)
+
+		ai_user = AppUser.objects.create_user(
+			username=unique_username,
+			nickname=nickname,
+			password=None,
+			avatar=avatar
+		)
+
+		ai_user.is_active = False
+		ai_user.save()
+		tournament.participants.add(ai_user)
+		current_player_count += 1
