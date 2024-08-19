@@ -2,7 +2,6 @@ import { Home } from '../pages/Home/Home.js';
 import { Login } from '../pages/Login/Login.js';
 import { Play } from '../pages/Play/Play.js';
 import { Signup } from '../pages/Signup/Signup.js';
-import { Chat } from '../pages/Chat/Chat.js';
 import { NotFound } from '../pages/NotFound/NotFound.js';
 import { Friends } from '../pages/Friends/Friends.js';
 import { Profile } from '../pages/Profile/Profile.js';
@@ -20,8 +19,6 @@ export const routes = {
 	"/friends": Friends,
 	"/profile": Profile,
 	"/auth": Auth,
-	"/chat": Chat,
-	"/chat/:chatId": Chat,
 	"/pong": Pong,
 };
 
