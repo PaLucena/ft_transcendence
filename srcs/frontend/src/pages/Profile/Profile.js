@@ -1,7 +1,7 @@
 import { Component } from '../../scripts/Component.js';
-import { navigateTo } from '../../scripts/router.js'
-import { closeUserWebSocket } from '../../scripts/websocket.js';
-import { getCSRFToken } from '../../scripts/utils/csrf.js'
+import { navigateTo } from '../../scripts/router.js';
+import { getCSRFToken } from '../../scripts/utils/csrf.js';
+import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
 export class Profile extends Component {
 	constructor() {
@@ -52,7 +52,7 @@ export class Profile extends Component {
 				credentials: 'include'
 			})
 			.then(response => {
-				closeUserWebSocket();
+				onlineSocket.closeWebSocket();
 				console.log("Respuesta a logout: ", response); // TODO: esto es debuggeo
 				navigateTo("/login");
 			})

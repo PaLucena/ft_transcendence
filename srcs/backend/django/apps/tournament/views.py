@@ -8,6 +8,7 @@ from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
 from django.contrib.auth.decorators import login_required
+from .utils import add_ai_players
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -71,27 +72,31 @@ def close_tournament(request, tournament_id):
 	try:
 		user = request.user
 		tournament = Tournament.objects.get(pk=tournament_id)
+		participant_count = tournament.participants.count()
 
-		if (user != tournament.creator):
+		if (user != tournament.creator) or participant_count < 2:
 			return Response({"error": "You can't close this tournament."}, status=status.HTTP_403_FORBIDDEN)
 
+		if participant_count < 8:
+			add_ai_players(tournament, participant_count)
 		player_ids = list(tournament.participants.values_list('pk', flat=True))
-		
+
 		try:
 			data = {
 				'tournament_id': tournament_id,
 				'player_ids': player_ids
 			}
 			bc_response = bc_create_tournament(data)
-			
+
 			print("HERE, ", user)
 			if bc_response.status_code == 200:
-				tournament.delete()
+				#tournament.delete()
+				tournament.is_active = True
 				return Response({"message": "Tournament closed and processed on blockchain successfully."},
 					status=status.HTTP_200_OK)
 			else:
 				return Response({"error": "Blockchain process failed."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-		
+
 		except Exception as e:
 			return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 	except Exception as e:
@@ -181,3 +186,4 @@ def remove_participation(request, tournament_id):
 
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+	

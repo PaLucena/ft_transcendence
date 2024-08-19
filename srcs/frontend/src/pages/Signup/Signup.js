@@ -1,9 +1,8 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js';
-import { initUserWebSocket } from '../../scripts/websocket.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
 import customAlert from '../../scripts/utils/customAlert.js';
-
+import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
 export class Signup extends Component {
 	constructor() {
@@ -66,7 +65,7 @@ export class Signup extends Component {
 					return response.json();
 				})
 				.then(data => {
-					initUserWebSocket();
+					onlineSocket.initWebSocket();
 					customAlert('success', 'Account was created successfully', 3000);
 					navigateTo("/play");
 				})

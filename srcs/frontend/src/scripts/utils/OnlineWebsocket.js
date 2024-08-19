@@ -38,12 +38,9 @@ class OnlineWebsocket {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
             } else {
                 this.handleError(null, 'Invalid data format received.');
-                customAlert('danger', 'Error processing online user data', 5000);
             }
-
         } catch (error) {
             this.handleError(null, error);
-            customAlert('danger', 'Error on processing message', 5000);
         }
     }
 
@@ -58,13 +55,15 @@ class OnlineWebsocket {
     handleError(errorCode, errorMessage) {
         switch (errorCode) {
             case 404:
-                customAlert('danger', 'Resource not found. Please try again.', 5000);
+                customAlert('danger', 'Resource not found.', 5000);
                 break;
 			case 403:
-				customAlert('danger', 'You do not have permission to perform this action.', 5000);
+                customAlert('danger', 'You do not have permission to perform this action.', 5000);
+                this.closeWebSocket();
 				break;
             case 500:
                 customAlert('danger', 'An internal server error occurred.', 5000);
+                this.closeWebSocket();
                 break;
             default:
                 console.error('Critical error:', errorMessage);

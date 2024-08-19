@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from . import consumers
 
 urlpatterns = [
 	path('check-auth/', views.check_auth, name='check_auth'),
@@ -16,6 +15,4 @@ urlpatterns = [
 	path('get_friends/', views.get_friends, name='get_friends'),
 	path('delete_account/', views.delete_account, name='delete_account'),
 	path('42api-login/', views.ftapiLogin, name='ftapiLogin'),
-
-	path('ws/status/', consumers.UserStatus.as_asgi()),
 ]

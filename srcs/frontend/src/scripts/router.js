@@ -2,14 +2,13 @@ import { Home } from '../pages/Home/Home.js';
 import { Login } from '../pages/Login/Login.js';
 import { Play } from '../pages/Play/Play.js';
 import { Signup } from '../pages/Signup/Signup.js';
-import { Chat } from '../pages/Chat/Chat.js';
 import { NotFound } from '../pages/NotFound/NotFound.js';
 import { Friends } from '../pages/Friends/Friends.js';
 import { Profile } from '../pages/Profile/Profile.js';
 import { Auth } from '../pages/Auth/Auth.js';
 import { Pong } from '../pages/Pong/Pong.js';
 import { renderStaticComponents } from './utils/renderStaticComponents.js';
-import { initUserWebSocket, usersocket } from './websocket.js';
+import { onlineSocket } from './utils/OnlineWebsocket.js';
 
 export const routes = {
 	"/404": NotFound,
@@ -20,8 +19,6 @@ export const routes = {
 	"/friends": Friends,
 	"/profile": Profile,
 	"/auth": Auth,
-	"/chat": Chat,
-	"/chat/:chatId": Chat,
 	"/pong": Pong,
 };
 
@@ -48,8 +45,8 @@ export default async function router() {
 	if (isProtectedRoute)
 		isAuthenticated = await checkAuthentication();
 
-	if (isAuthenticated && (!usersocket || usersocket.readyState === WebSocket.CLOSED) && isProtectedRoute)
-		initUserWebSocket();
+	if (isAuthenticated && (!onlineSocket.onlineSocket || onlineSocket.onlineSocket.readyState === WebSocket.CLOSED) && isProtectedRoute)
+		onlineSocket.initWebSocket();
 
 	if (!isAuthenticated && isProtectedRoute) {
 		navigateTo("/login");
