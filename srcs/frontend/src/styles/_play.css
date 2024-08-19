@@ -16,6 +16,10 @@
 	height: 45%;
 }
 
+.h-80p {
+	height: 80%;
+}
+
 .h-90p {
 	height: 90%;
 }
@@ -87,12 +91,17 @@
 }
 
 .dropdownOneVsOne .local, .dropdownOneVsOne .online, .dropdownOneVsOne .backOne {
-	margin-top: 7vh;
-	margin-left: 0;
+		margin-top: 7vh;
+		margin-left: 0;
 }
 
 .dropdownTournaments .btn, .dropdownCreateTournament .btn {
 	border: 1px solid black;
+}
+
+.modal-tournament {
+	/* background-color: rgba(123, 169, 169, .5); */
+	background-color: rgba(0, 0, 0, .6);
 }
 
 .chatbtn-placeholder {
@@ -104,8 +113,4 @@
 	bottom: 0;
 	right: 0.5%;
 	margin-bottom: 2vh;
-}
-
-.dropdownCreateTournament {
-	display: block;
 }

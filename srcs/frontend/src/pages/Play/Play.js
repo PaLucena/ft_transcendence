@@ -49,7 +49,10 @@ export class Play extends Component {
 			document.getElementById("dropdownTournaments").style.display = "none";
 		});
 
-		const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
+		const	tournamentModalElement = document.getElementById("tournamentModal");
+		new	bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
+
+		/* const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
 		plusPrivateBtn.addEventListener("click", () => {
 			console.log("Private");
 			document.getElementById("dropdownCreateTournament").style.display = "block";
@@ -60,6 +63,6 @@ export class Play extends Component {
 		backThree.addEventListener("click", () => {
 			document.getElementById("dropdownTournaments").style.display = "block";
 			document.getElementById("dropdownCreateTournament").style.display = "none";
-		});
+		}); */
 	}
 }
