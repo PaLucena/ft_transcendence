@@ -88,10 +88,12 @@ def login(request):
 	if authenticated_user is not None:
 		user = AppUser.objects.get(username=username)
 		user.save()
+		if Has2faEnabled(user):
+			return Response({"has_2fa": True}, status=status.HTTP_200_OK)
 		auth_login(request, user)
 		refresh = RefreshToken.for_user(user)
 		access = refresh.access_token
-		response = Response({"message": "Login successful", "has_2fa": True if Has2faEnabled(user) else False}, status=status.HTTP_200_OK)
+		response = Response({"message": "Login successful", "has_2fa": False}, status=status.HTTP_200_OK)
 		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
 		response.set_cookie('access_token', str(access), httponly=True, secure=True)
 
@@ -118,10 +120,7 @@ def logout(request):
 	response = Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
 	response.delete_cookie('access_token')
 	response.delete_cookie('refresh_token')
-
-	print(True if user.has_2fa_enabled else False)
 	auth_logout(request)
-	print(True if user.has_2fa_enabled else False)
 	return response
 
 

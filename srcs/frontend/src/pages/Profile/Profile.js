@@ -2,7 +2,9 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
 import { closeUserWebSocket } from '../../scripts/websocket.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
-import { showQRmodal } from '../../components/Show2faQRModal'
+import customAlert from "../../scripts/utils/customAlert.js";
+
+// import { showQRmodal } from '../../components/Show2faQRModal'
 
 export class Profile extends Component {
 	constructor() {
@@ -70,7 +72,36 @@ export class Profile extends Component {
 			})
 			.then(data => {
 				console.log(data.qrpath)
-				showQRmodal(data.qrpath)
+				const ModalElement = document.getElementById('imageModal');
+				const overlayElement = document.getElementById('customOverlay');
+				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
+				const csrftoken = getCSRFToken('csrftoken');
+				console.log(data.qrpath)
+				fetch("http://localhost:8000/media/" + data.qrpath, {
+					method: "GET",
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-CSRFToken': csrftoken
+					},
+					mode: 'no-cors'
+				})
+				.then(response => {
+					console.log(response)
+					if (!response.ok) {
+						return response.json().then(errData => {
+							throw new Error(errData.error || `Response status: ${response.status}`);
+						});
+					}
+					return response.json();
+				})
+				.then(data => {
+					console.log('hola');
+					qrmodal.show()
+				})
+				.catch(error => {
+					customAlert('danger', `Error: ${error.message}`, '');
+				});
 			})
 		})
 	}
