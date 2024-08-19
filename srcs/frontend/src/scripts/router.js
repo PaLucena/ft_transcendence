@@ -9,7 +9,7 @@ import { Profile } from '../pages/Profile/Profile.js';
 import { Auth } from '../pages/Auth/Auth.js';
 import { Pong } from '../pages/Pong/Pong.js';
 import { renderStaticComponents } from './utils/renderStaticComponents.js';
-import { initUserWebSocket, usersocket } from './websocket.js';
+import { onlineSocket } from './utils/OnlineWebsocket.js';
 
 export const routes = {
 	"/404": NotFound,
@@ -48,8 +48,8 @@ export default async function router() {
 	if (isProtectedRoute)
 		isAuthenticated = await checkAuthentication();
 
-	if (isAuthenticated && (!usersocket || usersocket.readyState === WebSocket.CLOSED) && isProtectedRoute)
-		initUserWebSocket();
+	if (isAuthenticated && (!onlineSocket.onlineSocket || onlineSocket.onlineSocket.readyState === WebSocket.CLOSED) && isProtectedRoute)
+		onlineSocket.initWebSocket();
 
 	if (!isAuthenticated && isProtectedRoute) {
 		navigateTo("/login");

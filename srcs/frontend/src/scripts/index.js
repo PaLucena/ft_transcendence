@@ -1,9 +1,7 @@
 import router, { navigateTo, navigateToOnBootup } from './router.js';
-import { onlineSocket } from './utils/OnlineWebsocket.js';
 
 window.addEventListener("DOMContentLoaded", () => {
 	navigateToOnBootup();
-    //onlineSocket.initWebSocket();
 });
 
 window.addEventListener("popstate", () => {

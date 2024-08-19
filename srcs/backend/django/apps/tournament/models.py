@@ -21,3 +21,10 @@ class Tournament(models.Model):
 	is_active = models.BooleanField(default=False)
 	#invitation_time_out =  models.DateTimeField(default=lambda: timezone.now() + timedelta(minutes=10))
 	#pending_invitations = models.ManyToManyField(AppUser, related_name='pending', default=list)
+
+
+class Match(models.Model):
+	player_1 = models.ForeignKey(AppUser, related_name='player_1', on_delete=models.SET_NULL, null=True, blank=True)
+	player_2 = models.ForeignKey(AppUser, related_name='player_2', on_delete=models.SET_NULL, null=True, blank=True)
+	player_1_score = models.IntegerField(null=True)
+	player_2_score = models.IntegerField(null=True)

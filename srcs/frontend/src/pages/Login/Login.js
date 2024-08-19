@@ -1,8 +1,8 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js'
-import { initUserWebSocket } from '../../scripts/websocket.js'
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
 import customAlert from '../../scripts/utils/customAlert.js';
+import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
 export class Login extends Component {
 	constructor() {
@@ -56,7 +56,7 @@ export class Login extends Component {
 					if (data.has_2fa == true) {
 						TwoFactorModal.show();
 					} else {
-						initUserWebSocket();
+						onlineSocket.initWebSocket();
 						customAlert('success', 'Login successful', 3000);
 						navigateTo("/play");
 					}
