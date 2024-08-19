@@ -114,12 +114,15 @@ export class WebSocketHandler {
                 break;
             case 404:
                 customAlert('danger', 'Chatroom not found or author not found', 5000);
+                this.closeWebSocket();
                 break;
             case 401:
                 customAlert('danger', 'You are not authenticated. Please log in.', 5000);
+                this.closeWebSocket();
                 break;
             case 500:
                 customAlert('danger', 'An internal server error occurred.', 5000);
+                this.closeWebSocket();
                 break;
             default:
                 console.error('Critical error:', errorMessage);
