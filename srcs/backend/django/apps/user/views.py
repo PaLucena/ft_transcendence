@@ -45,9 +45,9 @@ def get_user_data(request):
 		user = request.user
 		user_data = {
 			'username': user.username,
-			'avatar': user.avatar,
+			'avatar': user.avatar.url,
 			'email': user.email,
-			'number_of_friends': user.get_friend_count(user)
+			#'number_of_friends': user.get_friend_count(user)
 		}
 		return Response(user_data, status=status.HTTP_200_OK)
 	except Exception as e:

@@ -45,16 +45,20 @@ export class Play extends Component {
 
 		const	plusPublicBtn = document.getElementById("plusPublicBtn");
 		plusPublicBtn.addEventListener("click", () => {
-			this.createTournament('PUBLIC');
+			this.createTournament('public');
 		});
 
 		const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
 		plusPrivateBtn.addEventListener("click", () => {
-			this.createTournament('PRIVATE');
+			this.createTournament('private');
 		});
 
+		const	inputs = document.querySelectorAll('.otp-input');
 		const	tournamentModalElement = document.getElementById("tournamentModal");
-		new	bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
+		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
+		tournamentModalElement.addEventListener('shown.bs.modal', () => {
+			inputs[0].focus();
+		})
 	}
 
 	createTournament(tournamentType) {
@@ -110,13 +114,16 @@ export class Play extends Component {
 			credentials: 'include'
 		})
 		.then(response => {
-			console.log("Respuesta: ", response);
+			console.log("Respuesta de displayTournament: ", response);
 			if (!response.ok) {
 				return response.json().then(errData => {
 					throw new Error(errData.error || `Response status: ${response.status}`);
 				});
 			}
 			return response.json();
+		})
+		.then(data => {
+			console.log("Lista de torneos: ", data);
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');

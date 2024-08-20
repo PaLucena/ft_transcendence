@@ -1,4 +1,5 @@
 import { Component } from '../../scripts/Component.js';
+import customAlert from '../../scripts/utils/customAlert.js';
 import { navigateTo } from '../../scripts/router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
@@ -10,6 +11,7 @@ export class Profile extends Component {
 
 	init() {
 		this.focusPage();
+		this.displayUserInfo();
 		this.logout();
 		this.editUserBtn();
 		this.saveInfoBtn();
@@ -21,6 +23,34 @@ export class Profile extends Component {
 			navItem.style.border = "";
 		});
 		document.getElementById("navItemProfile").style.border = "2px solid #edeef0";
+	}
+
+	displayUserInfo() {
+		fetch("/api/get_user_data/", {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			console.log("Respuesta de get_user_data: ", response);
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			console.log("User data: ", data);
+			document.getElementById("photoContainer").innerHTML = `<img class="profile-photo rounded-circle col-12 shadow" src="${data["avatar"]}">`
+			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
+			// TODO: reemplazar el número de amigos
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
 	}
 
 	editUserBtn() {
