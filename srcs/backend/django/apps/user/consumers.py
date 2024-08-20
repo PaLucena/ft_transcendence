@@ -25,7 +25,7 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        if self.user.is_authenticated:
+        if self.user.is_authenticated or self.user is None:
             await self.remove_user_from_online_list(self.user)
             try:
                 await self.channel_layer.group_discard(self.group_name, self.channel_name)

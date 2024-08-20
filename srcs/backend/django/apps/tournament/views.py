@@ -2,13 +2,14 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from django.db.models import Q
 from user.models import AppUser
-from .models import Tournament
+from .models import Tournament, Match
 from rest_framework.response import Response
 from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
 from django.contrib.auth.decorators import login_required
 from .utils import add_ai_players
+from .tournament_config import next_match_dependencies, required_matches
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -120,7 +121,7 @@ def display_tournaments(request):
 				'players': [
 					{
 						'nickname': 'you' if player == user else player.nickname,
-	  					'avatar': player.avatar
+	  					'avatar': player.avatar.url
 					} 
 					for player in tournament.participants.all()
 				]
@@ -187,3 +188,65 @@ def remove_participation(request, tournament_id):
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 	
+
+def assign_matches(tournament):
+	players = tournament.participants
+
+	player_ids = [p.id for p in players]
+	match_order = [
+		# Winner's bracket Round 1
+		(1, player_ids[0], player_ids[1]),
+		(2, player_ids[2], player_ids[3]),
+		(3, player_ids[4], player_ids[5]),
+		(4, player_ids[6], player_ids[7]),
+		# Loser's bracket Round 1
+		(5, None, None), (6, None, None), 
+		# Winner's bracket Round 2
+		(7, None, None), (8, None, None),
+		# Loser's bracket Round 2
+		(9, None, None), (10, None, None),
+		# Winner's bracket Round 3
+		(11, None, None),
+		# Loser's bracket Round 3
+		(12, None, None), 
+		# Loser's final
+		(13, None, None), 
+		# Winner's final
+		(14, None, None)
+	]
+
+	matches = []
+	available_matches = []
+
+	for match_id, p1_id, p2_id in match_order:
+		match = Match.objects.create(
+			tournament=tournament,
+			match_id=match_id,
+			player1=AppUser.objects.get(pk=p1_id) if p1_id else None,
+			player2=AppUser.objects.get(pk=p2_id) if p2_id else None,
+		)
+		matches.append(match)
+		if match_id <= 4:
+			available=True
+	
+	return matches
+
+
+# checks if the next match can be assigned based on the outcome of the current match.
+def assign_next_match(tournament, finished_match_id):
+	next_possible_matches = next_match_dependencies.get(finished_match_id, [])
+
+	for next_match_id in next_possible_matches:
+		if can_assign_match(tournament, next_match_id):
+			match = Match.objects.get(tournament=tournament, match_id=next_match_id)
+			#assign_match_players(tournament, match)
+
+
+def can_assign_match(tournament, match_id):
+	for required_match_id in required_matches[match_id]:
+		match = Match.objects.filter(tournament=tournament, match_id=required_match_id, winner__isnull=False).first()
+		if not match:
+			return False
+	return True
+
+#def assign_match_players(tournament, match):
