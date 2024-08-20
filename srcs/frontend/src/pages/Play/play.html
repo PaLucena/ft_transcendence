@@ -64,47 +64,26 @@
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h1 class="modal-title fs-5" id="exampleModalLabel">Create tournament</h1>
+						<h1 class="modal-title fs-5" id="exampleModalLabel">New tournament</h1>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						<form>
+						<form id="tournamentForm">
 							<div class="form-floating mb-3">
-								<input type="email" class="form-control" id="floatingTName" placeholder="Tournament name">
-								<label for="floatingTName">Tournament name</label>
+								<input type="text" class="form-control" id="name" name="name" placeholder="Tournament name">
+								<label for="name">Tournament name</label>
 							</div>
 							<div class="form-floating">
-								<input type="password" class="form-control" id="floatingNickname" placeholder="Nickname">
-								<label for="floatingNickname">Nickname</label>
+								<input type="text" class="form-control" id="nickname" name="nickname" placeholder="Nickname">
+								<label for="nickname">Nickname</label>
 							</div>
 						</form>
 					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-						<button type="button" class="btn btn-primary">Save changes</button>
+					<div class="modal-footer d-flex justify-content-center">
+						<button type="submit" form="tournamentForm" class="btn btn-primary">Create</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- <div id="dropdownCreateTournament" class="dropdownCreateTournament container bg-light rounded-3">
-			<div class="row h-10p"></div>
-			<div class="row h-80p justify-content-center">
-				<form>
-					<div class="form-floating h-25 mt-5">
-						<input type="email" class="form-control" id="floatingTName" placeholder="Tournament name">
-						<label for="floatingTName">Tournament name</label>
-					</div>
-					<div class="form-floating h-25 mt-5">
-						<input type="password" class="form-control" id="floatingNickname" placeholder="Nickname">
-						<label for="floatingNickname">Nickname</label>
-					</div>
-				</form>
-			</div>
-			<div class="row h-10p">
-				<div id="backThree" class="backTwo row w-100 justify-content-center">
-					<button class="btn btn-green py-2 w-50"><h4>Back</h4></button>
-				</div>
-			</div>
-		</div> -->
 	</div>
 </div>

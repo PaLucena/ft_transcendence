@@ -1,4 +1,6 @@
 import { Component } from '../../scripts/Component.js';
+import { navigateTo } from '../../scripts/router.js';
+import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Play extends Component {
 	constructor() {
@@ -7,7 +9,6 @@ export class Play extends Component {
 
 	init() {
 		this.setupEventListeners();
-		//this.createTournament();
 		//this.joinTournament();
 	}
 
@@ -44,25 +45,55 @@ export class Play extends Component {
 
 		const	plusPublicBtn = document.getElementById("plusPublicBtn");
 		plusPublicBtn.addEventListener("click", () => {
-			console.log("Public");
-			document.getElementById("dropdownCreateTournament").style.display = "block";
-			document.getElementById("dropdownTournaments").style.display = "none";
+			this.createTournament('PUBLIC');
+		});
+
+		const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
+		plusPrivateBtn.addEventListener("click", () => {
+			this.createTournament('PRIVATE');
 		});
 
 		const	tournamentModalElement = document.getElementById("tournamentModal");
 		new	bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
+	}
 
-		/* const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
-		plusPrivateBtn.addEventListener("click", () => {
-			console.log("Private");
-			document.getElementById("dropdownCreateTournament").style.display = "block";
-			document.getElementById("dropdownTournaments").style.display = "none";
-		});
+	createTournament(tournamentType) {
+		const tournamentForm = document.querySelector("#tournamentForm");
 
-		const	backThree = document.getElementById("backThree");
-		backThree.addEventListener("click", () => {
-			document.getElementById("dropdownTournaments").style.display = "block";
-			document.getElementById("dropdownCreateTournament").style.display = "none";
-		}); */
+		tournamentForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+
+			const formData = new FormData(event.target);
+			const jsonData = {};
+
+			formData.forEach((value, key) => {
+				jsonData[key] = value;
+			});
+			jsonData["type"] = tournamentType;
+
+			fetch("/api/create_tournament/", {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(jsonData),
+				credentials: 'include'
+			})
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(errData => {
+						throw new Error(errData.error || `Response status: ${response.status}`);
+					});
+				}
+				return response.json();
+			})
+			.then(data => {
+				customAlert('success', data.message, '');
+				navigateTo("/pong");
+			})
+			.catch((error) => {
+				customAlert('danger', `Error: ` + error.message, '');
+			})
+		})
 	}
 }
