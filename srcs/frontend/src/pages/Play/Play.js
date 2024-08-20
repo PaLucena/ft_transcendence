@@ -88,12 +88,38 @@ export class Play extends Component {
 				return response.json();
 			})
 			.then(data => {
-				customAlert('success', data.message, '');
-				navigateTo("/pong");
+				customAlert('success', data.message, '3000');
+				this.joinTournament(jsonData["name"], tournamentType);
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
 			})
+		})
+	}
+
+	joinTournament(name, tournamentType) {
+
+		console.log("Nombre del torneo: ", name);
+		console.log("Tipo de torneo: ", tournamentType);
+
+		fetch("/api/display_tournaments/", {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			console.log("Respuesta: ", response);
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
 		})
 	}
 }

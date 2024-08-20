@@ -53,9 +53,9 @@ export default async function router() {
 		return;
 	}
 
-	if (RouteClass) {
+	if (RouteClass)
 		await renderPage(RouteClass, matchedParams);
-	} else {
+	else {
 		console.error('RouteClass is not a constructor or is null:', RouteClass);
 		document.getElementById('root').innerHTML = '<h1>Error: 404</h1>';
 	}
@@ -69,10 +69,11 @@ export default async function router() {
 			if (response.ok) {
 				const data = await response.json();
 				return data.authenticated;
-			} else {
-				return false;
 			}
-		} catch (error) {
+			else
+				return false;
+		}
+		catch (error) {
 			console.error("Error checking authentication:", error);
 			return false;
 		}
@@ -99,10 +100,10 @@ export default async function router() {
 			const html = await page.render();
 			document.getElementById('content').innerHTML = html;
 
-			if (typeof page.init === 'function') {
+			if (typeof page.init === 'function')
 				await page.init();
-			}
-		} catch (error) {
+		}
+		catch (error) {
 		  console.error("Error rendering page:", error);
 		  document.getElementById('content').innerHTML = '<h1>Error rendering page.</h1>';
 		}
@@ -115,9 +116,8 @@ export function navigateTo(url) {
 }
 
 export function navigateToOnBootup() {
-	if (window.location.pathname === "/") {
+	if (window.location.pathname === "/")
 		navigateTo("/login");
-	} else {
+	else
 		router();
-	}
 }
