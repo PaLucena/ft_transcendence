@@ -9,7 +9,6 @@ export class Play extends Component {
 
 	init() {
 		this.setupEventListeners();
-		//this.joinTournament();
 	}
 
 	setupEventListeners() {
@@ -53,12 +52,11 @@ export class Play extends Component {
 			this.createTournament('private');
 		});
 
-		const	inputs = document.querySelectorAll('.otp-input');
 		const	tournamentModalElement = document.getElementById("tournamentModal");
 		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
 		tournamentModalElement.addEventListener('shown.bs.modal', () => {
-			inputs[0].focus();
-		})
+			document.getElementById('name-input').focus();
+		});
 	}
 
 	createTournament(tournamentType) {
@@ -102,10 +100,6 @@ export class Play extends Component {
 	}
 
 	joinTournament(name, tournamentType) {
-
-		console.log("Nombre del torneo: ", name);
-		console.log("Tipo de torneo: ", tournamentType);
-
 		fetch("/api/display_tournaments/", {
 			method: "GET",
 			headers: {
@@ -114,7 +108,6 @@ export class Play extends Component {
 			credentials: 'include'
 		})
 		.then(response => {
-			console.log("Respuesta de displayTournament: ", response);
 			if (!response.ok) {
 				return response.json().then(errData => {
 					throw new Error(errData.error || `Response status: ${response.status}`);
@@ -123,10 +116,22 @@ export class Play extends Component {
 			return response.json();
 		})
 		.then(data => {
-			console.log("Lista de torneos: ", data);
+			if (tournamentType === 'private') {
+				const	tournamentData = data.private_tournaments.find(object => object.name === name);
+				this.getTournamentCode(tournamentData);
+				navigateTo("/tournament/" + tournamentData.id)
+			}
+			else {
+				const	tournamentData = data.public_tournaments.find(object => object.name === name);
+				navigateTo("/tournament/" + tournamentData.id)
+			}
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
 		})
+	}
+
+	getTournamentCode(tournamentData) {
+		console.log("Falta hacer el fetch al get_code(request, tournament_id");
 	}
 }

@@ -7,6 +7,7 @@ import { Friends } from '../pages/Friends/Friends.js';
 import { Profile } from '../pages/Profile/Profile.js';
 import { Auth } from '../pages/Auth/Auth.js';
 import { Pong } from '../pages/Pong/Pong.js';
+import { Tournament } from '../pages/Tournament/Tournament.js';
 import { renderStaticComponents } from './utils/renderStaticComponents.js';
 import { onlineSocket } from './utils/OnlineWebsocket.js';
 
@@ -19,6 +20,8 @@ export const routes = {
 	"/friends": Friends,
 	"/profile": Profile,
 	"/auth": Auth,
+	"/tournament": Tournament,
+	"/tournament/:tournamentId": Tournament,
 	"/pong": Pong,
 };
 

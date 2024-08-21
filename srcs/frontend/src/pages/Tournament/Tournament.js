@@ -1,13 +1,13 @@
 import { Component } from "../../scripts/Component.js";
 
 export class Tournament extends Component {
-	constructor() {
-		super('/pages/Tournament/Tournament.html');
+	constructor(params = {}) {
+		super('/pages/Tournament/tournament.html', params);
 	}
 
 	async init() {
-		this.createTournament();
 		this.joinTournament();
+		this.cosasDeTorneo(this.params);
 	}
 
 	joinTournament(id) {
@@ -53,5 +53,9 @@ export class Tournament extends Component {
 				alert(`Error joining tournament: ${error.message}`);
 			});
 		});
+	}
+
+	cosasDeTorneo(tournamentId) {
+		console.log("Id del torneo: ", tournamentId);
 	}
 }

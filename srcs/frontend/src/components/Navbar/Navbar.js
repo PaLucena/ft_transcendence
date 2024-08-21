@@ -18,7 +18,6 @@ export class Navbar extends Component {
 			credentials: 'include'
 		})
 		.then(response => {
-			console.log("Respuesta de get_user_data: ", response);
 			if (!response.ok) {
 				return response.json().then(errData => {
 					throw new Error(errData.error || `Response status: ${response.status}`);
