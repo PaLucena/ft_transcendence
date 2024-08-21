@@ -1,7 +1,8 @@
 import { Component } from "../../scripts/Component.js";
 
-export class NotFound extends Component {
+class NotFound extends Component {
 	constructor() {
+		console.log('NotFound Constructor');
 		super('/pages/NotFound/404.html');
 	}
 
@@ -15,4 +16,13 @@ export class NotFound extends Component {
 			window.history.back();
 		});
 	}
+}
+
+let notFoundInstance = null;
+
+export function getNotFoundInstance(params) {
+	if (!notFoundInstance) {
+		notFoundInstance = new NotFound(params);
+	}
+	return notFoundInstance;
 }

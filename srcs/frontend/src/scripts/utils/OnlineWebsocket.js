@@ -32,8 +32,6 @@ class OnlineWebsocket {
                 return;
             }
 
-			console.log('Received data:', data);
-
 			if (data.online_users) {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
             } else {

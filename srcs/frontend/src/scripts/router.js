@@ -1,26 +1,28 @@
-import { Home } from '../pages/Home/Home.js';
-import { Login } from '../pages/Login/Login.js';
-import { Play } from '../pages/Play/Play.js';
-import { Signup } from '../pages/Signup/Signup.js';
-import { NotFound } from '../pages/NotFound/NotFound.js';
-import { Friends } from '../pages/Friends/Friends.js';
-import { Profile } from '../pages/Profile/Profile.js';
-import { Auth } from '../pages/Auth/Auth.js';
-import { Pong } from '../pages/Pong/Pong.js';
+import { getHomeInstance } from '../pages/Home/Home.js';
+import { getLoginInstance } from '../pages/Login/Login.js';
+import { getPlayInstance } from '../pages/Play/Play.js'
+import { getSignupInstance } from '../pages/Signup/Signup.js';
+import { getNotFoundInstance } from '../pages/NotFound/NotFound.js';
+import { getFriendsInstance } from '../pages/Friends/Friends.js';
+import { getProfileInstance } from '../pages/Profile/Profile.js';
+import { getAuthInstance } from '../pages/Auth/Auth.js';
+import { getPongInstance } from '../pages/Pong/Pong.js';
 import { renderStaticComponents } from './utils/renderStaticComponents.js';
 import { onlineSocket } from './utils/OnlineWebsocket.js';
 
 export const routes = {
-	"/404": NotFound,
-	"/": Home,
-	"/login": Login,
-	"/signup": Signup,
-	"/play": Play,
-	"/friends": Friends,
-	"/profile": Profile,
-	"/auth": Auth,
-	"/pong": Pong,
+	'/404': getNotFoundInstance,
+	'/': getHomeInstance,
+	'/login': getLoginInstance,
+	'/signup': getSignupInstance,
+	'/play': getPlayInstance,
+	'/friends': getFriendsInstance,
+	'/profile': getProfileInstance,
+	'/auth': getAuthInstance,
+	'/pong': getPongInstance,
 };
+
+let currentComponent = null;
 
 export default async function router() {
 	const path = window.location.pathname;
@@ -36,12 +38,14 @@ export default async function router() {
 		}
 	});
 
-	console.log("Matched route:", matchedRoute);
-	console.log("Matched params:", matchedParams);
+	// console.log("Matched route:", matchedRoute);
+	// console.log("Matched params:", matchedParams);
 
-	const RouteClass = matchedRoute ? routes[matchedRoute] : routes["/404"];
+	const getRouteInstance = matchedRoute ? routes[matchedRoute] : routes['/404'];
+    const newComponent = getRouteInstance(matchedParams);
 
 	const isProtectedRoute = matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
+
 	if (isProtectedRoute)
 		isAuthenticated = await checkAuthentication();
 
@@ -53,12 +57,18 @@ export default async function router() {
 		return;
 	}
 
-	if (RouteClass) {
-		await renderPage(RouteClass, matchedParams);
-	} else {
-		console.error('RouteClass is not a constructor or is null:', RouteClass);
-		document.getElementById('root').innerHTML = '<h1>Error: 404</h1>';
-	}
+	if (currentComponent && typeof currentComponent.destroy === 'function') {
+        currentComponent.destroy();
+    }
+
+	currentComponent = newComponent;
+
+	if (currentComponent) {
+        await renderPage(currentComponent, matchedParams);
+    } else {
+        console.error('RouteClass is not a constructor or is null:', getRouteInstance);
+        document.getElementById('root').innerHTML = '<h1>Error: 404</h1>';
+    }
 
 	async function checkAuthentication() {
 		try {
@@ -92,21 +102,20 @@ export default async function router() {
 		return params;
 	}
 
-	async function renderPage(RouteClass, params) {
-		try {
-			await renderStaticComponents();
-			const page = new RouteClass(params);
-			const html = await page.render();
-			document.getElementById('content').innerHTML = html;
+	async function renderPage(instance, params) {
+        try {
+            await renderStaticComponents();
+            const html = await instance.render();
+            document.getElementById('content').innerHTML = html;
 
-			if (typeof page.init === 'function') {
-				await page.init();
-			}
-		} catch (error) {
-		  console.error("Error rendering page:", error);
-		  document.getElementById('content').innerHTML = '<h1>Error rendering page.</h1>';
-		}
-	}
+            if (typeof instance.init === 'function') {
+                await instance.init();
+            }
+        } catch (error) {
+            console.error("Error rendering page:", error);
+            document.getElementById('content').innerHTML = '<h1>Error rendering page.</h1>';
+        }
+    }
 }
 
 export function navigateTo(url) {

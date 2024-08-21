@@ -29,6 +29,8 @@ export class ChatLoader {
     async initChatroom(chatroomName) {
         this.chatroomName = chatroomName;
 
+        this.chatModal.webSocketHandler.closeWebSocket();
+
         try {
             const response = await fetch(`/api/chat/chatroom/${chatroomName}/`, {
                 method: 'GET',

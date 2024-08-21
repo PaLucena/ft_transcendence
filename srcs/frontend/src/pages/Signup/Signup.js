@@ -4,10 +4,16 @@ import { getCSRFToken } from '../../scripts/utils/csrf.js'
 import customAlert from '../../scripts/utils/customAlert.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
-export class Signup extends Component {
+class Signup extends Component {
 	constructor() {
+		console.log('Signup Constructor');
 		super('/pages/Signup/signup.html');
 	}
+
+	destroy() {
+		console.log("Signup Custom destroy");
+		this.removeAllEventListeners();
+    }
 
 	init() {
 		this.initSubmitForm()
@@ -92,3 +98,13 @@ export class Signup extends Component {
 		});
 	}
 }
+
+let signupInstance = null;
+
+export function getSignupInstance(params) {
+	if (!signupInstance) {
+		signupInstance = new Signup(params);
+	}
+	return signupInstance;
+}
+

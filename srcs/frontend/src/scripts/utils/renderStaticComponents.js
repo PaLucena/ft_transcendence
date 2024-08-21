@@ -3,6 +3,9 @@ import { Navbar } from "../../components/Navbar/Navbar.js";
 import { ChatModal } from '../../components/ChatModal/ChatModal.js';
 import { routes } from '../router.js';
 
+const navbarInstance = new Navbar();
+const chatModalInstance = new ChatModal();
+
 export async function renderStaticComponents() {
     const currentPath = window.location.pathname.replace(/\/+$/, '');
     const isValidRoute = Object.keys(routes).some(route => {
@@ -10,7 +13,12 @@ export async function renderStaticComponents() {
         return routeRegex.test(currentPath);
     });
 
-    for (const { ComponentClass, containerId, routesToExclude } of staticComponents) {
+    const staticComponents = [
+        { instance: navbarInstance, containerId: 'navbar', routesToExclude: ["/login", "/signup", "/auth", "/404", "/pong"] },
+        { instance: chatModalInstance, containerId: 'chat_modal', routesToExclude: ["/login", "/signup", "/auth", "/404"] },
+    ];
+
+    for (const { instance, containerId, routesToExclude } of staticComponents) {
         const container = document.getElementById(containerId);
         const shouldRender = isValidRoute && !routesToExclude.some(route => {
             const routeRegex = new RegExp(`^${route.replace(/:\w+/g, '[^/]+')}/?$`);
@@ -20,9 +28,12 @@ export async function renderStaticComponents() {
         if (container) {
             if (shouldRender) {
                 if (!container.innerHTML.trim()) {
-                    await Component.renderComponent(ComponentClass, containerId);
+                    await Component.renderComponent(instance, containerId);
                 }
             } else {
+                if (typeof instance.destroy === 'function') {
+                    instance.destroy();
+                }
                 container.innerHTML = '';
             }
         } else {
@@ -30,9 +41,3 @@ export async function renderStaticComponents() {
         }
     }
 }
-
-export const staticComponents = [
-    { ComponentClass: Navbar, containerId: 'navbar', routesToExclude: ["/login", "/signup", "/auth", "/404", "/pong"] },
-    { ComponentClass: ChatModal, containerId: 'chat_modal', routesToExclude: ["/login", "/signup", "/auth", "/404"] },
-];
-

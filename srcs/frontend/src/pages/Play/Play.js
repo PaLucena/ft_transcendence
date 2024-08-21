@@ -2,10 +2,16 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/router.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 
-export class Play extends Component {
+class Play extends Component {
 	constructor() {
+		console.log('Play Constructor');
 		super('/pages/Play/play.html');
 	}
+
+	destroy() {
+		console.log("Play Custom destroy");
+		this.removeAllEventListeners();
+    }
 
 	init() {
 		this.setupEventListeners();
@@ -97,3 +103,13 @@ export class Play extends Component {
 		})
 	}
 }
+
+let playInstance = null;
+
+export function getPlayInstance(params) {
+	if (!playInstance) {
+		playInstance = new Play(params);
+	}
+	return playInstance;
+}
+

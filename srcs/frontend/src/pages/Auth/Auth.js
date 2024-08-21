@@ -1,8 +1,9 @@
 import { Component } from "../../scripts/Component.js";
 import { navigateTo } from '../../scripts/router.js';
 
-export class Auth extends Component {
+class Auth extends Component {
 	constructor() {
+		console.log('Auth Constructor');
 		super("/pages/Auth/auth.html")
 	}
 
@@ -34,3 +35,13 @@ export class Auth extends Component {
 		})
 	}
 }
+
+let authInstance = null;
+
+export function getAuthInstance(params) {
+	if (!authInstance) {
+		authInstance = new Auth(params);
+	}
+	return authInstance;
+}
+

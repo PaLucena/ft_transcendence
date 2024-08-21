@@ -3,10 +3,16 @@ import { navigateTo } from '../../scripts/router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
-export class Profile extends Component {
+class Profile extends Component {
 	constructor() {
+		console.log('Profile Constructor');
 		super('/pages/Profile/profile.html')
 	}
+
+	destroy() {
+		console.log("Profile Custom destroy");
+		this.removeAllEventListeners();
+    }
 
 	init() {
 		this.focusPage();
@@ -81,4 +87,13 @@ export class Profile extends Component {
 			})
 		})
 	}
+}
+
+let profileInstance = null;
+
+export function getProfileInstance(params) {
+	if (!profileInstance) {
+		profileInstance = new Profile(params);
+	}
+	return profileInstance;
 }

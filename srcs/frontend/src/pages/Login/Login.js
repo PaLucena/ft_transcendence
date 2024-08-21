@@ -4,8 +4,9 @@ import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
-export class Login extends Component {
+class Login extends Component {
 	constructor() {
+		console.log('Login Constructor');
 		super('/pages/Login/login.html');
 	}
 
@@ -13,6 +14,11 @@ export class Login extends Component {
 		this.initLoginForm();
 		this.intraLogin();
 	}
+
+	destroy() {
+		console.log("Login Custom destroy");
+		this.removeAllEventListeners();
+    }
 
 	initLoginForm() {
 		var TwoFactorModal = new bootstrap.Modal(document.getElementById('twoFactorModal'), {keyboard: true})
@@ -75,4 +81,13 @@ export class Login extends Component {
 			window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-781a91f2e625f3dc4397483cfabd527da78d78a6d43f5be15bfac2ea1d8fe8c6&redirect_uri=https%3A%2F%2Flocalhost%3A8080%2Fauth&response_type=code";
 		})
 	}
+}
+
+let loginInstance = null;
+
+export function getLoginInstance(params) {
+	if (!loginInstance) {
+		loginInstance = new Login(params);
+	}
+	return loginInstance;
 }
