@@ -7,7 +7,7 @@ import { getFriendsInstance } from '../pages/Friends/Friends.js';
 import { getProfileInstance } from '../pages/Profile/Profile.js';
 import { getAuthInstance } from '../pages/Auth/Auth.js';
 import { getPongInstance } from '../pages/Pong/Pong.js';
-import { renderStaticComponents } from './utils/renderStaticComponents.js';
+import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
 import { onlineSocket } from './utils/OnlineWebsocket.js';
 
 export const routes = {
@@ -104,7 +104,7 @@ export default async function router() {
 
 	async function renderPage(instance, params) {
         try {
-            await renderStaticComponents();
+            await staticComponentsRenderer.render();
             const html = await instance.render();
             document.getElementById('content').innerHTML = html;
 

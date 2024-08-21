@@ -5,7 +5,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 window.addEventListener("popstate", () => {
-	console.log("popstate event triggered");
+	//console.log("popstate event triggered");
 	router();
 });
 
@@ -14,7 +14,7 @@ document.addEventListener("click", (event) => {
 
 	if (clickableElement && clickableElement.hasAttribute("href")) {
 		event.preventDefault();
-		console.log("Navigating to:", clickableElement.getAttribute("href"));
+		//console.log("Navigating to:", clickableElement.getAttribute("href"));
 		navigateTo(clickableElement.getAttribute("href"));
 	}
 });
