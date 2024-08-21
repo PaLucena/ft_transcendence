@@ -28,6 +28,7 @@ export class Play extends Component {
 		tournamentBtn.addEventListener("click", () => {
 			document.getElementById("btns").style.display = "none";
 			document.getElementById("dropdownTournaments").style.display = "block";
+			this.displayTournaments();
 		});
 
 		const	backOne = document.getElementById("backOne");
@@ -133,5 +134,46 @@ export class Play extends Component {
 
 	getTournamentCode(tournamentData) {
 		console.log("Falta hacer el fetch al get_code(request, tournament_id");
+	}
+
+	displayTournaments() {
+		fetch("/api/display_tournaments/", {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			const	displayPublic = data.public_tournaments;
+			const	displayPrivate = data.private_tournaments;
+			if (displayPublic.length === 0)
+				document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
+			else {
+				let	publicContainer = document.getElementById("publicTournamentDisplay");
+				for (let i = 0; displayPublic[i]; i++) {
+					publicContainer.innerHTML += `<button class="btn btn-success display-tournament-item col-10 my-1 rounded">${displayPublic[i].name} ${displayPublic[i].players.length}</div>`;
+				}
+			}
+			if (displayPrivate.length === 0)
+				document.getElementById("privateTournamentDisplay").innerHTML = "No active tournaments";
+			else {
+				let	privateContainer = document.getElementById("privateTournamentDisplay");
+				for (let i = 0; displayPrivate[i]; i++) {
+					privateContainer.innerHTML += `<button class="btn btn-success display-tournament-item col-10 my-1 rounded">${displayPublic[i].name} ${displayPublic[i].players.length}</div>`;
+				}
+			}
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
 	}
 }

@@ -39,12 +39,12 @@ export default async function router() {
 		}
 	});
 
-	console.log("Matched route:", matchedRoute);
-	console.log("Matched params:", matchedParams);
+/* 	console.log("Matched route:", matchedRoute);
+	console.log("Matched params:", matchedParams); */
 
-	const RouteClass = matchedRoute ? routes[matchedRoute] : routes["/404"];
+ 	const RouteClass = matchedRoute ? routes[matchedRoute] : routes["/404"];
 
-	const isProtectedRoute = matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
+/*	const isProtectedRoute = matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
 	if (isProtectedRoute)
 		isAuthenticated = await checkAuthentication();
 
@@ -54,7 +54,7 @@ export default async function router() {
 	if (!isAuthenticated && isProtectedRoute) {
 		navigateTo("/login");
 		return;
-	}
+	} */
 
 	if (RouteClass)
 		await renderPage(RouteClass, matchedParams);

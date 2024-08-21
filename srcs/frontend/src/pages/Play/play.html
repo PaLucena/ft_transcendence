@@ -37,9 +37,7 @@
 						</button>
 					</div>
 				</div>
-				<div class="row h-75 mt-0 align-items-center text-center">
-					<div>No active tournaments</div>
-				</div>
+				<div id="publicTournamentDisplay" class="tournament-display row h-75 mt-0d-flex justify-content-center align-items-center text-center"></div>
 			</div>
 			<div class="row h-45p justify-content-center">
 				<div class="row fs-4 h-25 mb-0 align-items-center">
@@ -50,12 +48,10 @@
 						</button>
 					</div>
 				</div>
-				<div class="row h-75 mt-0 align-items-center text-center">
-					<div>No active tournaments</div>
-				</div>
+				<div id="privateTournamentDisplay" class="tournament-display row h-75 mt-0 d-flex justify-content-center align-items-center"></div>
 			</div>
-			<div class="row h-10p">
-				<div id="backTwo" class="backTwo row w-100 justify-content-center">
+			<div class="row h-10p d-flex align-items-center">
+				<div id="backTwo" class="backTwo col-12 h-75 d-flex justify-content-center">
 					<button class="btn btn-green py-2 w-50"><h4>Back</h4></button>
 				</div>
 			</div>
@@ -70,11 +66,11 @@
 					<div class="modal-body">
 						<form id="tournamentForm">
 							<div class="form-floating mb-3">
-								<input type="text" class="form-control" id="name-input" name="name" placeholder="Tournament name">
+								<input type="text" class="form-control" id="name-input" name="name" placeholder="Tournament name" required>
 								<label for="name">Tournament name</label>
 							</div>
 							<div class="form-floating">
-								<input type="text" class="form-control" id="nickname-input" name="nickname" placeholder="Nickname">
+								<input type="text" class="form-control" id="nickname-input" name="nickname" placeholder="Nickname" required>
 								<label for="nickname">Nickname</label>
 							</div>
 						</form>

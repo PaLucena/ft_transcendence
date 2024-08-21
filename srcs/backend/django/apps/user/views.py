@@ -33,6 +33,7 @@ from django.http import JsonResponse
 @api_view(['GET'])
 @default_authentication_required
 def check_auth(request):
+	print("USER: ", request.user)
 	if request.user.is_authenticated:
 		return JsonResponse({'authenticated': True})
 	else:
