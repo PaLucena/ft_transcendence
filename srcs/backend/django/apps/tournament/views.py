@@ -9,7 +9,7 @@ import random
 from blockchain.views import create_tournament as bc_create_tournament
 from django.contrib.auth.decorators import login_required
 from .utils import add_ai_players
-from .tournament_config import next_match_dependencies, required_matches
+from .tournament_config import next_match_dependencies, required_matches, assignments
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -187,8 +187,9 @@ def remove_participation(request, tournament_id):
 
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-	
 
+
+#match logic
 def assign_matches(tournament):
 	players = tournament.participants
 
@@ -249,4 +250,52 @@ def can_assign_match(tournament, match_id):
 			return False
 	return True
 
-#def assign_match_players(tournament, match):
+
+def create_initial_matches(tournament):
+	players = list(tournament.participants.all())
+	real_players = [player for player in players if not player.is_ai]
+	ai_players = [player for player in players if  player.is_ai]
+	match_id = 1
+	matches = []
+
+	if len(ai_players) >= 4:
+		while match_id <= 4:
+			if real_players:
+				player1 = real_players.pop(0)
+			else:
+				player1 = ai_players.pop(0)
+			player2 = ai_players.pop(0)
+
+			match = Match.objects.create(
+				tournament=tournament,
+				match_id=match_id,
+				player_1=player1,
+				player_2=player2
+			)
+			match_id += 1
+
+	if len(ai_players) < 4:
+		while match_id <= 4:
+			if ai_players:
+				player1 = ai_players.pop(0)
+			else:
+				player1 = real_players.pop(0)
+			player2 = real_players.pop(0)
+
+			match = Match.objects.create(
+				tournament=tournament,
+				match_id=match_id,
+				player_1=player1,
+				player_2=player2
+			)
+			match_id += 1
+			matches.append(match)
+
+		available_matches = [{
+			'match_id': match.match_id,
+			'player_1_id': match.player_1.id if match.player_1 else None,
+			'player_2_id': match.player_2.id if match.player_2 else None,
+			'tournament_id': tournament.id,
+		}for match in matches]
+
+	return matches

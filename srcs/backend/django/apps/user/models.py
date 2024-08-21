@@ -12,6 +12,7 @@ class AppUser(AbstractUser):
 	is_online = models.BooleanField(default=False)
 	image_link = models.URLField(null=True, blank=True)
 	id_deleted = models.BooleanField(default=False)
+	is_ai = models.BooleanField(default=False)
 	created = models.DateTimeField(auto_now_add=True, auto_now=False)
 	api42auth = models.BooleanField(default=False)
 	has_2fa_enabled = models.BooleanField(default=False)

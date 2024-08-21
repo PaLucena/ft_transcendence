@@ -28,3 +28,4 @@ class Match(models.Model):
 	player_2 = models.ForeignKey(AppUser, related_name='player_2', on_delete=models.SET_NULL, null=True, blank=True)
 	player_1_score = models.IntegerField(null=True)
 	player_2_score = models.IntegerField(null=True)
+	winner =  models.ForeignKey(AppUser, related_name='winner', on_delete=models.SET_NULL, null=True, blank=True)
