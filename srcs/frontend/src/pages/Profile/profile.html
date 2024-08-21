@@ -1,14 +1,16 @@
-<div id="rootProfile" class="row">
-	<div id="containerUser" class="col-5">
+<div id="rootProfile" class="d-flex">
+	<div id="containerUser">
 		<div id="userInfo" class="bg-light rounded-5 shadow">
 			<div id="photo" class="row col-10 mx-auto">
-				<div id="photoContainer" class="profile-photo-container col-8 justify-content-center"></div>
+				<div class="profile-photo-container col-4 m-0 d-flex justify-content-center">
+					<img id="photoContainer" class="profile-photo rounded-circle square shadow" style="height: 100%;" alt="Avatar"/>
+				</div>
 			</div>
 			<div id="username" class="d-flex col-8 mt-4 mx-auto align-items-center justify-content-center">
 				<p id="usernamePlaceholder" class="display-6 fw-bold">[error]</p>
 			</div>
 			<div id="friendsNb" class="d-flex col-8 mx-auto align-items-center justify-content-center">
-				<p><span>0</span> friends</p>
+				<p><span id="friendsNbPlaceholder">0</span> friends</p>
 			</div>
 			<div class="row col-8 mx-auto">
 				<div id="editBtn" class="d-flex col mt-5 align-items-center justify-content-center">
@@ -35,7 +37,7 @@
 			</div>
 		</div>
 	</div>
-	<div id="containerStats" class="col-7">
+	<div id="containerStats">
 		<div id="stats" class="row align-items-center justify-content-center bg-light rounded-5 shadow">
 			<div class="text-center">
 				<p class="display-1" style="color: black;">Stats go here</p>

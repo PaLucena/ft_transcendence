@@ -43,10 +43,10 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
-			console.log("User data: ", data);
-			document.getElementById("photoContainer").innerHTML = `<img class="profile-photo rounded-circle col-12 shadow" src="${data["avatar"]}">`
+			//document.getElementById("photoContainer").innerHTML = `<img class="profile-photo h-120 square rounded-circle col-12 shadow" src="${data["avatar"]}">`
+			document.getElementById("photoContainer").src = `${data["avatar"]}`;
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
-			// TODO: reemplazar el número de amigos
+			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
