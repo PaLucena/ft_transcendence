@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
+from blockchain.views import record_match as bc_record_match
 from django.contrib.auth.decorators import login_required
 from .utils import add_ai_players
 from .tournament_config import next_match_dependencies, required_matches, assignments
@@ -89,10 +90,10 @@ def close_tournament(request, tournament_id):
 			}
 			bc_response = bc_create_tournament(data)
 
-			print("HERE, ", user)
 			if bc_response.status_code == 200:
 				#tournament.delete()
 				tournament.is_active = True
+				create_initial_matches(tournament)
 				return Response({"message": "Tournament closed and processed on blockchain successfully."},
 					status=status.HTTP_200_OK)
 			else:
@@ -189,58 +190,61 @@ def remove_participation(request, tournament_id):
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-#match logic
-def assign_matches(tournament):
-	players = tournament.participants
-
-	player_ids = [p.id for p in players]
-	match_order = [
-		# Winner's bracket Round 1
-		(1, player_ids[0], player_ids[1]),
-		(2, player_ids[2], player_ids[3]),
-		(3, player_ids[4], player_ids[5]),
-		(4, player_ids[6], player_ids[7]),
-		# Loser's bracket Round 1
-		(5, None, None), (6, None, None), 
-		# Winner's bracket Round 2
-		(7, None, None), (8, None, None),
-		# Loser's bracket Round 2
-		(9, None, None), (10, None, None),
-		# Winner's bracket Round 3
-		(11, None, None),
-		# Loser's bracket Round 3
-		(12, None, None), 
-		# Loser's final
-		(13, None, None), 
-		# Winner's final
-		(14, None, None)
-	]
-
-	matches = []
-	available_matches = []
-
-	for match_id, p1_id, p2_id in match_order:
-		match = Match.objects.create(
-			tournament=tournament,
-			match_id=match_id,
-			player1=AppUser.objects.get(pk=p1_id) if p1_id else None,
-			player2=AppUser.objects.get(pk=p2_id) if p2_id else None,
-		)
-		matches.append(match)
-		if match_id <= 4:
-			available=True
-	
-	return matches
-
-
+# -- match logic --
 # checks if the next match can be assigned based on the outcome of the current match.
-def assign_next_match(tournament, finished_match_id):
+@api_view(["POST"])
+@default_authentication_required
+def assign_next_match(tournament, finished_match_data):
+	finished_match_id = finished_match_data.get('match_id')
+	tournament = finished_match_data.get('tournament_id')
 	next_possible_matches = next_match_dependencies.get(finished_match_id, [])
+	next_matches = []
 
+	finished_match = Match.objects.get(match_id=finished_match_id, tournament=tournament)
+	if finished_match:
+		finished_match_data = set_winner_and_loser(finished_match_data, finished_match)
+		print("finished_match_data: ", finished_match_data)
+		bc_record_match(finished_match_data)
+	if finished_match_id == 14:
+		tournament_cleanup(tournament)
 	for next_match_id in next_possible_matches:
-		if can_assign_match(tournament, next_match_id):
-			match = Match.objects.get(tournament=tournament, match_id=next_match_id)
-			#assign_match_players(tournament, match)
+		if can_assign_match(tournament, next_match_id) and not Match.objects.filter(match_id=next_match_id).exists():
+			match, created = Match.objects.create(
+				tournament=tournament,
+				match_id=next_match_id
+			)
+			next_matches.append(assign_match_players(tournament, match.match_id))
+
+	return next_matches
+
+
+def set_winner_and_loser(finished_match_data, finished_match):
+	player1_id = finished_match_data.get('player_1_id')
+	player2_id = finished_match_data.get('player_2_id')
+	player1_goals = finished_match_data.get('player_1_goals')
+	player2_goals = finished_match_data.get('player_2_goals')
+
+	player1 = AppUser.objects.get(pk=player1_id)
+	player2 = AppUser.objects.get(pk=player2_id)
+
+	if player1_goals > player2_goals:
+		finished_match.winner = player1
+		finished_match.loser = player2
+
+	elif player1_goals < player2_goals:
+		finished_match.winner = player2
+		finished_match.loser = player1
+
+	else:
+		#delte them from tournament
+		finished_match.winner = None
+		finished_match.loser = None
+
+	finished_match.save()
+	finished_match_data['winner_id'] = finished_match.winner.pk if finished_match.winner else None
+
+	return finished_match_data
+
 
 
 def can_assign_match(tournament, match_id):
@@ -251,6 +255,24 @@ def can_assign_match(tournament, match_id):
 	return True
 
 
+def assign_match_players(tournament, match):
+	assignment = assignments[match.match_id]
+
+	player1_role = list(assignment['player1'].key())[0]
+	player1_match_id = assignment["player1"][player1_role]
+	player1_match = Match.objects.get(tournament=tournament, match_id=player1_match_id)
+	match.player_1 = getattr(player1_match, player1_role)
+
+	player2_role = list(assignment['player2'].key())[0]
+	player2_match_id = assignment["player2"][player2_role]
+	player2_match = Match.objects.get(tournament=tournament, match_id=player2_match_id)
+	match.player_2 = getattr(player2_match, player2_role)
+
+	match.save()
+	return match
+
+
+# tp assign first 4 matches
 def create_initial_matches(tournament):
 	players = list(tournament.participants.all())
 	real_players = [player for player in players if not player.is_ai]
@@ -292,10 +314,15 @@ def create_initial_matches(tournament):
 			matches.append(match)
 
 		available_matches = [{
+			'tournament_id': tournament.id,
 			'match_id': match.match_id,
 			'player_1_id': match.player_1.id if match.player_1 else None,
 			'player_2_id': match.player_2.id if match.player_2 else None,
-			'tournament_id': tournament.id,
-		}for match in matches]
+		} for match in matches]
 
-	return matches
+	return available_matches
+
+
+def tournament_cleanup(tournament):
+	Match.objects.filter(tournament=tournament).delete()
+	tournament.delete()

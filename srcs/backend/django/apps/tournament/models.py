@@ -24,8 +24,12 @@ class Tournament(models.Model):
 
 
 class Match(models.Model):
+	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+	match_id = models.IntegerField(null=True)
 	player_1 = models.ForeignKey(AppUser, related_name='player_1', on_delete=models.SET_NULL, null=True, blank=True)
 	player_2 = models.ForeignKey(AppUser, related_name='player_2', on_delete=models.SET_NULL, null=True, blank=True)
-	player_1_score = models.IntegerField(null=True)
-	player_2_score = models.IntegerField(null=True)
 	winner =  models.ForeignKey(AppUser, related_name='winner', on_delete=models.SET_NULL, null=True, blank=True)
+	loser =  models.ForeignKey(AppUser, related_name='loser', on_delete=models.SET_NULL, null=True, blank=True)
+	
+	class Meta:
+		unique_together = ('tournament', 'match_id')
