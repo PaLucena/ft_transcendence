@@ -67,7 +67,6 @@ contract PongTournament {
             require(tournament.playerExists_[p2Id], "P2 not in tournament");
         }
         require(p1Id != p2Id, "Players error");
-        require(winId == p1Id || winId == p2Id, "Winner is not a player");
 
         matches_[matchId] = Match(tournId, matchId, p1Id, p2Id, p1Sc, p2Sc, winId);
         if (tournId != 0) {

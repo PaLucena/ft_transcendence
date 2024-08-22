@@ -39,3 +39,4 @@ assignments = {
     13: {'player1': {'loser': 11}, 'player2': {'winner': 12}},
     14: {'player1': {'winner': 11}, 'player2': {'winner': 13}},
 }
+
