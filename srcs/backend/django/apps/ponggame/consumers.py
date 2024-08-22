@@ -1,46 +1,79 @@
 import json
-import asyncio
-
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .game_logic import GameLogic
-from .handlers import handle_start, handle_quit, handle_move, send_config, change_theme
+from .game_manager import game_manager
+from .handlers import handle_player_ready, handle_quit, handle_move, handle_resize, send_config
 
 
 class GameConsumer(AsyncWebsocketConsumer):
+
     def __init__(self):
         super().__init__()
         self.room_name = None
-        self.room_group_name = None
-        self.game_logic = GameLogic()
-        self.game_task = None
+        self.game_logic = None
+        self.player_id = None
+        self.player_channel = None
+        self.controls_side = None
 
     async def connect(self):
-        self.room_name = 'pong_game'
-        self.room_group_name = 'pong_game_group'
+        user = self.scope['user']
+        self.player_id = user.id
 
-        # Join room group
+        print(f"Player {self.player_id} connected") # DEBUG
+        print(f"Available rooms: {game_manager.rooms}") # DEBUG
+
+        room = game_manager.get_game_room_by_player(self.player_id)
+
+        if room is None:
+            print(f"Player {self.player_id} has no room") # DEBUG
+            await self.close()
+            return
+
+        print(f"Player {self.player_id} has room {room.get_room_name()}") # DEBUG
+
+        self.game_logic = room.get_game_logic()
+        self.room_name = room.get_room_name()
+
+        if self.player_id == room.player_1_id:
+            print(f"Player {self.player_id} is player 1") # DEBUG
+            self.game_logic.player_1_channel = self.channel_name
+            self.controls_side = 1
+        elif self.player_id == room.player_2_id:
+            print(f"Player {self.player_id} is player 2") # DEBUG
+            self.game_logic.player_2_channel = self.channel_name
+            self.controls_side = 2
+        else:
+            print(f"Player {self.player_id} is not in the room")
+            await self.close()
+            return
+
         await self.channel_layer.group_add(
-            self.room_group_name,
+            self.room_name,
             self.channel_name
         )
-
+        print(f"Player {self.player_id} - room {self.room_name} - side {self.controls_side}")
         await self.accept()
+
         await send_config(self)
 
     async def disconnect(self, close_code):
-        # Leave room group
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
-        if self.game_task:
-            self.game_task.cancel()
+        if self.game_logic:
+            # Disconnect from room
+            if self.player_id == 1:
+                self.game_logic.player_1_channel = None
+            elif self.player_id == 2:
+                self.game_logic.player_2_channel = None
 
-    async def receive(self, text_data):
+            # Leave room group
+            await self.channel_layer.group_discard(
+                self.room_name,
+                self.channel_name
+            )
+
+    async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
 
-        if data['type'] == 'start':
-            await handle_start(self)
+        if data['type'] == 'player_ready':
+            await handle_player_ready(self, data['player'])
 
         elif data['type'] == 'quit':
             await handle_quit(self)
@@ -48,9 +81,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         elif data['type'] == 'move':
             await handle_move(self, data['player'], data['direction'])
 
-        elif data['type'] == 'ready':
-            self.game_logic.player_1_ready = True
-            self.game_logic.player_2_ready = True
+        elif data['type'] == 'resize':
+            await handle_resize(self)
 
-        elif data['type'] == 'theme':
-            await change_theme(self, self.game_logic.theme)
+    async def game_message(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps(message))

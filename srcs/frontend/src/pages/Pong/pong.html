@@ -1,34 +1,38 @@
 <div class="container containerPong">
-	<div class="score-board">
-		<div class="player-1-container">
-			<div class="player_1_name"><h1>name</h1></div>
-			<img class="player_1_avatar avatar" src="assets/images/test_avatar_1.jpg" alt="avatar 1">
-			<h1 class="player_1_score">0</h1>
+	<div class="score-bar">
+		<div class="player-container player-1-container">
+			<div class="player-name player-1-name"><h1>name</h1></div>
+			<img class="player-avatar player-1-avatar" src="assets/images/default-avatar.png" alt="avatar 1">
+			<h1 class="player-score player-1-score">0</h1>
 		</div>
-		<div class="score-central">
+		<div class="central-container">
 			<div><h1>Score</h1></div>
-			<div class="win_goals">6 (dif.2)</div>
+			<div class="win-info">6 (dif.2)</div>
 		</div>
-		<div class="player-2-container">
-			<h1 class="player_2_score">0</h1>
-			<img class="player_2_avatar avatar" src="assets/images/test_avatar_2.jpg" alt="avatar 2">
-			<div class="player_2_name"><h1>name</h1></div>
+		<div class="player-container player-2-container">
+			<h1 class="player-score player-2-score">0</h1>
+			<img class="player-avatar player-2-avatar" src="assets/images/default-avatar.png" alt="avatar 2">
+			<div class="player-name player-2-name"><h1>name</h1></div>
 		</div>
 	</div>
 	<div class="board">
-		<div class="player_1_paddle paddle"></div>
-		<div class="player_2_paddle paddle"></div>
+		<div class="paddle player-1-paddle"></div>
+		<div class="paddle player-2-paddle"></div>
 		<div class="ball">
-			<div class="ball_effect"></div>
+			<div class="ball-effect"></div>
 		</div>
 		<div class="board-info">
-			<div class="controls_1">W(up)<br>S(down)</div>
-			<div class="message">
-				<div class="main-message">Press Enter to Start</div>
-				<div class="sub-message-1"></div>
-				<div class="sub-message-2"></div>
+			<div class="board-message">
+				<div class="message-line-super"></div>
+				<div class="message-line-main">Press to Start</div>
+				<div class="message-line-center"></div>
+				<div class="message-line-sub-1"></div>
+				<div class="message-line-sub-2"></div>
 			</div>
-			<div class="controls_2">Arrow Up<br>Arrow Down</div>
+			<div class="controls-info">
+				<div class="controls-1">W(up)<br>S(down)<br><br>press "space"</div>
+				<div class="controls-2">Arrow Up<br>Arrow Down<br><br>press "enter"</div>
+			</div>
 		</div>
 	</div>
 </div>
