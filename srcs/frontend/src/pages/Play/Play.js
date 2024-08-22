@@ -1,8 +1,8 @@
 import { Component } from '../../scripts/Component.js';
-import { navigateTo } from '../../scripts/router.js';
+import { navigateTo } from '../../scripts/Router.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 
-class Play extends Component {
+export class Play extends Component {
 	constructor() {
 		console.log('Play Constructor');
 		super('/pages/Play/play.html');
@@ -102,14 +102,5 @@ class Play extends Component {
 			})
 		})
 	}
-}
-
-let playInstance = null;
-
-export function getPlayInstance(params) {
-	if (!playInstance) {
-		playInstance = new Play(params);
-	}
-	return playInstance;
 }
 

@@ -1,12 +1,12 @@
-import router, { navigateTo, navigateToOnBootup } from './router.js';
+import routerInstance, { navigateTo, navigateToOnBootup } from './Router.js';
 
 window.addEventListener("DOMContentLoaded", () => {
 	navigateToOnBootup();
 });
 
 window.addEventListener("popstate", () => {
-	//console.log("popstate event triggered");
-	router();
+	// console.log("popstate event triggered");
+	routerInstance.router();
 });
 
 document.addEventListener("click", (event) => {

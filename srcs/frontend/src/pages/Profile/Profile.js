@@ -1,9 +1,9 @@
 import { Component } from '../../scripts/Component.js';
-import { navigateTo } from '../../scripts/router.js';
+import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
-class Profile extends Component {
+export class Profile extends Component {
 	constructor() {
 		console.log('Profile Constructor');
 		super('/pages/Profile/profile.html')
@@ -87,13 +87,4 @@ class Profile extends Component {
 			})
 		})
 	}
-}
-
-let profileInstance = null;
-
-export function getProfileInstance(params) {
-	if (!profileInstance) {
-		profileInstance = new Profile(params);
-	}
-	return profileInstance;
 }

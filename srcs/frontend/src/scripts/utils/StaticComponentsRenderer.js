@@ -1,7 +1,7 @@
 import { Component } from '../Component.js';
 import { Navbar } from "../../components/Navbar/Navbar.js";
 import { ChatModal } from '../../components/ChatModal/ChatModal.js';
-import { routes } from '../router.js';
+import routerInstance from '../Router.js'
 
 class StaticComponentsRenderer {
     constructor() {
@@ -23,7 +23,7 @@ class StaticComponentsRenderer {
 
     async render() {
         const currentPath = window.location.pathname.replace(/\/+$/, '');
-        const isValidRoute = Object.keys(routes).some(route => {
+        const isValidRoute = Object.keys(routerInstance.routes).some(route => {
             const routeRegex = new RegExp(`^${route.replace(/:\w+/g, '[^/]+')}/?$`);
             return routeRegex.test(currentPath);
         });

@@ -1,6 +1,6 @@
 import { Component } from "../../scripts/Component.js";
 
-class Pong extends Component {
+export class Pong extends Component {
 	constructor() {
 		console.log('Pong Constructor');
 		super("/pages/Pong/pong.html");
@@ -208,13 +208,4 @@ class Pong extends Component {
 			}
 		}
 	}
-}
-
-let pongInstance = null;
-
-export function getPongInstance(params) {
-	if (!pongInstance) {
-		pongInstance = new Pong(params);
-	}
-	return pongInstance;
 }
