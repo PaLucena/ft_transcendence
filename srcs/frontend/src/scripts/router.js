@@ -9,6 +9,7 @@ import { getAuthInstance } from '../pages/Auth/Auth.js';
 import { getPongInstance } from '../pages/Pong/Pong.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
 import { onlineSocket } from './utils/OnlineWebsocket.js';
+import { handleResponse } from './utils/rtchatUtils.js'
 
 export const routes = {
 	'/404': getNotFoundInstance,
@@ -44,17 +45,18 @@ export default async function router() {
 	const getRouteInstance = matchedRoute ? routes[matchedRoute] : routes['/404'];
     const newComponent = getRouteInstance(matchedParams);
 
-	const isProtectedRoute = matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
+	const isProtectedRoute = matchedRoute && matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
 
-	if (isProtectedRoute)
-		isAuthenticated = await checkAuthentication();
+	if (isProtectedRoute) {
+		const isAuthenticated = await checkAuthentication();
+		if (!isAuthenticated) {
+			navigateTo("/login");
+			return;
+		}
 
-	if (isAuthenticated && (!onlineSocket.onlineSocket || onlineSocket.onlineSocket.readyState === WebSocket.CLOSED) && isProtectedRoute)
-		onlineSocket.initWebSocket();
-
-	if (!isAuthenticated && isProtectedRoute) {
-		navigateTo("/login");
-		return;
+		if (!onlineSocket.onlineSocket || onlineSocket.onlineSocket.readyState === WebSocket.CLOSED) {
+            onlineSocket.initWebSocket();
+        }
 	}
 
 	if (currentComponent && typeof currentComponent.destroy === 'function') {
@@ -74,14 +76,20 @@ export default async function router() {
 		try {
 			const response = await fetch('api/check-auth/', {
 				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
 				credentials: 'include'
 			});
-			if (response.ok) {
-				const data = await response.json();
-				return data.authenticated;
-			} else {
-				return false;
-			}
+
+			let is_auth = false;
+
+			await handleResponse(response, data => {
+				is_auth = data.authenticated;
+			});
+
+			return is_auth;
+
 		} catch (error) {
 			console.error("Error checking authentication:", error);
 			return false;
