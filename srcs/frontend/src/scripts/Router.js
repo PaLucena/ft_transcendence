@@ -19,6 +19,7 @@ class Router {
             '/login': () => new Login(),
             '/signup': () => new Signup(),
             '/play': () => new Play(),
+            '/play/:playId': params => new Play(params),
             '/friends': () => new Friends(),
             '/profile': () => new Profile(),
             '/auth': () => new Auth(),
@@ -49,12 +50,14 @@ class Router {
         let matchedParams = {};
 
         Object.keys(this.routes).forEach(route => {
-            const routeRegex = new RegExp(`^${route.replace(/:\w+/g, '[^/]+')}/?$`);
-            if (routeRegex.test(path)) {
+            const routeRegex = new RegExp(`^${route.replace(/:\w+/g, '([^/]+)')}/?$`);
+            const match = path.match(routeRegex);
+            if (match) {
                 matchedRoute = route;
                 matchedParams = this.extractParams(route, path);
             }
         });
+
 
         const routeFactory = matchedRoute ? this.routes[matchedRoute] : this.routes['/404'];
         const isProtectedRoute = matchedRoute && matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
@@ -78,7 +81,7 @@ class Router {
             this.currentComponent = null;
         }
 
-        this.currentComponent = routeFactory();
+        this.currentComponent = routeFactory(matchedParams);
 
         if (this.currentComponent) {
             await this.renderPage(this.currentComponent);
@@ -92,7 +95,7 @@ class Router {
 
     async checkAuthentication() {
         try {
-            const response = await fetch('api/check-auth/', {
+            const response = await fetch('/api/check-auth/', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

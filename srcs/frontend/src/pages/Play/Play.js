@@ -3,9 +3,9 @@ import { navigateTo } from '../../scripts/Router.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Play extends Component {
-	constructor() {
+	constructor(params = {}) {
 		console.log('Play Constructor');
-		super('/pages/Play/play.html');
+		super('/pages/Play/play.html', params);
 	}
 
 	destroy() {
@@ -14,6 +14,7 @@ export class Play extends Component {
     }
 
 	init() {
+		console.log("Play Params!!", this.params);
 		this.setupEventListeners();
 		//this.joinTournament();
 	}
