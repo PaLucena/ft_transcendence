@@ -36,7 +36,17 @@ class GameManager:
         # Set the controls mode
         game_logic.controls_mode = controls_mode
 
-        # Start the game loop
+        await self.run_game_loop(game_room, game_logic)
+
+        # Get the game results
+        result = game_room.get_result(tournament_id, match_id)
+
+        # Remove the room
+        self.remove_game_room(game_room_id)
+
+        return result
+
+    async def run_game_loop(self, game_room, game_logic):
         while game_logic.game_state != "game_over":
             start_time = time.time()
             await game_logic.game_loop()
@@ -46,14 +56,6 @@ class GameManager:
                 await send_score(self.channel_layer, game_room.game_room_id, game_logic)
             elapsed_time = time.time() - start_time
             await asyncio.sleep(max(0.0, game_logic.FRAME_TIME - elapsed_time))
-
-        # Get the game results
-        result = game_room.get_result(tournament_id, match_id)
-
-        # Remove the room
-        self.remove_game_room(game_room_id)
-
-        return result
 
     def create_game_room(self, player_1_id, player_2_id):
         room_id = f"{player_1_id}_vs_{player_2_id}"
@@ -88,6 +90,8 @@ class GameRoom:
         self.player_1_id = player_1_id
         self.player_2_id = player_2_id
         self.game_logic = GameLogic()
+        self.game_logic.player_1_id = player_1_id
+        self.game_logic.player_2_id = player_2_id
 
     def get_room_name(self):
         return self.game_room_id
@@ -112,10 +116,16 @@ class GameRoom:
 game_manager = GameManager()
 
 
-async def test_game(tournament_id=1, match_id=1):
-    result = await game_manager.start_match(tournament_id, match_id, player_1_id=2, player_2_id=3, controls_mode='solo')
-    print("Result:")
-    print(f"Player 1 (ID: {result['player_1_id']}) score: {result['player_1_goals']}")
-    print(f"Player 2 (ID: {result['player_2_id']}) score: {result['player_2_goals']}")
-
-asyncio.run(test_game())
+# async def test_game(tournament_id, match_id, player_1_id, player_2_id):
+#     result = await game_manager.start_match(tournament_id, match_id, player_1_id, player_2_id, controls_mode='solo')
+#     print("Result:")
+#     print(f"Player 1 (ID: {result['player_1_id']}) score: {result['player_1_goals']}")
+#     print(f"Player 2 (ID: {result['player_2_id']}) score: {result['player_2_goals']}")
+#
+# async def run_multiple_games():
+#     await asyncio.gather(
+#         test_game(1, 1, 2, 3),
+#         test_game(1, 2, 4, 5)
+#     )
+#
+# asyncio.run(run_multiple_games())

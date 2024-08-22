@@ -7,7 +7,7 @@ class GameLogic:
     PADDLE_SPEED = 4
     BALL_SPEED_INIT = 6
     BALL_SPEED_INC = 0.5
-    GOALS_TO_WIN = 2
+    GOALS_TO_WIN = 5
     GOALS_DIFFERENCE = 1
     INIT_COUNTDOWN = 3
     CONNECT_TIMEOUT = 60
@@ -42,12 +42,14 @@ class GameLogic:
     # Game variables
     theme = "default"
     game_state = "waiting"
-    player_1_ready = False
-    player_2_ready = False
-    controls_mode = "duo"
-    ai_mode = 0
+    player_1_id = None
+    player_2_id = None
+    player_1_ready = True
+    player_2_ready = True
     player_1_goals = 0
     player_2_goals = 0
+    controls_mode = "duo"
+    ai_mode = 0
     countdown = 0
     timeout = 0
 
@@ -106,11 +108,11 @@ class GameLogic:
     def check_goal(self):
         if self.ball_x < self.GOAL_TAB_MARGIN:
             self.player_2_goals += 1
-            print("Goal player 2", "Score: ", self.player_1_goals, "-", self.player_2_goals) # DEBUG
+            print("Goal player", self.player_2_id, " Score:", self.player_1_goals, "-", self.player_2_goals) # DEBUG
             return 2
         if self.ball_x > self.TABLE_WIDTH - self.GOAL_TAB_MARGIN:
             self.player_1_goals += 1
-            print("Goal player 1", "Score: ", self.player_1_goals, "-", self.player_2_goals) # DEBUG
+            print("Goal player", self.player_1_id, " Score:", self.player_1_goals, "-", self.player_2_goals) # DEBUG
             return 1
         return 0
 
