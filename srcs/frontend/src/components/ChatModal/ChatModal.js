@@ -24,6 +24,7 @@ export class ChatModal extends Component {
         this.webSocketHandler.closeWebSocket();
         this.removeAllEventListeners();
         this.uiSetup.removeMessageFormEvents();
+        this.uiSetup.removeOnlineUpdateListeners();
     }
 
     async init() {

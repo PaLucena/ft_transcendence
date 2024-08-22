@@ -108,6 +108,12 @@ export class UISetup {
         }
     }
 
+    removeOnlineUpdateListeners() {
+        if (this.chatModal.chatRenderer.onlineUsersUpdatedListener) {
+            this.chatModal.chatRenderer.eventEmitter.off('onlineUsersUpdated', this.chatModal.chatRenderer.onlineUsersUpdatedListener);
+        }
+    }
+
     setupScrollEvent() {
         const chatMessagesContainer = document.getElementById('chat_messages_container');
 
