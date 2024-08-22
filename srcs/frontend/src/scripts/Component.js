@@ -2,7 +2,20 @@ export class Component {
 	constructor(rout, params = {}) {
 		this.rout = rout;
 		this.params = params;
+        this.eventListeners = [];
 	};
+
+    addEventListener(element, event, handler) {
+        element.addEventListener(event, handler);
+        this.eventListeners.push({ element, event, handler });
+    }
+
+    removeAllEventListeners() {
+        this.eventListeners.forEach(({ element, event, handler }) => {
+            element.removeEventListener(event, handler);
+        });
+        this.eventListeners = [];
+    }
 
 	async render() {
 		const html = await this.fetchHtmlFromFile(this.rout);
@@ -26,26 +39,30 @@ export class Component {
 		return `<div>Page route not defined.</div>`;
 	}
 
-	static async renderComponent(ComponentClass, placeholderId) {
-		try {
-			const component = new ComponentClass();
-			const componentHtml = await component.render();
-			const placeholder = document.getElementById(placeholderId);
-			if (placeholder) {
-				placeholder.innerHTML = componentHtml;
-				if (typeof component.init === 'function') {
-					await component.init();
-				}
-			} else {
-				console.warn(`Placeholder with id "${placeholderId}" not found.`);
-			}
-		} catch (error) {
-			console.error("Error rendering component:", error);
-		}
-	}
+	static async renderComponent(instance, placeholderId) {
+        try {
+            const componentHtml = await instance.render();
+            const placeholder = document.getElementById(placeholderId);
+            if (placeholder) {
+                placeholder.innerHTML = componentHtml;
+                if (typeof instance.init === 'function') {
+                    await instance.init();
+                }
+            } else {
+                console.warn(`Placeholder with id "${placeholderId}" not found.`);
+            }
+        } catch (error) {
+            console.error("Error rendering component:", error);
+        }
+    }
 
 	async init() {
 
 	}
+
+    destroy() {
+        console.log(`Destroying ${this.constructor.name}`);
+        this.removeAllEventListeners();
+    }
   }
 

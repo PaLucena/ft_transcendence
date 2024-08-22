@@ -1,8 +1,9 @@
 import { Component } from "../../scripts/Component.js";
-import { navigateTo } from '../../scripts/router.js';
+import { navigateTo } from '../../scripts/Router.js';
 
 export class Auth extends Component {
 	constructor() {
+		console.log('Auth Constructor');
 		super("/pages/Auth/auth.html")
 	}
 

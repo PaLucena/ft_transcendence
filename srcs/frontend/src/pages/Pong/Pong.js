@@ -3,8 +3,14 @@ import { InputController } from "./InputController.js";
 
 export class Pong extends Component {
 	constructor() {
+		console.log('Pong Constructor');
 		super("/pages/Pong/pong.html");
 	}
+
+	destroy() {
+		console.log("Pong Custom destroy");
+		this.removeAllEventListeners();
+    }
 
 	init() {
 		this.initPong();
