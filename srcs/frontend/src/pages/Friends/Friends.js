@@ -2,6 +2,7 @@ import { Component } from '../../scripts/Component.js';
 
 export class Friends extends Component {
 	constructor() {
+		console.log('Friends Constructor');
 		super('/pages/Friends/friends.html')
 	}
 

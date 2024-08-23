@@ -1,11 +1,12 @@
 import { Component } from '../../scripts/Component.js';
-import { navigateTo } from '../../scripts/router.js';
+import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
 export class Login extends Component {
 	constructor() {
+		console.log('Login Constructor');
 		super('/pages/Login/login.html');
 	}
 
@@ -13,6 +14,11 @@ export class Login extends Component {
 		this.initLoginForm();
 		this.intraLogin();
 	}
+
+	destroy() {
+		console.log("Login Custom destroy");
+		this.removeAllEventListeners();
+    }
 
 	initLoginForm() {
 		var TwoFactorModal = new bootstrap.Modal(document.getElementById('twoFactorModal'), {keyboard: true})

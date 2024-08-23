@@ -32,8 +32,6 @@ class OnlineWebsocket {
                 return;
             }
 
-			console.log('Received data:', data);
-
 			if (data.online_users) {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
             } else {
@@ -47,8 +45,7 @@ class OnlineWebsocket {
     handleClose(event) {
         if (!event.wasClean) {
             console.error('Online socket closed unexpectedly:', event.reason || 'Unknown reason');
-            // customAlert('danger', 'An unexpected disconnection has occurred. Reconnecting...', 5000);
-            // setTimeout(() => this.initWebSocket(), 5000);
+            //setTimeout(() => this.initWebSocket(), 5000);
         }
     }
 

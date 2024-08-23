@@ -5,9 +5,11 @@ export class ChatRenderer {
         this.chatModal = chatModal;
 		this.eventEmitter = eventEmitter;
 
-        this.eventEmitter.on('onlineUsersUpdated', (onlineUsers) => {
+		this.onlineUsersUpdatedListener = (onlineUsers) => {
             this.updateOnlineStatus(onlineUsers);
-        });
+        };
+
+		this.eventEmitter.on('onlineUsersUpdated', this.onlineUsersUpdatedListener);
     }
 
 	updateOnlineStatus(onlineUsers) {
