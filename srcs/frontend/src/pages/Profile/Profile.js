@@ -1,20 +1,35 @@
 import { Component } from '../../scripts/Component.js';
-import { navigateTo } from '../../scripts/router.js'
-import { closeUserWebSocket } from '../../scripts/websocket.js';
-import { getCSRFToken } from '../../scripts/utils/csrf.js'
+import { navigateTo } from '../../scripts/Router.js';
+import { getCSRFToken } from '../../scripts/utils/csrf.js';
+import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
 
 // import { showQRmodal } from '../../components/Show2faQRModal'
 
 export class Profile extends Component {
 	constructor() {
+		console.log('Profile Constructor');
 		super('/pages/Profile/profile.html')
 	}
 
+	destroy() {
+		console.log("Profile Custom destroy");
+		this.removeAllEventListeners();
+    }
+
 	init() {
+		this.focusPage();
 		this.logout();
 		this.editUserBtn();
 		this.saveInfoBtn();
+	}
+
+	focusPage() {
+		let navItems = document.querySelectorAll('[id^="navItem"]');
+		navItems.forEach(navItem => {
+			navItem.style.border = "";
+		});
+		document.getElementById("navItemProfile").style.border = "2px solid #edeef0";
 	}
 
 	editUserBtn() {
@@ -46,7 +61,7 @@ export class Profile extends Component {
 				credentials: 'include'
 			})
 			.then(response => {
-				closeUserWebSocket();
+				onlineSocket.closeWebSocket();
 				console.log("Respuesta a logout: ", response); // TODO: esto es debuggeo
 				navigateTo("/login");
 			})

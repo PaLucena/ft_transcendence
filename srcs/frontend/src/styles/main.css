@@ -53,3 +53,7 @@ nav {
 .btn-light, .bg-light {
 	background-color: #edeef0;
 }
+
+.text-light {
+	color: white;
+}

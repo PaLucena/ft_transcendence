@@ -1,6 +1,4 @@
-from pickletools import read_uint1
 from sqlite3 import IntegrityError
-from urllib import response
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import AbstractUser
@@ -12,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, logout
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 import json
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
@@ -24,12 +22,10 @@ import requests
 from .utils import set_nickname, upload_avatar, get_friend_count
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
-from django.views.decorators.csrf import csrf_exempt
 from .decorators import default_authentication_required
 from django.http import JsonResponse
 from twofactor.views import Has2faEnabled
 
-@csrf_exempt
 @api_view(['GET'])
 @default_authentication_required
 def check_auth(request):
@@ -37,6 +33,7 @@ def check_auth(request):
 		return JsonResponse({'authenticated': True})
 	else:
 		return JsonResponse({'authenticated': False}, status=401)
+
 
 @api_view(["GET"])
 @default_authentication_required
@@ -47,11 +44,12 @@ def get_user_data(request):
 			'username': user.username,
 			'avatar': user.avatar,
 			'email': user.email,
-			'number_of_friends': user.get_friend_count(user)
+			'number_of_friends': get_friend_count(user)
 		}
 		return Response(user_data, status=status.HTTP_200_OK)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(["POST"])
 def signup(request):
@@ -103,7 +101,7 @@ def login(request):
 	else:
 		return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-#shit
+#...
 @api_view(["GET"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -268,7 +266,6 @@ def get_friends(request):
     }
 
     return Response(response_data, status=status.HTTP_200_OK)
-
 
 
 @api_view (["GET"])

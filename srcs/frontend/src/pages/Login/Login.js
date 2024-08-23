@@ -1,12 +1,13 @@
 import { Component } from '../../scripts/Component.js';
-import { navigateTo } from '../../scripts/router.js'
-import { initUserWebSocket } from '../../scripts/websocket.js'
-import { getCSRFToken } from '../../scripts/utils/csrf.js'
+import { navigateTo } from '../../scripts/Router.js';
+import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
+import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 import { initTwoFactorAuth } from '../../components/Get2faModal/Get2faModal.js'; // Adjust path as needed
 
 export class Login extends Component {
 	constructor() {
+		console.log('Login Constructor');
 		super('/pages/Login/login.html');
 	}
 
@@ -14,6 +15,11 @@ export class Login extends Component {
 		this.initLoginForm();
 		this.intraLogin();
 	}
+
+	destroy() {
+		console.log("Login Custom destroy");
+		this.removeAllEventListeners();
+    }
 
 	initLoginForm() {
 		$('#username').find('[autofocus]').focus();
@@ -56,7 +62,7 @@ export class Login extends Component {
 					if (data.has_2fa == true) {
 						initTwoFactorAuth(jsonData);
 					} else {
-						initUserWebSocket();
+						onlineSocket.initWebSocket();
 						customAlert('success', 'Login successful', 3000);
 						navigateTo("/play");
 					}

@@ -1,58 +1,87 @@
-<div id="rootPlay" class="row align-items-center justify-content-center">
-	<div id="gifContainer" class="container position-relative align-items-center">
-		<div id="pongGIF" class="row w-100 justify-content-center">
-			<img src="assets/images/pong.gif" alt="Pong">
+<div class="rootPlay row align-items-center justify-content-center">
+	<div class="gifContainer container position-relative align-items-center">
+		<div class="pongGIF row w-100 justify-content-center">
+			<img src="/assets/images/pong.gif" alt="Pong">
 		</div>
 	</div>
-	<div id="btnsContainer" class="col-12 col-md-6 col-xl-4 justify-content-center align-items-center">
-		<div id="btns">
-			<div id="oneVSone" class="row col-12 justify-content-center">
-				<button id="oneVSoneBtn" class="btn btn-green py-4"><h1>1 vs 1</h1></button>
+	<div" class="btnsContainer col-12 col-md-6 col-xl-4 justify-content-center align-items-center">
+		<div id="btns" class="btns">
+			<div class="oneVSone row col-12 justify-content-center">
+				<button id="oneVSoneBtn" class="oneVSoneBtn btn btn-green py-4 text-light"><h1>1 vs 1</h1></button>
 			</div>
-			<div id="tournament" class="row w-100 justify-content-center">
-				<button id="tournamentBtn" class="btn btn-green py-4"><h1>Tournament</h1></button>
-			</div>
-		</div>
-		<div id="dropdownOne">
-			<div id="vsIA" class="row col-12 justify-content-center">
-				<button class="btn btn-green py-4"><h2>vs IA</h2></button>
-			</div>
-			<div id="local" class="row w-100 justify-content-center">
-				<button class="btn btn-green py-4" href="/pong"><h2>Local</h2></button>
-			</div>
-			<div id="online" class="row w-100 justify-content-center">
-				<button class="btn btn-green py-4"><h2>Online</h2></button>
-			</div>
-			<div id="backOne" class="row w-100 justify-content-center">
-				<button class="btn btn-green py-2 w-50"><h4>Back</h4></button>
+			<div class="tournament row w-100 justify-content-center">
+				<button id="tournamentBtn" class="tournamentBtn btn btn-green py-4 text-light"><h1>Tournament</h1></button>
 			</div>
 		</div>
-		<div id="dropdownTwo" class="container bg-light rounded-3">
-			<div class="row border-bottom justify-content-center" style="height: 45%;">
+		<div id="dropdownOneVsOne" class="dropdownOneVsOne">
+			<div class="vsIA row col-12 justify-content-center">
+				<button class="btn btn-green py-4 text-light"><h2>vs IA</h2></button>
+			</div>
+			<div class="local row w-100 justify-content-center">
+				<button class="btn btn-green py-4 text-light" href="/pong"><h2>Local</h2></button>
+			</div>
+			<div class="online row w-100 justify-content-center">
+				<button class="btn btn-green py-4 text-light"><h2>Online</h2></button>
+			</div>
+			<div id="backOne" class="backOne row w-100 justify-content-center">
+				<button class="btn btn-green py-2 w-50 text-light"><h4>Back</h4></button>
+			</div>
+		</div>
+		<div id="dropdownTournaments" class="dropdownTournaments container bg-light rounded-3">
+			<div class="row h-45p justify-content-center border-bottom">
 				<div class="row fs-4 h-25 mb-0 align-items-center">
 					<div class="col-8 text-end">Public tournaments</div>
 					<div class="col-4">
-						<button class="btn btn-green w-50" onclick="alert('Work in progress')"><span class="fs-4">+</span></button>
+						<button id="plusPublicBtn" class="btn btn-green w-50" data-bs-toggle="modal" data-bs-target="#tournamentModal">
+							<span class="fs-4">+</span>
+						</button>
 					</div>
 				</div>
 				<div class="row h-75 mt-0 align-items-center text-center">
 					<div>No active tournaments</div>
 				</div>
 			</div>
-			<div class="row justify-content-center" style="height: 45%;">
+			<div class="row h-45p justify-content-center">
 				<div class="row fs-4 h-25 mb-0 align-items-center">
 					<div class="col-8 text-end">Private tournaments</div>
 					<div class="col-4">
-						<button class="btn btn-green w-50" onclick="alert('Work in progress')"><span class="fs-4">+</span></button>
+						<button id="plusPrivateBtn" class="btn btn-green w-50" data-bs-toggle="modal" data-bs-target="#tournamentModal">
+							<span class="fs-4">+</span>
+						</button>
 					</div>
 				</div>
 				<div class="row h-75 mt-0 align-items-center text-center">
 					<div>No active tournaments</div>
 				</div>
 			</div>
-			<div class="row" style="height: 10%;">
-				<div id="backTwo" class="row w-100 justify-content-center">
+			<div class="row h-10p">
+				<div id="backTwo" class="backTwo row w-100 justify-content-center">
 					<button class="btn btn-green py-2 w-50"><h4>Back</h4></button>
+				</div>
+			</div>
+		</div>
+		<div class="modal-tournament modal fade" id="tournamentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5" id="exampleModalLabel">New tournament</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form id="tournamentForm">
+							<div class="form-floating mb-3">
+								<input type="text" class="form-control" id="name" name="name" placeholder="Tournament name">
+								<label for="name">Tournament name</label>
+							</div>
+							<div class="form-floating">
+								<input type="text" class="form-control" id="nickname" name="nickname" placeholder="Nickname">
+								<label for="nickname">Nickname</label>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer d-flex justify-content-center">
+						<button type="submit" form="tournamentForm" class="btn btn-primary">Create</button>
+					</div>
 				</div>
 			</div>
 		</div>

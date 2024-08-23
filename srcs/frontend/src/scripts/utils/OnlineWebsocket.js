@@ -32,39 +32,35 @@ class OnlineWebsocket {
                 return;
             }
 
-			console.log('Received data:', data);
-
 			if (data.online_users) {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
             } else {
                 this.handleError(null, 'Invalid data format received.');
-                customAlert('danger', 'Error processing online user data', 5000);
             }
-
         } catch (error) {
             this.handleError(null, error);
-            customAlert('danger', 'Error on processing message', 5000);
         }
     }
 
     handleClose(event) {
         if (!event.wasClean) {
             console.error('Online socket closed unexpectedly:', event.reason || 'Unknown reason');
-            // customAlert('danger', 'An unexpected disconnection has occurred. Reconnecting...', 5000);
-            // setTimeout(() => this.initWebSocket(), 5000);
+            //setTimeout(() => this.initWebSocket(), 5000);
         }
     }
 
     handleError(errorCode, errorMessage) {
         switch (errorCode) {
             case 404:
-                customAlert('danger', 'Resource not found. Please try again.', 5000);
+                customAlert('danger', 'Resource not found.', 5000);
                 break;
 			case 403:
-				customAlert('danger', 'You do not have permission to perform this action.', 5000);
+                customAlert('danger', 'You do not have permission to perform this action.', 5000);
+                this.closeWebSocket();
 				break;
             case 500:
                 customAlert('danger', 'An internal server error occurred.', 5000);
+                this.closeWebSocket();
                 break;
             default:
                 console.error('Critical error:', errorMessage);

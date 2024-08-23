@@ -23,18 +23,16 @@ def create_tournament(data):
 
 
 @csrf_exempt
-def record_match(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
+def record_match(data):
         tourn_id = data.get('tournament_id')
         match_id = data.get('match_id')
-        p1_id = data.get('player1_id')
-        p2_id = data.get('player2_id')
-        p1_sc = data.get('player1_score')
-        p2_sc = data.get('player2_score')
+        p1_id = data.get('player_1_id')
+        p2_id = data.get('player_2_id')
+        p1_sc = data.get('player_1_goals')
+        p2_sc = data.get('player_2_goals')
         win_id = data.get('winner_id')
 
-        required_keys = ['tournament_id', 'match_id', 'player1_id', 'player2_id', 'player1_score', 'player2_score', 'winner_id']
+        required_keys = ['tournament_id', 'match_id', 'player_1_id', 'player_2_id', 'player_1_goals', 'player_2_goals', 'winner_id']
         if not all(key in data for key in required_keys):
             return JsonResponse({'error': 'Invalid input'}, status=400)
 

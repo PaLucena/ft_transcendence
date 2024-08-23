@@ -1,14 +1,12 @@
-import router, { navigateTo, navigateToOnBootup } from './router.js';
-import { onlineSocket } from './utils/OnlineWebsocket.js';
+import routerInstance, { navigateTo, navigateToOnBootup } from './Router.js';
 
 window.addEventListener("DOMContentLoaded", () => {
 	navigateToOnBootup();
-    //onlineSocket.initWebSocket();
 });
 
 window.addEventListener("popstate", () => {
-	console.log("popstate event triggered");
-	router();
+	// console.log("popstate event triggered");
+	routerInstance.router();
 });
 
 document.addEventListener("click", (event) => {
@@ -16,7 +14,7 @@ document.addEventListener("click", (event) => {
 
 	if (clickableElement && clickableElement.hasAttribute("href")) {
 		event.preventDefault();
-		console.log("Navigating to:", clickableElement.getAttribute("href"));
+		//console.log("Navigating to:", clickableElement.getAttribute("href"));
 		navigateTo(clickableElement.getAttribute("href"));
 	}
 });

@@ -1,9 +1,9 @@
 import { Component } from "../../scripts/Component.js";
-import { navigateTo } from '../../scripts/router.js';
-import { initUserWebSocket } from '../../scripts/websocket.js'
+import { navigateTo } from '../../scripts/Router.js';
 
 export class Auth extends Component {
 	constructor() {
+		console.log('Auth Constructor');
 		super("/pages/Auth/auth.html")
 	}
 
@@ -30,7 +30,6 @@ export class Auth extends Component {
 			return response.json()
 		})
 		.then(data => {
-			initUserWebSocket();
 			navigateTo("/play");
 		})
 	}
