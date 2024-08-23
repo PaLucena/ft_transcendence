@@ -9,14 +9,13 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
 
         await self.accept()
 
-        if self.user is None or not self.user or not self.user.is_authenticated:
+        if self.user is None or not self.user.is_authenticated:
             await self.send_error(401, "User is not authenticated.")
             await self.close()
             return
 
         try:
             await self.channel_layer.group_add(self.group_name, self.channel_name)
-
             await self.add_user_to_online_list(self.user)
             await self.send_online_users_list()
         except Exception as e:
@@ -25,13 +24,17 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        if self.user.is_authenticated or self.user is None:
-            await self.remove_user_from_online_list(self.user)
+        if self.user is not None and self.user.is_authenticated:
             try:
-                await self.channel_layer.group_discard(self.group_name, self.channel_name)
-                await self.send_online_users_list()
+                await self.remove_user_from_online_list(self.user)
             except Exception as e:
-                await self.send_error(500, f"Failed to discard user from group: {str(e)}")
+                await self.send_error(500, f"Failed to remove user from online list: {str(e)}")
+
+        try:
+            await self.channel_layer.group_discard(self.group_name, self.channel_name)
+            await self.send_online_users_list()
+        except Exception as e:
+            await self.send_error(500, f"Failed to discard user from group: {str(e)}")
 
     async def send_online_users_list(self):
         try:
