@@ -25,7 +25,7 @@ class Tournament(models.Model):
 
 
 class Match(models.Model):
-	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=True)
 	match_id = models.IntegerField(null=True)
 	player1 = models.IntegerField(null=True)
 	player2 = models.IntegerField(null=True)
