@@ -92,7 +92,7 @@ export class Play extends Component {
 			})
 			.then(data => {
 				customAlert('success', data.message, '3000');
-				this.joinTournament(jsonData["name"], tournamentType);
+				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
@@ -100,7 +100,7 @@ export class Play extends Component {
 		})
 	}
 
-	joinTournament(name, tournamentType) {
+	joinTournamentAsCreator(name, tournamentType) {
 		fetch("/api/display_tournaments/", {
 			method: "GET",
 			headers: {
@@ -119,7 +119,7 @@ export class Play extends Component {
 		.then(data => {
 			if (tournamentType === 'private') {
 				const	tournamentData = data.private_tournaments.find(object => object.name === name);
-				this.getTournamentCode(tournamentData);
+				this.getTournamentCode(tournamentData.id);
 				navigateTo("/tournament/" + tournamentData.id)
 			}
 			else {
@@ -132,8 +132,31 @@ export class Play extends Component {
 		})
 	}
 
-	getTournamentCode(tournamentData) {
+	getTournamentCode(tournamentId) {
 		console.log("Falta hacer el fetch al get_code(request, tournament_id");
+		fetch("/api/get_code/", {
+			method: "POST",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: tournamentId,
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			customAlert('success', data.message, '3000');
+			console.log(data);
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
 	}
 
 	displayTournaments() {
@@ -160,20 +183,61 @@ export class Play extends Component {
 			else {
 				let	publicContainer = document.getElementById("publicTournamentDisplay");
 				for (let i = 0; displayPublic[i]; i++) {
-					publicContainer.innerHTML += `<button class="btn btn-success display-tournament-item col-10 my-1 rounded">${displayPublic[i].name} ${displayPublic[i].players.length}</div>`;
+					publicContainer.innerHTML += `<button class="display-tournament-item btn btn-info border-start-0 border-end-0 col-10 my-1 rounded"><span class="tName">${displayPublic[i].name}</span> [${displayPublic[i].players.length}]</div>`;
 				}
+				this.joinTournament(displayPublic, 'public');
 			}
 			if (displayPrivate.length === 0)
 				document.getElementById("privateTournamentDisplay").innerHTML = "No active tournaments";
 			else {
 				let	privateContainer = document.getElementById("privateTournamentDisplay");
 				for (let i = 0; displayPrivate[i]; i++) {
-					privateContainer.innerHTML += `<button class="btn btn-success display-tournament-item col-10 my-1 rounded">${displayPublic[i].name} ${displayPublic[i].players.length}</div>`;
+					privateContainer.innerHTML += `<button class="display-tournament-item btn btn-info border-start-0 border-end-0 col-10 my-1 rounded"><span class="tName">${displayPrivate[i].name}</span> [${displayPrivate[i].players.length}]</div>`;
 				}
+				this.joinTournament(displayPrivate, 'private');
 			}
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
 		})
+	}
+
+	joinTournament(allTournaments, type) {
+		const	joinBtns = document.querySelectorAll('.display-tournament-item');
+		console.log("hola");
+
+		joinBtns.forEach(joinBtn => {
+			joinBtn.addEventListener('click', () => {
+				const	tournamentName = joinBtn.querySelector('.tName').innerHTML;
+
+				const	tournamentData = allTournaments.find(object => object.name === tournamentName);
+				if (!tournamentData)
+					return ;
+				console.log("Tournament data: ", tournamentData);
+				
+				fetch("/api/join_tournament/" + tournamentData.id, {
+					method: "POST",
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					credentials: 'include'
+				})
+				.then(response => {
+					if (!response.ok) {
+						return response.json().then(errData => {
+							throw new Error(errData.error || `Response status: ${response.status}`);
+						});
+					}
+					return response.json();
+				})
+				.then(data => {
+					customAlert('success', data.message, '3000');
+					console.log(data);
+				})
+				.catch((error) => {
+					customAlert('danger', `Error: ` + error.message, '');
+				})
+			});
+		});
 	}
 }
