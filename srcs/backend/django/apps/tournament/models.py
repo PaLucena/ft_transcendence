@@ -19,12 +19,19 @@ class Tournament(models.Model):
 	type = models.CharField(max_length=10, choices=TOURNAMENT_TYPES, default=PUBLIC)
 	invitation_code = models.CharField(max_length=10, null=True, blank=True)
 	is_active = models.BooleanField(default=False)
+	player_ids = models.JSONField(default=list)
 	#invitation_time_out =  models.DateTimeField(default=lambda: timezone.now() + timedelta(minutes=10))
 	#pending_invitations = models.ManyToManyField(AppUser, related_name='pending', default=list)
 
 
 class Match(models.Model):
-	player_1 = models.ForeignKey(AppUser, related_name='player_1', on_delete=models.SET_NULL, null=True, blank=True)
-	player_2 = models.ForeignKey(AppUser, related_name='player_2', on_delete=models.SET_NULL, null=True, blank=True)
-	player_1_score = models.IntegerField(null=True)
-	player_2_score = models.IntegerField(null=True)
+	tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+	match_id = models.IntegerField(null=True)
+	player1 = models.IntegerField(null=True)
+	player2 = models.IntegerField(null=True)
+	winner = models.IntegerField(null=True)
+	loser = models.IntegerField(null=True)
+	can_create_match = models.BooleanField(default=True)
+
+	class Meta:
+		unique_together = ('tournament', 'match_id')

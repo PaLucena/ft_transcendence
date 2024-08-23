@@ -2,13 +2,12 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from django.db.models import Q
 from user.models import AppUser
-from .models import Tournament
+from .models import Tournament, Match
 from rest_framework.response import Response
 from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
-from django.contrib.auth.decorators import login_required
-from .utils import add_ai_players
+from .match_logic import create_initial_matches, format_match 
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -65,7 +64,7 @@ def create_tournament(request):
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-#call blockchain to save data when the tournament is complete
+#return list of first 4 available matches
 @api_view (["POST"])
 @default_authentication_required
 def close_tournament(request, tournament_id):
@@ -73,13 +72,15 @@ def close_tournament(request, tournament_id):
 		user = request.user
 		tournament = Tournament.objects.get(pk=tournament_id)
 		participant_count = tournament.participants.count()
+		matches = []
 
 		if (user != tournament.creator) or participant_count < 2:
 			return Response({"error": "You can't close this tournament."}, status=status.HTTP_403_FORBIDDEN)
 
-		if participant_count < 8:
-			add_ai_players(tournament, participant_count)
 		player_ids = list(tournament.participants.values_list('pk', flat=True))
+
+		while len(player_ids) < 8:
+			player_ids.append(0)
 
 		try:
 			data = {
@@ -88,12 +89,14 @@ def close_tournament(request, tournament_id):
 			}
 			bc_response = bc_create_tournament(data)
 
-			print("HERE, ", user)
 			if bc_response.status_code == 200:
-				#tournament.delete()
+				tournament.player_ids = player_ids
 				tournament.is_active = True
-				return Response({"message": "Tournament closed and processed on blockchain successfully."},
+				matches = create_initial_matches(tournament)
+				available_matches = [format_match(match) for match in matches]
+				return Response(available_matches,
 					status=status.HTTP_200_OK)
+
 			else:
 				return Response({"error": "Blockchain process failed."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -184,4 +187,3 @@ def remove_participation(request, tournament_id):
 
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-	

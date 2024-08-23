@@ -35,7 +35,8 @@ def add_ai_players(tournament, current_player_count):
 			username=unique_username,
 			nickname=nickname,
 			password=None,
-			avatar=avatar
+			avatar=avatar,
+			is_ia=True
 		)
 
 		ai_user.is_active = False

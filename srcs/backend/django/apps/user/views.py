@@ -1,6 +1,4 @@
-from pickletools import read_uint1
 from sqlite3 import IntegrityError
-from urllib import response
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import AbstractUser
@@ -12,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, logout
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 import json
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
@@ -24,12 +22,10 @@ import requests
 from .utils import set_nickname, upload_avatar, get_friend_count
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
-from django.views.decorators.csrf import csrf_exempt
 from .decorators import default_authentication_required
 from django.http import JsonResponse
 
 
-@csrf_exempt
 @api_view(['GET'])
 @default_authentication_required
 def check_auth(request):
