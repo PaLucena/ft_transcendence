@@ -101,6 +101,23 @@ def login(request):
 	else:
 		return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
+
+@api_view(["POST"])
+def loginWith2fa(request):
+	username = request.data.get('username')
+	user = AppUser.objects.get(username=username)
+	user.save()
+	refresh = RefreshToken.for_user(user)
+	access = refresh.access_token
+	response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+	response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
+	response.set_cookie('access_token', str(access), httponly=True, secure=True)
+
+	print("Access Token Expiry:", access['exp'])
+	print("Refresh Token Expiry:", refresh['exp'])
+	return response
+
+
 #...
 @api_view(["GET"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])

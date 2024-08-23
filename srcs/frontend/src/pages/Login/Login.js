@@ -62,7 +62,7 @@ export class Login extends Component {
 					if (data.has_2fa == true) {
 						initTwoFactorAuth(jsonData);
 					} else {
-						onlineSocket.initWebSocket();
+						onlineSocket.initWebSocket(jsonData["username"]);
 						customAlert('success', 'Login successful', 3000);
 						navigateTo("/play");
 					}

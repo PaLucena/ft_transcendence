@@ -1,6 +1,8 @@
-import { navigateTo } from '../../scripts/router.js'
+import { navigateTo } from '../../scripts/Router.js'
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
 import customAlert from '../../scripts/utils/customAlert.js';
+import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+
 
 export function initTwoFactorAuth(jsonData) {
     const inputs = document.querySelectorAll('.otp-input');
@@ -66,7 +68,7 @@ export function initTwoFactorAuth(jsonData) {
         submit2FAForm(jsonData);
     });
 
-    function submit2FAForm() {
+    function submit2FAForm(username) {
         const otpCode = Array.from(inputs).map(input => input.value).join('');
         const csrftoken = getCSRFToken('csrftoken');
 
@@ -92,8 +94,24 @@ export function initTwoFactorAuth(jsonData) {
             return response.json();
         })
         .then(data => {
+			jsonData = {
+				"username": username
+			}
             customAlert('success', '2FA Verified!', 3000);
-            navigateTo("/play");
+			fetch("/api/2fa-login/", {
+				method: "POST",
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(jsonData)
+			}).then(response => {
+				return response.json();
+			})
+			.then(data =>{
+				onlineSocket.initWebSocket();
+				navigateTo("/play");
+			})
         })
         .catch(error => {
             customAlert('danger', `Error: ${error.message}`, '');
