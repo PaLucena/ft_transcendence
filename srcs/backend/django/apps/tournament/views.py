@@ -7,8 +7,7 @@ from rest_framework.response import Response
 from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
-from .tournament_config import next_match_dependencies, required_matches, assignments
-
+from .match_logic import create_initial_matches, format_match 
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
