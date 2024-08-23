@@ -6,7 +6,7 @@ from user.decorators import default_authentication_required
 from rest_framework.decorators import api_view
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.shortcuts import render, redirect
-import qrcode, json, os
+import qrcode, json, os, base64
 from core import settings
 
 def Has2faEnabled(user):

@@ -71,37 +71,14 @@ export class Profile extends Component {
 				return response.json()
 			})
 			.then(data => {
-				console.log(data.qrpath)
 				const ModalElement = document.getElementById('imageModal');
 				const overlayElement = document.getElementById('customOverlay');
 				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
 				const csrftoken = getCSRFToken('csrftoken');
-				console.log(data.qrpath)
-				fetch("http://localhost:8000/media/" + data.qrpath, {
-					method: "GET",
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-CSRFToken': csrftoken
-					},
-					mode: 'no-cors'
-				})
-				.then(response => {
-					console.log(response)
-					if (!response.ok) {
-						return response.json().then(errData => {
-							throw new Error(errData.error || `Response status: ${response.status}`);
-						});
-					}
-					return response.json();
-				})
-				.then(data => {
-					console.log('hola');
-					qrmodal.show()
-				})
-				.catch(error => {
-					customAlert('danger', `Error: ${error.message}`, '');
-				});
+				const imageSpan = document.getElementById('modalImageContainer');
+				console.log(data['qrpath'])
+				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
+				qrmodal.show()
 			})
 		})
 	}
