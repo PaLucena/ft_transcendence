@@ -1,13 +1,20 @@
 import { Component } from '../../scripts/Component.js';
-import { navigateTo } from '../../scripts/router.js';
+import { navigateTo } from '../../scripts/Router.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Play extends Component {
-	constructor() {
-		super('/pages/Play/play.html');
+	constructor(params = {}) {
+		console.log('Play Constructor');
+		super('/pages/Play/play.html', params);
 	}
 
+	destroy() {
+		console.log("Play Custom destroy");
+		this.removeAllEventListeners();
+    }
+
 	init() {
+		console.log("Play Params!!", this.params);
 		this.setupEventListeners();
 	}
 
@@ -241,3 +248,4 @@ export class Play extends Component {
 		});
 	}
 }
+

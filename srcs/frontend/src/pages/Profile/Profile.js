@@ -1,13 +1,19 @@
 import { Component } from '../../scripts/Component.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-import { navigateTo } from '../../scripts/router.js';
+import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
 export class Profile extends Component {
 	constructor() {
+		console.log('Profile Constructor');
 		super('/pages/Profile/profile.html')
 	}
+
+	destroy() {
+		console.log("Profile Custom destroy");
+		this.removeAllEventListeners();
+    }
 
 	init() {
 		this.focusPage();

@@ -7,18 +7,31 @@ import { eventEmitter } from '../../scripts/utils/EventEmitter.js';
 
 export class ChatModal extends Component {
     constructor() {
+        console.log('ChatModal Constructor');
         super('/components/ChatModal/chatmodal.html');
+        this.chatSocket = null;
+        this.messageInputHandler = null;
+
         this.chatRenderer = new ChatRenderer(this, eventEmitter);
         this.chatLoader = new ChatLoader(this);
         this.webSocketHandler = new WebSocketHandler(this);
         this.uiSetup = new UISetup(this);
     }
 
-    init() {
-        this.uiSetup.setupChatModal();
+    destroy() {
+        console.log('Chat Custom destroy');
+
+        this.webSocketHandler.closeWebSocket();
+        this.removeAllEventListeners();
+        this.uiSetup.removeMessageFormEvents();
+        this.uiSetup.removeOnlineUpdateListeners();
+    }
+
+    async init() {
         this.uiSetup.setupMessagesModal();
+        this.uiSetup.setupChatModal();
         this.uiSetup.setupCloseMessagesModal();
         this.uiSetup.setupScrollEvent();
-        this.uiSetup.setupChatRender();
+        this.uiSetup.setupMessageInputEvent();
     }
 }
