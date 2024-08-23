@@ -42,11 +42,6 @@ contract PongTournament {
     function createTournament(uint256 tournamentId, uint256[] memory playersIds) public OnlyOwner(msg.sender) {
         require(tournaments_[tournamentId].tournamentId_ == 0, "Tournament already exists");
         require(playersIds.length == 8, "Must have 8 players");
-        for (uint256 i = 0; i < playersIds.length; ++i) {
-            for (uint256 j = i + 1; j < playersIds.length; ++j) {
-                require(playersIds[i] != playersIds[j], "Players error: duplicate");
-            }
-        }
         Tournament storage newTournament = tournaments_[tournamentId];
         newTournament.tournamentId_ = tournamentId;
         tournamentsIds.push(tournamentId);
