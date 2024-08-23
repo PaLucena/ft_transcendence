@@ -1,9 +1,9 @@
+from rest_framework.decorators import api_view
 from models import Match
 from .tournament_config import next_match_dependencies, required_matches, assignments
 from user.decorators import default_authentication_required
 from blockchain.views import record_match as bc_record_match
 
-# -- match logic --
 # checks if the next match can be assigned based on the outcome of the current match.
 @api_view(["POST"])
 @default_authentication_required
