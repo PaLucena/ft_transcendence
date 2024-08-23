@@ -10,6 +10,8 @@ services:
     networks:
       - transcendence_net
     restart: always
+    depends_on:
+      - django
 
   nginx:
     container_name: nginx
@@ -60,7 +62,6 @@ services:
       - postgres
       - redis
       - blockchain
-      - nginx_frontend
     volumes:
       - django_volume:/app
       - blockchain_volume:/blockchain_shared

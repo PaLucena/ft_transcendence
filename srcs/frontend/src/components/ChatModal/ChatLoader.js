@@ -48,7 +48,6 @@ export class ChatLoader {
                 this.chatModal.chatRenderer.renderMessageInputContainer(data.block_status, data.other_user);
                 this.chatModal.chatRenderer.renderChatMessages(data.chat_messages, currentUser, isPublicChat);
                 this.chatModal.webSocketHandler.initWebSocket(chatroomName, currentUser);
-                this.chatModal.chatRenderer.scrollToBottom();
             });
 
         } catch(error) {
