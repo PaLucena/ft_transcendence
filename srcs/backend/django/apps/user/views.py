@@ -35,6 +35,7 @@ def check_auth(request):
 	else:
 		return JsonResponse({'authenticated': False}, status=401)
 
+
 @api_view(["GET"])
 @default_authentication_required
 def get_user_data(request):
@@ -49,6 +50,7 @@ def get_user_data(request):
 		return Response(user_data, status=status.HTTP_200_OK)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(["POST"])
 def signup(request):
@@ -98,7 +100,7 @@ def login(request):
 	else:
 		return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-#shit
+#...
 @api_view(["GET"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -263,7 +265,6 @@ def get_friends(request):
     }
 
     return Response(response_data, status=status.HTTP_200_OK)
-
 
 
 @api_view (["GET"])

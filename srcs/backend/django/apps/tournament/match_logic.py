@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view
-from models import Match
+from .models import Match
 from .tournament_config import next_match_dependencies, required_matches, assignments
 from user.decorators import default_authentication_required
 from blockchain.views import record_match as bc_record_match
