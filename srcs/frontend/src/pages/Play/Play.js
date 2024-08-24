@@ -11,7 +11,7 @@ export class Play extends Component {
 	destroy() {
 		console.log("Play Custom destroy");
 		this.removeAllEventListeners();
-    }
+	}
 
 	init() {
 		console.log("Play Params!!", this.params);
@@ -126,40 +126,12 @@ export class Play extends Component {
 		.then(data => {
 			if (tournamentType === 'private') {
 				const	tournamentData = data.private_tournaments.find(object => object.name === name);
-				this.getTournamentCode(tournamentData.id);
 				navigateTo("/tournament/" + tournamentData.id)
 			}
 			else {
 				const	tournamentData = data.public_tournaments.find(object => object.name === name);
 				navigateTo("/tournament/" + tournamentData.id)
 			}
-		})
-		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
-		})
-	}
-
-	getTournamentCode(tournamentId) {
-		console.log("Falta hacer el fetch al get_code(request, tournament_id");
-		fetch("/api/get_code/", {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: tournamentId,
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			customAlert('success', data.message, '3000');
-			console.log(data);
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -211,7 +183,6 @@ export class Play extends Component {
 
 	joinTournament(allTournaments, type) {
 		const	joinBtns = document.querySelectorAll('.display-tournament-item');
-		console.log("hola");
 
 		joinBtns.forEach(joinBtn => {
 			joinBtn.addEventListener('click', () => {
@@ -222,7 +193,7 @@ export class Play extends Component {
 					return ;
 				console.log("Tournament data: ", tournamentData);
 				
-				fetch("/api/join_tournament/" + tournamentData.id, {
+				fetch(`/api/join_tournament/${tournamentData.id}/`, {
 					method: "POST",
 					headers: {
 						'Content-Type': 'application/json'
@@ -238,7 +209,8 @@ export class Play extends Component {
 					return response.json();
 				})
 				.then(data => {
-					customAlert('success', data.message, '3000');
+					// TODO: Añadir modal para insertar nickname
+					navigateTo("/tournament/" + tournamentData.id);
 					console.log(data);
 				})
 				.catch((error) => {

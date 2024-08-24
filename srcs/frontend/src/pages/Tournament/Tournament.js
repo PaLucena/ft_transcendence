@@ -1,13 +1,20 @@
 import { Component } from "../../scripts/Component.js";
+import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Tournament extends Component {
 	constructor(params = {}) {
+		console.log("Tournament Constructor");
 		super('/pages/Tournament/tournament.html', params);
 	}
 
-	async init() {
+	destroy() {
+		console.log("Tournament Custom destroy");
+		this.removeAllEventListeners();
+	}
+
+	init() {
 		this.joinTournament();
-		this.cosasDeTorneo(this.params);
+		this.getTournamentCode(this.params);
 	}
 
 	joinTournament(id) {
@@ -55,7 +62,31 @@ export class Tournament extends Component {
 		});
 	}
 
-	cosasDeTorneo(tournamentId) {
-		console.log("Id del torneo: ", tournamentId);
+	getTournamentCode(tournamentId) {
+		console.log("Tournament ID: ", tournamentId.tournamentId);
+
+		fetch(`/api/get_code/${tournamentId.tournamentId}`, {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			document.getElementById('invitationCode').innerHTML = data.code;
+
+			console.log("Código de acceso al torneo: ", data);
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
 	}
 }
