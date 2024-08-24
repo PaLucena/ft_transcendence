@@ -10,6 +10,9 @@ services:
     networks:
       - transcendence_net
     restart: always
+    depends_on:
+      django:
+        condition: service_healthy
 
   nginx:
     container_name: nginx
@@ -23,6 +26,7 @@ services:
     env_file: srcs/.env
     depends_on:
       - django
+      - nginx_frontend
     networks:
       - transcendence_net
 
@@ -60,7 +64,6 @@ services:
       - postgres
       - redis
       - blockchain
-      - nginx_frontend
     volumes:
       - django_volume:/app
       - blockchain_volume:/blockchain_shared
@@ -69,6 +72,11 @@ services:
     networks:
       - transcendence_net
     restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   blockchain:
     container_name: blockchain
