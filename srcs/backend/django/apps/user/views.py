@@ -104,15 +104,15 @@ def login(request):
 
 @api_view(["POST"])
 def loginWith2fa(request):
-	username = request.data.get('username')
-	user = AppUser.objects.get(username=username)
-	user.save()
+	user = request.data.get('username')
+	print("username is", user["username"])
+	user = AppUser.objects.get(username=user["username"])
+	auth_login(request, user)
 	refresh = RefreshToken.for_user(user)
 	access = refresh.access_token
 	response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
 	response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
 	response.set_cookie('access_token', str(access), httponly=True, secure=True)
-
 	print("Access Token Expiry:", access['exp'])
 	print("Refresh Token Expiry:", refresh['exp'])
 	return response
