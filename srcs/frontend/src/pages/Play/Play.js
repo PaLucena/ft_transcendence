@@ -192,6 +192,8 @@ export class Play extends Component {
 				if (!tournamentData)
 					return ;
 				console.log("Tournament data: ", tournamentData);
+
+				this.displayJoinModal(type);
 				
 				fetch(`/api/join_tournament/${tournamentData.id}/`, {
 					method: "POST",
@@ -219,5 +221,16 @@ export class Play extends Component {
 			});
 		});
 	}
-}
 
+	displayJoinModal(type) {
+		if (type === 'private')
+			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code"><label for="code">Invitation code</label>`;
+		else
+			document.querySelector('#codeInput').innerHTML = ``;
+		
+		const	joinModalElement = document.getElementById('joinModal');
+		const	joinModal = new bootstrap.Modal(joinModalElement, {backdrop: false, keyboard: true});
+
+		joinModal.show();
+	}
+}
