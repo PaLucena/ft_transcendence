@@ -1,15 +1,15 @@
-.modal-dialog {
+.twofactor-modal-dialog {
     display: flex;
     align-items: center;
     min-height: calc(100% - 1.75rem);
 }
 
-.modal-content {
+.twofactor-modal-content {
     width: 100%;
     max-width: 500px;
 }
 
-.overlay {
+.twofactor-overlay {
     position: fixed;
     top: 0;
     left: 0;
