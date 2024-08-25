@@ -18,6 +18,12 @@ def Has2faEnabled(user):
 	except TOTPDevice.DoesNotExist:
 		return False
 
+@api_view(["POST"])
+@default_authentication_required
+def check2fa(request):
+	print("returning: ", Has2faEnabled(request.user))
+	return Response({"has2faEnabled": Has2faEnabled(request.user)}, status=status.HTTP_200_OK)
+
 # Create your views here.
 @api_view(["POST"])
 @default_authentication_required
@@ -57,3 +63,15 @@ def verifyTwoFactor(request):
 			return Response({'success': False, 'message': 'Invalid OTP code.'}, status=400)
 	except TOTPDevice.DoesNotExist:
 		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+
+@api_view(["POST"])
+@default_authentication_required
+def disable2fa(request):
+	user = userModel.objects.get(username=request.user)
+	try:
+		device = TOTPDevice.objects.get(user=user.pk, confirmed=False)
+		device.delete()
+		device.save()
+	except TOTPDevice.DoesNotExist:
+		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+	return Response(status=status.HTTP_200_OK)

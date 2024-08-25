@@ -22,6 +22,9 @@ export class Profile extends Component {
 		this.logout();
 		this.editUserBtn();
 		this.saveInfoBtn();
+		this.show2faButton();
+		this.enable2fa();
+		this.disable2fa();
 	}
 
 	focusPage() {
@@ -49,7 +52,6 @@ export class Profile extends Component {
 			document.getElementById("userEdit").style.display = "none"; // Esto es solo si la información
 			document.getElementById("userInfo").style.display = "block";  // nueva es válida
 		});
-		this.enable2fa();
 	}
 
 	logout() {
@@ -71,8 +73,41 @@ export class Profile extends Component {
 		});
 	}
 
+	show2faButton() {
+		let ButtonPlaceholder = document.getElementById("2faButtonPlaceholder");
+		let EnableButtonPlaceholder = document.getElementById("Enable2faButtonPlaceholder");
+		let DisableButtonPlaceholder = document.getElementById("Disable2faButtonPlaceholder");
+		fetch("/api/2fa/check2fa/", {
+			method: "POST",
+			credentials: 'include',
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json()
+		})
+		.then(data => {
+			if (data["has2faEnabled"] == true) {
+				EnableButtonPlaceholder.style.display = "none";
+				DisableButtonPlaceholder.style.display = "block";
+				console.log("2fa is enabled")
+			}
+			else {
+				EnableButtonPlaceholder.style.display = "block";
+				DisableButtonPlaceholder.style.display = "none";
+				console.log("2fa is disabled")
+			}
+		})
+		.catch(error => {
+			customAlert('danger', `Error: ${error.message}`, '');
+		});
+	}
+
 	enable2fa() {
-		let twofaBtn = document.getElementById("2faBtn");
+		let twofaBtn = document.getElementById("Enable2faBtn");
 
 		twofaBtn.addEventListener("click", (event) => {
 			const response = fetch("/api/2fa/enable2fa/", {
@@ -89,11 +124,28 @@ export class Profile extends Component {
 				const ModalElement = document.getElementById('imageModal');
 				const overlayElement = document.getElementById('customOverlay');
 				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
-				const csrftoken = getCSRFToken('csrftoken');
 				const imageSpan = document.getElementById('modalImageContainer');
-				console.log(data['qrpath'])
 				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
-				qrmodal.show()
+				qrmodal.show(); // TODO: adjust hidden modal
+				this.show2faButton();
+			})
+		})
+	}
+	
+	disable2fa() {
+		let TwofaBtn = document.getElementById("Disable2faBtn");
+		console.log("b")
+		TwofaBtn.addEventListener("click", (event) => {
+			console.log("a")
+			const response = fetch("/api/2fa/disable2fa/", {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+			.then(response => {
+				this.show2faButton();
 			})
 		})
 	}
