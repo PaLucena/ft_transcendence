@@ -1,5 +1,8 @@
 import { Component } from "../../scripts/Component.js";
 import { navigateTo } from '../../scripts/Router.js';
+import customAlert from '../../scripts/utils/customAlert.js';
+import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+
 
 export class Auth extends Component {
 	constructor() {
@@ -27,11 +30,20 @@ export class Auth extends Component {
 			}),
 		})
 		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
 			return response.json()
 		})
 		.then(data => {
-			console.log(data)
+			console.log("Initializing websocket for user", data["username"]);
+			onlineSocket.initWebSocket(data["username"]);
 			navigateTo("/play");
 		})
+		.catch(error => {
+			customAlert('danger', `Error: ${error.message}`, '');
+		});
 	}
 }
