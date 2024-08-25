@@ -17,7 +17,6 @@ def get_friend_count(user):
 
 def set_nickname(request):
 	nickname = request.data.get('nickname')
-
 	user = request.user
 	if AppUser.objects.filter(nickname__iexact=nickname).exclude(pk=user.pk).exists():
 		return Response({"error": "This nickname is already in use."}, status=status.HTTP_400_BAD_REQUEST)
@@ -28,7 +27,7 @@ def set_nickname(request):
 	else:
 		user.nickname = nickname
 	user.save()
-	return Response({"message": "logout was successful"}, status=status.HTTP_200_OK)
+	return Response({"message": "Nickname set successfully"}, status=status.HTTP_200_OK)
 
 
 def upload_avatar(request):

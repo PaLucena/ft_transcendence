@@ -8,6 +8,7 @@ from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
 from .match_logic import create_initial_matches, format_match 
+from user.utils import set_nickname
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -36,11 +37,10 @@ def create_tournament(request):
 
 		if Tournament.objects.filter(name=name).exists():
 			return Response({"error": "Tournament name is already taken."}, status=status.HTTP_400_BAD_REQUEST)
-		if AppUser.objects.filter(nickname=nickname).exists():
-			return Response({"error": "Nickname is already taken."}, status=status.HTTP_400_BAD_REQUEST)
 
-		creator.nickname = nickname
-		creator.save()
+		nickname_response = set_nickname(request)
+		if nickname_response.status_code != status.HTTP_200_OK:
+			return nickname_response
 
 		if type == Tournament.PRIVATE:
 			private_tournament_count = Tournament.objects.filter(creator=creator, type=Tournament.PRIVATE).count()
@@ -152,14 +152,14 @@ def join_tournament(request, tournament_id):
 			code = request.data.get('code', '').strip()
 			if code != tournament.invitation_code:
 				return Response({"error": "Invalid invitation code."}, status=status.HTTP_403_FORBIDDEN)
-			if user in tournament.participants.all():
-				return Response({"error": "You are already in."}, status=status.HTTP_400_BAD_REQUEST)
-			tournament.participants.add(user)
 
-		elif tournament.type == Tournament.PUBLIC:
-			if user in tournament.participants.all():
-				return Response({"error": "You are already in."}, status=status.HTTP_400_BAD_REQUEST)
-			tournament.participants.add(user)
+		if user in tournament.participants.all():
+			return Response({"error": "You are already in."}, status=status.HTTP_400_BAD_REQUEST)
+
+		nickname_response = set_nickname(request)
+		if nickname_response.status_code != status.HTTP_200_OK:
+			return nickname_response
+		tournament.participants.add(user)
 
 		return Response({"success": "You have joined the tournament."}, status=status.HTTP_200_OK)
 	
