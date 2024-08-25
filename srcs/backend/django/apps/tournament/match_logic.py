@@ -34,7 +34,6 @@ def assign_next_match(tournament, finished_match_data):
 	return next_matches
 
 
-
 def set_winner_and_loser(finished_match_data, finished_match):
 	player1_id = finished_match_data.get('player_1_id')
 	player2_id = finished_match_data.get('player_2_id')
