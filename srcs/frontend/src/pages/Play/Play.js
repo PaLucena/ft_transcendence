@@ -161,8 +161,10 @@ export class Play extends Component {
 				document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
 			else {
 				let	publicContainer = document.getElementById("publicTournamentDisplay");
+				publicContainer.innerHTML = '';
+
 				for (let i = 0; displayPublic[i]; i++) {
-					publicContainer.innerHTML += `<button class="display-tournament-item btn btn-info border-start-0 border-end-0 col-10 my-1 rounded"><span class="tName">${displayPublic[i].name}</span> [${displayPublic[i].players.length}]</div>`;
+					publicContainer.innerHTML += `<button class="display-tournament-item btn border-start-0 border-end-0 col-10 my-1 rounded" style="background-color: #ff6d3f;"><span class="tName">${displayPublic[i].name}</span> [${displayPublic[i].players.length}]</div>`;
 				}
 				this.joinTournament(displayPublic, 'public');
 			}
@@ -170,8 +172,10 @@ export class Play extends Component {
 				document.getElementById("privateTournamentDisplay").innerHTML = "No active tournaments";
 			else {
 				let	privateContainer = document.getElementById("privateTournamentDisplay");
+				privateContainer.innerHTML = '';
+
 				for (let i = 0; displayPrivate[i]; i++) {
-					privateContainer.innerHTML += `<button class="display-tournament-item btn btn-info border-start-0 border-end-0 col-10 my-1 rounded"><span class="tName">${displayPrivate[i].name}</span> [${displayPrivate[i].players.length}]</div>`;
+					privateContainer.innerHTML += `<button class="display-tournament-item btn btn-success border-start-0 border-end-0 col-10 my-1 rounded"><span class="tName">${displayPrivate[i].name}</span> [${displayPrivate[i].players.length}]</div>`;
 				}
 				this.joinTournament(displayPrivate, 'private');
 			}
@@ -193,13 +197,14 @@ export class Play extends Component {
 					return ;
 				console.log("Tournament data: ", tournamentData);
 
-				this.displayJoinModal(type);
+				const jsonData = this.displayJoinModal(type);
 				
 				fetch(`/api/join_tournament/${tournamentData.id}/`, {
 					method: "POST",
 					headers: {
 						'Content-Type': 'application/json'
 					},
+					body: JSON.stringify(jsonData),
 					credentials: 'include'
 				})
 				.then(response => {
@@ -232,5 +237,19 @@ export class Play extends Component {
 		const	joinModal = new bootstrap.Modal(joinModalElement, {backdrop: false, keyboard: true});
 
 		joinModal.show();
+
+		const joinForm = document.querySelector("#joinForm");
+
+		joinForm.addEventListener("submit", (event) => {
+			event.preventDefault();
+
+			const formData = new FormData(event.target);
+			const jsonData = {};
+
+			formData.forEach((value, key) => {
+				jsonData[key] = value;
+			});
+		});
+		return jsonData;
 	}
 }
