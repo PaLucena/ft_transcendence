@@ -310,7 +310,6 @@ def delete_account(request):
 
 @api_view(["POST"])
 def ftapiLogin(request):
-	print("im in")
 	code = request.data.get("api-code");
 	ftapiresponse = requests.post("https://api.intra.42.fr/v2/oauth/token", params={
 		"grant_type": "authorization_code",
@@ -319,8 +318,6 @@ def ftapiLogin(request):
 		"code": code,
 		"redirect_uri": os.getenv("API42_URI"),
 	})
-
-	print(ftapiresponse)
 	if ftapiresponse == None:
 		return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -333,9 +330,11 @@ def ftapiLogin(request):
 		ExistingUser = AppUser.objects.get(username=user_json["login"])
 		if not ExistingUser.api42auth:
 			return Response({'error': 'Username already in use'}, status=status.HTTP_409_CONFLICT)
+		auth_login(request, ExistingUser)
+		ExistingUser.save()
 		refresh = RefreshToken.for_user(ExistingUser)
 		access = refresh.access_token
-		response = Response({"mesage": "Login successful"}, status=status.HTTP_200_OK)
+		response = Response({"mesage": "Login successful", "username": user_json["login"]}, status=status.HTTP_200_OK)
 		response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
 		response.set_cookie('access_token', str(access), httponly=True, secure=True)
 		return response
@@ -361,14 +360,16 @@ def ftapiLogin(request):
 	NewuserJson = {
 		'username': user_json["login"],
 		'email': user_json["email"],
+		'password': "",
 		'avatar': "avatars/" + user_json["login"] + ".jpg"
 	}
 	user = AppUser.objects.create_user(**NewuserJson)
 	user.api42auth = True
+	auth_login(request, user)
 	user.save()
 	refresh = RefreshToken.for_user(user)
 	access = refresh.access_token
-	response = Response({"mesage": "Signup successful"}, status=status.HTTP_201_CREATED)
+	response = Response({"mesage": "Signup successful", "username": user_json["login"]}, status=status.HTTP_201_CREATED)
 	response.set_cookie('refresh_token', str(refresh), httponly=True, secure=True)
 	response.set_cookie('access_token', str(access), httponly=True, secure=True)
 	return response
