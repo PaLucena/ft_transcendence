@@ -29,6 +29,7 @@ from twofactor.views import Has2faEnabled
 @api_view(['GET'])
 @default_authentication_required
 def check_auth(request):
+	print("USER: ", request.user)
 	if request.user.is_authenticated:
 		return JsonResponse({'authenticated': True})
 	else:
@@ -42,7 +43,7 @@ def get_user_data(request):
 		user = request.user
 		user_data = {
 			'username': user.username,
-			'avatar': user.avatar,
+			'avatar': user.avatar.url,
 			'email': user.email,
 			'number_of_friends': get_friend_count(user)
 		}

@@ -8,6 +8,7 @@ from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
 from .match_logic import create_initial_matches, format_match 
+from user.utils import set_nickname
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -36,11 +37,10 @@ def create_tournament(request):
 
 		if Tournament.objects.filter(name=name).exists():
 			return Response({"error": "Tournament name is already taken."}, status=status.HTTP_400_BAD_REQUEST)
-		if AppUser.objects.filter(nickname=nickname).exists():
-			return Response({"error": "Nickname is already taken."}, status=status.HTTP_400_BAD_REQUEST)
 
-		creator.nickname = nickname
-		creator.save()
+		nickname_response = set_nickname(request)
+		if nickname_response.status_code != status.HTTP_200_OK:
+			return nickname_response
 
 		if type == Tournament.PRIVATE:
 			private_tournament_count = Tournament.objects.filter(creator=creator, type=Tournament.PRIVATE).count()
@@ -115,7 +115,6 @@ def display_tournaments(request):
 			type=Tournament.PUBLIC, is_active=False)
 		private_tournaments = Tournament.objects.filter(
 			type=Tournament.PRIVATE, is_active=False)
-		
 		def serialize_tournament(tournament):
 			return {
 				'name': tournament.name,
@@ -132,7 +131,6 @@ def display_tournaments(request):
 			'public_tournaments': [serialize_tournament(tournament) for tournament in public_tournaments],
 			'private_tournaments': [serialize_tournament(tournament) for tournament in private_tournaments]
 		}
-
 		return Response(response_data, status=status.HTTP_200_OK)
 
 	except Exception as e:
@@ -152,14 +150,14 @@ def join_tournament(request, tournament_id):
 			code = request.data.get('code', '').strip()
 			if code != tournament.invitation_code:
 				return Response({"error": "Invalid invitation code."}, status=status.HTTP_403_FORBIDDEN)
-			if user in tournament.participants.all():
-				return Response({"error": "You are already in."}, status=status.HTTP_400_BAD_REQUEST)
-			tournament.participants.add(user)
 
-		elif tournament.type == Tournament.PUBLIC:
-			if user in tournament.participants.all():
-				return Response({"error": "You are already in."}, status=status.HTTP_400_BAD_REQUEST)
-			tournament.participants.add(user)
+		if user in tournament.participants.all():
+			return Response({"error": "You are already in."}, status=status.HTTP_400_BAD_REQUEST)
+
+		nickname_response = set_nickname(request)
+		if nickname_response.status_code != status.HTTP_200_OK:
+			return nickname_response
+		tournament.participants.add(user)
 
 		return Response({"success": "You have joined the tournament."}, status=status.HTTP_200_OK)
 	
@@ -189,3 +187,46 @@ def remove_participation(request, tournament_id):
 
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@default_authentication_required
+def tournament_bracket(request, tournament_id):
+    try:
+        tournament = Tournament.objects.get(pk=tournament_id)
+        bracket_data = get_tournament_bracket(tournament)
+        return Response({'bracket': bracket_data}, status=status.HTTP_200_OK)
+    except Tournament.DoesNotExist:
+        return Response({"error": "Tournament not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+#to show tournament bracket
+def get_tournament_bracket(tournament):
+	bracket_data = []
+	matches = Match.objects.filter(tournament=tournament).order_by('match_id')
+
+	for match in matches:
+		if match.player1 == 0:
+			player1_nickname = "AI"
+		elif match.player1 == -1:
+			player1_nickname = "Did not participate"
+		else:
+			player1 = AppUser.objects.filter(pk=match.player1).first()
+			player1_nickname = player1.nickname if player1 else "None"
+
+		if match.player2 == 0:
+			player2_nickname = "AI"
+		elif match.player2 == -1:
+			player2_nickname = "Did not participate"
+		else:
+			player2 = AppUser.objects.filter(pk=match.player2).first()
+			player2_nickname = player2.nickname if player2 else "None"
+
+		match_data = {
+			'match_id': match.match_id,
+			'player1_nickname': player1_nickname,
+			'player2_nickname': player2_nickname,
+		}
+		bracket_data.append(match_data)
+
+	return bracket_data
