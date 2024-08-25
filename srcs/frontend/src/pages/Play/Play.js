@@ -189,7 +189,7 @@ export class Play extends Component {
 		const	joinBtns = document.querySelectorAll('.display-tournament-item');
 
 		joinBtns.forEach(joinBtn => {
-			joinBtn.addEventListener('click', () => {
+			joinBtn.addEventListener('click', async () => {
 				const	tournamentName = joinBtn.querySelector('.tName').innerHTML;
 
 				const	tournamentData = allTournaments.find(object => object.name === tournamentName);
@@ -197,7 +197,9 @@ export class Play extends Component {
 					return ;
 				console.log("Tournament data: ", tournamentData);
 
-				const jsonData = this.displayJoinModal(type);
+				const jsonData = await this.displayJoinModal(type);
+				console.log("hola");
+				console.log(jsonData);
 				
 				fetch(`/api/join_tournament/${tournamentData.id}/`, {
 					method: "POST",
@@ -229,7 +231,7 @@ export class Play extends Component {
 
 	displayJoinModal(type) {
 		if (type === 'private')
-			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code"><label for="code">Invitation code</label>`;
+			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required><label for="code">Invitation code</label>`;
 		else
 			document.querySelector('#codeInput').innerHTML = ``;
 		
@@ -238,18 +240,21 @@ export class Play extends Component {
 
 		joinModal.show();
 
-		const joinForm = document.querySelector("#joinForm");
+		return new Promise((resolve) => {
+			const joinForm = document.querySelector("#joinForm");
 
-		joinForm.addEventListener("submit", (event) => {
-			event.preventDefault();
+			joinForm.addEventListener("submit", (event) => {
+				event.preventDefault();
 
-			const formData = new FormData(event.target);
-			const jsonData = {};
+				const formData = new FormData(event.target);
+				const jsonData = {};
 
-			formData.forEach((value, key) => {
-				jsonData[key] = value;
+				formData.forEach((value, key) => {
+					jsonData[key] = value;
+				});
+				resolve(jsonData);
+				joinModal.hide();
 			});
 		});
-		return jsonData;
 	}
 }

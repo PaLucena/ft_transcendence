@@ -86,7 +86,7 @@ export class Tournament extends Component {
 			console.log("Código de acceso al torneo: ", data);
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			console.log(error);
 		})
 	}
 }
