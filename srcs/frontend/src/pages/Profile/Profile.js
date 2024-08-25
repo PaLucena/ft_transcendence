@@ -2,6 +2,9 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+import customAlert from "../../scripts/utils/customAlert.js";
+
+// import { showQRmodal } from '../../components/Show2faQRModal'
 
 export class Profile extends Component {
 	constructor() {
@@ -83,7 +86,14 @@ export class Profile extends Component {
 				return response.json()
 			})
 			.then(data => {
-				console.log(data.qrpath)
+				const ModalElement = document.getElementById('imageModal');
+				const overlayElement = document.getElementById('customOverlay');
+				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
+				const csrftoken = getCSRFToken('csrftoken');
+				const imageSpan = document.getElementById('modalImageContainer');
+				console.log(data['qrpath'])
+				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
+				qrmodal.show()
 			})
 		})
 	}

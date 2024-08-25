@@ -11,13 +11,13 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
 
         await self.accept()
 
+        if self.user is None or not self.user.is_authenticated:
+            await self.send_error(401, "User is not authenticated.")
+            await self.close()
+            return
+
         try:
             self.chatroom = await self.get_chatroom(self.chatroom_name)
-
-            if self.user is None or not self.user or not self.user.is_authenticated:
-                await self.send_error(401, "User is not authenticated.")
-                await self.close()
-                return
 
             if self.chatroom is None:
                 await self.send_error(404, "Chatroom not found")
@@ -38,12 +38,13 @@ class ChatroomConsumer(AsyncJsonWebsocketConsumer):
             return None
 
     async def disconnect(self, close_code):
-        try:
-            await self.channel_layer.group_discard(
-                self.chatroom_name, self.channel_name
-            )
-        except Exception as e:
-            await self.send_error(500, f"Failed to leave chatroom: {str(e)}")
+        if self.user is not None and self.user.is_authenticated:
+            try:
+                await self.channel_layer.group_discard(
+                    self.chatroom_name, self.channel_name
+                )
+            except Exception as e:
+                await self.send_error(500, f"Failed to leave chatroom: {str(e)}")
 
     async def receive_json(self, content, **kwargs):
         body = content.get("body")

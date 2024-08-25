@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="../../styles/_login.css">
+
 <div class="d-flex justify-content-center align-items-center vh-100">
 	<div class="bg-light row col-10 col-sm-8 col-md-6 col-xl-4 p-4 align-items-center rounded-4" style="max-width: 650px;">
 		<div class="d-flex justify-content-center mb-4 " style="align-content: center;">
@@ -37,22 +39,31 @@
 </div>
 
 
-<div class="modal fade" id="twoFactorModal" tabindex="-1" aria-labelledby="twoFactorModalLabel" aria-hidden="true" style="z-index: 0;">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="twoFactorModalLabel">Two-Factor Authentication</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<form id="twoFactorForm">
-					<div class="mb-3">
-						<label for="otp" class="form-label">Enter your 2FA code</label>
-						<input type="text" class="form-control" id="otp" name="otp" required>
-					</div>
-					<button type="submit" class="btn btn-primary">Verify</button>
-				</form>
-			</div>
-		</div>
-	</div>
+<div id="customOverlay" class="twofactor-overlay"></div>
+
+<div class="modal fade" id="twoFactorModal" tabindex="-1" aria-labelledby="twoFactorModalLabel" aria-hidden="true">
+    <div class="twofactor-modal-dialog">
+        <div class="twofactor-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="twoFactorModalLabel">Two-Factor Authentication</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="twoFactorForm">
+                    <div class="mb-3">
+                        <label for="otp" class="form-label">Enter your 2FA code</label>
+                        <div class="d-flex justify-content-between">
+                            <input type="text" class="otp-input" maxlength="1">
+                            <input type="text" class="otp-input" maxlength="1">
+                            <input type="text" class="otp-input" maxlength="1">
+                            <input type="text" class="otp-input" maxlength="1">
+                            <input type="text" class="otp-input" maxlength="1">
+                            <input type="text" class="otp-input" maxlength="1">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verify</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

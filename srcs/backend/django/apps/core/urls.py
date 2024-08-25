@@ -19,13 +19,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from django.http import JsonResponse
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
 
+# Django Container Health check view
+def health_check(request):
+    return JsonResponse({'status': 'ok'}, status=200)
+
 urlpatterns = [
+     # The route for checking the health of the django container
+    path('health/', health_check),
+
+    # Admin and API routes
     path("admin/", admin.site.urls),
     path("api/", include("user.urls")),
     path("api/", include("user_stats.urls")),
