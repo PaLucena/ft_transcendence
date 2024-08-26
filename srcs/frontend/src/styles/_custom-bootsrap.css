@@ -1,0 +1,48 @@
+.h-90 {
+	height: 90vh;
+}
+
+.max-width-containe {
+	max-width: 1475px;
+}
+
+.h-8 {
+	height: 8vh;
+}
+
+.h-10 {
+	height: 10vh;
+}
+
+.display-md-6 {
+	font-size: 2.5rem;
+	font-weight: 300;
+}
+
+.square {
+	aspect-ratio: 1 / 1;
+}
+
+.h-10p {
+	height: 10%;
+}
+
+.h-45p {
+	height: 45%;
+}
+
+.h-80p {
+	height: 80%;
+}
+
+.h-90p {
+	height: 90%;
+}
+
+.btn-green, .bg-green {
+	background-color: #3a595c;
+}
+
+.btn-light, .bg-light {
+	background-color: #edeef0;
+}

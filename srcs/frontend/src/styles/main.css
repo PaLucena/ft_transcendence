@@ -45,15 +45,3 @@ nav {
 #chatbtn {
 	right: 1%;
 }
-
-.btn-green, .bg-green {
-	background-color: #3a595c;
-}
-
-.btn-light, .bg-light {
-	background-color: #edeef0;
-}
-
-.text-light {
-	color: white;
-}
