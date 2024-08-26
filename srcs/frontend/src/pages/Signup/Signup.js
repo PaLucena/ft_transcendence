@@ -84,17 +84,21 @@ export class Signup extends Component {
 			this.classList.add('was-validated');
 		});
 
-		$('#confirm_password, #password').on('input', function() {
-			let password = $('#password').val();
-			let confirmPassword = $('#confirm_password').val();
+		const passwords = document.querySelectorAll("#password");
 
-			if (password !== confirmPassword) {
-				$('#confirm_password').addClass('is-invalid').removeClass('is-valid');
-				$('#confirm_password')[0].setCustomValidity('Passwords do not match.');
-			} else {
-				$('#confirm_password').removeClass('is-invalid').addClass('is-valid');
-				$('#confirm_password')[0].setCustomValidity('');
-			}
-		});
+		passwords.forEach(password => {
+			this.addEventListener(password, 'input', function() {
+				let password = document.getElementById('password').val();
+				let confirmPassword = document.getElementById('confirm_password').val();
+
+				if (password !== confirmPassword) {
+					document.getElementById('confirm_password').addClass('is-invalid').removeClass('is-valid');
+					document.getElementById('confirm_password')[0].setCustomValidity('Passwords do not match.');
+				} else {
+					document.getElementById('confirm_password').removeClass('is-invalid').addClass('is-valid');
+					document.getElementById('confirm_password')[0].setCustomValidity('');
+				}
+			});
+		})
 	}
 }

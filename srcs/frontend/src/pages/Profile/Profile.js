@@ -64,7 +64,7 @@ export class Profile extends Component {
 	editUserBtn() {
 		let editBtn = document.getElementById("editBtn");
 
-		editBtn.addEventListener("click", (event) => {
+		this.addEventListener(editBtn, "click", (event) => {
 			document.getElementById("userInfo").style.display = "none";
 			document.getElementById("userEdit").style.display = "block";
 		});
@@ -73,7 +73,7 @@ export class Profile extends Component {
 	saveInfoBtn() {
 		let saveInfo = document.getElementById("saveInfo");
 
-		saveInfo.addEventListener("click", (event) => {
+		this.addEventListener(saveInfo, "click", (event) => {
 			//TODO: aquí falta hacer un fetch con post para guardar la información de usuario
 			document.getElementById("userEdit").style.display = "none"; // Esto es solo si la información
 			document.getElementById("userInfo").style.display = "block";  // nueva es válida
@@ -84,7 +84,7 @@ export class Profile extends Component {
 	logout() {
 		let	logoutBtn = document.getElementById("logoutBtn");
 
-		logoutBtn.addEventListener("click", (event) => {
+		this.addEventListener(logoutBtn, "click", (event) => {
 			fetch("/api/logout/", {
 				method: "GET",
 				credentials: 'include'
@@ -103,7 +103,7 @@ export class Profile extends Component {
 	enable2fa() {
 		let twofaBtn = document.getElementById("2faBtn");
 
-		twofaBtn.addEventListener("click", (event) => {
+		this.addEventListener(twofaBtn, "click", (event) => {
 			const response = fetch("/api/2fa/enable2fa/", {
 				method: 'POST',
 				credentials: 'include',

@@ -29,23 +29,25 @@
 @media only screen and (min-width: 600px) {
 	#rootProfile {
 		flex-direction: row;
+		align-items: center;
 	}
 
 	#containerUser {
+		display: flex;
 		height: 100%;
 		width: 40%;
-		display: flex;
 		align-items: center;
 	}
 	
 	#containerStats {
+		display: flex;
+		align-items: center;
 		height: 100%;
 		width: 60%;
 	}
 
 	#containerUser #userInfo, #containerStats #stats {
 		margin-left: 5%;
-		margin-top: 5vh;
 	}
 }
 
@@ -86,11 +88,18 @@
 
 #containerUser #userEdit {
 	display: none;
+	margin: 0 auto;
 	color: black;
-	margin-top: 5vh;
-	margin-left: 8%;
 	height: 90%;
 	width: 90%;
+}
+
+#editForm {
+	flex-direction: column;
+}
+
+.edit-profile-input {
+	width: 80%;
 }
 
 #chat-placeholder {
@@ -103,21 +112,20 @@
 }
 
 .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.75); /* Dark overlay with opacity */
-    z-index: 1040; /* Make sure it sits behind the modal */
-    display: none; /* Initially hidden */
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.75);
+	z-index: 1040;
+	display: none;
 }
 
 .qr-modal {
-    width: 40px;
-    height: 40px;
-    text-align: center;
-    font-size: 1.5rem;
-    margin: 0 5px;
+	width: 40px;
+	height: 40px;
+	text-align: center;
+	font-size: 1.5rem;
+	margin: 0 5px;
 }
-

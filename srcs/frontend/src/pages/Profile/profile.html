@@ -7,7 +7,7 @@
 				</div>
 			</div>
 			<div id="username" class="d-flex col-8 mt-4 mx-auto align-items-center justify-content-center">
-				<p id="usernamePlaceholder" class="display-6 fw-bold">[error]</p>
+				<p id="usernamePlaceholder" class="display-6 fw-bold">‎ </p>
 			</div>
 			<div id="friendsNb" class="d-flex col-8 mx-auto align-items-center justify-content-center">
 				<p><span id="friendsNbPlaceholder">0</span> friends</p>
@@ -16,24 +16,37 @@
 				<div id="editBtn" class="d-flex col mt-5 align-items-center justify-content-center">
 					<button class="btn btn-success">EDIT PROFILE</button>
 				</div>
-				<div id="logoutBtn" class="d-flex col mt-5 align-items-center justify-content-center">
-					<button class="btn btn-success">LOGOUT</button>
-				</div>
 			</div>
 			<div class="row col-8 mx-auto">
 				<div id="editBtn" class="d-flex col mt-5 align-items-center justify-content-center">
 					<button class="btn btn-danger">BLOCK</button>
 				</div>
 			</div>
-			<div class="row col-8 mx-auto">
-				<div id="twofaBtn" class="d-flex col mt-5 align-items-center justify-content-center">
-					<button class="btn btn-dark" id="2faBtn">2FA</button>
-				</div>
+			<div id="logoutBtn" class="d-flex col mt-5 align-items-center justify-content-center">
+				<button class="btn btn-success">LOGOUT</button>
 			</div>
 		</div>
-		<div id="userEdit" class="card card-profile align-items-center bg-light rounded-5 shadow">
+		<div id="userEdit" class="bg-light rounded-5 shadow">
+			<form id="editForm" class="d-flex justify-content-center align-items-center">
+				<div class="edit-profile-input form-floating mt-5">
+					<input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+					<label for="username">username</label>
+				</div>
+				<div class="edit-profile-input form-floating mt-3">
+					<input type="text" class="form-control" id="Email" name="Email" placeholder="Email" required>
+					<label for="Email">email</label>
+				</div>
+				<div class="edit-profile-input form-floating mt-3">
+					<input type="text" class="form-control" id="password" name="password" placeholder="Password" required>
+					<label for="password">password</label>
+				</div>
+			</form>
+			<div id="twofaBtn" class="d-flex col mt-5 align-items-center justify-content-center">
+				<button class="btn btn-dark" id="2faBtn">2FA</button>
+			</div>
+
 			<div id="saveInfo" class="d-flex col mt-5 justify-content-center">
-				<button class="btn btn-success btn-dark">SAVE INFO</button>
+				<button class="btn btn-success btn-dark">SAVE</button>
 			</div>
 		</div>
 	</div>

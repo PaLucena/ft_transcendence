@@ -26,37 +26,37 @@ export class Play extends Component {
 		document.getElementById("navItemPlay").style.border = "2px solid #edeef0";
 
 		const	oneVSoneBtn = document.getElementById("oneVSoneBtn");
-		oneVSoneBtn.addEventListener("click", () => {
+		this.addEventListener(oneVSoneBtn, "click", () => {
 			document.getElementById("btns").style.display = "none";
 			document.getElementById("dropdownOneVsOne").style.display = "block";
 		});
 
 		const	tournamentBtn = document.getElementById("tournamentBtn");
-		tournamentBtn.addEventListener("click", () => {
+		this.addEventListener(tournamentBtn, "click", () => {
 			document.getElementById("btns").style.display = "none";
 			document.getElementById("dropdownTournaments").style.display = "block";
 			this.displayTournaments();
 		});
 
 		const	backOne = document.getElementById("backOne");
-		backOne.addEventListener("click", () => {
+		this.addEventListener(backOne, "click", () => {
 			document.getElementById("dropdownOneVsOne").style.display = "none";
 			document.getElementById("btns").style.display = "block";
 		});
 
 		const	backTwo = document.getElementById("backTwo");
-		backTwo.addEventListener("click", () => {
+		this.addEventListener(backTwo, "click", () => {
 			document.getElementById("dropdownTournaments").style.display = "none";
 			document.getElementById("btns").style.display = "block";
 		});
 
 		const	plusPublicBtn = document.getElementById("plusPublicBtn");
-		plusPublicBtn.addEventListener("click", () => {
+		this.addEventListener(plusPublicBtn, "click", () => {
 			this.createTournament('public');
 		});
 
 		const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
-		plusPrivateBtn.addEventListener("click", () => {
+		this.addEventListener(plusPrivateBtn, "click", () => {
 			this.createTournament('private');
 		});
 
@@ -70,7 +70,7 @@ export class Play extends Component {
 	createTournament(tournamentType) {
 		const tournamentForm = document.querySelector("#tournamentForm");
 
-		tournamentForm.addEventListener("submit", (event) => {
+		this.addEventListener(tournamentForm, "submit", (event) => {
 			event.preventDefault();
 
 			const formData = new FormData(event.target);
@@ -243,7 +243,7 @@ export class Play extends Component {
 		return new Promise((resolve) => {
 			const joinForm = document.querySelector("#joinForm");
 
-			joinForm.addEventListener("submit", (event) => {
+			this.addEventListener(joinForm, "submit", (event) => {
 				event.preventDefault();
 
 				const formData = new FormData(event.target);
