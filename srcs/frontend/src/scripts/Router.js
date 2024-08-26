@@ -7,6 +7,7 @@ import { Friends } from '../pages/Friends/Friends.js';
 import { Profile } from '../pages/Profile/Profile.js';
 import { Auth } from '../pages/Auth/Auth.js';
 import { Pong } from '../pages/Pong/Pong.js';
+import { Tournament } from '../pages/Tournament/Tournament.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
 import { onlineSocket } from './utils/OnlineWebsocket.js';
 import { handleResponse } from './utils/rtchatUtils.js';
@@ -24,6 +25,8 @@ class Router {
             '/profile': () => new Profile(),
             '/auth': () => new Auth(),
             '/pong': () => new Pong(),
+            '/tournament': () => new Tournament(),
+            '/tournament/:tournamentId': params => new Tournament(params),
         };
         this.currentComponent = null;
         this.previousPath = null;

@@ -84,6 +84,8 @@ export class ChatRenderer {
 				messages.forEach(message => {
 					this.addMessageElement(message, currentUser, isPublicChat);
 				});
+				
+				this.chatModal.chatRenderer.scrollToBottom(200);
 			}
 		}
 	}

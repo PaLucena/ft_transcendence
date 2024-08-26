@@ -2,6 +2,9 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+import customAlert from "../../scripts/utils/customAlert.js";
+
+// import { showQRmodal } from '../../components/Show2faQRModal'
 
 export class Profile extends Component {
 	constructor() {
@@ -16,6 +19,7 @@ export class Profile extends Component {
 
 	init() {
 		this.focusPage();
+		this.displayUserInfo();
 		this.logout();
 		this.editUserBtn();
 		this.saveInfoBtn();
@@ -27,6 +31,34 @@ export class Profile extends Component {
 			navItem.style.border = "";
 		});
 		document.getElementById("navItemProfile").style.border = "2px solid #edeef0";
+	}
+
+	displayUserInfo() {
+		fetch("/api/get_user_data/", {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			console.log("Respuesta de get_user_data: ", response);
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			//document.getElementById("photoContainer").innerHTML = `<img class="profile-photo h-120 square rounded-circle col-12 shadow" src="${data["avatar"]}">`
+			document.getElementById("photoContainer").src = `${data["avatar"]}`;
+			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
+			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
 	}
 
 	editUserBtn() {
@@ -83,7 +115,14 @@ export class Profile extends Component {
 				return response.json()
 			})
 			.then(data => {
-				console.log(data.qrpath)
+				const ModalElement = document.getElementById('imageModal');
+				const overlayElement = document.getElementById('customOverlay');
+				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
+				const csrftoken = getCSRFToken('csrftoken');
+				const imageSpan = document.getElementById('modalImageContainer');
+				console.log(data['qrpath'])
+				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
+				qrmodal.show()
 			})
 		})
 	}

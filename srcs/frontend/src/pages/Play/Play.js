@@ -11,12 +11,11 @@ export class Play extends Component {
 	destroy() {
 		console.log("Play Custom destroy");
 		this.removeAllEventListeners();
-    }
+	}
 
 	init() {
 		console.log("Play Params!!", this.params);
 		this.setupEventListeners();
-		//this.joinTournament();
 	}
 
 	setupEventListeners() {
@@ -36,6 +35,7 @@ export class Play extends Component {
 		tournamentBtn.addEventListener("click", () => {
 			document.getElementById("btns").style.display = "none";
 			document.getElementById("dropdownTournaments").style.display = "block";
+			this.displayTournaments();
 		});
 
 		const	backOne = document.getElementById("backOne");
@@ -52,16 +52,19 @@ export class Play extends Component {
 
 		const	plusPublicBtn = document.getElementById("plusPublicBtn");
 		plusPublicBtn.addEventListener("click", () => {
-			this.createTournament('PUBLIC');
+			this.createTournament('public');
 		});
 
 		const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
 		plusPrivateBtn.addEventListener("click", () => {
-			this.createTournament('PRIVATE');
+			this.createTournament('private');
 		});
 
 		const	tournamentModalElement = document.getElementById("tournamentModal");
-		new	bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
+		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
+		tournamentModalElement.addEventListener('shown.bs.modal', () => {
+			document.getElementById('name-input').focus();
+		});
 	}
 
 	createTournament(tournamentType) {
@@ -95,13 +98,163 @@ export class Play extends Component {
 				return response.json();
 			})
 			.then(data => {
-				customAlert('success', data.message, '');
-				navigateTo("/pong");
+				customAlert('success', data.message, '3000');
+				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
 			})
 		})
 	}
-}
 
+	joinTournamentAsCreator(name, tournamentType) {
+		fetch("/api/display_tournaments/", {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			if (tournamentType === 'private') {
+				const	tournamentData = data.private_tournaments.find(object => object.name === name);
+				navigateTo("/tournament/" + tournamentData.id)
+			}
+			else {
+				const	tournamentData = data.public_tournaments.find(object => object.name === name);
+				navigateTo("/tournament/" + tournamentData.id)
+			}
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
+	}
+
+	displayTournaments() {
+		fetch("/api/display_tournaments/", {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			const	displayPublic = data.public_tournaments;
+			const	displayPrivate = data.private_tournaments;
+			if (displayPublic.length === 0)
+				document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
+			else {
+				let	publicContainer = document.getElementById("publicTournamentDisplay");
+				publicContainer.innerHTML = '';
+
+				for (let i = 0; displayPublic[i]; i++) {
+					publicContainer.innerHTML += `<button class="display-tournament-item btn border-start-0 border-end-0 col-10 my-1 rounded" style="background-color: #ff6d3f;"><span class="tName">${displayPublic[i].name}</span> [${displayPublic[i].players.length}]</div>`;
+				}
+				this.joinTournament(displayPublic, 'public');
+			}
+			if (displayPrivate.length === 0)
+				document.getElementById("privateTournamentDisplay").innerHTML = "No active tournaments";
+			else {
+				let	privateContainer = document.getElementById("privateTournamentDisplay");
+				privateContainer.innerHTML = '';
+
+				for (let i = 0; displayPrivate[i]; i++) {
+					privateContainer.innerHTML += `<button class="display-tournament-item btn btn-success border-start-0 border-end-0 col-10 my-1 rounded"><span class="tName">${displayPrivate[i].name}</span> [${displayPrivate[i].players.length}]</div>`;
+				}
+				this.joinTournament(displayPrivate, 'private');
+			}
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
+	}
+
+	joinTournament(allTournaments, type) {
+		const	joinBtns = document.querySelectorAll('.display-tournament-item');
+
+		joinBtns.forEach(joinBtn => {
+			joinBtn.addEventListener('click', async () => {
+				const	tournamentName = joinBtn.querySelector('.tName').innerHTML;
+
+				const	tournamentData = allTournaments.find(object => object.name === tournamentName);
+				if (!tournamentData)
+					return ;
+				console.log("Tournament data: ", tournamentData);
+
+				const jsonData = await this.displayJoinModal(type);
+				console.log("hola");
+				console.log(jsonData);
+				
+				fetch(`/api/join_tournament/${tournamentData.id}/`, {
+					method: "POST",
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(jsonData),
+					credentials: 'include'
+				})
+				.then(response => {
+					if (!response.ok) {
+						return response.json().then(errData => {
+							throw new Error(errData.error || `Response status: ${response.status}`);
+						});
+					}
+					return response.json();
+				})
+				.then(data => {
+					// TODO: Añadir modal para insertar nickname
+					navigateTo("/tournament/" + tournamentData.id);
+					console.log(data);
+				})
+				.catch((error) => {
+					customAlert('danger', `Error: ` + error.message, '');
+				})
+			});
+		});
+	}
+
+	displayJoinModal(type) {
+		if (type === 'private')
+			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required><label for="code">Invitation code</label>`;
+		else
+			document.querySelector('#codeInput').innerHTML = ``;
+		
+		const	joinModalElement = document.getElementById('joinModal');
+		const	joinModal = new bootstrap.Modal(joinModalElement, {backdrop: false, keyboard: true});
+
+		joinModal.show();
+
+		return new Promise((resolve) => {
+			const joinForm = document.querySelector("#joinForm");
+
+			joinForm.addEventListener("submit", (event) => {
+				event.preventDefault();
+
+				const formData = new FormData(event.target);
+				const jsonData = {};
+
+				formData.forEach((value, key) => {
+					jsonData[key] = value;
+				});
+				resolve(jsonData);
+				joinModal.hide();
+			});
+		});
+	}
+}

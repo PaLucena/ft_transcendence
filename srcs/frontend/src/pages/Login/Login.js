@@ -3,6 +3,7 @@ import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+import { initTwoFactorAuth } from '../../components/Get2faModal/Get2faModal.js'; // Adjust path as needed
 
 export class Login extends Component {
 	constructor() {
@@ -21,7 +22,6 @@ export class Login extends Component {
     }
 
 	initLoginForm() {
-		var TwoFactorModal = new bootstrap.Modal(document.getElementById('twoFactorModal'), {keyboard: true})
 		$('#username').find('[autofocus]').focus();
 		$('#login_form').on('submit', function (event) {
 			event.preventDefault();
@@ -60,9 +60,9 @@ export class Login extends Component {
 				})
 				.then(data => {
 					if (data.has_2fa == true) {
-						TwoFactorModal.show();
+						initTwoFactorAuth(jsonData);
 					} else {
-						onlineSocket.initWebSocket();
+						onlineSocket.initWebSocket(jsonData["username"]);
 						customAlert('success', 'Login successful', 3000);
 						navigateTo("/play");
 					}

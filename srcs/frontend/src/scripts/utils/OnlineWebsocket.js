@@ -45,7 +45,6 @@ class OnlineWebsocket {
     handleClose(event) {
         if (!event.wasClean) {
             console.error('Online socket closed unexpectedly:', event.reason || 'Unknown reason');
-            //setTimeout(() => this.initWebSocket(), 5000);
         }
     }
 

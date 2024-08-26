@@ -44,7 +44,6 @@ export class WebSocketHandler {
     handleClose(event, chatroomName, currentUser) {
         if (!event.wasClean) {
             console.error('Chat socket closed unexpectedly:', event.reason);
-            //setTimeout(() => this.initWebSocket(chatroomName, currentUser), 5000);
         }
     }
 

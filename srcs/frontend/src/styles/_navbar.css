@@ -10,3 +10,7 @@
 	font-size: 2.5rem;
 	font-weight: 300;
 }
+
+.square {
+	aspect-ratio: 1 / 1;
+}

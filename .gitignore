@@ -77,3 +77,4 @@ venv.bak/
 fixtures/
 
 srcs/backend/django/apps/media/avatars/*.jpg
+srcs/backend/django/apps/media/qrs/*.jpg
