@@ -10,9 +10,9 @@
 export default function customAlert(type, text, time, customStyle = '') {
     const customAlert = document.querySelector('#alert');
     if (customAlert) {
-     const baseClasses = ['custom-alert'];
+        const baseClasses = ['custom-alert'];
 
-     const classesToRemove = [];
+        const classesToRemove = [];
         customAlert.classList.forEach(className => {
             if (!baseClasses.includes(className)) {
                 classesToRemove.push(className);
@@ -24,7 +24,6 @@ export default function customAlert(type, text, time, customStyle = '') {
         });
 
         let icon = '';
-        let closeButton = '';
 
         switch (type) {
             case 'success':
@@ -40,18 +39,19 @@ export default function customAlert(type, text, time, customStyle = '') {
                 icon = '<i class="fa-solid fa-circle-info"></i>';
                 break;
             default:
-                icon = '';
+                icon = '<i class="fa-regular fa-bell"></i>';
                 break;
         }
 
-        if (time === '' || time === undefined) {
-            closeButton = `
-			<button type="button" id="alert_close" class="btn btn-close rounded-circle p-0 btn-window-action ms-4">
-				<i class="fa-solid fa-xmark" aria-hidden="true"></i>
-			</button>`;
-        }
-
-        customAlert.innerHTML = `<span class="alert-icon me-2">${icon}</span> ${text} ${closeButton}`;
+        customAlert.innerHTML = `
+            <div class="alert-icon me-2 d-flex justify-content-md-center align-items-center gap-3">
+                ${icon}
+                <span class='text-start'>${text}</span>
+            </div>
+            <button type="button" id="alert_close" class="btn btn-close rounded-circle p-0 btn-window-action">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        `;
 
         customAlert.classList.add('alert', `alert-${type}`, 'active');
 

@@ -1,11 +1,12 @@
 .custom-alert {
 	display: flex;
+	justify-content: space-between;
 	align-items: center;
 	position: absolute;
 	top: -110px;
-	left: 85%;
-	transform: translateX(-50%);
-	min-width: 200px;
+	right: 60px;
+	min-width: 400px;
+	max-width: 450px;
 	opacity: 0;
 	z-index: 1056;
 	text-align: center;
@@ -42,3 +43,22 @@
 	height: 100%;
 	background-color: #66C4A4;
 }
+
+@media (max-width: 1140px) {
+	.custom-alert {
+		min-width: 350px;
+		max-width: 400px;
+	}
+}
+
+@media (max-width: 720px) {
+	.custom-alert {
+		margin: 0 auto;
+		right: 0;
+        left: 0;
+        transform: translateX(0);
+        min-width: 200px;
+        max-width: 300px;
+	}
+}
+
