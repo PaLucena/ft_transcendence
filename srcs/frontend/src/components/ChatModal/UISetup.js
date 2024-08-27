@@ -9,11 +9,11 @@ export class UISetup {
         const chatModalElement = document.getElementById('chats_modal');
 
         if (chatModalElement) {
-            this.chatModal.addEventListener(chatModalElement, 'shown.bs.modal', () => {
-                this.chatModal.chatLoader.loadChats();
+            this.chatModal.addEventListener(chatModalElement, 'shown.bs.modal', async () => {
+                await this.chatModal.chatLoader.loadChats();
             });
 
-            this.chatModal.addEventListener(chatModalElement, 'click', (e) => {
+            this.chatModal.addEventListener(chatModalElement, 'click', async (e) => {
                 const targetElement = e.target.closest('.open_chat_btn');
                 if (targetElement) {
                     const chatroomName = targetElement.getAttribute('data-chatroom_name');
@@ -23,7 +23,7 @@ export class UISetup {
                         return;
                     }
 
-                    this.chatModal.chatLoader.initChatroom(chatroomName);
+                    await this.chatModal.chatLoader.initChatroom(chatroomName);
                 }
             });
         } else {

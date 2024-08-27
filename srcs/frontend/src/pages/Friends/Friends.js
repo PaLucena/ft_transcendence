@@ -3,10 +3,13 @@ import { FriendsLoader } from './FriendsLoader.js';
 import { FriendsRenderer } from './FriendsRenderer.js';
 import { UISetup } from './UISetup.js';
 
+
 export class Friends extends Component {
-	constructor() {
+	constructor(params = {}) {
 		console.log('Friends Constructor');
-		super('/pages/Friends/friends.html')
+		super('/pages/Friends/friends.html', params)
+
+		this.filter = this.params.filter || 'all';
 
 		this.friendsRenderer = new FriendsRenderer(this);
         this.friendsLoader = new FriendsLoader(this);
@@ -20,6 +23,7 @@ export class Friends extends Component {
 	}
 
 	async init() {
-
+		await this.friendsLoader.loadFriendsData(this.filter);
+		this.uiSetup.setupFilterButtons();
 	}
 }

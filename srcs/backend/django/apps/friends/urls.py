@@ -4,9 +4,11 @@ from friends.views import (
     accept_friend_request,
     remove_friend,
     get_friends,
+    filter_users,
 )
 
 urlpatterns = [
+    path("filter/<str:filter_type>/", filter_users, name="filter_users"),
     path("invite_friend/", invite_friend, name="invite_friend"),
     path("accept_friend_request/", accept_friend_request, name="accept_friend_request"),
     path("remove_friend/", remove_friend, name="remove_friend"),
