@@ -13,8 +13,14 @@ export class UISetup {
                 const targetButton = event.target.closest('button[data-filter]');
 
                 if (targetButton) {
-                    this.updateActiveButton(targetButton);
                     const filter = targetButton.getAttribute('data-filter');
+                    const currentPath = window.location.pathname.split('/').pop();
+
+                    if (filter === currentPath) {
+                        return;
+                    }
+
+                    this.updateActiveButton(targetButton);
                     this.updateURL(filter);
                     await this.friends.friendsLoader.loadFriendsData(filter);
                 }
