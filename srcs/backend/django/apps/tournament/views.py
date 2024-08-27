@@ -115,7 +115,6 @@ def display_tournaments(request):
 			type=Tournament.PUBLIC, is_active=False)
 		private_tournaments = Tournament.objects.filter(
 			type=Tournament.PRIVATE, is_active=False)
-		
 		def serialize_tournament(tournament):
 			return {
 				'name': tournament.name,
@@ -132,7 +131,6 @@ def display_tournaments(request):
 			'public_tournaments': [serialize_tournament(tournament) for tournament in public_tournaments],
 			'private_tournaments': [serialize_tournament(tournament) for tournament in private_tournaments]
 		}
-
 		return Response(response_data, status=status.HTTP_200_OK)
 
 	except Exception as e:

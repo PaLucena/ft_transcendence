@@ -8,22 +8,6 @@
 	background-repeat: no-repeat;
 }
 
-.h-10p {
-	height: 10%;
-}
-
-.h-45p {
-	height: 45%;
-}
-
-.h-80p {
-	height: 80%;
-}
-
-.h-90p {
-	height: 90%;
-}
-
 .gifContainer {
 	background-color: black;
 	border-radius: 20px;
@@ -86,6 +70,18 @@
 	height: 75%;
 }
 
+.tournament-display {
+	max-height: 100%;
+	overflow-y: auto;
+}
+
+.display-tournament-item {
+	height: 20%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
 .dropdownOneVsOne .vsIA, .dropdownTournaments .createPub {
 	margin-left: 0;
 }
@@ -100,7 +96,6 @@
 }
 
 .modal-tournament {
-	/* background-color: rgba(123, 169, 169, .5); */
 	background-color: rgba(0, 0, 0, .6);
 }
 

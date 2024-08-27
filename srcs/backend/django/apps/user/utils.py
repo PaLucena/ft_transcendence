@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
-from .models import AppUser, Friend
+from .models import AppUser
+from friends.models import Friend
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime, timedelta
@@ -65,8 +66,8 @@ def upload_avatar(request):
 # def get_token_expiry_times():
 # 	access_token_lifetime = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']
 # 	refresh_token_lifetime = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']
-	
+
 # 	access_token_expiry = (datetime.utcnow() + access_token_lifetime).replace(tzinfo=utc)
 # 	refresh_token_expiry = (datetime.utcnow() + refresh_token_lifetime).replace(tzinfo=utc)
-	
+
 # 	return access_token_expiry, refresh_token_expiry
