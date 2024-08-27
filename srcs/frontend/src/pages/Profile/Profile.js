@@ -174,7 +174,7 @@ export class Profile extends Component {
 				},
 			})
 			.then(response => {
-				this.show2faButton();
+				this.show2faButton(); // TODO: Esto solo tiene que hacerse en el eventListener del modal
 			})
 		})
 	}
