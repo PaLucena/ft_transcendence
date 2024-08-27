@@ -47,6 +47,8 @@
 	}
 
 	.search-friends-container {
+		overflow-y: auto;
+		overflow-x: hidden;
 		padding-left: 10px;
 		padding-right: 10px;
 	}

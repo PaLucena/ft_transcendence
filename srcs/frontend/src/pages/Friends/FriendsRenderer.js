@@ -25,7 +25,7 @@ export class FriendsRenderer {
     createUserElement(user) {
         try {
             const userHtml = `
-            <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4 data-username="${user.username}">
+            <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4 data-username="${user.username}">
                 <div class="img-nick">
                     <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
                         <img src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}" class="rounded-circle" alt="Circle Image">
