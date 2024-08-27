@@ -23,6 +23,11 @@ class JWTAuthMiddleware:
 			if session_id:
 				try:
 					session = await sync_to_async(Session.objects.get, thread_sensitive=True)(session_key=session_id)
+					
+					session_expiry_date = session.expire_date
+					if session_expiry_date < timezone.now():
+						scope['user'] = None 
+					
 					session_data = session.get_decoded()
 					user_id = session_data.get('_auth_user_id', None)
 

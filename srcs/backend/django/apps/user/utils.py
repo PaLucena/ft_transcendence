@@ -48,10 +48,10 @@ def upload_avatar(request):
 		filepath = os.path.join('avatars', filename)
 		counter = 1
 
-		while default_storage.exists(os.path.join(settings.MEDIA_ROOT, filepath)):
-			filename: str = f"{user.username}_{counter}.{extension}"
-			filepath = os.path.join('avatars', filename)
-			counter += 1
+		# while default_storage.exists(os.path.join(settings.MEDIA_ROOT, filepath)):
+		# 	filename: str = f"{user.username}_{counter}.{extension}"
+		# 	filepath = os.path.join('avatars', filename)
+		# 	counter += 1
 
 		user.avatar.save(filepath, ContentFile(file.read()), save=True)
 
