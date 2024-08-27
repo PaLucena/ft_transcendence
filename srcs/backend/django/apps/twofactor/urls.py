@@ -6,4 +6,5 @@ urlpatterns = [
 	path("disable2fa/", name='disable2fa', view=views.disable2fa),
 	path("verify-2fa/", name='verify2fa', view=views.verifyTwoFactor),
 	path("check2fa/", name='check2fa', view=views.check2fa),
+	path("confirmDevice/", name='confirmDevice', view=views.confirmDevice),
 ]

@@ -56,7 +56,7 @@ def verifyTwoFactor(request):
 
 	user=userModel.objects.get(username=username)
 	try:
-		device = TOTPDevice.objects.get(user=user.pk, confirmed=False)
+		device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
 		if device.verify_token(otp_code):
 			return Response({'success': True, 'message': 'OTP verified successfully.'}, status=200)
 		else:
@@ -69,9 +69,19 @@ def verifyTwoFactor(request):
 def disable2fa(request):
 	user = userModel.objects.get(username=request.user)
 	try:
+		device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
+		TOTPDevice.delete(device)
+	except TOTPDevice.DoesNotExist:
+		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+	return Response(status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+@default_authentication_required
+def confirmDevice():
+	user=userModel.objects.get(username=request.user)
+	try:
 		device = TOTPDevice.objects.get(user=user.pk, confirmed=False)
-		device.delete()
-		device.save()
+		device.confirmDevice()
 	except TOTPDevice.DoesNotExist:
 		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
 	return Response(status=status.HTTP_200_OK)

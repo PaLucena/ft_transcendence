@@ -138,6 +138,28 @@ export class Profile extends Component {
 	enable2fa() {
 		let twofaBtn = document.getElementById("Enable2faBtn");
 
+		function hideModal() {
+			const response = fetch("/api/2fa/confirmDevice/", {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(errData => {
+						throw new Error(errData.error || `Response status: ${response.status}`);
+					});
+				}
+				return response.json();
+			})
+			.catch(error => {
+				customAlert('danger', `Error: ${error.message}`, '');
+			});
+			this.show2faButton();
+		}
+
 		twofaBtn.addEventListener("click", (event) => {
 			const response = fetch("/api/2fa/enable2fa/", {
 				method: 'POST',
@@ -155,15 +177,15 @@ export class Profile extends Component {
 				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
 				const imageSpan = document.getElementById('modalImageContainer');
 				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
+				ModalElement.addEventListener('hidden.bs.modal', hideModal);
 				qrmodal.show(); // TODO: adjust hidden modal
-				this.show2faButton();
 			})
 		})
 	}
 	
+	
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
-		console.log("b")
 		TwofaBtn.addEventListener("click", (event) => {
 			console.log("a")
 			const response = fetch("/api/2fa/disable2fa/", {
@@ -174,7 +196,7 @@ export class Profile extends Component {
 				},
 			})
 			.then(response => {
-				this.show2faButton(); // TODO: Esto solo tiene que hacerse en el eventListener del modal
+				this.show2faButton();
 			})
 		})
 	}
