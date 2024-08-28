@@ -3,6 +3,30 @@ from .models import Match
 from .tournament_config import next_match_dependencies, required_matches, assignments
 from user.decorators import default_authentication_required
 from blockchain.views import record_match as bc_record_match
+import random
+from ponggame.game_manager import game_manager
+
+async def start_all_matches(tournament_id, matches):
+	results = []
+	for match in matches:
+		result = await game_manager.start_match(match)
+
+		print(f"Match {match.match_id} finished with result: {result}")
+		results.append(result)
+
+		next_matches = assign_next_match(tournament_id, result)
+
+		while next_matches:
+			new_results = await start_all_matches(tournament_id, next_matches)
+			results.extend(new_results)
+
+			next_matches = []
+			for new_result in new_results:
+				next_matches.extend(assign_next_match(tournament_id, new_result))
+
+
+	return results
+
 
 # checks if the next match can be assigned based on the outcome of the current match.
 @api_view(["POST"])
@@ -125,6 +149,7 @@ def create_initial_matches(tournament):
 	ai_players = [pid for pid in players if pid == 0]
 	match_id = 1
 	matches = []
+	ai_vs_ai_matches = []
 
 	if len(ai_players) >= 4:
 		while match_id <= 4:
@@ -138,30 +163,39 @@ def create_initial_matches(tournament):
 				tournament=tournament,
 				match_id=match_id,
 				player1=player1,
-				player2=player2
+				player2=player2,
+				controls_mode='AI'
 			)
+			if (player1 == 0 and player2 == 0):
+				ai_vs_ai_matches.append(match)
+			else:
+				matches.append(match)
 			match_id += 1
 
 	if len(ai_players) < 4:
 		while match_id <= 4:
 			if ai_players:
 				player1 = ai_players.pop(0)
+				mode='AI'
 			else:
 				player1 = real_players.pop(0)
+				mode='remote'
 			player2 = real_players.pop(0)
 
 			match = Match.objects.create(
 				tournament=tournament,
 				match_id=match_id,
 				player1=player1,
-				player2=player2
+				player2=player2,
+				controls_mode=mode
 			)
 			match_id += 1
 			matches.append(match)
 
 		available_matches = [format_match(match) for match in matches]
-
-	return available_matches
+		ai_vs_ai_matches = [format_match(match) for match in matches]
+	
+	return available_matches, ai_vs_ai_matches
 
 
 def format_match(match):
@@ -170,7 +204,15 @@ def format_match(match):
 		'match_id': match.match_id,
 		'player_1_id': match.player1 if match.player1 else None,
 		'player_2_id': match.player2 if match.player2 else None,
+		'controls_mode': match.controls_mode
 	}
+
+
+def generate_ai_result(match):
+	player1_score = 6
+	player2_score = random.randint(0, 4)
+	match.winner = 0
+	match.loser = 0
 
 
 def tournament_cleanup(tournament):

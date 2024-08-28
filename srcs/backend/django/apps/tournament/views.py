@@ -7,8 +7,9 @@ from rest_framework.response import Response
 from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
-from .match_logic import create_initial_matches, format_match 
+from .match_logic import create_initial_matches, format_match, assign_next_match
 from user.utils import set_nickname
+from .game_manager import game_manager
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -31,7 +32,7 @@ def create_tournament(request):
 	try:
 		creator = request.user
 		name = request.data.get('name')
-		nickname = request.data.get('nickname')
+		#nickname = request.data.get('nickname')
 		type = request.data.get('type')
 		invitation_code = None
 
@@ -92,8 +93,15 @@ def close_tournament(request, tournament_id):
 			if bc_response.status_code == 200:
 				tournament.player_ids = player_ids
 				tournament.is_active = True
-				matches = create_initial_matches(tournament)
-				available_matches = [format_match(match) for match in matches]
+				tournament.save()
+				available_matches, ai_vs_ai_matches = create_initial_matches(tournament)
+				
+				for match in ai_vs_ai_matches:
+					next_matches = assign_next_match(tournament, match)
+					available_matches.extend(next_matches)
+
+				start_all_matches(tournament.id, available_matches)
+
 				return Response(available_matches,
 					status=status.HTTP_200_OK)
 
