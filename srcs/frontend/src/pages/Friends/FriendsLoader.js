@@ -6,9 +6,9 @@ export class FriendsLoader {
         this.friends = friends;
     }
 
-    async loadFriendsData(filer) {
+    async loadFriendsData() {
         try {
-            const response = await fetch(`/api/friends/filter/${filer}`, {
+            const response = await fetch(`/api/friends/filter/${this.friends.filter}`, {
 				method: 'GET',
                 headers: {
                     "Content-Type": "application/json",

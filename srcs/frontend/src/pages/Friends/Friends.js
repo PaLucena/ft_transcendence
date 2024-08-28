@@ -20,10 +20,12 @@ export class Friends extends Component {
 		console.log('Friends Custom destroy');
 
 		this.removeAllEventListeners();
+		this.uiSetup.removeOnlineUpdateListeners();
 	}
 
 	async init() {
-		await this.friendsLoader.loadFriendsData(this.filter);
+		await this.friendsLoader.loadFriendsData();
 		this.uiSetup.setupFilterButtons();
+		// this.uiSetup.setupFriendButtons();
 	}
 }

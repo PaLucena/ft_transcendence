@@ -1,30 +1,8 @@
 import { handleBlockUnblock } from '../../scripts/utils/rtchatUtils.js';
 
 export class ChatRenderer {
-    constructor(chatModal, eventEmitter) {
+    constructor(chatModal) {
         this.chatModal = chatModal;
-		this.eventEmitter = eventEmitter;
-
-		this.onlineUsersUpdatedListener = (onlineUsers) => {
-            this.updateOnlineStatus(onlineUsers);
-        };
-
-		this.eventEmitter.on('onlineUsersUpdated', this.onlineUsersUpdatedListener);
-    }
-
-	updateOnlineStatus(onlineUsers) {
-        const chatElements = document.querySelectorAll('[data-username]');
-
-        chatElements.forEach(element => {
-            const username = element.getAttribute('data-username');
-            const isOnline = onlineUsers.includes(username);
-            const statusDot = element.querySelector('.status-dot');
-
-			if (statusDot) {
-                statusDot.classList.remove('green-dot', 'gray-dot');
-                statusDot.classList.add(isOnline ? 'green-dot' : 'gray-dot');
-            }
-        });
     }
 
 	renderChatElements(chats) {
@@ -46,7 +24,7 @@ export class ChatRenderer {
 	createChatElement(chat) {
 		try {
 			const chatHtml = `
-				<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4" data-username="${chat.other_user_username}">
+				<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
 					<button class="open_chat_btn btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative"
 							style="width: 102px; height: 102px;"
 							data-bs-target="#messages_modal"
@@ -57,7 +35,8 @@ export class ChatRenderer {
 							 class="rounded-circle"
 							 alt="Circle Image">
 						<div class="status-dot position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status ? 'green' : 'gray'}-dot p-2"
-							 style="top:90%; left:85%;">
+						data-online-username="${chat.other_user_username}"
+						style="top:90%; left:85%;">
 						</div>
 					</button>
 					<p class="text-light mt-2">${chat.other_user_username}</p>
@@ -84,7 +63,7 @@ export class ChatRenderer {
 				messages.forEach(message => {
 					this.addMessageElement(message, currentUser, isPublicChat);
 				});
-				
+
 				this.chatModal.chatRenderer.scrollToBottom(200);
 			}
 		}
@@ -124,8 +103,8 @@ export class ChatRenderer {
 	createOtherUserMessageContent(message, isPublicChat) {
 		if (isPublicChat) {
 			const userBtn = `
-			<button type="button" class="btn p-0" data-bs-toggle="dropdown" data-username="${message.author.username}">
-				<div class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" style="top:90%; left:90%;"></div>
+			<button type="button" class="btn p-0" data-bs-toggle="dropdown">
+				<div class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" data-online-username="${message.author.username}" style="top:90%; left:90%;"></div>
 				<img
 					class="rounded-circle"
 					style="width: 32px; height: 32px;"
@@ -208,9 +187,8 @@ export class ChatRenderer {
 					type="button"
 					class="btn p-0"
 					data-bs-toggle="dropdown"
-					data-username="${data.other_user.username}"
 				>
-					<div class="status-dot position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot" style="top:90%; left:90%;"></div>
+					<div class="status-dot position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot" data-online-username="${data.other_user.username}" style="top:90%; left:90%;"></div>
 					<img
 						class="rounded-circle"
 						src="${data.other_user.avatar}"

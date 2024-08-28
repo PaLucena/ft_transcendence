@@ -6,6 +6,31 @@ from user.models import AppUser
 from friends.models import Friend
 from user.decorators import default_authentication_required
 
+STATUS_ACCEPTED = "accepted"
+STATUS_NO_RELATION = "no_relation"
+STATUS_INCOMING = "incoming"
+STATUS_PENDING = "pending"
+
+
+def get_friendship_status(user, other_user):
+    try:
+        friendship = Friend.objects.get(
+            Q(from_user=user, to_user=other_user)
+            | Q(to_user=user, from_user=other_user)
+        )
+
+        if friendship.status == Friend.ACCEPTED:
+            return STATUS_ACCEPTED
+
+        if friendship.status == Friend.PENDING and friendship.from_user == other_user:
+            return STATUS_INCOMING
+
+        if friendship.status == Friend.PENDING and friendship.from_user == user:
+            return STATUS_PENDING
+
+    except Friend.DoesNotExist:
+        return STATUS_NO_RELATION
+
 
 @api_view(["GET"])
 @default_authentication_required
@@ -15,54 +40,72 @@ def filter_users(request, filter_type):
     all_users = AppUser.objects.exclude(id=user.id)
     friendships = Friend.objects.filter(Q(from_user=user) | Q(to_user=user))
 
-    if filter_type == 'all':
+    if filter_type == "all":
         users_data = [
             {
                 "username": other_user.username,
-                "is_friend": friendships.filter(
-                    Q(from_user=user, to_user=other_user) | Q(to_user=user, from_user=other_user),
-                    status=Friend.ACCEPTED
-                ).exists(),
-                "other_user_avatar_url": other_user.avatar.url if other_user.avatar else None
+                "friendship_status": get_friendship_status(user, other_user),
+                "other_user_avatar_url": (
+                    other_user.avatar.url if other_user.avatar else None
+                ),
             }
             for other_user in all_users
         ]
 
-    elif filter_type == 'my_friends':
+    elif filter_type == "my_friends":
         friends = friendships.filter(status=Friend.ACCEPTED)
         users_data = [
             {
-                "username": friend.to_user.username if friend.from_user == user else friend.from_user.username,
-                "is_online": friend.to_user.is_online if friend.from_user == user else friend.from_user.is_online,
-                "other_user_avatar_url": friend.to_user.avatar.url if friend.from_user == user else friend.from_user.avatar.url
+                "username": (
+                    friend.to_user.username
+                    if friend.from_user == user
+                    else friend.from_user.username
+                ),
+                "is_online": (
+                    friend.to_user.is_online
+                    if friend.from_user == user
+                    else friend.from_user.is_online
+                ),
+                "other_user_avatar_url": (
+                    friend.to_user.avatar.url
+                    if friend.from_user == user
+                    else friend.from_user.avatar.url
+                ),
             }
             for friend in friends
         ]
 
-    elif filter_type == 'pending_requests':
+    elif filter_type == "pending_requests":
         pending_requests = friendships.filter(from_user=user, status=Friend.PENDING)
         users_data = [
             {
                 "username": friend.to_user.username,
-                "other_user_avatar_url": friend.to_user.avatar.url if friend.to_user.avatar else None
+                "other_user_avatar_url": (
+                    friend.to_user.avatar.url if friend.to_user.avatar else None
+                ),
             }
             for friend in pending_requests
         ]
 
-    elif filter_type == 'incoming_requests':
+    elif filter_type == "incoming_requests":
         incoming_requests = friendships.filter(to_user=user, status=Friend.PENDING)
         users_data = [
             {
                 "username": friend.from_user.username,
-                "other_user_avatar_url": friend.from_user.avatar.url if friend.from_user.avatar else None
+                "other_user_avatar_url": (
+                    friend.from_user.avatar.url if friend.from_user.avatar else None
+                ),
             }
             for friend in incoming_requests
         ]
 
     else:
-        return Response({"error": "Invalid filter type."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "Invalid filter type."}, status=status.HTTP_404_NOT_FOUND
+        )
 
     return Response({"users": users_data}, status=status.HTTP_200_OK)
+
 
 # CBV has to be created to not repeat code
 @api_view(["POST"])
@@ -120,7 +163,7 @@ def accept_friend_request(request):
         )
 
 
-@api_view(["DELETE"])
+@api_view(["POST"])
 @default_authentication_required
 def remove_friend(request):
     friend_username = request.data.get("username")
@@ -135,8 +178,9 @@ def remove_friend(request):
         return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
     friendship = Friend.objects.filter(
-        from_user=request.user, to_user=friend
-    ) | Friend.objects.filter(to_user=friend, from_user=request.user)
+        Q(from_user=request.user, to_user=friend)
+        | Q(to_user=request.user, from_user=friend)
+    )
 
     if not friendship.exists():
         return Response(
@@ -145,7 +189,7 @@ def remove_friend(request):
 
     friendship.delete()
     return Response(
-        {"message": "Friend successfully removed."}, status=status.HTTP_204_NO_CONTENT
+        {"message": "Friend successfully removed."}, status=status.HTTP_200_OK
     )
 
 

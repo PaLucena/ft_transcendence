@@ -1,5 +1,18 @@
 import customAlert from './customAlert.js'
 
+export function updateOnlineStatus(onlineUsers) {
+    const statusDots = document.querySelectorAll('.status-dot[data-online-username]');
+
+    statusDots.forEach(dot => {
+        const username = dot.getAttribute('data-online-username');
+        const isOnline = onlineUsers.includes(username);
+
+        dot.classList.remove('green-dot', 'gray-dot');
+        dot.classList.add(isOnline ? 'green-dot' : 'gray-dot');
+    });
+}
+
+
 export async function handleBlockUnblock(action, username, callback) {
     try {
         const response = await fetch('/api/chat/block_or_unblock/', {
