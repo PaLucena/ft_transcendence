@@ -58,7 +58,7 @@ export class Pong extends Component {
 		p_2_name.innerHTML = player_2_name;
 
 		// Websocket setup
-		const socket = new WebSocket('ws/ponggame/');
+		const socket = new WebSocket('/ws/ponggame/');
 
 		socket.onopen = function() {
 			console.log("Connection established");

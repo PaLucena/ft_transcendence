@@ -16,7 +16,7 @@ export class InputController {
 
     configureControls() {
         switch (this.controls_mode) {
-            case 'duo':
+            case 'local':
                 this.controlModule = new DualControl(this.execCommands.bind(this));
                 break;
             case 'solo':

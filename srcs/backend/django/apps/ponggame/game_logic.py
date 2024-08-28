@@ -10,7 +10,7 @@ class GameLogic:
     GOALS_TO_WIN = 5
     GOALS_DIFFERENCE = 1
     INIT_COUNTDOWN = 3
-    CONNECT_TIMEOUT = 60
+    CONNECT_TIMEOUT = 120
 
     # Graphic configuration
     TABLE_HEIGHT = 680
@@ -44,11 +44,11 @@ class GameLogic:
     game_state = "waiting"
     player_1_id = None
     player_2_id = None
-    player_1_ready = True
-    player_2_ready = True
+    player_1_ready = False
+    player_2_ready = False
     player_1_goals = 0
     player_2_goals = 0
-    controls_mode = "duo"
+    controls_mode = "local"
     ai_mode = 0
     countdown = 0
     timeout = 0

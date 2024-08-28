@@ -21,7 +21,7 @@ class GameManager:
         :param match_id: The id of the match.
         :param player_1_id: The id of the first player. 0 for AI.
         :param player_2_id: The id of the second player. 0 for AI.
-        :param controls_mode: The controls mode to use. "solo" (remote or AI) or "duo" (same keyboard)
+        :param controls_mode: The controls mode to use. "remote", "AI" or "local" (same keyboard)
 
         :return:
             JSON object with the result of the match.
@@ -114,18 +114,3 @@ class GameRoom:
 
 # Create the game manager
 game_manager = GameManager()
-
-
-# async def test_game(tournament_id, match_id, player_1_id, player_2_id):
-#     result = await game_manager.start_match(tournament_id, match_id, player_1_id, player_2_id, controls_mode='solo')
-#     print("Result:")
-#     print(f"Player 1 (ID: {result['player_1_id']}) score: {result['player_1_goals']}")
-#     print(f"Player 2 (ID: {result['player_2_id']}) score: {result['player_2_goals']}")
-#
-# async def run_multiple_games():
-#     await asyncio.gather(
-#         test_game(1, 1, 2, 3),
-#         test_game(1, 2, 4, 5)
-#     )
-#
-# asyncio.run(run_multiple_games())
