@@ -122,7 +122,10 @@ def invite_friend(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    if Friend.objects.filter(from_user=request.user, to_user=friend).exists():
+    if Friend.objects.filter(
+        Q(from_user=request.user, to_user=friend)
+        | Q(from_user=friend, to_user=request.user)
+    ).first():
         return Response(
             {"error": "Friend request already sent"}, status=status.HTTP_409_CONFLICT
         )
@@ -135,35 +138,39 @@ def invite_friend(request):
 
 @api_view(["POST"])
 @default_authentication_required
-def accept_friend_request(request):
+def accept_invitation(request):
+    username = request.data.get("username")
+
+    if not username:
+        return Response(
+            {"error": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
     try:
-        friendship_request = Friend.objects.get(to_user=request.user)
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        friend = AppUser.objects.get(username=username)
+    except AppUser.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    action = request.data.get("action")
-
-    if friendship_request is None:
-        return Response(
-            {"error": "Missing friendship ID."}, status=status.HTTP_400_BAD_REQUEST
+    try:
+        friend_request = Friend.objects.get(
+            from_user=friend, to_user=request.user, status=0
         )
 
-    if friendship_request.to_user == request.user:
-        # friendship_request.to_user.friends.add(friendship_request.from_user)
-        # friendship_request.user.from_user.add(friendship_request.to_user)
-        friendship_request.status = Friend.ACCEPTED
-        friendship_request.save()
+        friend_request.status = 1
+        friend_request.save()
+
         return Response(
-            {"message": "Friend request accepted."}, status=status.HTTP_200_OK
+            {"message": "Friend request accepted successfully."},
+            status=status.HTTP_200_OK,
         )
-    else:
-        friendship_request.delete()
+    except Friend.DoesNotExist:
         return Response(
-            {"message": "Friend request not accepted."}, status=status.HTTP_200_OK
+            {"error": "No pending friend request from this user"},
+            status=status.HTTP_404_NOT_FOUND,
         )
 
 
-@api_view(["POST"])
+@api_view(["DELETE"])
 @default_authentication_required
 def remove_friend(request):
     friend_username = request.data.get("username")

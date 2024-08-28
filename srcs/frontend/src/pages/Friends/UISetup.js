@@ -54,8 +54,28 @@ export class UISetup {
 
     async handleFriendAction(action, username) {
         try {
-            const response = await fetch(`/api/friends/${action === 'add' ? 'invite_friend' : 'remove_friend'}/`, {
-                method: 'POST',
+            let endpoint;
+            let method;
+
+            switch (action) {
+                case 'invite':
+                    endpoint = 'invite_friend';
+                    method = 'POST';
+                    break;
+                case 'remove':
+                    endpoint = 'remove_friend';
+                    method = 'DELETE';
+                    break;
+                case 'accept':
+                    endpoint = 'accept_invitation';
+                    method = 'POST';
+                    break;
+                default:
+                    throw new Error('Invalid action type');
+            }
+
+            const response = await fetch(`/api/friends/${endpoint}/`, {
+                method: method,
                 headers: {
                     "Content-Type": "application/json",
                 },
