@@ -10,7 +10,6 @@ export class ChatModal extends Component {
         console.log('ChatModal Constructor');
         super('/components/ChatModal/chatmodal.html');
         this.chatSocket = null;
-        this.messageInputHandler = null;
 
         this.chatRenderer = new ChatRenderer(this, eventEmitter);
         this.chatLoader = new ChatLoader(this);

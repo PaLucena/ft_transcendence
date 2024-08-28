@@ -41,9 +41,9 @@ export class WebSocketHandler {
         }
     }
 
-    handleClose(event, chatroomName, currentUser) {
+    handleClose(event) {
         if (!event.wasClean) {
-            console.error('Chat socket closed unexpectedly:', event.reason);
+            console.error('Chat socket closed unexpectedly:', event.reason || 'Unknown reason');
         }
     }
 
@@ -68,7 +68,7 @@ export class WebSocketHandler {
                 this.closeWebSocket();
                 break;
             default:
-                console.error('Critical error:', errorMessage);
+                console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
                 this.closeWebSocket();
         }
     }
