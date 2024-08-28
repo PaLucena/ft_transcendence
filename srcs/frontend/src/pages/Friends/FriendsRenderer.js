@@ -46,7 +46,7 @@ export class FriendsRenderer {
                         <p class="text-light mt-2 fw-bold">${user.username}</p>
                     </div>
                     <button class="btn btn-outline-light"
-                            data-action="${user.is_friend ? 'remove' : 'add'}"
+                            data-action="remove"
                             data-username="${user.username}">
                         Remove
                     </button>

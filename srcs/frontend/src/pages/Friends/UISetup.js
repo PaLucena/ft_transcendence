@@ -29,52 +29,52 @@ export class UISetup {
         }
     }
 
-    // setupFriendButtons() {
-    //     const container = document.getElementById('friends_elemets_container');
+    setupFriendButtons() {
+        const container = document.getElementById('friends_elemets_container');
 
-    //     if (container) {
-    //         this.friends.addEventListener(container, 'click', async (event) => {
-    //             console.log(event.target);
+        if (container) {
+            this.friends.addEventListener(container, 'click', async (event) => {
+                console.log(event.target);
 
-    //             const targetButton = event.target.closest('button[data-action]');
+                const targetButton = event.target.closest('button[data-action]');
 
-    //             if (targetButton) {
-    //                 const action = targetButton.getAttribute('data-action');
-    //                 const username = targetButton.getAttribute('data-username');
+                if (targetButton) {
+                    const action = targetButton.getAttribute('data-action');
+                    const username = targetButton.getAttribute('data-username');
 
-    //                 if (action && username) {
-    //                     await this.handleFriendAction(action, username);
-    //                 }
-    //             }
-    //         });
-    //     } else {
-    //         console.warn("Friends elements container not found");
-    //     }
-    // }
+                    if (action && username) {
+                        await this.handleFriendAction(action, username);
+                    }
+                }
+            });
+        } else {
+            console.warn("Friends elements container not found");
+        }
+    }
 
-    // async handleFriendAction(action, username) {
-    //     try {
-    //         const response = await fetch(`/api/friends/${action === 'add' ? 'invite_friend' : 'remove_friend'}/`, {
-    //             method: 'POST',
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             credentials: 'include',
-    //             body: JSON.stringify({ username })
-    //         });
+    async handleFriendAction(action, username) {
+        try {
+            const response = await fetch(`/api/friends/${action === 'add' ? 'invite_friend' : 'remove_friend'}/`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: 'include',
+                body: JSON.stringify({ username })
+            });
 
-    //         if (response.ok) {
-    //             const result = await response.json();
-    //             customAlert('success', result.message, 5000);
-    //             await this.friends.friendsLoader.loadFriendsData(window.location.pathname.split('/').pop());
-    //         } else {
-    //             const error = await response.json();
-    //             customAlert('danger', error.error, 5000);
-    //         }
-    //     } catch (error) {
-    //         customAlert('danger', 'An unexpected error occurred.', 5000);
-    //     }
-    // }
+            if (response.ok) {
+                const result = await response.json();
+                customAlert('success', result.message, 5000);
+                await this.friends.friendsLoader.loadFriendsData(window.location.pathname.split('/').pop());
+            } else {
+                const error = await response.json();
+                customAlert('danger', error.error, 5000);
+            }
+        } catch (error) {
+            customAlert('danger', 'An unexpected error occurred.', 5000);
+        }
+    }
 
     updateActiveButtonByFilter(filter) {
         const buttons = document.querySelectorAll('#search_filter_btn_container .btn');
