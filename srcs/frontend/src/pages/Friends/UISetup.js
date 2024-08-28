@@ -20,13 +20,11 @@ export class UISetup {
                         return;
                     }
 
-                    this.updateActiveButton(targetButton);
                     this.updateURL(filter);
                     await this.friends.friendsLoader.loadFriendsData();
                 }
             });
-        }
-        else {
+        } else {
             console.warn("Filter buttons container not found");
         }
     }
@@ -78,10 +76,15 @@ export class UISetup {
     //     }
     // }
 
-    updateActiveButton(activeButton) {
+    updateActiveButtonByFilter(filter) {
         const buttons = document.querySelectorAll('#search_filter_btn_container .btn');
-        buttons.forEach(button => button.classList.remove('active'));
-        activeButton.classList.add('active');
+        buttons.forEach(button => {
+            if (button.getAttribute('data-filter') === filter) {
+                button.classList.add('active');
+            } else {
+                button.classList.remove('active');
+            }
+        });
     }
 
     updateURL(filter) {

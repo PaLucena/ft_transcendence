@@ -18,6 +18,8 @@ export class FriendsLoader {
 
 			await handleResponse(response, data => {
                 this.friends.friendsRenderer.renderUsersElements(data.users);
+
+                this.friends.uiSetup.updateActiveButtonByFilter(this.friends.filter);
             });
 
         } catch (error) {

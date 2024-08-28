@@ -45,10 +45,10 @@ export class FriendsRenderer {
                         </button>
                         <p class="text-light mt-2 fw-bold">${user.username}</p>
                     </div>
-                    <button class="btn ${user.is_friend ? 'btn-outline-light' : 'btn-light'}"
+                    <button class="btn btn-outline-light"
                             data-action="${user.is_friend ? 'remove' : 'add'}"
                             data-username="${user.username}">
-                        ${user.is_friend ? 'Remove' : 'Add'}
+                        Remove
                     </button>
                 </div>
                 `;
