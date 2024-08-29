@@ -8,6 +8,7 @@ export class Navbar extends Component {
 
 	init() {
 		this.initNavbar();
+		this.focus();
 	}
 
 	initNavbar() {
@@ -27,10 +28,22 @@ export class Navbar extends Component {
 			return response.json();
 		})
 		.then(data => {
-			document.getElementById("navItemProfile").src = `${data["avatar"]}`;
+			document.getElementById("navItem-profile").src = `${data["avatar"]}`;
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
 		})
-	}r
+	}
+
+	
+	static focus() {
+		const page = window.location.pathname.slice(1);
+		console.log("Estoy en: ", 'navItem-' + page);
+
+		let navItems = document.querySelectorAll('[id^="navItem"]');
+		navItems.forEach(navItem => {
+			navItem.style.border = "";
+		});
+		document.getElementById('navItem-' + page).style.border = "2px solid #edeef0";
+	}
 }

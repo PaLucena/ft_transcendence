@@ -1,5 +1,6 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
+import { Navbar } from '../../components/Navbar/Navbar.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
@@ -18,18 +19,10 @@ export class Profile extends Component {
     }
 
 	init() {
-		this.focusPage();
 		this.displayUserInfo();
 		this.logout();
 		this.saveInfoBtn();
-	}
-
-	focusPage() {
-		let navItems = document.querySelectorAll('[id^="navItem"]');
-		navItems.forEach(navItem => {
-			navItem.style.border = "";
-		});
-		document.getElementById("navItemProfile").style.border = "2px solid #edeef0";
+		Navbar.focus()
 	}
 
 	displayUserInfo() {
@@ -49,7 +42,6 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
-			console.log("Respuesta de get_user_data: ", data);
 			document.getElementById("photoContainer").src = `${data["avatar"]}`;
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
 			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];

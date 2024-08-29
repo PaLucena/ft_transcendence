@@ -1,5 +1,6 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
+import { Navbar } from '../../components/Navbar/Navbar.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Play extends Component {
@@ -15,15 +16,10 @@ export class Play extends Component {
 
 	init() {
 		this.setupEventListeners();
+		Navbar.focus();
 	}
 
 	setupEventListeners() {
-		let navItems = document.querySelectorAll('[id^="navItem"]');
-		navItems.forEach(navItem => {
-			navItem.style.border = "";
-		});
-		document.getElementById("navItemPlay").style.border = "2px solid #edeef0";
-
 		const	oneVSoneBtn = document.getElementById("oneVSoneBtn");
 		this.addEventListener(oneVSoneBtn, "click", () => {
 			document.getElementById("btns").style.display = "none";

@@ -109,7 +109,6 @@ export class Tournament extends Component {
 			return response.json();
 		})
 		.then(data => {
-			console.log("Respuesta de get_tournament_creator: ", data);
 			if (data === true) {
 				document.getElementById('closeBtn').style.display = 'block';
 				this.closeTournament(tournamentId)
