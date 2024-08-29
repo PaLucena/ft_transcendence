@@ -5,39 +5,49 @@ from user.decorators import default_authentication_required
 from blockchain.views import record_match as bc_record_match
 import random
 from ponggame.game_manager import game_manager
+import asyncio
 
-async def start_all_matches(tournament_id, matches):
+async def start_all_matches(tournament, matches):
 	results = []
-	for match in matches:
-		result = await game_manager.start_match(match)
 
-		print(f"Match {match.match_id} finished with result: {result}")
+	match_tasks = [
+		game_manager.start_match(
+			match['tournament_id'],
+			match['match_id'],
+			match['player_1_id'],
+			match['player_2_id'],
+			match['controls_mode']
+		)
+		for match in matches
+	]
+
+	for task in asyncio.as_completed(match_tasks):
+		result = await task
+		match_id = result['match_id']
+		print(f"Match {match_id} finished with result: {result}")
 		results.append(result)
 
-		next_matches = assign_next_match(tournament_id, result)
+		next_matches = assign_next_match(tournament, match_id, results)
 
 		while next_matches:
-			new_results = await start_all_matches(tournament_id, next_matches)
+			formatted_next_matches = [format_match(m) for m in next_matches]
+			new_results = await start_all_matches(tournament, formatted_next_matches)
 			results.extend(new_results)
 
 			next_matches = []
 			for new_result in new_results:
-				next_matches.extend(assign_next_match(tournament_id, new_result))
-
+				next_matches.extend(assign_next_match(tournament, new_result['match_id'], results))
 
 	return results
 
 
 # checks if the next match can be assigned based on the outcome of the current match.
-@api_view(["POST"])
-@default_authentication_required
-def assign_next_match(tournament, finished_match_data):
-	finished_match_id = finished_match_data.get('match_id')
-	tournament = finished_match_data.get('tournament_id')
-	next_possible_matches = next_match_dependencies.get(finished_match_id, [])
+def assign_next_match(tournament, match_id, finished_match_data):
+	next_possible_matches = next_match_dependencies.get(match_id, [])
 	next_matches = []
 
-	finished_match = Match.objects.get(match_id=finished_match_id, tournament=tournament)
+	# check if its match between 2 ai players i want to advance (or put this in pong) 
+	finished_match = Match.objects.get(match_id=match_id, tournament=tournament)
 	if finished_match:
 		finished_match_data = set_winner_and_loser(finished_match_data, finished_match)
 		print("finished_match_data: ", finished_match_data)
@@ -51,8 +61,11 @@ def assign_next_match(tournament, finished_match_data):
 			)
 			if auto_advance_match(tournament, match):
 				next_matches.append(assign_match_players(tournament, match.match_id))
+			else:
+				assign_match_players(tournament, match.match_id)
+				next_matches.append(format_match(match))
 
-	if finished_match_id == 14: # needs change
+	if match_id == 14: # needs change
 		tournament_cleanup(tournament)
 
 	return next_matches

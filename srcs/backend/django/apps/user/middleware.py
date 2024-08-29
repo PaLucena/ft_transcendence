@@ -4,8 +4,6 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from asgiref.sync import sync_to_async
 from django.contrib.sessions.models import Session
-from django.contrib.auth import get_user_model
-from asgiref.sync import sync_to_async
 
 class JWTAuthMiddleware:
 	def __init__(self, inner):

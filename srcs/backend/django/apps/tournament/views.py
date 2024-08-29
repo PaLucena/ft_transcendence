@@ -7,9 +7,10 @@ from rest_framework.response import Response
 from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
-from .match_logic import create_initial_matches, format_match, assign_next_match
+from .match_logic import create_initial_matches, format_match, assign_next_match, start_all_matches
 from user.utils import set_nickname
-from .game_manager import game_manager
+from ponggame.game_manager import game_manager
+from asgiref.sync import async_to_sync
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -97,10 +98,10 @@ def close_tournament(request, tournament_id):
 				available_matches, ai_vs_ai_matches = create_initial_matches(tournament)
 				
 				for match in ai_vs_ai_matches:
-					next_matches = assign_next_match(tournament, match)
+					next_matches = assign_next_match(tournament, match.match_id) #needs fix!!!
 					available_matches.extend(next_matches)
 
-				start_all_matches(tournament.id, available_matches)
+				async_to_sync(start_all_matches)(tournament, available_matches)	
 
 				return Response(available_matches,
 					status=status.HTTP_200_OK)
