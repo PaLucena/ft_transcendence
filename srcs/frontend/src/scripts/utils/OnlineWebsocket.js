@@ -43,9 +43,9 @@ class OnlineWebsocket {
                 return;
             }
 
-            if (data.type == "update_online_users_list" || data.online_users) {
+            if (data.online_users) {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
-            } else if (data.type == "server_message") {
+            } else if (data.message) {
 				customAlert('info', data.message, 3000);
 			}
 			else {

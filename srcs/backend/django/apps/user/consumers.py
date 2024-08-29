@@ -47,27 +47,17 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
         except Exception as e:
             await self.send_error(500, f"Failed to send online users list: {str(e)}")
 
-    async def receive_json(self, content):
-        print(content)
-        await self.handle_client_message(content)
+    async def receive(self, text_data):
+        print("cont received =>", text_data)
+        await self.handle_server_message(text_data)
        
-    async def handle_client_message(self, content):
-        """
-        Handle messages of type 'client_message' received from the client.
-        Broadcast the message to all clients in the group.
-        """
-        message = content.get('message', '')
-
-        if message:
-            # Broadcast the message to all clients in the group
-            await self.send_message_from_server(message)
+    async def handle_server_message(self, content):
+        if content:
+            await self.send_message_from_server(content)
         else:
             await self.send_error(400, "No message content provided.")
 
     async def send_message_from_server(self, message):
-        """
-        Send a message from the server to all clients in the group.
-        """
         try:
             event = {
                 "type": "server_message",
@@ -81,6 +71,12 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
     async def update_online_users_list(self, event):
         try:
             await self.send_json({"online_users": event["online_users"]})
+        except Exception as e:
+            await self.send_error(500, f"Failed to update online users list: {str(e)}")
+
+    async def server_message(self, event):
+        try:
+            await self.send_json({"message": event["message"]})
         except Exception as e:
             await self.send_error(500, f"Failed to update online users list: {str(e)}")
 
