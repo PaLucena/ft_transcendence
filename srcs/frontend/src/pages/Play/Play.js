@@ -14,7 +14,6 @@ export class Play extends Component {
 	}
 
 	init() {
-		console.log("Play Params!!", this.params);
 		this.setupEventListeners();
 	}
 
