@@ -10,7 +10,8 @@ from blockchain.views import create_tournament as bc_create_tournament
 from .match_logic import create_initial_matches, format_match, assign_next_match, start_all_matches
 from user.utils import set_nickname
 from ponggame.game_manager import game_manager
-from asgiref.sync import async_to_sync
+from asgiref.sync import sync_to_async
+import asyncio
 
 # when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
@@ -66,7 +67,7 @@ def create_tournament(request):
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-#return list of first 4 available matches
+#return list of first available matches
 @api_view (["POST"])
 @default_authentication_required
 def close_tournament(request, tournament_id):
@@ -75,9 +76,9 @@ def close_tournament(request, tournament_id):
 		tournament = Tournament.objects.get(pk=tournament_id)
 		participant_count = tournament.participants.count()
 		matches = []
-
-		if (user != tournament.creator) or participant_count < 2:
-			return Response({"error": "You can't close this tournament."}, status=status.HTTP_403_FORBIDDEN)
+#(user != tournament.creator) or 
+		if participant_count < 2:
+			return Response({"error": "To close tournament minimum 2 players are required!"}, status=status.HTTP_403_FORBIDDEN)
 
 		player_ids = list(tournament.participants.values_list('pk', flat=True))
 
@@ -95,13 +96,13 @@ def close_tournament(request, tournament_id):
 				tournament.player_ids = player_ids
 				tournament.is_active = True
 				tournament.save()
-				available_matches, ai_vs_ai_matches = create_initial_matches(tournament)
+				available_matches = create_initial_matches(tournament)
 				
-				for match in ai_vs_ai_matches:
-					next_matches = assign_next_match(tournament, match.match_id) #needs fix!!!
-					available_matches.extend(next_matches)
+				# for match in ai_vs_ai_matches:
+				# 	next_matches = assign_next_match(tournament, match.match_id) #needs fix!!!
+				# 	available_matches.extend(next_matches)
 
-				async_to_sync(start_all_matches)(tournament, available_matches)	
+				sync_to_async(asyncio.create_task)(start_all_matches(tournament, available_matches))
 
 				return Response(available_matches,
 					status=status.HTTP_200_OK)
@@ -113,6 +114,22 @@ def close_tournament(request, tournament_id):
 			return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 	except Exception as e:
 		return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@default_authentication_required
+def get_tournament_creator(request, tournament_id):
+	try:
+		user = request.user
+		tournament = Tournament.objects.get(pk=tournament_id)
+		response = False
+
+		if user == tournament.creator:
+			response = True
+
+		return Response(response, status=status.HTTP_200_OK)
+	except Tournament.DoesNotExist:
+		return Response({"error": "Tournament not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET"])

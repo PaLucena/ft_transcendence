@@ -51,7 +51,10 @@ def assign_next_match(tournament, match_id, finished_match_data):
 	if finished_match:
 		finished_match_data = set_winner_and_loser(finished_match_data, finished_match)
 		print("finished_match_data: ", finished_match_data)
-		bc_record_match(finished_match_data)
+		if finished_match.player1 == 0 and finished_match.player2 == 0:
+			pass
+		else:
+			bc_record_match(finished_match_data)
 
 	for next_match_id in next_possible_matches:
 		if can_assign_match(tournament, next_match_id) and not Match.objects.filter(match_id=next_match_id).exists():
@@ -151,18 +154,22 @@ def assign_match_players(tournament, match):
 	player2_match = Match.objects.get(tournament=tournament, match_id=player2_match_id)
 	match.player2 = getattr(player2_match, player2_role)
 
+	if (match.player1 == 0 and match.player2 == 0):
+		match.controls_mode = 'AI'
+	else:
+		match.controls_mode = 'remote'
+
 	match.save()
 	return match
 
 
-# tp assign first 4 matches
+# to assign first 4 matches
 def create_initial_matches(tournament):
 	players = tournament.player_ids
 	real_players = [pid for pid in players if pid > 0]
 	ai_players = [pid for pid in players if pid == 0]
 	match_id = 1
 	matches = []
-	ai_vs_ai_matches = []
 
 	if len(ai_players) >= 4:
 		while match_id <= 4:
@@ -179,10 +186,7 @@ def create_initial_matches(tournament):
 				player2=player2,
 				controls_mode='AI'
 			)
-			if (player1 == 0 and player2 == 0):
-				ai_vs_ai_matches.append(match)
-			else:
-				matches.append(match)
+			matches.append(match)
 			match_id += 1
 
 	if len(ai_players) < 4:
@@ -206,9 +210,8 @@ def create_initial_matches(tournament):
 			matches.append(match)
 
 		available_matches = [format_match(match) for match in matches]
-		ai_vs_ai_matches = [format_match(match) for match in matches]
 	
-	return available_matches, ai_vs_ai_matches
+	return available_matches
 
 
 def format_match(match):

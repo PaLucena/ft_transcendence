@@ -28,12 +28,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 AUTH_USER_MODEL = "user.AppUser"
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-def generate_secret_key():
-    return hashlib.sha256(os.urandom(64)).hexdigest()
+# def generate_secret_key():
+#     return hashlib.sha256(os.urandom(64)).hexdigest()
 
-SECRET_KEY = generate_secret_key()
+# SECRET_KEY = generate_secret_key()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
