@@ -9,25 +9,28 @@ class OnlineWebsocket {
         try {
             this.onlineSocket = new WebSocket('/ws/online-status/');
         } catch (error) {
-            this.handleError(null, 'Failed to create WebSocket');
+            this.handleError(null, 'Failed to create WebSocket', true);
             return;
         }
 
         this.onlineSocket.onmessage = (e) => this.handleMessage(e);
         this.onlineSocket.onerror = (e) => {
-            this.handleError(null, e);
+            this.handleError(null, e, true);
         }
         this.onlineSocket.onclose = (e) => this.handleClose(e);
     }
 
-	sendMessage(message) {
+	sendMessage(message, to_user) {
         if (this.onlineSocket && this.onlineSocket.readyState === WebSocket.OPEN) {
             try {
-                const data = JSON.stringify(message);
-                this.onlineSocket.send(data);
+                const data = {
+					'to_user': to_user,
+					'message': message
+				}
+                this.onlineSocket.send(JSON.stringify(data));
                 console.log("Message sent:", data);
             } catch (error) {
-                this.handleError(null, 'Failed to send message');
+                this.handleError(null, 'Failed to send message', false);
             }
         } else {
             console.error("WebSocket is not open. Cannot send message.");
@@ -49,10 +52,10 @@ class OnlineWebsocket {
 				customAlert('info', data.message, 3000);
 			}
 			else {
-                this.handleError(null, 'Invalid data format received.');
+                this.handleError(null, 'Invalid data format received.', false);
             }
         } catch (error) {
-            this.handleError(null, error);
+            this.handleError(null, error, false);
         }
     }
 
@@ -62,9 +65,10 @@ class OnlineWebsocket {
         }
     }
 
-    handleError(errorCode, errorMessage) {
+    handleError(errorCode, errorMessage, close) {
         console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
-        this.closeWebSocket();
+        if (close == true)
+			this.closeWebSocket();
     }
 
     closeWebSocket() {

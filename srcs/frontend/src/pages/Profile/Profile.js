@@ -203,7 +203,7 @@ export class Profile extends Component {
 	sendServerMessage() {
 		let testBtn = document.getElementById('testBtn');
 		testBtn.addEventListener("click", (event) => {
-			onlineSocket.sendMessage("test")
+			onlineSocket.sendMessage("test", "ealgar-c")
 		})
 	}
 }
