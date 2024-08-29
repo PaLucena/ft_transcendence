@@ -5,29 +5,28 @@ import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 
 
 export function initTwoFactorAuth(jsonData) {
-    const inputs = document.querySelectorAll('.otp-input');
+	const inputs = document.querySelectorAll('.otp-input');
     const form = document.getElementById('twoFactorForm');
 	const TwoFactorModalElement = document.getElementById('twoFactorModal');
 	const overlayElement = document.getElementById('customOverlay');
-	var TwoFactorModal = new bootstrap.Modal(TwoFactorModalElement, {backdrop: false, keyboard: true})
-
-	TwoFactorModal.show();
-
+	let TwoFactorModal = new bootstrap.Modal(TwoFactorModalElement, {backdrop: false, keyboard: true})
 
 	TwoFactorModalElement.addEventListener('shown.bs.modal', () => {
 		if (inputs.length > 0) {
 			inputs.forEach(input => input.value = '');
-			inputs[0].focus(); // Focus the first input field
+			inputs[0].focus();
 		}
 	});
 	
 	function showModal() {
-        overlayElement.style.display = 'block'; // Show the custom overlay
+		console.log('showing modal')
+        overlayElement.style.display = 'block';
         TwoFactorModal.show();
+		console.log('finished showing modal')
     }
 
     function hideModal() {
-        overlayElement.style.display = 'none'; // Hide the custom overlay
+        overlayElement.style.display = 'none';
         TwoFactorModal.hide();
     }
 
@@ -38,17 +37,13 @@ export function initTwoFactorAuth(jsonData) {
         input.addEventListener('input', (event) => {
             const value = event.target.value;
 
-            // Allow only numeric values
             if (!/^\d$/.test(value)) {
                 event.target.value = '';
                 return;
             }
-            // Move to the next input
             if (value && index < inputs.length - 1) {
                 inputs[index + 1].focus();
             }
-
-            // If it's the last input and all are filled, submit the form
             if (index === inputs.length - 1 && Array.from(inputs).every(input => input.value)) {
                 submit2FAForm(jsonData);
             }

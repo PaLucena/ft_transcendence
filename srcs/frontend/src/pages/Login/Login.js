@@ -52,6 +52,7 @@ export class Login extends Component {
 				})
 				.then(response => {
 					if (!response.ok) {
+						console.log('test')
 						return response.json().then(errData => {
 							throw new Error(errData.error || `Response status: ${response.status}`);
 						});

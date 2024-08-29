@@ -152,7 +152,6 @@ export class Profile extends Component {
 						throw new Error(errData.error || `Response status: ${response.status}`);
 					});
 				}
-				return response.json();
 			})
 			.catch(error => {
 				customAlert('danger', `Error: ${error.message}`, '');

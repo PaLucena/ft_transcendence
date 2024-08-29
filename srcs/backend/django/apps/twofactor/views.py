@@ -13,7 +13,7 @@ def Has2faEnabled(user):
 	if user == None:
 		return False
 	try:
-		device = TOTPDevice.objects.get(user=user, confirmed=False)
+		device = TOTPDevice.objects.get(user=user, confirmed=True)
 		return True
 	except TOTPDevice.DoesNotExist:
 		return False
@@ -77,11 +77,12 @@ def disable2fa(request):
 
 @api_view(["POST"])
 @default_authentication_required
-def confirmDevice():
+def confirmDevice(request):
 	user=userModel.objects.get(username=request.user)
 	try:
 		device = TOTPDevice.objects.get(user=user.pk, confirmed=False)
-		device.confirmDevice()
+		device.confirmed = True
+		device.save()
 	except TOTPDevice.DoesNotExist:
 		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
 	return Response(status=status.HTTP_200_OK)
