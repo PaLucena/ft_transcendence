@@ -26,6 +26,7 @@ export class Profile extends Component {
 		this.show2faButton();
 		this.enable2fa();
 		this.disable2fa();
+		this.sendServerMessage();
 	}
 
 	focusPage() {
@@ -158,7 +159,7 @@ export class Profile extends Component {
 			});
 			this.show2faButton();
 		}
-
+		
 		twofaBtn.addEventListener("click", (event) => {
 			const response = fetch("/api/2fa/enable2fa/", {
 				method: 'POST',
@@ -186,7 +187,6 @@ export class Profile extends Component {
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
 		TwofaBtn.addEventListener("click", (event) => {
-			console.log("a")
 			const response = fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',
@@ -197,6 +197,13 @@ export class Profile extends Component {
 			.then(response => {
 				this.show2faButton();
 			})
+		})
+	}
+	
+	sendServerMessage() {
+		let testBtn = document.getElementById('testBtn');
+		testBtn.addEventListener("click", (event) => {
+			onlineSocket.sendMessage("test")
 		})
 	}
 }

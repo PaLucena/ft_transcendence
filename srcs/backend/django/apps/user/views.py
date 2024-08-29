@@ -26,7 +26,7 @@ from django.contrib.auth import login as auth_login
 from .decorators import default_authentication_required
 from django.http import JsonResponse
 from twofactor.views import Has2faEnabled
-
+from .consumers import OnlineStatusConsumer as OSocketConsumers
 
 @api_view(["GET"])
 @default_authentication_required

@@ -1,5 +1,5 @@
 import { eventEmitter } from './EventEmitter.js';
-
+import customAlert from './customAlert.js'; 
 class OnlineWebsocket {
     constructor() {
         this.onlineSocket = null;
@@ -20,18 +20,35 @@ class OnlineWebsocket {
         this.onlineSocket.onclose = (e) => this.handleClose(e);
     }
 
+	sendMessage(message) {
+        if (this.onlineSocket && this.onlineSocket.readyState === WebSocket.OPEN) {
+            try {
+                const data = JSON.stringify(message);
+                this.onlineSocket.send(data);
+                console.log("Message sent:", data);
+            } catch (error) {
+                this.handleError(null, 'Failed to send message');
+            }
+        } else {
+            console.error("WebSocket is not open. Cannot send message.");
+        }
+    }
+
     handleMessage(event) {
         try {
             const data = JSON.parse(event.data);
-
+			console.log("data: ", data)
             if (data.error) {
                 this.handleError(data.errorCode, data.errorMessage);
                 return;
             }
 
-            if (data.online_users) {
+            if (data.type == "update_online_users_list" || data.online_users) {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
-            } else {
+            } else if (data.type == "server_message") {
+				customAlert('info', data.message, 3000);
+			}
+			else {
                 this.handleError(null, 'Invalid data format received.');
             }
         } catch (error) {
