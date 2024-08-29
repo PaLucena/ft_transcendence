@@ -15,6 +15,7 @@ export class Tournament extends Component {
 	init() {
 		this.joinTournament();
 		this.getTournamentCode(this.params);
+		this.closeTournament(this.params);
 	}
 
 	joinTournament(id) {
@@ -88,5 +89,58 @@ export class Tournament extends Component {
 		.catch((error) => {
 			console.log(error);
 		})
+	}
+
+	closeTournament(tournamentId) {
+		fetch(`/api/get_tournament_creator/${tournamentId.tournamentId}`, {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			console.log("Respuesta de get_tournament_creator: ", data);
+		})
+		.catch((error) => {
+			console.log(error);
+		})
+
+		const	closeBtn = document.getElementById('closeBtn');
+
+		this.addEventListener(closeBtn, 'click', () => {
+			fetch(`/api/close_tournament/${tournamentId.tournamentId}/`, {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include'
+			})
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(errData => {
+						throw new Error(errData.error || `Response status: ${response.status}`);
+					});
+				}
+				return response.json();
+			})
+			.then(data => {
+				document.getElementById('invitationCode').innerHTML = data.code;
+
+				console.log("Código de acceso al torneo: ", data);
+			})
+			.catch((error) => {
+				console.log(error);
+				customAlert('danger', `Error: ` + error.message, '');
+			})
+		});
 	}
 }

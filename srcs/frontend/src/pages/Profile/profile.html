@@ -1,15 +1,15 @@
-<div id="rootProfile" class="d-flex">
-	<div id="containerUser">
-		<div id="userInfo" class="bg-light rounded-5 shadow">
-			<div id="photo" class="row col-10 mx-auto">
+<div id="rootProfile" class="root-profile d-flex">
+	<div class="container-user">
+		<div id="userInfo" class="user-info bg-light rounded-5 shadow">
+			<div class="photo row col-10 mx-auto">
 				<div class="profile-photo-container col-4 m-0 d-flex justify-content-center">
 					<img id="photoContainer" class="profile-photo rounded-circle square shadow" style="height: 100%;" alt="Avatar"/>
 				</div>
 			</div>
-			<div id="username" class="d-flex col-8 mt-4 mx-auto align-items-center justify-content-center">
+			<div class="d-flex col-8 mt-4 mx-auto align-items-center justify-content-center">
 				<p id="usernamePlaceholder" class="display-6 fw-bold">‎ </p>
 			</div>
-			<div id="friendsNb" class="d-flex col-8 mx-auto align-items-center justify-content-center">
+			<div class="d-flex col-8 mx-auto align-items-center justify-content-center">
 				<p><span id="friendsNbPlaceholder">0</span> friends</p>
 			</div>
 			<div class="row col-8 mx-auto">
@@ -26,32 +26,39 @@
 				<button class="btn btn-success">LOGOUT</button>
 			</div>
 		</div>
-		<div id="userEdit" class="bg-light rounded-5 shadow">
-			<form id="editForm" class="d-flex justify-content-center align-items-center">
+		<div id="userEdit" class="user-edit bg-light align-items-center rounded-5 shadow">
+			<form id="editForm" class="edit-form d-flex mt-0 mt-md-5 justify-content-center align-items-center">
 				<div class="edit-profile-input form-floating mt-5">
-					<input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+					<input type="text" class="form-control" id="username" name="username" placeholder="">
 					<label for="username">username</label>
 				</div>
 				<div class="edit-profile-input form-floating mt-3">
-					<input type="text" class="form-control" id="Email" name="Email" placeholder="Email" required>
-					<label for="Email">email</label>
+					<input type="file" class="form-control" id="avatar" name="avatar" placeholder="avatar">
+					<label for="avatar">avatar</label>
 				</div>
 				<div class="edit-profile-input form-floating mt-3">
-					<input type="text" class="form-control" id="password" name="password" placeholder="Password" required>
-					<label for="password">password</label>
+					<input type="password" class="form-control" id="old_password" name="old_password" placeholder="">
+					<label for="old_password">password</label>
+				</div>
+				<div class="edit-profile-input form-floating mt-3">
+					<input type="password" class="form-control" id="new_password" name="new_password" placeholder="">
+					<label for="new_password">new password</label>
+				</div>
+				<div class="edit-profile-input form-floating mt-3">
+					<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="">
+					<label for="confirm_password">confirm new password</label>
 				</div>
 			</form>
 			<div id="twofaBtn" class="d-flex col mt-5 align-items-center justify-content-center">
-				<button class="btn btn-dark" id="2faBtn">2FA</button>
+				<button class="btn btn-dark col-8" id="2faBtn">2FA</button>
 			</div>
-
-			<div id="saveInfo" class="d-flex col mt-5 justify-content-center">
-				<button class="btn btn-success btn-dark">SAVE</button>
+			<div id="saveInfo" class="d-flex col my-5 justify-content-center">
+				<button class="btn btn-primary col-10">SAVE</button>
 			</div>
 		</div>
 	</div>
-	<div id="containerStats">
-		<div id="stats" class="row align-items-center justify-content-center bg-light rounded-5 shadow">
+	<div class="container-stats">
+		<div class="stats row align-items-center justify-content-center bg-light rounded-5 shadow">
 			<div class="text-center">
 				<p class="display-1" style="color: black;">Stats go here</p>
 			</div>

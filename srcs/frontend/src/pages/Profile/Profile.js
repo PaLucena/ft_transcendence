@@ -21,7 +21,6 @@ export class Profile extends Component {
 		this.focusPage();
 		this.displayUserInfo();
 		this.logout();
-		this.editUserBtn();
 		this.saveInfoBtn();
 	}
 
@@ -42,7 +41,6 @@ export class Profile extends Component {
 			credentials: 'include'
 		})
 		.then(response => {
-			console.log("Respuesta de get_user_data: ", response);
 			if (!response.ok) {
 				return response.json().then(errData => {
 					throw new Error(errData.error || `Response status: ${response.status}`);
@@ -51,22 +49,25 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
-			//document.getElementById("photoContainer").innerHTML = `<img class="profile-photo h-120 square rounded-circle col-12 shadow" src="${data["avatar"]}">`
+			console.log("Respuesta de get_user_data: ", data);
 			document.getElementById("photoContainer").src = `${data["avatar"]}`;
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
 			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
+
+			this.editUserBtn(data);
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
 		})
 	}
 
-	editUserBtn() {
+	editUserBtn(userData) {
 		let editBtn = document.getElementById("editBtn");
 
-		this.addEventListener(editBtn, "click", (event) => {
+		this.addEventListener(editBtn, "click", () => {
 			document.getElementById("userInfo").style.display = "none";
 			document.getElementById("userEdit").style.display = "block";
+			document.getElementById("username").value = `${userData["username"]}`;
 		});
 	}
 

@@ -1,4 +1,4 @@
-#rootProfile {
+.root-profile {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
@@ -7,18 +7,18 @@
 	background-repeat: no-repeat;
 }
 
-#containerUser {
+.container-user {
 	z-index: 2;
 	height: 100%;
 	justify-content: center;
 }
 
 @media only screen and (max-width: 599px) {
-	#rootProfile {
+	.root-profile {
 		flex-direction: column;
 	}
 
-	#containerUser, #containerStats {
+	.container-user, .container-stats {
 		height: 50%;
 		display: flex;
 		justify-content: center;
@@ -27,31 +27,31 @@
 }
 
 @media only screen and (min-width: 600px) {
-	#rootProfile {
+	.root-profile {
 		flex-direction: row;
 		align-items: center;
 	}
 
-	#containerUser {
+	.container-user {
 		display: flex;
 		height: 100%;
 		width: 40%;
 		align-items: center;
 	}
 	
-	#containerStats {
+	.container-stats {
 		display: flex;
 		align-items: center;
 		height: 100%;
 		width: 60%;
 	}
 
-	#containerUser #userInfo, #containerStats #stats {
+	.container-user .user-info, .container-stats .stats {
 		margin-left: 5%;
 	}
 }
 
-#containerUser #userInfo {
+.container-user .user-info {
 	display: block;
 	margin: 0 auto;
 	color: black;
@@ -59,7 +59,7 @@
 	width: 90%;
 }
 
-#userInfo #photo {
+.user-info .photo {
 	position: relative;
 	height: 20%;
 	justify-content: center;
@@ -77,38 +77,31 @@
 	border: 2px solid #192e2f;
 }
 
-#containerStats {
+.container-stats {
 	z-index: 2;
 }
 
-#containerStats #stats {
+.container-stats .stats {
 	height: 90%;
 	width: 90%;
 }
 
-#containerUser #userEdit {
+.container-user .user-edit {
 	display: none;
 	margin: 0 auto;
 	color: black;
 	height: 90%;
 	width: 90%;
+	max-height: 100%;
+	overflow-y: auto;
 }
 
-#editForm {
+.edit-form {
 	flex-direction: column;
 }
 
 .edit-profile-input {
 	width: 80%;
-}
-
-#chat-placeholder {
-	position: absolute;
-	display: flex;
-	z-index: 3;
-	bottom: 0;
-	right: 0.5%;
-	margin-bottom: 2vh;
 }
 
 .overlay {
