@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import hashlib
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,6 +30,10 @@ AUTH_USER_MODEL = "user.AppUser"
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
+# def generate_secret_key():
+#     return hashlib.sha256(os.urandom(64)).hexdigest()
+
+# SECRET_KEY = generate_secret_key()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -48,18 +53,19 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
-	"rest_framework_simplejwt.token_blacklist",
+    "rest_framework_simplejwt.token_blacklist",
     "user",
+    "friends",
     "user_stats",
     "tournament",
     "corsheaders",
     "blockchain",
     "rtchat",
     "ponggame",
-	"django_otp",
-	"django_otp.plugins.otp_totp",
-	"twofactor",
-	"qrcode",
+    "django_otp",
+    "django_otp.plugins.otp_totp",
+    "twofactor",
+    "qrcode",
 ]
 
 MIDDLEWARE = [
@@ -71,8 +77,8 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-#	'user.middleware.UpdateLastSeenMiddleware',
-	'django_otp.middleware.OTPMiddleware'
+    # 	'user.middleware.UpdateLastSeenMiddleware',
+    "django_otp.middleware.OTPMiddleware",
 ]
 ROOT_URLCONF = "core.urls"
 
@@ -129,38 +135,36 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-       # "rest_framework.authentication.SessionAuthentication",  # For browsable API
+        # "rest_framework.authentication.SessionAuthentication",  # For browsable API
         # "rest_framework.authentication.TokenAuthentication",  # For API clients
         #'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-     #  'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": [
+        #  'rest_framework.permissions.IsAuthenticated',
     ],
-	'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-    'VERIFYING_KEY': None,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type',
-    'AUTH_COOKIE': 'access_token',
-    'REFRESH_COOKIE': 'refresh_token',
-    'AUTH_COOKIE_DOMAIN': None,
-    'AUTH_COOKIE_SECURE': True,
-    'AUTH_COOKIE_HTTP_ONLY': True,
-    'AUTH_COOKIE_PATH': '/',
-    'AUTH_COOKIE_SAMESITE': 'Lax',
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "AUTH_COOKIE": "access_token",
+    "REFRESH_COOKIE": "refresh_token",
+    "AUTH_COOKIE_DOMAIN": None,
+    "AUTH_COOKIE_SECURE": True,
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_PATH": "/",
+    "AUTH_COOKIE_SAMESITE": "Lax",
 }
 
 # Password validation
@@ -181,7 +185,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Or another backend of your choice
+SESSION_ENGINE = (
+    "django.contrib.sessions.backends.db"  # Or another backend of your choice
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

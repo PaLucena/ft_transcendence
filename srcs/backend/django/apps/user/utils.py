@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
-from .models import AppUser, Friend
+from .models import AppUser
+from friends.models import Friend
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import datetime, timedelta
@@ -40,20 +41,10 @@ def upload_avatar(request):
 		elif not file.content_type.startswith('image'):
 			return Response({'error': 'Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 
-		#user.avatar = file
-		#user.save()
-
 		extension = file.name.split('.')[-1]
 		filename = f"{user.username}.{extension}"
-		filepath = os.path.join('avatars', filename)
-		counter = 1
 
-		while default_storage.exists(os.path.join(settings.MEDIA_ROOT, filepath)):
-			filename: str = f"{user.username}_{counter}.{extension}"
-			filepath = os.path.join('avatars', filename)
-			counter += 1
-
-		user.avatar.save(filepath, ContentFile(file.read()), save=True)
+		user.avatar.save(filename, ContentFile(file.read()), save=True)
 
 		print("user avatar:", user.avatar)
 		return Response({'message': 'Avatar updated successfully.'}, status=status.HTTP_200_OK)
@@ -65,8 +56,8 @@ def upload_avatar(request):
 # def get_token_expiry_times():
 # 	access_token_lifetime = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']
 # 	refresh_token_lifetime = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']
-	
+
 # 	access_token_expiry = (datetime.utcnow() + access_token_lifetime).replace(tzinfo=utc)
 # 	refresh_token_expiry = (datetime.utcnow() + refresh_token_lifetime).replace(tzinfo=utc)
-	
+
 # 	return access_token_expiry, refresh_token_expiry

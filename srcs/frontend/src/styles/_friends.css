@@ -1,0 +1,79 @@
+.friends-elemets-container {
+	margin: 0;
+}
+
+.search-friends-container .container {
+	padding: 0;
+}
+
+.search-friends-container .chat-element {
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.search-friends-container .chat-element  .img-nick  {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.search-friends-container .chat-element  .img-nick  .btn {
+	width: 102px;
+	height: 102px;
+}
+
+.search-friends-container .chat-element  .img-nick .btn img {
+	width: 100px;
+	height: 100px;
+}
+
+@media (max-width: 720px) {
+	.friends-elemets-container {
+		margin: 0 auto;
+	}
+}
+
+@media (max-width: 540px) {
+	.search-header {
+		flex-direction: column;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	.search-header .search-filter-container {
+		margin-bottom: 15px;
+	}
+
+	.search-header .search-form-container {
+		width: 100%;
+	}
+
+	.search-friends-container {
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	.search-friends-container .chat-element {
+		padding: 0;
+		flex-direction: row;
+		justify-content: space-between;
+		width: 100%;
+	}
+	.search-friends-container .chat-element .img-nick {
+		gap: 10px;
+		flex-direction: row;
+	}
+
+	.search-friends-container .chat-element  .img-nick  .btn {
+		width: 82px;
+		height: 82px;
+	}
+
+	.search-friends-container .chat-element  .img-nick .btn img {
+		width: 80px;
+		height: 80px;
+	}
+
+}

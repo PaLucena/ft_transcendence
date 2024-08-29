@@ -4,6 +4,9 @@ from django.contrib.auth.decorators import login_required
 from user.models import AppUser
 from .models import UserStats
 from rest_framework.response import Response
+from blockchain.views import get_player_tournaments as bc_get_player_tournaments
+from blockchain.views import get_player_matches as bc_get_player_matches
+
 
 # expected from blockchain smth like this
 # {

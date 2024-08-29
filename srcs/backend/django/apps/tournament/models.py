@@ -32,6 +32,7 @@ class Match(models.Model):
 	winner = models.IntegerField(null=True)
 	loser = models.IntegerField(null=True)
 	can_create_match = models.BooleanField(default=True)
+	controls_mode = models.CharField(max_length=100, null=True, blank=True)
 
 	class Meta:
 		unique_together = ('tournament', 'match_id')

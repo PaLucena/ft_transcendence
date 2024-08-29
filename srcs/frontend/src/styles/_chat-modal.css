@@ -1,15 +1,11 @@
-#chat_modal {
-	position: relative;
-}
-
 .other-message {
 	border-bottom-right-radius: 0.5rem !important;
 }
+
 .my-message {
 	background-color: #BBF7D0;
 	border-bottom-left-radius: 0.5rem !important;
 }
-
 
 .message-field {
     height: 60px;
@@ -25,21 +21,17 @@
     font-style: italic;
 }
 
-
 .message-field::-webkit-scrollbar {
 	width: 10px;
 }
-
 
 .message-field::-webkit-scrollbar-track {
 	background: #f1f1f1;
 }
 
-
 .message-field::-webkit-scrollbar-thumb {
 	background: #888;
 }
-
 
 .message-field::-webkit-scrollbar-thumb:hover {
 	background: #555;
@@ -97,20 +89,19 @@
 	background-color: #6b7280;
 }
 
-
 /*  First Chat modal  */
 
 .circle-container {
     width: 100px;
     height: 100px;
     overflow: hidden;
-  }
+}
 
-  .circle-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-  }
+.circle-image {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: cover;
+}
 
 .chat-element .btn > img {
 	opacity: 1;
@@ -136,4 +127,10 @@
 	color: gray;
 	margin-left: 5px;
 	cursor: pointer;
+}
+
+@media screen and (min-width: 680px) and (max-width: 991px) {
+	.modal-dialog.custom-width {
+		max-width: 640px;
+	}
 }

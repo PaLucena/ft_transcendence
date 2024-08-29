@@ -25,22 +25,26 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+
 # Django Container Health check view
 def health_check(request):
-    return JsonResponse({'status': 'ok'}, status=200)
+    return JsonResponse({"status": "ok"}, status=200)
+
 
 urlpatterns = [
-     # The route for checking the health of the django container
-    path('health/', health_check),
-
+    # The route for checking the health of the django container
+    path("health/", health_check),
     # Admin and API routes
     path("admin/", admin.site.urls),
     path("api/", include("user.urls")),
     path("api/", include("user_stats.urls")),
     path("api/", include("tournament.urls")),
     path("api/chat/", include("rtchat.urls")),
+    path("api/friends/", include("friends.urls")),
     path("api/blockchain/", include("blockchain.urls")),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), #frontend asks a new access token here
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path(
+        "api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
+    ),  # frontend asks a new access token here
     path("api/2fa/", include("twofactor.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

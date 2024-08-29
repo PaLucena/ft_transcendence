@@ -2,6 +2,7 @@ from rest_framework import exceptions
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from .models import AppUser
 
 class DefaultAuthentication:
 
@@ -17,7 +18,6 @@ class DefaultAuthentication:
 			try:
 				validated_token = self.jwt_auth.get_validated_token(access_token)
 			except Exception as e:
-				print("Access token is invalid or expired")
 				if refresh_token:
 					try:
 						print("ACCESS TOKEN: ", access_token)
@@ -38,11 +38,11 @@ class DefaultAuthentication:
 
 		user = self.jwt_auth.get_user(validated_token)
 
-		#if not user.is_authenticated:
-		#	raise exceptions.AuthenticationFailed('User not authenticated')
+		if not AppUser.objects.filter(pk=user.pk).exists():
+			raise exceptions.AuthenticationFailed('User does not exist')
 
 		request.user = user
-		print("DONE")
+		print("USER: ", user)
 
 		return user, request.COOKIES.get('access_token')
 

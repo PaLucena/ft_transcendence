@@ -1,59 +1,60 @@
 import math
 import random
-import asyncio
-import time
 
 
 class GameLogic:
-    # Game measurements
-    TABLE_HEIGHT = 680
-    TABLE_WIDTH = 1200
-    MID_Y = TABLE_HEIGHT / 2
-    MID_X = TABLE_WIDTH / 2
-    PAD_HEIGHT = 110
-    PAD_WIDTH = 20
-    PAD_MID_HEIGHT = PAD_HEIGHT / 2
-    PAD_MARGIN = 90
-    PAD_SPEED = 4
-    BALL_RADIUS = 24
+    # Game configuration
+    PADDLE_SPEED = 4
     BALL_SPEED_INIT = 6
     BALL_SPEED_INC = 0.5
-    COUNTDOWN = 3
-    GOAL_MARGIN = 25
-    GOALS_TO_WIN = 6
-    GOALS_DIFF = 2
-    FPS = 64
+    GOALS_TO_WIN = 5
+    GOALS_DIFFERENCE = 1
+    INIT_COUNTDOWN = 3
+    CONNECT_TIMEOUT = 120
 
-    # Initial positions
-    pad_1_x = PAD_MARGIN
-    pad_1_y = MID_Y
-    pad_2_x = TABLE_WIDTH - PAD_MARGIN
-    pad_2_y = MID_Y
-    ball_x = MID_X
-    ball_y = MID_Y
+    # Graphic configuration
+    TABLE_HEIGHT = 680
+    TABLE_WIDTH = 1200
+    TABLE_MID_HEIGHT = TABLE_HEIGHT / 2
+    TABLE_MID_WIDTH = TABLE_WIDTH / 2
+    PADDLE_HEIGHT = 110
+    PADDLE_WIDTH = 20
+    PADDLE_MID_HEIGHT = PADDLE_HEIGHT / 2
+    PADDLE_MID_WIDTH = PADDLE_WIDTH / 2
+    PADDLE_TAB_MARGIN = 90
+    BALL_RADIUS = 24
+    GOAL_TAB_MARGIN = 25
+    FPS = 64
+    FRAME_TIME = 1 / FPS
+
+    # Initial values
+    pad_1_x = PADDLE_TAB_MARGIN
+    pad_1_y = TABLE_MID_HEIGHT
+    pad_2_x = TABLE_WIDTH - PADDLE_TAB_MARGIN
+    pad_2_y = TABLE_MID_HEIGHT
+    ball_x = TABLE_MID_WIDTH
+    ball_y = TABLE_MID_HEIGHT
     ball_dir_x = -1 if random.uniform(-1, 1) <= 0.5 else 1
     ball_dir_y = -1 if random.uniform(-1, 1) <= 0.5 else 1
     ball_vel_x = BALL_SPEED_INIT
     ball_vel_y = BALL_SPEED_INIT
 
-    count_down = 0
-
-    frame_duration = 1 / FPS
-
-    player_1_name = "Pepito"
-    player_2_name = "Jaimito"
+    # Game variables
     theme = "default"
+    game_state = "waiting"
+    player_1_id = None
+    player_2_id = None
+    player_1_ready = False
+    player_2_ready = False
+    player_1_goals = 0
+    player_2_goals = 0
+    controls_mode = "local"
+    ai_mode = 0
+    countdown = 0
+    timeout = 0
 
-    def __init__(self):
-        self.reset_game()
-        self.game_state = "ready"
-        self.player_1_ready = False
-        self.player_2_ready = False
-        self.player_1_score = 0
-        self.player_2_score = 0
-
-    def players_ready(self):
-        return self.player_1_ready and self.player_2_ready
+    player_1_channel = None
+    player_2_channel = None
 
     def move_ball(self):
         self.ball_x += self.ball_vel_x * self.ball_dir_x
@@ -61,31 +62,32 @@ class GameLogic:
 
     def move_paddle(self, player, direction):
         if player == 1:
-            self.pad_1_y += direction * self.PAD_SPEED
-            if self.pad_1_y - self.PAD_MID_HEIGHT < self.GOAL_MARGIN:
-                self.pad_1_y = self.PAD_MID_HEIGHT + self.GOAL_MARGIN
-            if self.pad_1_y + self.PAD_MID_HEIGHT > self.TABLE_HEIGHT - self.GOAL_MARGIN:
-                self.pad_1_y = self.TABLE_HEIGHT - self.PAD_MID_HEIGHT - self.GOAL_MARGIN
+            self.pad_1_y += direction * self.PADDLE_SPEED
+            if self.pad_1_y - self.PADDLE_MID_HEIGHT < self.GOAL_TAB_MARGIN:
+                self.pad_1_y = self.PADDLE_MID_HEIGHT + self.GOAL_TAB_MARGIN
+            if self.pad_1_y + self.PADDLE_MID_HEIGHT > self.TABLE_HEIGHT - self.GOAL_TAB_MARGIN:
+                self.pad_1_y = self.TABLE_HEIGHT - self.PADDLE_MID_HEIGHT - self.GOAL_TAB_MARGIN
         else:
-            self.pad_2_y += direction * self.PAD_SPEED
-            if self.pad_2_y - self.PAD_HEIGHT / 2 < self.GOAL_MARGIN:
-                self.pad_2_y = self.PAD_HEIGHT / 2 + self.GOAL_MARGIN
-            if self.pad_2_y + self.PAD_HEIGHT / 2 > self.TABLE_HEIGHT - self.GOAL_MARGIN:
-                self.pad_2_y = self.TABLE_HEIGHT - self.PAD_HEIGHT / 2 - self.GOAL_MARGIN
+            self.pad_2_y += direction * self.PADDLE_SPEED
+            if self.pad_2_y - self.PADDLE_HEIGHT / 2 < self.GOAL_TAB_MARGIN:
+                self.pad_2_y = self.PADDLE_HEIGHT / 2 + self.GOAL_TAB_MARGIN
+            if self.pad_2_y + self.PADDLE_HEIGHT / 2 > self.TABLE_HEIGHT - self.GOAL_TAB_MARGIN:
+                self.pad_2_y = self.TABLE_HEIGHT - self.PADDLE_HEIGHT / 2 - self.GOAL_TAB_MARGIN
 
     def check_collision(self):
         # Check collision with walls
         if self.ball_y - self.BALL_RADIUS <= 0 or self.ball_y + self.BALL_RADIUS >= self.TABLE_HEIGHT:
             self.ball_dir_y *= -1
+
         # Check collision with pads
-        if (self.pad_1_x >= self.ball_x - self.BALL_RADIUS >= self.pad_1_x - self.PAD_WIDTH and
-                self.pad_1_y - self.PAD_HEIGHT / 2 <= self.ball_y <= self.pad_1_y + self.PAD_HEIGHT / 2 and
+        if (self.pad_1_x >= self.ball_x - self.BALL_RADIUS >= self.pad_1_x - self.PADDLE_WIDTH and
+                self.pad_1_y - self.PADDLE_HEIGHT / 2 <= self.ball_y <= self.pad_1_y + self.PADDLE_HEIGHT / 2 and
                 self.ball_dir_x < 0):
             self.new_angle(1)
             self.ball_vel_y += self.BALL_SPEED_INC
             self.ball_vel_x += self.BALL_SPEED_INC
-        elif (self.pad_2_x <= self.ball_x + self.BALL_RADIUS <= self.pad_2_x + self.PAD_WIDTH and
-              self.pad_2_y - self.PAD_HEIGHT / 2 <= self.ball_y <= self.pad_2_y + self.PAD_HEIGHT / 2 and
+        elif (self.pad_2_x <= self.ball_x + self.BALL_RADIUS <= self.pad_2_x + self.PADDLE_WIDTH and
+              self.pad_2_y - self.PADDLE_HEIGHT / 2 <= self.ball_y <= self.pad_2_y + self.PADDLE_HEIGHT / 2 and
               self.ball_dir_x > 0):
             self.new_angle(2)
             self.ball_vel_y += self.BALL_SPEED_INC
@@ -97,60 +99,44 @@ class GameLogic:
         else:
             impact_point = self.ball_y - self.pad_2_y
 
-        relative_intersect = impact_point / (self.PAD_HEIGHT / 2)
-        bounce_angle = relative_intersect * math.radians(60)  # Max bounce angle is 60 degrees
+        relative_intersect = impact_point / (self.PADDLE_HEIGHT / 2)
+        bounce_angle = relative_intersect * math.radians(60)
 
         self.ball_dir_x = -self.ball_dir_x
         self.ball_dir_y = math.sin(bounce_angle)
 
     def check_goal(self):
-        if self.ball_x < self.GOAL_MARGIN:
-            self.player_2_score += 1
+        if self.ball_x < self.GOAL_TAB_MARGIN:
+            self.player_2_goals += 1
+            print("Goal player", self.player_2_id, " Score:", self.player_1_goals, "-", self.player_2_goals) # DEBUG
             return 2
-        if self.ball_x > self.TABLE_WIDTH - self.GOAL_MARGIN:
-            self.player_1_score += 1
+        if self.ball_x > self.TABLE_WIDTH - self.GOAL_TAB_MARGIN:
+            self.player_1_goals += 1
+            print("Goal player", self.player_1_id, " Score:", self.player_1_goals, "-", self.player_2_goals) # DEBUG
             return 1
         return 0
 
     def reset_game(self):
-        self.ball_x = self.MID_X
-        self.ball_y = self.MID_Y
+        self.ball_x = self.TABLE_MID_WIDTH
+        self.ball_y = self.TABLE_MID_HEIGHT
         self.ball_vel_x = self.BALL_SPEED_INIT
         self.ball_vel_y = self.BALL_SPEED_INIT
         self.ball_dir_x = -1 if random.uniform(-1, 1) <= 0.5 else 1
         self.ball_dir_y = -1 if random.uniform(-1, 1) <= 0.5 else 1
 
     def end_game(self):
-        if self.player_1_score >= self.GOALS_TO_WIN and self.player_1_score - self.player_2_score >= self.GOALS_DIFF:
+        if (self.player_1_goals >= self.GOALS_TO_WIN and
+                self.player_1_goals - self.player_2_goals >= self.GOALS_DIFFERENCE):
             return True
-        if self.player_2_score >= self.GOALS_TO_WIN and self.player_2_score - self.player_1_score >= self.GOALS_DIFF:
+        if (self.player_2_goals >= self.GOALS_TO_WIN and
+                self.player_2_goals - self.player_1_goals >= self.GOALS_DIFFERENCE):
             return True
         return False
 
-    def print_positions(self):
-        print(f"Ball: ({self.ball_x}, {self.ball_y})")
-        print(f"Pad 1: ({self.pad_1_x}, {self.pad_1_y})")
-        print(f"Pad 2: ({self.pad_2_x}, {self.pad_2_y})")
-        print(f"Score: {self.player_1_score} - {self.player_2_score}")
-
-    def init_game(self):
-        test_counter = 0
-        while not self.players_ready() and test_counter < 15:
-            print("Waiting for players to be ready...")
-            asyncio.sleep(1)
-            test_counter += 1
-        if test_counter < 15:
-            self.game_state = "ready"
-            return True
-        else:
-            return False
-
     def set_countdown(self):
-        self.count_down = (self.COUNTDOWN + 1) * self.FPS
+        self.countdown = (self.INIT_COUNTDOWN + 1) * self.FPS
 
     async def game_loop(self):
-        start_time = time.time()
-
         if self.game_state == "playing":
             self.move_ball()
             self.check_collision()
@@ -163,9 +149,33 @@ class GameLogic:
                     self.set_countdown()
                     self.reset_game()
         elif self.game_state == "countdown":
-            if self.count_down > self.FPS:
-                self.count_down -= 1
+            if self.countdown > self.FPS:
+                self.countdown -= 1
             else:
                 self.game_state = "playing"
-        elapsed_time = time.time() - start_time
-        await asyncio.sleep(max(0, self.frame_duration - elapsed_time))
+        elif self.game_state == "scored":
+            self.game_state = "countdown"
+        elif self.game_state == "waiting":
+            self.timeout += 1
+            if self.timeout > self.CONNECT_TIMEOUT * self.FPS:
+                self.game_state = "game_over"
+            if self.player_1_ready and self.player_2_ready:
+                self.game_state = "countdown"
+                self.set_countdown()
+            if not self.player_1_ready:
+                self.player_1_goals = -1
+            if not self.player_2_ready:
+                self.player_2_goals = -1
+
+    def get_game_result(self):
+        return {
+            "player_1_score": self.player_1_goals,
+            "player_2_score": self.player_2_goals,
+        }
+
+    # Debugging methods
+    def print_positions(self):
+        print(f"Ball: ({self.ball_x}, {self.ball_y})")
+        print(f"Pad 1: ({self.pad_1_x}, {self.pad_1_y})")
+        print(f"Pad 2: ({self.pad_2_x}, {self.pad_2_y})")
+        print(f"Score: {self.player_1_goals} - {self.player_2_goals}")
