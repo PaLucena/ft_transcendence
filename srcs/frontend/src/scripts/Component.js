@@ -25,7 +25,8 @@ export class Component {
 	async fetchHtmlFromFile(route) {
 		if (route) {
 			try {
-				const response = await fetch(route);
+				console.log("ROUTE: ", route)
+                const response = await fetch(route);
 				if (response.ok) return await response.text();
 				else {
 					console.error(`Failed to load Page at ${route}: ${response.status}`);

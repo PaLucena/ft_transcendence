@@ -53,12 +53,12 @@ export class Pong extends Component {
 		const controls_1 = getCSSSelector('.controls-1');
 		const controls_2 = getCSSSelector('.controls-2');
 
+		// Websocket setup
+		const socket = new WebSocket('/ws/ponggame/');
+
 		// Apply game settings
 		p_1_name.innerHTML = player_1_name;
 		p_2_name.innerHTML = player_2_name;
-
-		// Websocket setup
-		const socket = new WebSocket('/ws/ponggame/');
 
 		socket.onopen = function() {
 			console.log("Connection established");

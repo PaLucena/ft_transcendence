@@ -41,20 +41,10 @@ def upload_avatar(request):
 		elif not file.content_type.startswith('image'):
 			return Response({'error': 'Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
 
-		#user.avatar = file
-		#user.save()
-
 		extension = file.name.split('.')[-1]
 		filename = f"{user.username}.{extension}"
-		filepath = os.path.join('avatars', filename)
-		counter = 1
 
-		while default_storage.exists(os.path.join(settings.MEDIA_ROOT, filepath)):
-			filename: str = f"{user.username}_{counter}.{extension}"
-			filepath = os.path.join('avatars', filename)
-			counter += 1
-
-		user.avatar.save(filepath, ContentFile(file.read()), save=True)
+		user.avatar.save(filename, ContentFile(file.read()), save=True)
 
 		print("user avatar:", user.avatar)
 		return Response({'message': 'Avatar updated successfully.'}, status=status.HTTP_200_OK)
