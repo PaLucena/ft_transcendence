@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+	"adrf",
     "user",
     "friends",
     "user_stats",

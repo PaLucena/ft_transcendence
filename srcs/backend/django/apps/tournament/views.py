@@ -97,10 +97,6 @@ def close_tournament(request, tournament_id):
 				tournament.is_active = True
 				tournament.save()
 				available_matches = create_initial_matches(tournament)
-				
-				# for match in ai_vs_ai_matches:
-				# 	next_matches = assign_next_match(tournament, match.match_id) #needs fix!!!
-				# 	available_matches.extend(next_matches)
 
 				sync_to_async(asyncio.create_task)(start_all_matches(tournament, available_matches))
 

@@ -74,7 +74,6 @@ export class Play extends Component {
 
 	//local logic
 	playLocal() {
-		navigateTo("/pong");
 		fetch("/api/start_local_match/", {
 			method: "POST",
 			headers: {
@@ -92,6 +91,7 @@ export class Play extends Component {
 		})
 		.then(data => {
 			customAlert('success', data.message, '3000');
+			navigateTo("/pong");
 			
 		})
 		.catch((error) => {
