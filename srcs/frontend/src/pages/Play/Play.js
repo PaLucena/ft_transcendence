@@ -54,12 +54,44 @@ export class Play extends Component {
 		this.addEventListener(plusPrivateBtn, "click", () => {
 			this.createTournament('private');
 		});
+		//local game
+		const	localBtn = document.getElementById("localBtn");
+		localBtn.addEventListener("click", () => {
+			this.playLocal();
+		});
 
 		const	tournamentModalElement = document.getElementById("tournamentModal");
 		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
 		tournamentModalElement.addEventListener('shown.bs.modal', () => {
 			document.getElementById('name-input').focus();
 		});
+	}
+
+	//local logic
+	playLocal() {
+		fetch("/api/start_local_match/", {
+			method: "POST",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			customAlert('success', data.message, '3000');
+			navigateTo("/pong");
+			
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
 	}
 
 	createTournament(tournamentType) {
