@@ -15,8 +15,9 @@ export class Tournament extends Component {
 
 	init() {
 		//this.joinTournament();
-		this.getTournamentCode(this.params);
-		this.checkCreator(this.params);
+		this.getTournamentCode(this.params.tournamentId);
+		this.checkCreator(this.params.tournamentId);
+		this.displayInfo(this.params.tournamentId);
 	}
 
 	/* joinTournament(id) {
@@ -65,9 +66,9 @@ export class Tournament extends Component {
 	} */
 
 	getTournamentCode(tournamentId) {
-		console.log("Tournament ID: ", tournamentId.tournamentId);
+		console.log("Tournament ID: ", tournamentId);
 
-		fetch(`/api/get_code/${tournamentId.tournamentId}`, {
+		fetch(`/api/get_code/${tournamentId}`, {
 			method: "GET",
 			headers: {
 				'Content-Type': 'application/json'
@@ -85,7 +86,7 @@ export class Tournament extends Component {
 		.then(data => {
 			document.getElementById('invitationCode').innerHTML = data.code;
 
-			console.log("Código de acceso al torneo: ", data);
+			console.log("Código de acceso al torneo: ", data.code);
 		})
 		.catch((error) => {
 			console.log(error);
@@ -93,7 +94,7 @@ export class Tournament extends Component {
 	}
 
 	checkCreator(tournamentId) {
-		fetch(`/api/get_tournament_creator/${tournamentId.tournamentId}`, {
+		fetch(`/api/get_tournament_creator/${tournamentId}`, {
 			method: "GET",
 			headers: {
 				'Content-Type': 'application/json'
@@ -127,7 +128,7 @@ export class Tournament extends Component {
 		const	closeBtn = document.getElementById('closeBtn');
 
 		this.addEventListener(closeBtn, 'click', () => {
-			fetch(`/api/close_tournament/${tournamentId.tournamentId}/`, {
+			fetch(`/api/close_tournament/${tournamentId}/`, {
 				method: "POST",
 				headers: {
 					'Content-Type': 'application/json'
@@ -156,7 +157,7 @@ export class Tournament extends Component {
 		const	exitBtn = document.getElementById('exitBtn');
 
 		this.addEventListener(exitBtn, 'click', () => {
-			fetch(`/api/remove_participation/${tournamentId.tournamentId}/`, {
+			fetch(`/api/remove_participation/${tournamentId}/`, {
 				method: "POST",
 				headers: {
 					'Content-Type': 'application/json'
@@ -181,5 +182,49 @@ export class Tournament extends Component {
 				customAlert('danger', `Error: ` + error.message, '');
 			})
 		});
+	}
+
+	displayInfo(tournamentId) {
+		fetch("/api/display_tournaments/", {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			let	tournamentInfo = {};
+
+			tournamentInfo = data.public_tournaments.find(object => object.id == tournamentId);
+			if (!tournamentInfo)
+				tournamentInfo = data.private_tournaments.find(object => object.id == tournamentId);
+
+			console.log("Info del torneo:", tournamentInfo);
+			document.getElementById('tournamentName').innerHTML = `<p class="display-4">${tournamentInfo.name}</h1>`;
+
+			const	players = document.querySelectorAll('[id^="player"]');
+
+			let	userStatus = "";
+			
+			players.forEach(player => {
+				console.log("Jugador:", tournamentInfo.players[player.id.substring(6, 7) - 1]);
+
+				userStatus = tournamentInfo.players[player.id.substring(6, 7) - 1];
+				player.querySelector('[id^="nickname-"]').innerHTML =  userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].nickname : "AI";
+
+				player.querySelector('[id^="avatar-"]').src = userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].avatar : 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg';
+			});
+		})
+		.catch((error) => {
+			console.log("Error: ", error);
+		})
 	}
 }

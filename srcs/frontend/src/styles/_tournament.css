@@ -1,4 +1,41 @@
+#rootTournament {
+	height: 90vh;
+}
+
+.tournament-name {
+	position: absolute;
+	margin-top: 2vh;
+}
 
 #rootTournament .close-btn, #rootTournament .exit-btn {
 	display: none;
+}
+
+.match-container {
+	max-width: 100%;
+	flex-wrap: wrap;
+}
+
+.match-container .player-container {
+	position: relative;
+}
+
+.player-container .avatar {
+	width: 15vh;
+	height: 15vh;
+	border: 2px solid black;
+}
+
+.player-container .avatar img {
+	position: inherit;
+}
+
+.player-container .nickname {
+	border: 2px solid black;
+}
+
+.close-exit-btn {
+	position: absolute;
+	bottom: 10vh;
+	margin-bottom: 4vh;
 }

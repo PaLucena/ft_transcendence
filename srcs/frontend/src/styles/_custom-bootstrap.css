@@ -6,11 +6,11 @@
 	max-width: 1475px;
 }
 
-.h-8 {
+.h-8vh {
 	height: 8vh;
 }
 
-.h-10 {
+.h-10vh {
 	height: 10vh;
 }
 
@@ -23,19 +23,27 @@
 	aspect-ratio: 1 / 1;
 }
 
-.h-10p {
+.h-10 {
 	height: 10%;
 }
 
-.h-45p {
+.h-40 {
+	height: 40%;
+}
+
+.h-45 {
 	height: 45%;
 }
 
-.h-80p {
+.h-60 {
+	height: 60%;
+}
+
+.h-80 {
 	height: 80%;
 }
 
-.h-90p {
+.h-90 {
 	height: 90%;
 }
 

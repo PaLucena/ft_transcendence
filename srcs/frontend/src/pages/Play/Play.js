@@ -63,7 +63,7 @@ export class Play extends Component {
 	}
 
 	createTournament(tournamentType) {
-		const tournamentForm = document.querySelector("#tournamentForm");
+		const tournamentForm = document.getElementById("tournamentForm");
 
 		this.addEventListener(tournamentForm, "submit", (event) => {
 			event.preventDefault();

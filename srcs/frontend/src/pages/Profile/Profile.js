@@ -64,13 +64,48 @@ export class Profile extends Component {
 	}
 
 	saveInfoBtn() {
-		let saveInfo = document.getElementById("saveInfo");
+		let editForm = document.getElementById("editForm");
 
-		this.addEventListener(saveInfo, "click", (event) => {
+		/* this.addEventListener(saveInfo, "click", () => {
+			
 			//TODO: aquí falta hacer un fetch con post para guardar la información de usuario
 			document.getElementById("userEdit").style.display = "none"; // Esto es solo si la información
 			document.getElementById("userInfo").style.display = "block";  // nueva es válida
-		});
+		}); */
+		this.addEventListener(editForm, "submit", (event) => {
+			event.preventDefault();
+
+			const formData = new FormData(event.target);
+			const jsonData = {};
+
+			formData.forEach((value, key) => {
+				jsonData[key] = value;
+			});
+
+			fetch("/api/create_tournament/", {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(jsonData),
+				credentials: 'include'
+			})
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(errData => {
+						throw new Error(errData.error || `Response status: ${response.status}`);
+					});
+				}
+				return response.json();
+			})
+			.then(data => {
+				customAlert('success', data.message, '3000');
+				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
+			})
+			.catch((error) => {
+				console.log("Edit user error:", error);
+			})
+		})
 		this.enable2fa();
 	}
 

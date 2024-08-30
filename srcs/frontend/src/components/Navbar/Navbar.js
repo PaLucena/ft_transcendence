@@ -8,7 +8,7 @@ export class Navbar extends Component {
 
 	init() {
 		this.initNavbar();
-		this.focus();
+		Navbar.focus();
 	}
 
 	initNavbar() {
@@ -39,6 +39,8 @@ export class Navbar extends Component {
 	static focus() {
 		const page = window.location.pathname.slice(1);
 		console.log("Estoy en: ", 'navItem-' + page);
+		if (page.substring(0, 10) === 'tournament')
+			return ;
 
 		let navItems = document.querySelectorAll('[id^="navItem"]');
 		navItems.forEach(navItem => {
