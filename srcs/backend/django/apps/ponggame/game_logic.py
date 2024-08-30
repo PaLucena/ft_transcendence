@@ -10,7 +10,7 @@ class GameLogic:
     GOALS_TO_WIN = 5
     GOALS_DIFFERENCE = 1
     INIT_COUNTDOWN = 3
-    CONNECT_TIMEOUT = 120
+    CONNECT_TIMEOUT = 30
 
     # Graphic configuration
     TABLE_HEIGHT = 680
