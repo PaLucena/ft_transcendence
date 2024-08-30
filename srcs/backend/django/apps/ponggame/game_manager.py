@@ -30,18 +30,8 @@ class GameManager:
 		
 		# Generate random scores for AI vs AI match
 		if player_1_id == 0 and player_2_id == 0:
-			player_1_goals = 6
-			player_2_goals = random.randint(0, 4)
-			print(f"AI vs AI result: {player_1_goals} - {player_2_goals}")
+			return self.random_ai_game(tournament_id, match_id, player_1_id, player_2_id)
 			
-			return {
-				'tournament_id': tournament_id,
-				'match_id': match_id,
-				'player_1_id': player_1_id,
-				'player_2_id': player_2_id,
-				'player_1_goals': player_1_goals,
-				'player_2_goals': player_2_goals,
-			}
 	
 		print(f"Starting match between (ID {player_1_id}) and (ID {player_2_id})") # DEBUG
 
@@ -99,6 +89,20 @@ class GameManager:
 			del self.player_to_room[room.player_1_id]
 			del self.player_to_room[room.player_2_id]
 			del self.rooms[game_room_id]
+	
+	def random_ai_game(self, tournament_id, match_id, player_1_id, player_2_id):
+		player_1_goals = 6
+		player_2_goals = random.randint(0, 4)
+		print(f"AI vs AI result: {player_1_goals} - {player_2_goals}")
+			
+		return {
+			'tournament_id': tournament_id,
+			'match_id': match_id,
+			'player_1_id': player_1_id,
+			'player_2_id': player_2_id,
+			'player_1_goals': player_1_goals,
+			'player_2_goals': player_2_goals,
+		}
 
 
 class GameRoom:

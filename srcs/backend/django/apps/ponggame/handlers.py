@@ -1,5 +1,5 @@
 import json
-
+from user.models import AppUser 
 
 async def handle_player_ready(consumer, player):
     if player == 1:
@@ -29,12 +29,17 @@ async def handle_resize(consumer):
 
 
 async def send_config(consumer):
+    player_1 = AppUser.objects.get(pk=consumer.room.get_players()[0])
+    player_2 = AppUser.objects.get(pk=consumer.room.get_players()[1])
+
     await consumer.send(text_data=json.dumps({
         'type': 'config',
         'controls_mode': consumer.controls_mode,
         'controls_side': consumer.controls_side,
-        'player_1_name': consumer.room.get_players()[0],
-        'player_2_name': consumer.room.get_players()[1],
+        #'player_1_name': consumer.room.get_players()[0],
+        #'player_2_name': consumer.room.get_players()[1],
+        'player_1_name': player_1.username,
+        'player_2_name': player_2.username,
         'goals_to_win': consumer.game_logic.GOALS_TO_WIN,
         'goals_diff': consumer.game_logic.GOALS_DIFFERENCE,
     }))
