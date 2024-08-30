@@ -19,7 +19,7 @@ export class FriendsRenderer {
                 }
             });
         } else {
-            console.warn("Friends elements container not found");
+            console.warn("friends_elemets_container not found.");
         }
     }
 

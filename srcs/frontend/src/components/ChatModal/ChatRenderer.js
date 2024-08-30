@@ -18,19 +18,21 @@ export class ChatRenderer {
 					container.appendChild(chatElement);
 				}
 			});
+		} else {
+			console.warn("chat_element_container not found.")
 		}
     }
 
 	createChatElement(chat) {
 		try {
 			const chatHtml = `
-				<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
+				<div class="chat-element scale-fade-in-up col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
 					<button class="open_chat_btn btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative"
 							style="width: 102px; height: 102px;"
 							data-bs-target="#messages_modal"
 							data-bs-toggle="modal"
 							data-chatroom_name="${chat.chatroom_name}">
-						<img src="${chat.other_user_avatar_url || ''}"
+						<img src="${chat.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
 							 style="width: 100px; height: 100px;"
 							 class="rounded-circle"
 							 alt="Circle Image">
@@ -55,7 +57,7 @@ export class ChatRenderer {
 
 	renderChatMessages(messages, currentUser, isPublicChat) {
 		if (messages) {
-			const container = document.querySelector('#chat_messages');
+			const container = document.getElementById('chat_messages');
 
 			if (container) {
 				container.innerHTML = '';
@@ -65,6 +67,8 @@ export class ChatRenderer {
 				});
 
 				this.chatModal.chatRenderer.scrollToBottom(200);
+			} else {
+				console.warn('chat_messages not found.')
 			}
 		}
 	}
@@ -78,10 +82,12 @@ export class ChatRenderer {
 		template.innerHTML = messageHtml.trim();
 		const messageElement = template.content.firstChild;
 
-		const chatMessages = document.querySelector('#chat_messages');
+		const chatMessages = document.getElementById('chat_messages');
 
 		if (chatMessages) {
 			chatMessages.appendChild(messageElement);
+		} else {
+			console.warn('chat_messages not found.')
 		}
 	}
 
@@ -108,7 +114,7 @@ export class ChatRenderer {
 				<img
 					class="rounded-circle"
 					style="width: 32px; height: 32px;"
-					src="${message.author.avatar}"
+					src="${message.author.avatar || '/assets/images/default_avatar.jpg'}"
 				>
 			</button>`;
 			return `
@@ -154,10 +160,10 @@ export class ChatRenderer {
 	}
 
 	renderChatHeader(isPublicChat, data) {
-		const chatHeader = document.getElementById('chat_header_content');
+		const container = document.getElementById('chat_header_content');
 
-		if (chatHeader) {
-			chatHeader.innerHTML = '';
+		if (container) {
+			container.innerHTML = '';
 
 			const headerHtml = isPublicChat ?
 				this.createPublicChatHeaderContent() :
@@ -167,7 +173,9 @@ export class ChatRenderer {
 			template.innerHTML = headerHtml.trim();
 			const headerElement = template.content.firstChild;
 
-			chatHeader.appendChild(headerElement);
+			container.appendChild(headerElement);
+		} else {
+			console.warn('chat_header_content not found.');
 		}
 	}
 
@@ -191,7 +199,7 @@ export class ChatRenderer {
 					<div class="status-dot position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot" data-online-username="${data.other_user.username}" style="top:90%; left:90%;"></div>
 					<img
 						class="rounded-circle"
-						src="${data.other_user.avatar}"
+						src="${data.other_user.avatar || '/assets/images/default_avatar.jpg'}"
 						style="width: 32px; height: 32px;"
 					>
 				</button>
@@ -211,8 +219,6 @@ export class ChatRenderer {
         const messageInputContainer = document.querySelector('.message-input-container');
 		const chatMessageInput = document.getElementById('chat_message_input');
     	const chatMessageSubmit = document.getElementById('chat_message_submit');
-
-
 
         if (messageInputContainer && chatMessageInput && chatMessageSubmit) {
             const existingMessage = messageInputContainer.querySelector('.block-status-message');
@@ -283,7 +289,9 @@ export class ChatRenderer {
             const container = document.getElementById("chat_messages_container");
             if (container) {
                 container.scrollTop = container.scrollHeight;
-            }
+            } else {
+				console.warn('chat_messages_container not found.')
+			}
         }, time);
     }
 }

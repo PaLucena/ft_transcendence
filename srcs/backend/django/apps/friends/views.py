@@ -44,9 +44,16 @@ def get_friend_data(user, friend):
         "other_user_avatar_url": other_user.avatar.url if other_user.avatar else None,
     }
 
+
 @api_view(["GET"])
 @default_authentication_required
 def filter_users(request, filter_type):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
     user = request.user
 
     all_users = AppUser.objects.exclude(id=user.id)
@@ -95,7 +102,7 @@ def filter_users(request, filter_type):
 
     else:
         return Response(
-            {"error": "Invalid filter type."}, status=status.HTTP_404_NOT_FOUND
+            {"detail": "Invalid filter type"}, status=status.HTTP_404_NOT_FOUND
         )
 
     return Response({"users": users_data}, status=status.HTTP_200_OK)
@@ -105,45 +112,62 @@ def filter_users(request, filter_type):
 @api_view(["POST"])
 @default_authentication_required
 def invite_friend(request):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
     username = request.data.get("username")
+
     if not username:
         return Response(
-            {"error": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     try:
         friend = AppUser.objects.get(username=username)
+    except AppUser.DoesNotExist:
+        return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
     if Friend.objects.filter(
         Q(from_user=request.user, to_user=friend)
         | Q(from_user=friend, to_user=request.user)
     ).first():
         return Response(
-            {"error": "Friend request already sent"}, status=status.HTTP_409_CONFLICT
+            {"detail": "Friend request already exists"}, status=status.HTTP_409_CONFLICT
         )
 
     Friend.objects.create(from_user=request.user, to_user=friend)
     return Response(
-        {"message": "Friend request sent successfully."}, status=status.HTTP_200_OK
+        {"detail": "Friend request sent successfully"}, status=status.HTTP_200_OK
     )
 
 
 @api_view(["POST"])
 @default_authentication_required
 def accept_invitation(request):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
     username = request.data.get("username")
 
     if not username:
         return Response(
-            {"error": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     try:
         friend = AppUser.objects.get(username=username)
     except AppUser.DoesNotExist:
-        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
     try:
         friend_request = Friend.objects.get(
@@ -154,29 +178,38 @@ def accept_invitation(request):
         friend_request.save()
 
         return Response(
-            {"message": "Friend request accepted successfully."},
+            {"detail": "Friend request accepted successfully"},
             status=status.HTTP_200_OK,
         )
     except Friend.DoesNotExist:
         return Response(
-            {"error": "No pending friend request from this user"},
+            {"detail": "No pending friend request from this user"},
             status=status.HTTP_404_NOT_FOUND,
         )
 
 
-@api_view(["DELETE"])
+@api_view(["POST"])
 @default_authentication_required
 def remove_friend(request):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required."},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
     friend_username = request.data.get("username")
+
     if not friend_username:
         return Response(
-            {"error": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     try:
         friend = AppUser.objects.get(username=friend_username)
+    except AppUser.DoesNotExist:
+        return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": str(e)}, status=status.HTTP_404_NOT_FOUND)
 
     friendship = Friend.objects.filter(
         Q(from_user=request.user, to_user=friend)
@@ -185,46 +218,10 @@ def remove_friend(request):
 
     if not friendship.exists():
         return Response(
-            {"error": "Friendship does not exist."}, status=status.HTTP_404_NOT_FOUND
+            {"detail": "Friendship does not exist"}, status=status.HTTP_404_NOT_FOUND
         )
 
     friendship.delete()
     return Response(
-        {"message": "Friend successfully removed."}, status=status.HTTP_200_OK
+        {"detail": "Friend successfully removed"}, status=status.HTTP_200_OK
     )
-
-
-@api_view(["GET"])
-@default_authentication_required
-def get_friends(request):
-    user = request.user
-    all_friends = []
-    online_friends = []
-
-    friendships = Friend.objects.filter(
-        Q(from_user=user) | Q(to_user=user), status=Friend.ACCEPTED
-    )
-
-    for friendship in friendships:
-        friend = (
-            friendship.to_user if friendship.from_user == user else friendship.from_user
-        )
-        all_friends.append(friend)
-        if friend.is_online:
-            online_friends.append(friend)
-
-    all_friends_data = [
-        {
-            "username": friend.username,
-            "status": friend.is_online,
-        }
-        for friend in all_friends
-    ]
-    online_friends_data = [{"username": friend.username} for friend in online_friends]
-
-    response_data = {
-        "all_friends": all_friends_data,
-        "online_friends": online_friends_data,
-    }
-
-    return Response(response_data, status=status.HTTP_200_OK)

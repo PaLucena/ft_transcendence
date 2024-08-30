@@ -25,9 +25,10 @@ export class ChatModal extends Component {
     }
 
     async init() {
-        this.uiSetup.setupMessagesModal();
         this.uiSetup.setupChatModal();
-        this.uiSetup.setupCloseMessagesModal();
+        this.uiSetup.setupChatModalClose();
+        this.uiSetup.setupMessagesModal();
+        this.uiSetup.setupMessagesModalClose();
         this.uiSetup.setupScrollEvent();
         this.uiSetup.setupMessageInputEvent();
     }

@@ -55,12 +55,12 @@ export class WebSocketHandler {
             case 1002:
                 customAlert('info', errorMessage, 3000);
                 break;
-            case 404:
-                customAlert('danger', 'Chatroom not found or author not found', 5000);
-                this.closeWebSocket();
-                break;
             case 401:
                 customAlert('danger', 'You are not authenticated. Please log in.', 5000);
+                this.closeWebSocket();
+                break;
+            case 404:
+                customAlert('danger', `${errorCode}: ${errorMessage || 'Not found'}`, 5000);
                 this.closeWebSocket();
                 break;
             case 500:

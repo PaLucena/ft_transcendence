@@ -1,4 +1,5 @@
 import customAlert from '../../scripts/utils/customAlert.js';
+import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 
 export class UISetup {
     constructor(friends) {
@@ -6,10 +7,10 @@ export class UISetup {
     }
 
     setupFilterButtons() {
-        const filterContainer = document.getElementById('search_filter_btn_container');
+        const container = document.getElementById('search_filter_btn_container');
 
-        if (filterContainer) {
-            this.friends.addEventListener(filterContainer, 'click', async (event) => {
+        if (container) {
+            this.friends.addEventListener(container, 'click', async (event) => {
                 const targetButton = event.target.closest('button[data-filter]');
 
                 if (targetButton) {
@@ -25,7 +26,7 @@ export class UISetup {
                 }
             });
         } else {
-            console.warn("Filter buttons container not found");
+            console.warn("search_filter_btn_container not found.");
         }
     }
 
@@ -48,34 +49,30 @@ export class UISetup {
                 }
             });
         } else {
-            console.warn("Friends elements container not found");
+            console.warn("friends_elemets_container not found");
         }
     }
 
     async handleFriendAction(action, username) {
         try {
             let endpoint;
-            let method;
 
             switch (action) {
                 case 'invite':
                     endpoint = 'invite_friend';
-                    method = 'POST';
                     break;
                 case 'remove':
                     endpoint = 'remove_friend';
-                    method = 'DELETE';
                     break;
                 case 'accept':
                     endpoint = 'accept_invitation';
-                    method = 'POST';
                     break;
                 default:
-                    throw new Error('Invalid action type');
+                    throw { errorCode: 400, errorMessage: 'Invalid action type' };
             }
 
-            const response = await fetch(`/api/friends/${endpoint}/`, {
-                method: method,
+            const response = await fetch(`/api/friends/action/${endpoint}/`, {
+                method: 'POST',
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -83,16 +80,12 @@ export class UISetup {
                 body: JSON.stringify({ username })
             });
 
-            if (response.ok) {
-                const result = await response.json();
-                customAlert('success', result.message, 5000);
+            await handleResponse(response, async () => {
                 await this.friends.friendsLoader.loadFriendsData(window.location.pathname.split('/').pop());
-            } else {
-                const error = await response.json();
-                customAlert('danger', error.error, 5000);
-            }
+            });
+
         } catch (error) {
-            customAlert('danger', 'An unexpected error occurred.', 5000);
+            this.handleError(error.errorCode, error.errorMessage || 'An unexpected error occurred.');
         }
     }
 
@@ -123,6 +116,25 @@ export class UISetup {
     removeOnlineUpdateListeners() {
         if (this.friends.friendsRenderer.onlineUsersUpdatedListener) {
             this.friends.friendsRenderer.eventEmitter.off('onlineUsersUpdated', this.friends.friendsRenderer.onlineUsersUpdatedListener);
+        }
+    }
+
+    handleError(errorCode, errorMessage) {
+        switch (errorCode) {
+            case 401:
+                customAlert('danger', 'You are not authenticated. Please log in.', 5000);
+                break;
+            case 404:
+                customAlert('danger', `${errorCode}: ${errorMessage || 'Not found'}`, 5000);
+                break;
+            case 409:
+                customAlert('danger', `${errorCode}: ${errorMessage}.`, 5000);
+                break;
+            case 500:
+                customAlert('danger', 'An internal server error occurred.', 5000);
+                break;
+            default:
+                console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
         }
     }
 }
