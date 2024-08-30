@@ -32,6 +32,18 @@ def get_friendship_status(user, other_user):
         return STATUS_NO_RELATION
 
 
+def get_friend_data(user, friend):
+    if friend.from_user == user:
+        other_user = friend.to_user
+    else:
+        other_user = friend.from_user
+
+    return {
+        "username": other_user.username,
+        "is_online": other_user.is_online,
+        "other_user_avatar_url": other_user.avatar.url if other_user.avatar else None,
+    }
+
 @api_view(["GET"])
 @default_authentication_required
 def filter_users(request, filter_type):
@@ -45,6 +57,7 @@ def filter_users(request, filter_type):
             {
                 "username": other_user.username,
                 "friendship_status": get_friendship_status(user, other_user),
+                "is_online": other_user.is_online,
                 "other_user_avatar_url": (
                     other_user.avatar.url if other_user.avatar else None
                 ),
@@ -54,26 +67,7 @@ def filter_users(request, filter_type):
 
     elif filter_type == "my_friends":
         friends = friendships.filter(status=Friend.ACCEPTED)
-        users_data = [
-            {
-                "username": (
-                    friend.to_user.username
-                    if friend.from_user == user
-                    else friend.from_user.username
-                ),
-                "is_online": (
-                    friend.to_user.is_online
-                    if friend.from_user == user
-                    else friend.from_user.is_online
-                ),
-                "other_user_avatar_url": (
-                    friend.to_user.avatar.url
-                    if friend.from_user == user
-                    else friend.from_user.avatar.url
-                ),
-            }
-            for friend in friends
-        ]
+        users_data = [get_friend_data(user, friend) for friend in friends]
 
     elif filter_type == "pending_requests":
         pending_requests = friendships.filter(from_user=user, status=Friend.PENDING)

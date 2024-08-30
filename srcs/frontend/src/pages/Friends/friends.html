@@ -4,10 +4,26 @@
             <!-- Header -->
 			<div class="search-header position-relative d-flex justify-content-between align-items-center bg-dark pb-3 gap-2">
                 <div id="search_filter_btn_container" class="btn-group flex-wrap gap-2">
-                    <button class="btn btn-outline-light active" data-filter="all">All</button>
-                    <button class="btn btn-outline-light" data-filter="my_friends">Friends</button>
-                    <button class="btn btn-outline-light" data-filter="pending_requests">Pending</button>
-                    <button class="btn btn-outline-light" data-filter="incoming_requests">Incoming</button>
+                    <button class="btn btn-outline-light active position-relative" data-filter="all">
+                        <i class="fa-solid fa-list"></i>
+                        <span class="filter-indicator bg-secondary"></span>
+                        All
+                    </button>
+                    <button class="btn btn-outline-light position-relative" data-filter="my_friends">
+                        <i class="fa-solid fa-user-friends"></i>
+                        <span class="filter-indicator bg-success"></span>
+                        Friends
+                    </button>
+                    <button class="btn btn-outline-light position-relative" data-filter="pending_requests">
+                        <i class="fa-solid fa-clock"></i>
+                        <span class="filter-indicator bg-warning"></span>
+                        Pending
+                    </button>
+                    <button class="btn btn-outline-light position-relative" data-filter="incoming_requests">
+                        <i class="fa-solid fa-inbox"></i>
+                        <span class="filter-indicator bg-info"></span>
+                        Incoming
+                    </button>
                 </div>
                 <div class="search-form-container form-group mb-0">
 					<form id="friends_search_form" method='POST' class="w-100 d-flex align-items-center">

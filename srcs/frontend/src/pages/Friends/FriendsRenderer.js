@@ -4,7 +4,7 @@ export class FriendsRenderer {
     }
 
     renderUsersElements(users) {
-        console.log("USERS: ", users);
+        console.log("Users: ", users);
 
         const container = document.getElementById('friends_elemets_container');
 
@@ -18,8 +18,7 @@ export class FriendsRenderer {
                     container.appendChild(userElement);
                 }
             });
-        }
-        else {
+        } else {
             console.warn("Friends elements container not found");
         }
     }
@@ -27,195 +26,35 @@ export class FriendsRenderer {
     createUserElement(user) {
         try {
             const filterType = this.friends.filter;
-            let userHtml;
 
-            if (filterType === 'all') {
-                switch (user.friendship_status) {
-                    case 'accepted':
-                        userHtml = `
-                        <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                            <div class="img-nick">
-                                <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                    <img
-                                        src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-                                        class="rounded-circle" alt="Circle Image"
-                                    >
-                                    <div
-                                        class="status-dot position-absolute translate-middle border border-3 border-dark ${user.is_online ? 'green' : 'gray'}-dot p-2"
-                                        data-online-username="${user.username}"
-                                        style="top:90%; left:85%;"></div>
-                                </button>
-                                <p class="text-light mt-2 fw-bold">${user.username}</p>
-                            </div>
-                            <button class="btn btn-outline-danger"
-                                    data-action="remove"
-                                    data-username="${user.username}">
-                                Remove
-                            </button>
-                        </div>
-                        `;
-                        break;
+            const showStatusDot = (filterType === 'all' && user.friendship_status === 'accepted') || filterType === 'my_friends';
 
-                    case 'pending':
-                        userHtml = `
-                        <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                            <div class="img-nick">
-                                <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                    <img
-                                        src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-                                        class="rounded-circle" alt="Circle Image"
-                                    >
-                                </button>
-                                <p class="text-light mt-2 fw-bold">${user.username}</p>
-                            </div>
-                            <div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
-                                <button class="btn btn-outline-danger"
-                                        data-action="remove"
-                                        data-username="${user.username}">
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                        `;
-                        break;
+            const borderClass = this.getBorderClass(filterType, user.friendship_status);
 
-                    case 'incoming':
-                        userHtml = `
-                        <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                            <div class="img-nick">
-                                <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                    <img
-                                        src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-                                        class="rounded-circle" alt="Circle Image"
-                                    >
-                                </button>
-                                <p class="text-light mt-2 fw-bold">${user.username}</p>
-                            </div>
-                            <div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
-                                <button class="btn btn-outline-success"
-                                        data-action="accept"
-                                        data-username="${user.username}">
-                                    Accept
-                                </button>
-                                <button class="btn btn-outline-danger"
-                                        data-action="remove"
-                                        data-username="${user.username}">
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                        `;
-                        break;
+            const statusDotHtml = `
+                <div
+                    class="status-dot position-absolute translate-middle border border-3 border-dark ${user.is_online ? 'green' : 'gray'}-dot p-2"
+                    data-online-username="${user.username}"
+                    style="top:90%; left:85%;">
+                </div>`;
 
-                    case 'no_relation':
-                    default:
-                        userHtml = `
-                        <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                            <div class="img-nick">
-                                <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                    <img src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}" class="rounded-circle" alt="Circle Image">
-                                </button>
-                                <p class="text-light mt-2 fw-bold">${user.username}</p>
-                            </div>
-                            <button class="btn btn-outline-success"
-                                    data-action="invite"
-                                    data-username="${user.username}">
-                                Invite
-                            </button>
-                        </div>
-                        `;
-                        break;
-                }
-            }
-            else if (filterType === 'my_friends') {
-                userHtml = `
+            const commonHtml = `
                 <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
                     <div class="img-nick">
                         <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
                             <img
                                 src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-                                class="rounded-circle" alt="Circle Image"
+                                class="${borderClass} border border-2 rounded-circle" alt="Circle Image"
                             >
-                            <div
-                                class="status-dot position-absolute translate-middle border border-3 border-dark ${user.is_online ? 'green' : 'gray'}-dot p-2"
-                                data-online-username="${user.username}"
-							    style="top:90%; left:85%;"></div>
+                            ${showStatusDot ? statusDotHtml : ''}
                         </button>
                         <p class="text-light mt-2 fw-bold">${user.username}</p>
                     </div>
-                    <button class="btn btn-outline-danger"
-                            data-action="remove"
-                            data-username="${user.username}">
-                        Remove
-                    </button>
-                </div>
-                `;
-            }
-            else if (filterType === 'pending_requests') {
-                userHtml = `
-                <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                    <div class="img-nick">
-                        <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                            <img
-                                src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-                                class="rounded-circle" alt="Circle Image"
-                            >
-                        </button>
-                        <p class="text-light mt-2 fw-bold">${user.username}</p>
-                    </div>
-                    <div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
-                        <button class="btn btn-outline-danger"
-                            data-action="remove"
-                            data-username="${user.username}">
-                            Cancel Invitation
-                        </button>
-                    </div>
-                </div>
-                `;
-            }
-            else if (filterType === 'incoming_requests') {
-                userHtml = `
-                <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                    <div class="img-nick">
-                        <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                            <img
-                                src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-                                class="rounded-circle" alt="Circle Image"
-                            >
-                        </button>
-                        <p class="text-light mt-2 fw-bold">${user.username}</p>
-                    </div>
-                    <div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
-                        <button class="btn btn-outline-success"
-                            data-action="accept"
-                            data-username="${user.username}">
-                            Accept
-                        </button>
-                        <button class="btn btn-outline-danger"
-                            data-action="remove"
-                            data-username="${user.username}">
-                            Cancel
-                        </button>
-                    </div>
-                </div>
-                `;
-            }
-            else {
-                userHtml = `
-                <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                    <div class="img-nick">
-                        <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                            <img src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}" class="rounded-circle" alt="Circle Image">
-                        </button>
-                        <p class="text-light mt-2 fw-bold">${user.username}</p>
-                    </div>
-                    Something Went Wrong...
-                </div>
-                `;
-            }
+                    ${this.getActionButtons(user, filterType)}
+                </div>`;
 
             const template = document.createElement('template');
-            template.innerHTML = userHtml.trim();
+            template.innerHTML = commonHtml.trim();
 
             return template.content.firstChild;
         } catch (error) {
@@ -224,4 +63,106 @@ export class FriendsRenderer {
         }
     }
 
+    getBorderClass(filterType, friendshipStatus) {
+        if (filterType === 'all') {
+            switch (friendshipStatus) {
+                case 'accepted':
+                    return 'border-success';
+                case 'pending':
+                    return 'border-warning';
+                case 'incoming':
+                    return 'border-info';
+                case 'no_relation':
+                default:
+                    return 'border-secondary';
+            }
+        } else {
+
+            switch (filterType) {
+                case 'my_friends':
+                    return 'border-success';
+                case 'pending_requests':
+                    return 'border-warning';
+                case 'incoming_requests':
+                    return 'border-info';
+                default:
+                    return 'border-secondary';
+            }
+        }
+    }
+
+    getActionButtons(user, filterType) {
+        switch (filterType) {
+            case 'all':
+                return this.getAllFilterButtons(user);
+            case 'my_friends':
+                return `<button class="btn btn-outline-light"
+                            data-action="remove"
+                            data-username="${user.username}">
+                        Remove
+                    </button>`;
+            case 'pending_requests':
+                return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
+                            <button class="btn btn-outline-light"
+                                data-action="remove"
+                                data-username="${user.username}">
+                                Cancel
+                            </button>
+                        </div>`;
+            case 'incoming_requests':
+                return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
+                            <button class="btn btn-light"
+                                data-action="accept"
+                                data-username="${user.username}">
+                                Accept
+                            </button>
+                            <button class="btn btn-outline-light"
+                                data-action="remove"
+                                data-username="${user.username}">
+                                Cancel
+                            </button>
+                        </div>`;
+            default:
+                return 'Something Went Wrong...';
+        }
+    }
+
+    getAllFilterButtons(user) {
+        switch (user.friendship_status) {
+            case 'accepted':
+                return `<button class="btn btn-outline-light"
+                            data-action="remove"
+                            data-username="${user.username}">
+                        Remove
+                    </button>`;
+            case 'pending':
+                return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
+                            <button class="btn btn-outline-light"
+                                data-action="remove"
+                                data-username="${user.username}">
+                                Cancel
+                            </button>
+                        </div>`;
+            case 'incoming':
+                return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
+                            <button class="btn btn-light"
+                                data-action="accept"
+                                data-username="${user.username}">
+                                Accept
+                            </button>
+                            <button class="btn btn-outline-light"
+                                data-action="remove"
+                                data-username="${user.username}">
+                                Cancel
+                            </button>
+                        </div>`;
+            case 'no_relation':
+            default:
+                return `<button class="btn btn-light"
+                            data-action="invite"
+                            data-username="${user.username}">
+                        Invite
+                    </button>`;
+        }
+    }
 }
