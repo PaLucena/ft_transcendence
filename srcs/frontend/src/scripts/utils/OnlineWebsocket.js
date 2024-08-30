@@ -1,8 +1,10 @@
 import { eventEmitter } from './EventEmitter.js';
+import { updateOnlineStatus } from './rtchatUtils.js'
 
 class OnlineWebsocket {
     constructor() {
         this.onlineSocket = null;
+        this.onlineUsersUpdatedListener = null;
     }
 
     initWebSocket() {
@@ -14,10 +16,18 @@ class OnlineWebsocket {
         }
 
         this.onlineSocket.onmessage = (e) => this.handleMessage(e);
-        this.onlineSocket.onerror = (e) => {
-            this.handleError(null, e);
-        }
+        this.onlineSocket.onerror = (e) => {this.handleError(null, e);}
         this.onlineSocket.onclose = (e) => this.handleClose(e);
+
+        this.initOnlineStatusListener();
+    }
+
+    initOnlineStatusListener() {
+        this.onlineUsersUpdatedListener = (onlineUsers) => {
+            updateOnlineStatus(onlineUsers);
+        };
+
+        eventEmitter.on('onlineUsersUpdated', this.onlineUsersUpdatedListener);
     }
 
     handleMessage(event) {
@@ -43,6 +53,8 @@ class OnlineWebsocket {
         if (!event.wasClean) {
             console.error('Online socket closed unexpectedly:', event.reason || 'Unknown reason');
         }
+
+        this.removeOnlineUpdateListeners();
     }
 
     handleError(errorCode, errorMessage) {
@@ -54,6 +66,15 @@ class OnlineWebsocket {
         if (this.onlineSocket) {
             this.onlineSocket.close();
             this.onlineSocket = null;
+        }
+
+        this.removeOnlineUpdateListeners();
+    }
+
+    removeOnlineUpdateListeners() {
+        if (this.onlineUsersUpdatedListener) {
+            eventEmitter.off('onlineUsersUpdated', this.onlineUsersUpdatedListener);
+            this.onlineUsersUpdatedListener = null;
         }
     }
 }

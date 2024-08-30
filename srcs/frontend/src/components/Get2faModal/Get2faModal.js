@@ -20,7 +20,7 @@ export function initTwoFactorAuth(jsonData) {
 			inputs[0].focus(); // Focus the first input field
 		}
 	});
-	
+
 	function showModal() {
         overlayElement.style.display = 'block'; // Show the custom overlay
         TwoFactorModal.show();

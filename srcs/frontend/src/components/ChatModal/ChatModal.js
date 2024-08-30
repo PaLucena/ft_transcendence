@@ -3,7 +3,6 @@ import { ChatLoader } from './ChatLoader.js';
 import { ChatRenderer } from './ChatRenderer.js';
 import { WebSocketHandler } from './WebSocketHandler.js';
 import { UISetup } from './UISetup.js';
-import { eventEmitter } from '../../scripts/utils/EventEmitter.js';
 
 export class ChatModal extends Component {
     constructor() {
@@ -11,7 +10,7 @@ export class ChatModal extends Component {
         super('/components/ChatModal/chatmodal.html');
         this.chatSocket = null;
 
-        this.chatRenderer = new ChatRenderer(this, eventEmitter);
+        this.chatRenderer = new ChatRenderer(this);
         this.chatLoader = new ChatLoader(this);
         this.webSocketHandler = new WebSocketHandler(this);
         this.uiSetup = new UISetup(this);
@@ -23,13 +22,13 @@ export class ChatModal extends Component {
         this.webSocketHandler.closeWebSocket();
         this.removeAllEventListeners();
         this.uiSetup.removeMessageFormEvents();
-        this.uiSetup.removeOnlineUpdateListeners();
     }
 
     async init() {
-        this.uiSetup.setupMessagesModal();
         this.uiSetup.setupChatModal();
-        this.uiSetup.setupCloseMessagesModal();
+        this.uiSetup.setupChatModalClose();
+        this.uiSetup.setupMessagesModal();
+        this.uiSetup.setupMessagesModalClose();
         this.uiSetup.setupScrollEvent();
         this.uiSetup.setupMessageInputEvent();
     }

@@ -22,6 +22,7 @@ class Router {
             '/play': () => new Play(),
             '/play/:playId': params => new Play(params),
             '/friends': () => new Friends(),
+            '/friends/:filter': params => new Friends(params),
             '/profile': () => new Profile(),
             '/auth': () => new Auth(),
             '/pong': () => new Pong(),

@@ -57,20 +57,20 @@ export class ChatLoader {
 
     handleError(errorCode, errorMessage) {
         switch (errorCode) {
-            case 404:
-                customAlert('danger', 'Chatroom not found or author not found', 5000);
-                break;
             case 401:
                 customAlert('danger', 'You are not authenticated. Please log in.', 5000);
                 break;
             case 403:
-                customAlert('danger', 'You do not have permission to access this chatroom.', 5000);
+                customAlert('danger', `${errorCode}: ${errorMessage || 'You do not have access to this private chat'}.`, 5000);
+                break;
+            case 404:
+                customAlert('danger', `${errorCode}: ${errorMessage || 'Not found'}`, 5000);
                 break;
             case 500:
                 customAlert('danger', 'An internal server error occurred.', 5000);
                 break;
             default:
-                console.error('Critical error:', errorMessage);
+                console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
         }
     }
 }
