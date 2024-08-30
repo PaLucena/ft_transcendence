@@ -25,7 +25,7 @@ def start_local_match(request):
 			player_1_id=user_id,
 			player_2_id=0,  # AI opponent
 			controls_mode='local'
-		))
+		))	
 
 		return Response(result, status=status.HTTP_200_OK)
 	except Exception as e:
