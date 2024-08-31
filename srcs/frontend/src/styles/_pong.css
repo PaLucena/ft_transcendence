@@ -49,7 +49,7 @@
 } }
 
 
-.color-score_text { color: var(--text-score); }
+.color-score-text { color: var(--text-score); }
 
 .containerPong {
     height: var(--size-canvas-height);
@@ -60,14 +60,14 @@
     align-items: center;
 }
 
-.score-board {
+.score-bar {
     display: flex;
     flex-direction: row;
     justify-content: center;
     height: calc(140px * var(--responsive));
     width: 100%;
 }
-.score-board div {
+.score-bar div {
     text-align: center;
     align-content: center;
 }
@@ -87,53 +87,53 @@
     flex: 1;
 }
 
-.score-central {
+.central-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
-.score-central div {
+.central-container div {
     text-align: center;
     font-size: calc(20px * var(--responsive));
     color: var(--color-text);
 }
-.score-central div h1 {
+.central-container div h1 {
     font-size: calc(40px * var(--responsive));
     color: var(--color-text);
 }
 
-.avatar {
+.player-avatar {
     width: calc(80px * var(--responsive));
     height: calc(80px * var(--responsive));
     margin: calc(30px * var(--responsive));
     border-radius: 50%;
 }
-.player_1_avatar {
+.player-1-avatar {
     border: calc(4px * var(--responsive)) solid var(--color-p1);
 }
-.player_2_avatar {
+.player-2-avatar {
     border: calc(4px * var(--responsive)) solid var(--color-p2);
 }
 
-.player_1_name, .player_2_name {
+.player-1-name, .player-2-name {
     font-size: calc(40px * var(--responsive));
     align-content: center;
 }
-.player_1_name {
+.player-1-name {
     color: var(--color-p1);
 }
-.player_2_name {
+.player-2-name {
     color: var(--color-p2);
 }
 
-.player_1_score, .player_2_score {
+.player-1-score, .player-2-score {
     font-size: calc(80px * var(--responsive));
 }
-.player_1_score {
+.player-1-score {
     margin: auto calc(30px * var(--responsive)) auto 0;
     color: var(--color-p1);
 }
-.player_2_score {
+.player-2-score {
     margin: auto 0 auto calc(30px * var(--responsive));
     color: var(--color-p2);
 }
@@ -152,26 +152,36 @@
     align-content: center;
 }
 
-.board-info {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    height: 100%;
-    width: 100%;
-}
-.board-info div {
+.board-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
     text-align: center;
     color: var(--color-text);
-}
-.board-info .main-message {
     font-size: calc(40px * var(--responsive));
 }
-.controls_1, .controls_2 {
+
+.controls-info {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 80%;
+    width: 80%;
+}
+
+.controls-info div {
     width: calc(150px * var(--responsive));
     font-size: calc(25px * var(--responsive));
 }
-.main-message, .sub-message-1, .sub-message-2 {
-    height: calc(60px * var(--responsive));
+.board-message div {
+    height: calc(100px * var(--responsive));
 }
 
 .ball {
@@ -184,7 +194,7 @@
     background-color: var(--ball-color-theme);
 }
 
-.ball_effect {
+.ball-effect {
     height: 100%;
     width: 100%;
     border-radius: var(--ball-border-radius);
@@ -200,12 +210,12 @@
     border-radius: calc(var(--paddle-border-radius) * var(--responsive));
 }
 
-.player_1_paddle {
+.player-1-paddle {
     left: calc((var(--size-pad-margin) - var(--size-pad-width)) * var(--responsive));
     box-shadow: inset 0 0 calc(10px * var(--responsive)) var(--color-p1);
     background-color: var(--paddle-color);
 }
-.player_2_paddle {
+.player-2-paddle {
     right: calc((var(--size-pad-margin) - var(--size-pad-width)) * var(--responsive));
     box-shadow: inset 0 0 calc(10px * var(--responsive)) var(--color-p2);
     background-color: var(--paddle-color);

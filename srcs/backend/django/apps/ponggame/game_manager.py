@@ -42,6 +42,15 @@ class GameManager:
 
 		# Set the controls mode
 		game_logic.controls_mode = controls_mode
+		if controls_mode == "local":
+			game_logic.player_2_name = "Guest"
+		elif controls_mode == "AI":
+			if player_1_id == 0:
+				game_logic.player_1_name = "AI"
+				game_logic.player_1_ready = True
+			else:
+				game_logic.player_2_name = "AI"
+				game_logic.player_2_ready = True
 
 		await self.run_game_loop(game_room, game_logic)
 
@@ -63,6 +72,7 @@ class GameManager:
 				await send_score(self.channel_layer, game_room.game_room_id, game_logic)
 			elapsed_time = time.time() - start_time
 			await asyncio.sleep(max(0.0, game_logic.FRAME_TIME - elapsed_time))
+		await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
 
 	def create_game_room(self, player_1_id, player_2_id):
 		room_id = f"{player_1_id}_vs_{player_2_id}"

@@ -21,10 +21,6 @@ export default class DualControl {
         });
     }
 
-    isKeyPressed(key) {
-        return this.keysPressed[key.toLowerCase()];
-    }
-
     handleKeyPresses() {
         if (this.keysPressed[' ']) {
             this.execCommands('player_1_ready');
@@ -32,21 +28,21 @@ export default class DualControl {
         if (this.keysPressed['Enter']) {
             this.execCommands('player_2_ready');
         }
-        if (this.isKeyPressed['q']) {
+        if (this.keysPressed['q']) {
             this.execCommands('quit');
         }
-        if (this.isKeyPressed['t']) {
+        if (this.keysPressed['t']) {
             this.execCommands('change_theme');
         }
 
-        if (this.isKeyPressed['w'] && !this.isKeyPressed['s']) {
+        if (this.keysPressed['w'] && !this.keysPressed['s']) {
             if (!this.paddle1Interval) {
                 clearInterval(this.paddle1Interval);
                 this.paddle1Interval = setInterval(() => {
                     this.execCommands('player_1_up');
                 }, 10);
             }
-        } else if (this.isKeyPressed['s'] && !this.isKeyPressed['w']) {
+        } else if (this.keysPressed['s'] && !this.keysPressed['w']) {
             if (!this.paddle1Interval) {
                 clearInterval(this.paddle1Interval);
                 this.paddle1Interval = setInterval(() => {

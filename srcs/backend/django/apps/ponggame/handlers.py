@@ -1,5 +1,5 @@
 import json
-from user.models import AppUser 
+
 
 async def handle_player_ready(consumer, player):
     if player == 1:
@@ -16,38 +16,23 @@ async def handle_player_ready(consumer, player):
 
 async def handle_quit(consumer):
     consumer.game_logic.game_state = "game_over"
-    await consumer.send_game_state()
 
 
 async def handle_move(consumer, player_id, direction):
     consumer.game_logic.move_paddle(player_id, direction)
-    await consumer.send_positions()
 
 
 async def handle_resize(consumer):
-    await consumer.send_positions()
-
-
-async def send_config(consumer):
-    player_1 = AppUser.objects.get(pk=consumer.room.get_players()[0])
-    player_2 = AppUser.objects.get(pk=consumer.room.get_players()[1])
-
-    await consumer.send(text_data=json.dumps({
-        'type': 'config',
-        'controls_mode': consumer.controls_mode,
-        'controls_side': consumer.controls_side,
-        #'player_1_name': consumer.room.get_players()[0],
-        #'player_2_name': consumer.room.get_players()[1],
-        'player_1_name': player_1.username,
-        'player_2_name': player_2.username,
-        'goals_to_win': consumer.game_logic.GOALS_TO_WIN,
-        'goals_diff': consumer.game_logic.GOALS_DIFFERENCE,
-    }))
+    await consumer.send_positions(
+        consumer.channel_layer,
+        consumer.room_name,
+        consumer.game_logic
+    )
 
 
 async def send_game_state(channel_layer, room_group_name, game_logic):
     countdown = 0
-    if game_logic.game_state == "countdown":
+    if game_logic.game_state == "countdown" or game_logic.game_state == "waiting":
         left = game_logic.countdown
         fps = game_logic.FPS
         countdown = int(left / fps)
