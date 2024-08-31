@@ -109,7 +109,6 @@ def filter_users(request, filter_type):
     return Response({"users": users_data}, status=status.HTTP_200_OK)
 
 
-# CBV has to be created to not repeat code
 @api_view(["POST"])
 @default_authentication_required
 def invite_friend(request):
@@ -228,3 +227,70 @@ def remove_friend(request):
     return Response(
         {"detail": "Friend successfully removed"}, status=status.HTTP_200_OK
     )
+
+
+@api_view(["GET"])
+@default_authentication_required
+def search_friends(request):
+    if not request.user.is_authenticated:
+        return Response(
+            {"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    user = request.user
+    query = request.GET.get("query", "").strip().lower()
+    filter_type = request.GET.get("filter", "all")
+
+    all_users = AppUser.objects.exclude(id=user.id)
+    friendships = Friend.objects.filter(Q(from_user=user) | Q(to_user=user))
+
+    if filter_type == "all":
+        users_data = [
+            {
+                "username": other_user.username,
+                "friendship_status": get_friendship_status(user, other_user),
+                "is_online": other_user.is_online,
+                "other_user_avatar_url": (
+                    other_user.avatar.url if other_user.avatar else None
+                ),
+            }
+            for other_user in all_users.filter(username__icontains=query)
+        ]
+    elif filter_type == "my_friends":
+        friends = friendships.filter(status=Friend.ACCEPTED).filter(
+            Q(from_user__username__icontains=query)
+            | Q(to_user__username__icontains=query)
+        )
+        users_data = [get_friend_data(user, friend) for friend in friends]
+    elif filter_type == "pending_requests":
+        pending_requests = friendships.filter(
+            from_user=user, status=Friend.PENDING
+        ).filter(to_user__username__icontains=query)
+        users_data = [
+            {
+                "username": friend.to_user.username,
+                "other_user_avatar_url": (
+                    friend.to_user.avatar.url if friend.to_user.avatar else None
+                ),
+            }
+            for friend in pending_requests
+        ]
+    elif filter_type == "incoming_requests":
+        incoming_requests = friendships.filter(
+            to_user=user, status=Friend.PENDING
+        ).filter(from_user__username__icontains=query)
+        users_data = [
+            {
+                "username": friend.from_user.username,
+                "other_user_avatar_url": (
+                    friend.from_user.avatar.url if friend.from_user.avatar else None
+                ),
+            }
+            for friend in incoming_requests
+        ]
+    else:
+        return Response(
+            {"detail": "Invalid filter type"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    return Response({"users": users_data}, status=status.HTTP_200_OK)

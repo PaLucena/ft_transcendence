@@ -4,24 +4,20 @@ import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 export class UISetup {
     constructor(friends) {
         this.friends = friends;
+        this.searchInterval = null;
     }
 
     setupSearchInputEvent() {
         const searchInputDom = document.getElementById('friends_search_input');
 
         if (searchInputDom) {
-            this.friends.addEventListener(searchInputDom, 'keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-
-                    const searchSubmit = document.getElementById('search_friends_submit');
-                    if (searchSubmit) {
-                        searchSubmit.click();
-                    } else {
-                        console.warn('search_friends_submit not found.');
-                    }
-                }
+            this.friends.addEventListener(searchInputDom, 'focus', () => {
+                this.startAutoSearch();
             });
+
+            this.friends.addEventListener(searchInputDom, 'blur', () => {
+                this.stopAutoSearch();
+            })
         } else {
             console.warn('friends_search_input not found.');
         }
@@ -31,22 +27,29 @@ export class UISetup {
         const searchForm = document.getElementById('friends_search_form');
 
         if (searchForm) {
-            searchForm.onsubmit = (e) => {
+            searchForm.onsubmit = async (e) => {
                 e.preventDefault();
 
                 const searchInputDom = document.getElementById('friends_search_input');
                 if (searchInputDom) {
                     const searchValue = searchInputDom.value.trim();
 
-                    if (searchValue) {
-                        try {
-                            console.log(searchValue);
-                            searchInputDom.value = '';
-                            searchInputDom.focus();
-                        } catch (error) {
-                            console.error('Failed to search people:', error);
-                            customAlert('danger', 'Failed to search people', 5000);
-                        }
+                    try {
+                        const response = await fetch(`/api/friends/search/?query=${searchValue}&filter=${this.friends.filter}`, {
+                            method: 'GET',
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            credentials: 'include',
+                        });
+
+                        await handleResponse(response, data => {
+                            this.friends.friendsRenderer.renderUsersElements(data.users);
+                        });
+
+                    } catch (error) {
+                        this.handleError(error.errorCode, error.errorMessage || 'An unexpected error occurred.');
+                        this.stopAutoSearch();
                     }
                 } else {
                     console.warn("chat_message_input not found.");
@@ -54,6 +57,31 @@ export class UISetup {
             };
         } else {
             console.warn("chat_message_form not found.");
+        }
+    }
+
+    startAutoSearch() {
+        if (this.searchInterval === null) {
+            this.searchInterval = setInterval(() => {
+                const searchInputDom = document.getElementById('friends_search_input');
+
+                if (searchInputDom) {
+                    const searchSubmit = document.getElementById('search_friends_submit');
+
+                    if (searchSubmit) {
+                        searchSubmit.click();
+                    } else {
+                        console.warn('search_friends_submit not found.');
+                    }
+                }
+            }, 500);
+        }
+    }
+
+    stopAutoSearch() {
+        if (this.searchInterval !== null) {
+            clearInterval(this.searchInterval);
+            this.searchInterval = null;
         }
     }
 
@@ -65,6 +93,8 @@ export class UISetup {
         } else {
             console.warn('friends_search_form not found.')
         }
+
+        this.stopAutoSearch();
     }
 
     setupFilterButtons() {
