@@ -37,15 +37,18 @@ export class Navbar extends Component {
 
 	
 	static focus() {
-		const page = window.location.pathname.slice(1);
-		console.log("Estoy en: ", 'navItem-' + page);
-		if (page.substring(0, 10) === 'tournament')
-			return ;
+		let page = window.location.pathname.slice(1);
+		const	border = page.indexOf("/");
+		if (border > 0)
+			page = page.substring(0, page.indexOf("/"));
 
 		let navItems = document.querySelectorAll('[id^="navItem"]');
 		navItems.forEach(navItem => {
 			navItem.style.border = "";
 		});
+
+		if (page === 'tournament')
+			return ;
 		document.getElementById('navItem-' + page).style.border = "2px solid #edeef0";
 	}
 }

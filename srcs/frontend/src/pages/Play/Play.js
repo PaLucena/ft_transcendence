@@ -183,7 +183,9 @@ export class Play extends Component {
 		})
 		.then(data => {
 			const	displayPublic = data.public_tournaments;
+			console.log("Torneos publicos:", displayPublic);
 			const	displayPrivate = data.private_tournaments;
+			console.log("Torneos privados:", displayPrivate);
 			if (displayPublic.length === 0)
 				document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
 			else {

@@ -207,7 +207,6 @@ export class Tournament extends Component {
 			if (!tournamentInfo)
 				tournamentInfo = data.private_tournaments.find(object => object.id == tournamentId);
 
-			console.log("Info del torneo:", tournamentInfo);
 			document.getElementById('tournamentName').innerHTML = `<p class="display-4">${tournamentInfo.name}</h1>`;
 
 			const	players = document.querySelectorAll('[id^="player"]');
@@ -215,11 +214,9 @@ export class Tournament extends Component {
 			let	userStatus = "";
 			
 			players.forEach(player => {
-				console.log("Jugador:", tournamentInfo.players[player.id.substring(6, 7) - 1]);
-
 				userStatus = tournamentInfo.players[player.id.substring(6, 7) - 1];
-				player.querySelector('[id^="nickname-"]').innerHTML =  userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].nickname : "AI";
 
+				player.querySelector('[id^="nickname-"]').innerHTML =  userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].nickname : "AI";
 				player.querySelector('[id^="avatar-"]').src = userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].avatar : 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg';
 			});
 		})

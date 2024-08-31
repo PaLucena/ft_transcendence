@@ -1,4 +1,4 @@
-#rootTournament {
+.root-tournament {
 	height: 90vh;
 }
 
@@ -7,7 +7,7 @@
 	margin-top: 2vh;
 }
 
-#rootTournament .close-btn, #rootTournament .exit-btn {
+.root-tournament .close-btn, .root-tournament .exit-btn {
 	display: none;
 }
 
@@ -20,18 +20,32 @@
 	position: relative;
 }
 
-.player-container .avatar {
-	width: 15vh;
-	height: 15vh;
-	border: 2px solid black;
+@media only screen and (max-width: 599px) {
+	.player-container .avatar {
+		width: 10vh;
+		height: 10vh;
+		border: 2px solid black;
+	}
 }
 
+@media only screen and (min-width: 600px) {
+	.player-container .avatar {
+		width: 15vh;
+		height: 15vh;
+		border: 2px solid black;
+	}
+}
+	
 .player-container .avatar img {
 	position: inherit;
 }
 
 .player-container .nickname {
 	border: 2px solid black;
+}
+
+.vs-tournament {
+	font-size: 230%;
 }
 
 .close-exit-btn {
