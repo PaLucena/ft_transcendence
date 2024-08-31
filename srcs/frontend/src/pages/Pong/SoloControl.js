@@ -8,16 +8,6 @@ export default class SoloControl {
 
     init() {
         this.initEventListeners();
-
-        // Change controls depending on player
-        const controls_1 = document.querySelector('.controls-1');
-        const controls_2 = document.querySelector('.controls-2');
-        if (this.player === 1) {
-            controls_1.innerHTML = controls_2.innerHTML;
-            controls_2.innerHTML = '';
-        } else {
-            controls_1.innerHTML = '';
-        }
     }
 
     initEventListeners() {

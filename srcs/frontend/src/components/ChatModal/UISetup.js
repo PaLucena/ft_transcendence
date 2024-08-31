@@ -9,25 +9,25 @@ export class UISetup {
         const chatModalElement = document.getElementById('chats_modal');
 
         if (chatModalElement) {
-            this.chatModal.addEventListener(chatModalElement, 'shown.bs.modal', () => {
-                this.chatModal.chatLoader.loadChats();
+            this.chatModal.addEventListener(chatModalElement, 'shown.bs.modal', async () => {
+                await this.chatModal.chatLoader.loadChats();
             });
 
-            this.chatModal.addEventListener(chatModalElement, 'click', (e) => {
+            this.chatModal.addEventListener(chatModalElement, 'click', async (e) => {
                 const targetElement = e.target.closest('.open_chat_btn');
                 if (targetElement) {
                     const chatroomName = targetElement.getAttribute('data-chatroom_name');
 
                     if (!chatroomName) {
-                        customAlert('warning', 'Chatroom name not found', 3000);
+                        customAlert('warning', 'Chatroom name not found.', 3000);
                         return;
                     }
 
-                    this.chatModal.chatLoader.initChatroom(chatroomName);
+                    await this.chatModal.chatLoader.initChatroom(chatroomName);
                 }
             });
         } else {
-            console.warn("Chat modal element not found");
+            console.warn("chats_modal not found.");
         }
     }
 
@@ -44,16 +44,16 @@ export class UISetup {
                 if (messageInput) {
                     messageInput.focus();
                 } else {
-                    console.warn("Message input not found");
+                    console.warn("chat_message_input not found.");
                 }
             });
         } else {
-            console.warn("Messages modal element not found");
+            console.warn("messages_modal not found.");
         }
     }
 
     setupMessageInputEvent() {
-        const messageInputDom = document.querySelector('#chat_message_input');
+        const messageInputDom = document.getElementById('chat_message_input');
 
         if (messageInputDom) {
             this.chatModal.addEventListener(messageInputDom, 'keydown', (e) => {
@@ -64,16 +64,16 @@ export class UISetup {
                     if (messageSubmit) {
                         messageSubmit.click();
                     } else {
-                        console.warn('Message submit button not found');
+                        console.warn('Message submit button not found.');
                     }
                 }
             });
         } else {
-            console.warn("Message input element not found");
+            console.warn("chat_message_input not found.");
         }
     }
 
-    setupCloseMessagesModal() {
+    setupMessagesModalClose() {
         const messagesModalElement = document.getElementById('messages_modal');
 
         if (messagesModalElement) {
@@ -84,33 +84,29 @@ export class UISetup {
                 if (chatMessages) {
                     chatMessages.innerHTML = '';
                 } else {
-                    console.warn("Chat messages container not found");
+                    console.warn("chat_messages not found.");
                 }
 
                 const chatHeader = document.getElementById('chat_header_content');
                 if (chatHeader) {
                     chatHeader.innerHTML = '';
                 } else {
-                    console.warn("Chat header container not found");
+                    console.warn("chat_header_content not found.");
                 }
 
                 this.removeMessageFormEvents();
             });
         } else {
-            console.warn("Messages modal element not found");
+            console.warn("messages_modal element not found.");
         }
     }
 
     removeMessageFormEvents() {
-        const messageForm = document.querySelector('#chat_message_form');
+        const messageForm = document.getElementById('chat_message_form');
         if (messageForm) {
             messageForm.onsubmit = null;
-        }
-    }
-
-    removeOnlineUpdateListeners() {
-        if (this.chatModal.chatRenderer.onlineUsersUpdatedListener) {
-            this.chatModal.chatRenderer.eventEmitter.off('onlineUsersUpdated', this.chatModal.chatRenderer.onlineUsersUpdatedListener);
+        } else {
+            console.warn('chat_message_form not found.')
         }
     }
 
@@ -125,18 +121,18 @@ export class UISetup {
                 }
             });
         } else {
-            console.warn("Chat messages container element not found");
+            console.warn("chat_messages_container not found.");
         }
     }
 
     setupMessageForm() {
-        const messageForm = document.querySelector('#chat_message_form');
+        const messageForm = document.getElementById('chat_message_form');
 
         if (messageForm) {
             messageForm.onsubmit = (e) => {
                 e.preventDefault();
 
-                const messageInputDom = document.querySelector('#chat_message_input');
+                const messageInputDom = document.getElementById('chat_message_input');
                 if (messageInputDom) {
                     const message = messageInputDom.value.trim();
 
@@ -156,11 +152,11 @@ export class UISetup {
                         }
                     }
                 } else {
-                    console.warn("Message input element not found");
+                    console.warn("chat_message_input not found.");
                 }
             };
         } else {
-            console.warn("Chat messages form element not found");
+            console.warn("chat_message_form not found.");
         }
     }
 }

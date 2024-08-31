@@ -14,7 +14,7 @@ from user.decorators import default_authentication_required
 def chat_view(request, chatroom_name):
     if not request.user.is_authenticated:
         return Response(
-            {"detail": "Authentication required."},
+            {"detail": "Authentication required"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
@@ -23,7 +23,7 @@ def chat_view(request, chatroom_name):
 
         if not chat_group:
             return Response(
-                {"detail": f"Chatroom '{chatroom_name}' does not exist."},
+                {"detail": f"Chatroom does not exist"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -34,7 +34,7 @@ def chat_view(request, chatroom_name):
         if chat_group.is_private:
             if request.user not in chat_group.members.all():
                 return Response(
-                    {"detail": "You do not have access to this private chat."},
+                    {"detail": "You do not have access to this private chat"},
                     status=status.HTTP_403_FORBIDDEN,
                 )
             for member in chat_group.members.all():
@@ -63,12 +63,6 @@ def chat_view(request, chatroom_name):
 
         return Response(context, status=status.HTTP_200_OK)
 
-    except ObjectDoesNotExist as e:
-        return Response(
-            {"detail": f"Object does not exist: {str(e)}"},
-            status=status.HTTP_404_NOT_FOUND,
-        )
-
     except Exception as e:
         return Response(
             {"detail": f"An error occurred: {str(e)}"},
@@ -81,13 +75,13 @@ def chat_view(request, chatroom_name):
 def get_or_create_chatroom(request, username):
     if not request.user.is_authenticated:
         return Response(
-            {"detail": "Authentication required."},
+            {"detail": "Authentication required"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
     if request.user.username == username:
         return Response(
-            {"detail": "You cannot create a private chat with yourself."},
+            {"detail": "You cannot create a private chat with yourself"},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -95,7 +89,7 @@ def get_or_create_chatroom(request, username):
         other_user = get_object_or_404(AppUser, username=username)
     except AppUser.DoesNotExist:
         return Response(
-            {"detail": "The user does not exist."},
+            {"detail": "The user does not exist"},
             status=status.HTTP_404_NOT_FOUND,
         )
 
@@ -122,7 +116,7 @@ def get_or_create_chatroom(request, username):
 def get_all_private_chats_view(request):
     if not request.user.is_authenticated:
         return Response(
-            {"detail": "Authentication required."},
+            {"detail": "Authentication required"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
@@ -161,7 +155,7 @@ def get_all_private_chats_view(request):
 def block_or_unblock_user_view(request):
     if not request.user.is_authenticated:
         return Response(
-            {"detail": "Authentication required."},
+            {"detail": "Authentication required"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
@@ -178,7 +172,7 @@ def block_or_unblock_user_view(request):
 
         if action not in ["block", "unblock"]:
             return Response(
-                {"detail": "Invalid action. Action must be 'block' or 'unblock'."},
+                {"detail": "Invalid action. Action must be 'block' or 'unblock'"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

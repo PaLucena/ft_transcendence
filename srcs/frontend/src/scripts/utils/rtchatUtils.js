@@ -1,5 +1,18 @@
 import customAlert from './customAlert.js'
 
+export function updateOnlineStatus(onlineUsers) {
+    const statusDots = document.querySelectorAll('.status-dot[data-online-username]');
+
+    statusDots.forEach(dot => {
+        const username = dot.getAttribute('data-online-username');
+        const isOnline = onlineUsers.includes(username);
+
+        dot.classList.remove('green-dot', 'gray-dot');
+        dot.classList.add(isOnline ? 'green-dot' : 'gray-dot');
+    });
+}
+
+
 export async function handleBlockUnblock(action, username, callback) {
     try {
         const response = await fetch('/api/chat/block_or_unblock/', {
@@ -39,8 +52,8 @@ export async function handleResponse(response, onSuccess) {
 
 function handleError(errorCode, errorMessage) {
     switch (errorCode) {
-        case 404:
-            customAlert('danger', 'Chatroom not found or author not found', 5000);
+        case 400:
+            customAlert('danger', `${errorCode}: ${errorMessage}`, 5000);
             break;
         case 401:
             customAlert('danger', 'You are not authenticated. Please log in.', 5000);
@@ -48,10 +61,13 @@ function handleError(errorCode, errorMessage) {
         case 403:
             customAlert('danger', 'You do not have permission to access this chatroom.', 5000);
             break;
+        case 404:
+            customAlert('danger', `${errorCode}: ${errorMessage || 'Not found'}`, 5000);
+            break;
         case 500:
             customAlert('danger', 'An internal server error occurred.', 5000);
             break;
         default:
-            console.error('Critical error:', errorMessage);
+            console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
     }
 }
