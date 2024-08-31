@@ -54,7 +54,7 @@ def assign_next_match(tournament, match_id, finished_match_data):
 		if finished_match.player1 == 0 and finished_match.player2 == 0:
 			pass
 		else:
-			bc_record_match(finished_match_data)
+			bc_record_match(format_match_for_bc(finished_match_data))
 
 	for next_match_id in next_possible_matches:
 		if can_assign_match(tournament, next_match_id) and not Match.objects.filter(match_id=next_match_id).exists():
@@ -223,6 +223,16 @@ def format_match(match):
 		'controls_mode': match.controls_mode
 	}
 
+def format_match_for_bc(result):
+	return {
+		'tournament_id': result['tournament_id'],
+		'match_id': result['match_id'],
+		'player_1_id': result['player_1_id'],
+		'player_2_id': result['player_2_id'],
+		'player_1_goals': result['player_1_goals'],
+		'player_2_goals': result['player_2_goals'],
+		'winner_id': result['player_1_id'] if result['player_1_goals'] > result['player_2_goals'] else result['player_2_id'],
+	}
 
 def generate_ai_result(match):
 	player1_score = 6

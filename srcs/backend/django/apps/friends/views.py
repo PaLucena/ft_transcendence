@@ -48,12 +48,6 @@ def get_friend_data(user, friend):
 @api_view(["GET"])
 @default_authentication_required
 def filter_users(request, filter_type):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     user = request.user
 
     all_users = AppUser.objects.exclude(id=user.id)
@@ -112,12 +106,6 @@ def filter_users(request, filter_type):
 @api_view(["POST"])
 @default_authentication_required
 def invite_friend(request):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     username = request.data.get("username")
 
     if not username:
@@ -149,12 +137,6 @@ def invite_friend(request):
 @api_view(["POST"])
 @default_authentication_required
 def accept_invitation(request):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     username = request.data.get("username")
 
     if not username:
@@ -191,12 +173,6 @@ def accept_invitation(request):
 @api_view(["POST"])
 @default_authentication_required
 def remove_friend(request):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required."},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     friend_username = request.data.get("username")
 
     if not friend_username:
