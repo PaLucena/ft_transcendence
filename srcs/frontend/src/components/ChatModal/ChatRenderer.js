@@ -235,13 +235,14 @@ export class ChatRenderer {
 
 				if (blockStatus === "blocker" && otherUser) {
 					const unblockBtn = document.getElementById('unblock_btn');
+
 					if (unblockBtn) {
-						unblockBtn.addEventListener('click', () => {
+						this.chatModal.addEventListener(unblockBtn, 'click', () => {
 							handleBlockUnblock('unblock', otherUser.username, () => {
 								this.removeBlockStatusMessage();
 								this.toggleInputState(chatMessageInput, chatMessageSubmit, false);
 							});
-						});
+						})
 					}
 				}
             } else {
