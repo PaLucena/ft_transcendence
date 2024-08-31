@@ -106,6 +106,8 @@ def filter_users(request, filter_type):
             {"detail": "Invalid filter type"}, status=status.HTTP_404_NOT_FOUND
         )
 
+    users_data.sort(key=lambda x: x["username"].lower())
+
     return Response({"users": users_data}, status=status.HTTP_200_OK)
 
 
@@ -256,12 +258,14 @@ def search_friends(request):
             }
             for other_user in all_users.filter(username__icontains=query)
         ]
+
     elif filter_type == "my_friends":
         friends = friendships.filter(status=Friend.ACCEPTED).filter(
             Q(from_user__username__icontains=query)
             | Q(to_user__username__icontains=query)
         )
         users_data = [get_friend_data(user, friend) for friend in friends]
+
     elif filter_type == "pending_requests":
         pending_requests = friendships.filter(
             from_user=user, status=Friend.PENDING
@@ -275,6 +279,7 @@ def search_friends(request):
             }
             for friend in pending_requests
         ]
+
     elif filter_type == "incoming_requests":
         incoming_requests = friendships.filter(
             to_user=user, status=Friend.PENDING
@@ -288,9 +293,12 @@ def search_friends(request):
             }
             for friend in incoming_requests
         ]
+
     else:
         return Response(
             {"detail": "Invalid filter type"}, status=status.HTTP_404_NOT_FOUND
         )
+
+    users_data.sort(key=lambda x: x["username"].lower())
 
     return Response({"users": users_data}, status=status.HTTP_200_OK)
