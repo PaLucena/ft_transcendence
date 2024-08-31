@@ -5,6 +5,7 @@ from django.db.models import Q
 from user.models import AppUser
 from friends.models import Friend
 from user.decorators import default_authentication_required
+from rtchat.views import create_private_chat_if_not_exists
 
 STATUS_ACCEPTED = "accepted"
 STATUS_NO_RELATION = "no_relation"
@@ -176,6 +177,8 @@ def accept_invitation(request):
 
         friend_request.status = 1
         friend_request.save()
+
+        create_private_chat_if_not_exists(request.user, friend)
 
         return Response(
             {"detail": "Friend request accepted successfully"},
