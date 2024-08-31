@@ -6,6 +6,67 @@ export class UISetup {
         this.friends = friends;
     }
 
+    setupSearchInputEvent() {
+        const searchInputDom = document.getElementById('friends_search_input');
+
+        if (searchInputDom) {
+            this.friends.addEventListener(searchInputDom, 'keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+
+                    const searchSubmit = document.getElementById('search_friends_submit');
+                    if (searchSubmit) {
+                        searchSubmit.click();
+                    } else {
+                        console.warn('search_friends_submit not found.');
+                    }
+                }
+            });
+        } else {
+            console.warn('friends_search_input not found.');
+        }
+    }
+
+    setupSearchForm() {
+        const searchForm = document.getElementById('friends_search_form');
+
+        if (searchForm) {
+            searchForm.onsubmit = (e) => {
+                e.preventDefault();
+
+                const searchInputDom = document.getElementById('friends_search_input');
+                if (searchInputDom) {
+                    const searchValue = searchInputDom.value.trim();
+
+                    if (searchValue) {
+                        try {
+                            console.log(searchValue);
+                            searchInputDom.value = '';
+                            searchInputDom.focus();
+                        } catch (error) {
+                            console.error('Failed to search people:', error);
+                            customAlert('danger', 'Failed to search people', 5000);
+                        }
+                    }
+                } else {
+                    console.warn("chat_message_input not found.");
+                }
+            };
+        } else {
+            console.warn("chat_message_form not found.");
+        }
+    }
+
+    removeSearchFormEvents() {
+        const searchForm = document.getElementById('friends_search_form');
+
+        if (searchForm) {
+            searchForm.onsubmit = null;
+        } else {
+            console.warn('friends_search_form not found.')
+        }
+    }
+
     setupFilterButtons() {
         const container = document.getElementById('search_filter_btn_container');
 
