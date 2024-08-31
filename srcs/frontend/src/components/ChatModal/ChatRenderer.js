@@ -26,7 +26,7 @@ export class ChatRenderer {
 	createChatElement(chat) {
 		try {
 			const chatHtml = `
-				<div class="chat-element scale-fade-in-up col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
+				<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
 					<button class="open_chat_btn btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative"
 							style="width: 102px; height: 102px;"
 							data-bs-target="#messages_modal"

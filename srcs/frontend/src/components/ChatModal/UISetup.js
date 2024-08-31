@@ -31,22 +31,6 @@ export class UISetup {
         }
     }
 
-    setupChatModalClose() {
-        const chatModalElement = document.getElementById('chats_modal');
-
-        if (chatModalElement) {
-            this.chatModal.addEventListener(chatModalElement, 'hidden.bs.modal', async () => {
-                const chatElements = document.getElementById('chat_element_container')
-
-                if (chatElements) {
-                    chatElements.innerHTML = '';
-                }
-            });
-        } else {
-            console.warn("chats_modal not found.");
-        }
-    }
-
     setupMessagesModal() {
         const messagesModalElement = document.getElementById('messages_modal');
 

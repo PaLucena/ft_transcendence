@@ -4,8 +4,6 @@ export class FriendsRenderer {
     }
 
     renderUsersElements(users) {
-        console.log("Users: ", users);
-
         const container = document.getElementById('friends_elemets_container');
 
         if (container) {
@@ -39,7 +37,7 @@ export class FriendsRenderer {
                 </div>`;
 
             const commonHtml = `
-                <div class="chat-element scale-fade-in-up col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
+                <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
                     <div class="img-nick">
                         <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
                             <img
