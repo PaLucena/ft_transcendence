@@ -1,50 +1,56 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .game_manager import game_manager
-from .handlers import handle_player_ready, handle_quit, handle_move, handle_resize, send_config
+from .handlers import handle_player_ready, handle_quit, handle_move, handle_resize
+from user.models import AppUser as User
 
 
 class GameConsumer(AsyncWebsocketConsumer):
 
     def __init__(self):
         super().__init__()
+        self.room = None
         self.room_name = None
         self.game_logic = None
         self.player_id = None
         self.player_channel = None
+        self.controls_mode = None
         self.controls_side = None
 
     async def connect(self):
         user = self.scope['user']
         self.player_id = user.id
 
-        print(f"Player {self.player_id} connected") # DEBUG
+        print(f"Player name: {user.username}") # DEBUG
         print(f"Available rooms: {game_manager.rooms}") # DEBUG
 
-        room = game_manager.get_game_room_by_player(self.player_id)
+        self.room = game_manager.get_game_room_by_player(self.player_id)
 
-        if room is None:
+        if self.room is None:
             print(f"Player {self.player_id} has no room") # DEBUG
             await self.close()
             return
 
-        print(f"Player {self.player_id} has room {room.get_room_name()}") # DEBUG
+        print(f"Player {self.player_id} has room {self.room.get_room_name()}") # DEBUG
 
-        self.game_logic = room.get_game_logic()
-        self.room_name = room.get_room_name()
+        self.game_logic = self.room.get_game_logic()
+        self.room_name = self.room.get_room_name()
 
-        if self.player_id == room.player_1_id:
+        if self.player_id == self.room.player_1_id:
             print(f"Player {self.player_id} is player 1") # DEBUG
             self.game_logic.player_1_channel = self.channel_name
+            self.game_logic.player_1_name = user.username
             self.controls_side = 1
-        elif self.player_id == room.player_2_id:
+        elif self.player_id == self.room.player_2_id:
             print(f"Player {self.player_id} is player 2") # DEBUG
             self.game_logic.player_2_channel = self.channel_name
+            self.game_logic.player_2_name = user.username
             self.controls_side = 2
         else:
             print(f"Player {self.player_id} is not in the room")
             await self.close()
             return
+
 
         await self.channel_layer.group_add(
             self.room_name,
@@ -53,7 +59,17 @@ class GameConsumer(AsyncWebsocketConsumer):
         print(f"Player {self.player_id} - room {self.room_name} - side {self.controls_side}")
         await self.accept()
 
-        await send_config(self)
+        await self.send(text_data=json.dumps({
+            'type': 'config',
+            'controls_mode': self.game_logic.controls_mode,
+            'controls_side': self.controls_side,
+            'player_1_name': self.game_logic.player_1_name,
+            'player_2_name': self.game_logic.player_2_name,
+            'goals_to_win': self.game_logic.GOALS_TO_WIN,
+            'goals_diff': self.game_logic.GOALS_DIFFERENCE,
+        }))
+
+        print(f"Player {self.player_id} sent config") # DEBUG
 
     async def disconnect(self, close_code):
         if self.game_logic:

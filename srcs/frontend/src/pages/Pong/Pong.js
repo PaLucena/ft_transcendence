@@ -19,7 +19,7 @@ export class Pong extends Component {
 	initPong() {
 		// Variables
 		let controls_side = 0;
-		let player_1_name = 'Player 1'; 
+		let player_1_name = 'Player 1';
 		let player_2_name = 'Player 2';
 		let inputController = null;
 
@@ -55,11 +55,11 @@ export class Pong extends Component {
 
 		// Websocket setup
 		const socket = new WebSocket('/ws/ponggame/');
-		
+
 		// Apply game settings
 		p_1_name.innerHTML = player_1_name;
 		p_2_name.innerHTML = player_2_name;
-		
+
 		socket.onopen = function() {
 			console.log("Connection established");
 		};
@@ -92,7 +92,9 @@ export class Pong extends Component {
 
 		function updateGameConfig(gameState) {
 			controls_side = gameState.controls_side;
+			console.log("--- control side: " + gameState.controls_side);
 			inputController = new InputController(socket, gameState.controls_mode, gameState.controls_side);
+			console.log("--- controlMode from controller: " + inputController.controls_mode);
 
 			player_1_name = gameState["player_1_name"];
 			p_1_name.innerHTML = `${gameState["player_1_name"]}`;
@@ -100,6 +102,26 @@ export class Pong extends Component {
 			p_2_name.innerHTML = `${gameState["player_2_name"]}`;
 			win_goals.innerHTML = gameState["goals_to_win"] + ' (dif.' + gameState["goals_diff"] + ')';
 
+			if (gameState.controls_mode === 'remote' || gameState.controls_mode === 'AI') {
+				console.log("Modifying controls for remote and AI modes");
+				console.log("Previous controls_1 innerHTML: " + controls_1.innerHTML);
+				console.log("Previous controls_2 innerHTML: " + controls_2.innerHTML);
+				if (controls_side === 1) {
+					controls_1.innerHTML = controls_2.innerHTML;
+					controls_2.innerHTML = '';
+				} else {
+					controls_1.innerHTML = '';
+				}
+				if (gameState.controls_mode === 'AI') {
+					if (controls_side === 1) {
+						message_line_sub_2.style.color = p_2_color;
+					} else {
+						message_line_sub_2.style.color = p_1_color;
+					}
+					message_line_sub_2.innerHTML = 'AI is ready';
+
+				}
+			}
 		}
 		function updatePositions(gameState) {
 			let responsiveValue = getCSSVar('--responsive');
@@ -120,11 +142,9 @@ export class Pong extends Component {
 				controls_1.innerHTML = '';
 				controls_2.innerHTML = '';
 			} else if (gameState.state === 'waiting') {
-				message_line_super.innerHTML = `timeout: ${gameState["countdown"]} (auto-start)`;
+				message_line_super.innerHTML = `timeout: ${gameState["countdown"]}`;
 				message_line_main.innerHTML = 'Press to start';
-				controls_1.innerHTML = 'W(up)<br>S(down)<br><br>press "space"';
-				controls_2.innerHTML = 'Arrow Up<br>Arrow Down<br><br>press "enter"';
-			} else if (gameState.state === 'player_ready') {
+			} else if (gameState.state === 'player_ready' && message_line_sub_2.innerHTML === '') {
 				if (gameState.player === 1) {
 					message_line_sub_2.style.color = p_1_color;
 					message_line_sub_2.innerHTML = `${player_1_name} is ready`;
@@ -132,13 +152,14 @@ export class Pong extends Component {
 					message_line_sub_2.style.color = p_2_color;
 					message_line_sub_2.innerHTML = `${player_2_name} is ready`;
 				}
-			} else if (gameState.state === 'round_countdown') {
+			} else if (gameState.state === 'countdown') {
 				message_line_super.innerHTML = '';
 				message_line_main.innerHTML = `Ready in ${gameState["countdown"]}...`;
 				message_line_sub_2.innerHTML = '';
 				controls_1.innerHTML = '';
 				controls_2.innerHTML = '';
 			} else if (gameState.state === 'game_over') {
+				message_line_super.innerHTML = '';
 				message_line_main.innerHTML = 'Game Over';
 				controls_1.innerHTML = '';
 				controls_2.innerHTML = '';

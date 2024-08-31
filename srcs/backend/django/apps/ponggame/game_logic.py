@@ -40,18 +40,18 @@ class GameLogic:
     ball_vel_y = BALL_SPEED_INIT
 
     # Game variables
-    theme = "default"
     game_state = "waiting"
     player_1_id = None
     player_2_id = None
+    player_1_name = 'Default'
+    player_2_name = 'Default'
     player_1_ready = False
     player_2_ready = False
     player_1_goals = 0
     player_2_goals = 0
     controls_mode = "local"
     ai_mode = 0
-    countdown = 0
-    timeout = 0
+    countdown = CONNECT_TIMEOUT * FPS
 
     player_1_channel = None
     player_2_channel = None
@@ -156,12 +156,14 @@ class GameLogic:
         elif self.game_state == "scored":
             self.game_state = "countdown"
         elif self.game_state == "waiting":
-            self.timeout += 1
-            if self.timeout > self.CONNECT_TIMEOUT * self.FPS:
+            if self.countdown > self.FPS:
+                self.countdown -= 1
+            else:
                 self.game_state = "game_over"
             if self.player_1_ready and self.player_2_ready:
                 self.game_state = "countdown"
                 self.set_countdown()
+        elif self.game_state == "game_over":
             if not self.player_1_ready:
                 self.player_1_goals = -1
             if not self.player_2_ready:

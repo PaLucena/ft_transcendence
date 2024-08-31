@@ -25,7 +25,7 @@ class LocalMatch(APIView):
 				match_id=match_id,
 				player_1_id=user_id,
 				player_2_id=0,  # AI opponent
-				controls_mode='local'
+				controls_mode='AI'
 			))
 
 			return Response({'message': 'Match started!'}, status=status.HTTP_200_OK)
