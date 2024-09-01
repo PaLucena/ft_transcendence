@@ -122,12 +122,10 @@ export class Profile extends Component {
 			if (data["has2faEnabled"] == true) {
 				EnableButtonPlaceholder.style.display = "none";
 				DisableButtonPlaceholder.style.display = "block";
-				console.log("2fa is enabled")
 			}
 			else {
 				EnableButtonPlaceholder.style.display = "block";
 				DisableButtonPlaceholder.style.display = "none";
-				console.log("2fa is disabled")
 			}
 		})
 		.catch(error => {
@@ -186,7 +184,6 @@ export class Profile extends Component {
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
 		TwofaBtn.addEventListener("click", (event) => {
-			console.log("a")
 			const response = fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',

@@ -105,7 +105,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ./database_volume/db_volume
+      device: ${DATABASE_CONTAINER_PATH}/db_volume
       o: bind
 
   ssl_volume:
