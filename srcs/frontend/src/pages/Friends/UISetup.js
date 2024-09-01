@@ -4,6 +4,97 @@ import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 export class UISetup {
     constructor(friends) {
         this.friends = friends;
+        this.searchInterval = null;
+    }
+
+    setupSearchInputEvent() {
+        const searchInputDom = document.getElementById('friends_search_input');
+
+        if (searchInputDom) {
+            this.friends.addEventListener(searchInputDom, 'focus', () => {
+                this.startAutoSearch();
+            });
+
+            this.friends.addEventListener(searchInputDom, 'blur', () => {
+                this.stopAutoSearch();
+            })
+        } else {
+            console.warn('friends_search_input not found.');
+        }
+    }
+
+    setupSearchForm() {
+        const searchForm = document.getElementById('friends_search_form');
+
+        if (searchForm) {
+            searchForm.onsubmit = async (e) => {
+                e.preventDefault();
+
+                const searchInputDom = document.getElementById('friends_search_input');
+                if (searchInputDom) {
+                    const searchValue = searchInputDom.value.trim();
+
+                    try {
+                        const response = await fetch(`/api/friends/search/?query=${searchValue}&filter=${this.friends.filter}`, {
+                            method: 'GET',
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            credentials: 'include',
+                        });
+
+                        await handleResponse(response, data => {
+                            this.friends.friendsRenderer.renderUsersElements(data.users);
+                        });
+
+                    } catch (error) {
+                        this.handleError(error.errorCode, error.errorMessage || 'An unexpected error occurred.');
+                        this.stopAutoSearch();
+                    }
+                } else {
+                    console.warn("chat_message_input not found.");
+                }
+            };
+        } else {
+            console.warn("chat_message_form not found.");
+        }
+    }
+
+    startAutoSearch() {
+        if (this.searchInterval === null) {
+            this.searchInterval = setInterval(() => {
+                const searchInputDom = document.getElementById('friends_search_input');
+
+                if (searchInputDom) {
+                    const searchSubmit = document.getElementById('search_friends_submit');
+
+                    if (searchSubmit) {
+                        searchSubmit.click();
+                    } else {
+                        console.warn('search_friends_submit not found.');
+                    }
+                }
+            }, 500);
+        }
+    }
+
+    stopAutoSearch() {
+        if (this.searchInterval !== null) {
+            clearInterval(this.searchInterval);
+            this.searchInterval = null;
+        }
+    }
+
+    removeSearchFormEvents() {
+        const searchForm = document.getElementById('friends_search_form');
+
+        if (searchForm) {
+            searchForm.onsubmit = null;
+        } else {
+            console.warn('friends_search_form not found.')
+        }
+
+        this.stopAutoSearch();
     }
 
     setupFilterButtons() {

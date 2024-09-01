@@ -26,7 +26,7 @@ export class ChatRenderer {
 	createChatElement(chat) {
 		try {
 			const chatHtml = `
-				<div class="chat-element scale-fade-in-up col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
+				<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
 					<button class="open_chat_btn btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative"
 							style="width: 102px; height: 102px;"
 							data-bs-target="#messages_modal"
@@ -235,13 +235,14 @@ export class ChatRenderer {
 
 				if (blockStatus === "blocker" && otherUser) {
 					const unblockBtn = document.getElementById('unblock_btn');
+
 					if (unblockBtn) {
-						unblockBtn.addEventListener('click', () => {
+						this.chatModal.addEventListener(unblockBtn, 'click', () => {
 							handleBlockUnblock('unblock', otherUser.username, () => {
 								this.removeBlockStatusMessage();
 								this.toggleInputState(chatMessageInput, chatMessageSubmit, false);
 							});
-						});
+						})
 					}
 				}
             } else {

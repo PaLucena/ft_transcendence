@@ -70,6 +70,19 @@ def chat_view(request, chatroom_name):
         )
 
 
+def create_private_chat_if_not_exists(user1, user2):
+    chatroom = (
+        ChatGroup.objects.filter(is_private=True, members=user1)
+        .filter(members=user2)
+        .first()
+    )
+
+    if not chatroom:
+        chatroom = ChatGroup.objects.create(is_private=True)
+        chatroom.members.add(user1, user2)
+        chatroom.save()
+
+
 @api_view(["GET"])
 @default_authentication_required
 def get_or_create_chatroom(request, username):
@@ -93,17 +106,13 @@ def get_or_create_chatroom(request, username):
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    my_chatrooms = request.user.chat_group.filter(is_private=True)
-    chatroom = None
+    create_private_chat_if_not_exists(request.user, other_user)
 
-    for room in my_chatrooms:
-        if other_user in room.members.all():
-            chatroom = room
-            break
-
-    if not chatroom:
-        chatroom = ChatGroup.objects.create(is_private=True)
-        chatroom.members.add(other_user, request.user)
+    chatroom = (
+        ChatGroup.objects.filter(is_private=True, members=request.user)
+        .filter(members=other_user)
+        .first()
+    )
 
     return Response(
         {"chatroom_name": chatroom.group_name},

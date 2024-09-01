@@ -31,22 +31,6 @@ export class UISetup {
         }
     }
 
-    setupChatModalClose() {
-        const chatModalElement = document.getElementById('chats_modal');
-
-        if (chatModalElement) {
-            this.chatModal.addEventListener(chatModalElement, 'hidden.bs.modal', async () => {
-                const chatElements = document.getElementById('chat_element_container')
-
-                if (chatElements) {
-                    chatElements.innerHTML = '';
-                }
-            });
-        } else {
-            console.warn("chats_modal not found.");
-        }
-    }
-
     setupMessagesModal() {
         const messagesModalElement = document.getElementById('messages_modal');
 
@@ -76,11 +60,11 @@ export class UISetup {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
 
-                    const messageSubmit = document.querySelector('#chat_message_submit');
+                    const messageSubmit = document.getElementById('chat_message_submit');
                     if (messageSubmit) {
                         messageSubmit.click();
                     } else {
-                        console.warn('Message submit button not found.');
+                        console.warn('chat_message_submit not found.');
                     }
                 }
             });

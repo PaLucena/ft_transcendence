@@ -4,6 +4,7 @@ from friends.views import (
     accept_invitation,
     remove_friend,
     filter_users,
+    search_friends,
 )
 
 urlpatterns = [
@@ -11,4 +12,5 @@ urlpatterns = [
     path("action/invite_friend/", invite_friend, name="invite_friend"),
     path("action/accept_invitation/", accept_invitation, name="accept_invitation"),
     path("action/remove_friend/", remove_friend, name="remove_friend"),
+    path("search/", search_friends, name="search_friends"),
 ]

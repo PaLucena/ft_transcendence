@@ -11,8 +11,8 @@ export class NotFound extends Component {
 	}
 
 	goBack() {
-		const	goBack = document.getElementById("goBackBtn");
-		goBack.addEventListener("click", () => {
+		const goBack = document.getElementById("goBackBtn");
+		this.addEventListener(goBack, 'click', () => {
 			window.history.back();
 		});
 	}
