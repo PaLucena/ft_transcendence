@@ -60,11 +60,11 @@ export class UISetup {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
 
-                    const messageSubmit = document.querySelector('#chat_message_submit');
+                    const messageSubmit = document.getElementById('chat_message_submit');
                     if (messageSubmit) {
                         messageSubmit.click();
                     } else {
-                        console.warn('Message submit button not found.');
+                        console.warn('chat_message_submit not found.');
                     }
                 }
             });
