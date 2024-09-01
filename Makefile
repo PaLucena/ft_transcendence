@@ -1,5 +1,5 @@
 USER := $(shell echo $$USER)
-CONTAINERS_DIR := /home/$(USER)/data
+CONTAINERS_DIR := ./database_volume
 DJANGO_MEDIA := ./srcs/backend/django/apps/media
 
 all:
