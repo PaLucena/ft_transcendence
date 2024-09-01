@@ -50,7 +50,7 @@ class GameLogic:
     player_1_goals = 0
     player_2_goals = 0
     controls_mode = "local"
-    ai_mode = 0
+    ai_side = 0
     countdown = CONNECT_TIMEOUT * FPS
 
     player_1_channel = None
