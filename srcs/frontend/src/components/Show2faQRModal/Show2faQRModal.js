@@ -24,7 +24,6 @@ export function showQRmodal(qrpath){
 		return response.json();
 	})
 	.then(data => {
-		console.log('hola');
 		qrmodal.show()
 	})
 	.catch(error => {
