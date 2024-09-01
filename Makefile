@@ -4,7 +4,7 @@ DJANGO_MEDIA := ./srcs/backend/django/apps/media
 sys = $(shell uname)
 
 
-ifeq ($(sys), "Linux")
+ifeq ($(sys), Linux)
 	CONTAINERS_DIR := /home/$(USER)/data
 else
 	CONTAINERS_DIR := /Users/$(USER)/data
