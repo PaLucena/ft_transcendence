@@ -8,7 +8,7 @@ export class Navbar extends Component {
 
 	init() {
 		this.initNavbar();
-		Navbar.focus();
+		//Navbar.focus();
 	}
 
 	initNavbar() {
@@ -35,7 +35,7 @@ export class Navbar extends Component {
 		})
 	}
 
-	
+
 	static focus() {
 		let page = window.location.pathname.slice(1);
 		const	border = page.indexOf("/");

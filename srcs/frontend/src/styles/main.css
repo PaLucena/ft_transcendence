@@ -7,17 +7,7 @@ html, body {
 }
 
 body {
-	background-color: #fff;
-}
-
-nav {
-	height: 10vh;
-	margin: 0;
-	margin-bottom: 0;
-	padding: 0;
-	background-color: #425f4b;
-	border-bottom-left-radius: 20px;
-	border-bottom-right-radius: 20px;
+	background-color: #7ba9a9;
 }
 
 .particles {
@@ -29,7 +19,6 @@ nav {
 	width: 100vw;
 	height: 100vh;
 	z-index: -1;
-	background-color: #7ba9a9;
 }
 
 .content {

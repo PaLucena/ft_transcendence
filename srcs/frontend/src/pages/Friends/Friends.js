@@ -27,7 +27,7 @@ export class Friends extends Component {
 	}
 
 	async init() {
-		await Navbar.focus();
+		//await Navbar.focus();
 		await this.friendsLoader.loadFriendsData();
 		this.uiSetup.setupSearchInputEvent();
 		this.uiSetup.setupSearchForm();

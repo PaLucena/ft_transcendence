@@ -16,7 +16,7 @@ export class Play extends Component {
 
 	init() {
 		this.setupEventListeners();
-		Navbar.focus();
+		//Navbar.focus();
 	}
 
 	setupEventListeners() {
@@ -100,7 +100,7 @@ export class Play extends Component {
 		.then(data => {
 			customAlert('success', data.message, '3000');
 			navigateTo("/pong");
-			
+
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -127,7 +127,7 @@ export class Play extends Component {
 		.then(data => {
 			customAlert('success', data.message, '3000');
 			navigateTo("/pong");
-			
+
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -157,7 +157,7 @@ export class Play extends Component {
 		.then(data => {
 			customAlert('success', data.message, '3000');
 			navigateTo("/pong");
-			
+
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -299,7 +299,7 @@ export class Play extends Component {
 				const jsonData = await this.displayJoinModal(type);
 				console.log("hola");
 				console.log(jsonData);
-				
+
 				fetch(`/api/join_tournament/${tournamentData.id}/`, {
 					method: "POST",
 					headers: {
@@ -333,7 +333,7 @@ export class Play extends Component {
 			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required><label for="code">Invitation code</label>`;
 		else
 			document.querySelector('#codeInput').innerHTML = ``;
-		
+
 		const	joinModalElement = document.getElementById('joinModal');
 		const	joinModal = new bootstrap.Modal(joinModalElement, {backdrop: false, keyboard: true});
 
