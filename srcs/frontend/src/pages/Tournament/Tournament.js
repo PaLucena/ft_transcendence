@@ -173,8 +173,6 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
-				console.log("AAAA:", data);
-				customAlert('success', data.success, '3000');
 				navigateTo('/play');
 			})
 			.catch((error) => {

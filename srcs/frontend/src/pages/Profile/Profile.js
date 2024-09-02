@@ -70,7 +70,7 @@ export class Profile extends Component {
 		const pswdLabel = document.getElementById('oldPasswordLabel');
 
 		this.addEventListener(oldPwsd, 'focus', () => {
-			pswdLabel.innerHTML = "Password";
+			pswdLabel.innerHTML = "Current password";
 		});
 
 		this.addEventListener(oldPwsd, 'blur', () => {
