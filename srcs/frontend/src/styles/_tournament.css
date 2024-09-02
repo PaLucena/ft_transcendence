@@ -20,32 +20,46 @@
 	position: relative;
 }
 
-@media only screen and (max-width: 599px) {
+@media only screen and (max-width: 699px) {
 	.player-container .avatar {
-		width: 10vh;
-		height: 10vh;
-		border: 2px solid black;
+		width: 9vh;
+		height: 9vh;
 	}
 }
 
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: 700px) and (max-width: 999px) {
+	.player-container .avatar {
+		width: 12vh;
+		height: 12vh;
+	}
+
+	.vs-tournament {
+		font-size: 150%;
+	}
+}
+
+@media only screen and (min-width: 1000px) {
 	.player-container .avatar {
 		width: 15vh;
 		height: 15vh;
-		border: 2px solid black;
+	}
+	
+	.vs-tournament {
+		font-size: 230%;
 	}
 }
-	
+
+.player-container .avatar {
+	border: 2px solid black;
+}
+
 .player-container .avatar img {
 	position: inherit;
 }
 
-.player-container .nickname {
+.player-container .nickname-placeholder .nickname {
 	border: 2px solid black;
-}
-
-.vs-tournament {
-	font-size: 230%;
+	position: absolute;
 }
 
 .close-exit-btn {
