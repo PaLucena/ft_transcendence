@@ -1,5 +1,6 @@
 {
 	"conventionalCommits.scopes": [
-		"2fa"
+		"2fa",
+		"42intra-api"
 	]
 }

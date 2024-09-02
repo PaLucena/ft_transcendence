@@ -44,6 +44,7 @@ export class Auth extends Component {
 		})
 		.catch(error => {
 			customAlert('danger', `Error: ${error.message}`, '');
+			navigateTo("/login")
 		});
 	}
 }
