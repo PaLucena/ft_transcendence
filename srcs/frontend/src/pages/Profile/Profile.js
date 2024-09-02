@@ -23,10 +23,10 @@ export class Profile extends Component {
 		this.logout();
 		this.saveInfoBtn();
 		Navbar.focus()
-		/* this.show2faButton();
+		this.show2faButton();
 		this.enable2fa();
 		this.disable2fa();
-		this.sendServerMessage(); */
+		// this.sendServerMessage();
 	}
 
 	displayUserInfo() {
@@ -146,7 +146,7 @@ export class Profile extends Component {
 		});
 	}
 
-	/* show2faButton() {
+	 show2faButton() {
 		let ButtonPlaceholder = document.getElementById("2faButtonPlaceholder");
 		let EnableButtonPlaceholder = document.getElementById("Enable2faButtonPlaceholder");
 		let DisableButtonPlaceholder = document.getElementById("Disable2faButtonPlaceholder");
@@ -240,7 +240,7 @@ export class Profile extends Component {
 			})
 		})
 	}
-	
+	/*
 	sendServerMessage() {
 		let testBtn = document.getElementById('testBtn');
 		if (testBtn) {
