@@ -57,8 +57,9 @@ __pycache__/
 .idea
 .DS_Store
 node/
-.vscode/*
+.vscode/settings.json
 .history
+
 
 
 # Environments
