@@ -23,10 +23,10 @@ export class Profile extends Component {
 		this.logout();
 		this.saveInfoBtn();
 		Navbar.focus()
-		this.show2faButton();
+		/* this.show2faButton();
 		this.enable2fa();
 		this.disable2fa();
-		this.sendServerMessage();
+		this.sendServerMessage(); */
 	}
 
 	displayUserInfo() {
@@ -101,7 +101,7 @@ export class Profile extends Component {
 				jsonData[key] = value;
 			});
 
-			fetch("/api/update_user_info/", {
+			fetch("/api/updateuserinfo/", {
 				method: "POST",
 				headers: {
 					'Content-Type': 'application/json'
@@ -119,7 +119,7 @@ export class Profile extends Component {
 			})
 			.then(data => {
 				customAlert('success', data.message, '3000');
-				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
+				//location.reload();
 			})
 			.catch((error) => {
 				console.log("Edit user error:", error);
@@ -146,7 +146,7 @@ export class Profile extends Component {
 		});
 	}
 
-	show2faButton() {
+	/* show2faButton() {
 		let ButtonPlaceholder = document.getElementById("2faButtonPlaceholder");
 		let EnableButtonPlaceholder = document.getElementById("Enable2faButtonPlaceholder");
 		let DisableButtonPlaceholder = document.getElementById("Disable2faButtonPlaceholder");
@@ -243,8 +243,10 @@ export class Profile extends Component {
 	
 	sendServerMessage() {
 		let testBtn = document.getElementById('testBtn');
-		testBtn.addEventListener("click", (event) => {
-			onlineSocket.sendMessage("test", "ealgar-c")
-		})
-	}
+		if (testBtn) {
+			testBtn.addEventListener("click", (event) => {
+				onlineSocket.sendMessage("test", "ealgar-c")
+			})
+		}
+	} */
 }
