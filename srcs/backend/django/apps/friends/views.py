@@ -210,11 +210,6 @@ def remove_friend(request):
 @api_view(["GET"])
 @default_authentication_required
 def search_friends(request):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required"}, status=status.HTTP_401_UNAUTHORIZED
-        )
-
     user = request.user
     query = request.GET.get("query", "").strip().lower()
     filter_type = request.GET.get("filter", "all")
