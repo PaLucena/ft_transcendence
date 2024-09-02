@@ -2,10 +2,28 @@
     <div class="rounded-4 container position-relative bg-dark align-items-center overflow-hidden max-width-containe p-3" style="height: 90%; width: 90%;">
         <div class="d-flex position-relative flex-column bg-dark h-100">
             <!-- Header -->
-			<div class="search-header position-relative d-flex justify-content-between align-items-center bg-dark pb-3">
-                <div class="search-filter-container btn-group gap-2">
-                    <button class="btn btn-outline-light active">All</button>
-                    <button class="btn btn-outline-light">Friends</button>
+			<div class="search-header position-relative d-flex justify-content-between align-items-center bg-dark pb-3 gap-2">
+                <div id="search_filter_btn_container" class="btn-group flex-wrap gap-2">
+                    <button class="btn btn-outline-light active position-relative" data-filter="all">
+                        <i class="fa-solid fa-list"></i>
+                        <span class="filter-indicator bg-secondary"></span>
+                        All
+                    </button>
+                    <button class="btn btn-outline-light position-relative" data-filter="my_friends">
+                        <i class="fa-solid fa-user-friends"></i>
+                        <span class="filter-indicator bg-success"></span>
+                        Friends
+                    </button>
+                    <button class="btn btn-outline-light position-relative" data-filter="pending_requests">
+                        <i class="fa-solid fa-clock"></i>
+                        <span class="filter-indicator bg-warning"></span>
+                        Pending
+                    </button>
+                    <button class="btn btn-outline-light position-relative" data-filter="incoming_requests">
+                        <i class="fa-solid fa-inbox"></i>
+                        <span class="filter-indicator bg-info"></span>
+                        Incoming
+                    </button>
                 </div>
                 <div class="search-form-container form-group mb-0">
 					<form id="friends_search_form" method='POST' class="w-100 d-flex align-items-center">
@@ -22,126 +40,9 @@
                 </div>
             </div>
 			<!-- Content -->
-            <div class="search-friends-container overflow-auto flex-grow-1 m-0">
-                <div class="container row friends-elemets-container" style="min-width: 100%;">
-					<div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_1.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Palucena</p>
-                        </div>
-                        <button class="btn btn-light">Add</button>
-                    </div>
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_2.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Gkrusta</p>
-                        </div>
-                        <button class="btn btn-outline-light">Remove</button>
-                    </div>
-
-
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_1.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Palucena</p>
-                        </div>
-                        <button class="btn btn-light">Add</button>
-                    </div>
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_2.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Gkrusta</p>
-                        </div>
-                        <button class="btn btn-outline-light">Remove</button>
-                    </div>
-
-
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_1.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Palucena</p>
-                        </div>
-                        <button class="btn btn-light">Add</button>
-                    </div>
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_2.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Gkrusta</p>
-                        </div>
-                        <button class="btn btn-outline-light">Remove</button>
-                    </div>
-
-
-
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_1.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Palucena</p>
-                        </div>
-                        <button class="btn btn-light">Add</button>
-                    </div>
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_2.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Gkrusta</p>
-                        </div>
-                        <button class="btn btn-outline-light">Remove</button>
-                    </div>
-
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_1.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Palucena</p>
-                        </div>
-                        <button class="btn btn-light">Add</button>
-                    </div>
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_2.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Gkrusta</p>
-                        </div>
-                        <button class="btn btn-outline-light">Remove</button>
-                    </div>
-
-
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_1.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Palucena</p>
-                        </div>
-                        <button class="btn btn-light">Add</button>
-                    </div>
-                    <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
-                        <div class="img-nick">
-                            <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
-                                <img src="/assets/images/test_avatar_2.jpg" class="rounded-circle" alt="Circle Image">
-                            </button>
-                            <p class="text-light mt-2 fw-bold">Gkrusta</p>
-                        </div>
-                        <button class="btn btn-outline-light">Remove</button>
-                    </div>
+            <div class="search-friends-container flex-grow-1 m-0">
+                <div id="friends_elemets_container" class="container row friends-elemets-container" style="min-width: 100%;">
+                    <!-- Here Friends/Users elements -->
 				</div>
             </div>
         </div>

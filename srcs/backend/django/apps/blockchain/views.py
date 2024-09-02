@@ -1,12 +1,10 @@
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from .blockchain_service import bc_create_tournament, bc_record_match, bc_get_tournament, bc_get_match
 from .blockchain_service import bc_get_player_tournaments, bc_get_player_matches, bc_get_face2face
 from .blockchain_service import bc_load_test_data, bc_get_all_tournaments_ids
 import json
 
 
-@csrf_exempt
 def create_tournament(data):
     try:
         tournament_id = data.get('tournament_id')
@@ -22,7 +20,6 @@ def create_tournament(data):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-@csrf_exempt
 def record_match(data):
         tourn_id = data.get('tournament_id')
         match_id = data.get('match_id')
@@ -94,7 +91,6 @@ def get_face2face(request, player1_id, player2_id):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-@csrf_exempt
 def load_test_data(request):
     try:
         tx_hash = bc_load_test_data()

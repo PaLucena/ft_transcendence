@@ -1,30 +1,8 @@
 import { handleBlockUnblock } from '../../scripts/utils/rtchatUtils.js';
 
 export class ChatRenderer {
-    constructor(chatModal, eventEmitter) {
+    constructor(chatModal) {
         this.chatModal = chatModal;
-		this.eventEmitter = eventEmitter;
-
-		this.onlineUsersUpdatedListener = (onlineUsers) => {
-            this.updateOnlineStatus(onlineUsers);
-        };
-
-		this.eventEmitter.on('onlineUsersUpdated', this.onlineUsersUpdatedListener);
-    }
-
-	updateOnlineStatus(onlineUsers) {
-        const chatElements = document.querySelectorAll('[data-username]');
-
-        chatElements.forEach(element => {
-            const username = element.getAttribute('data-username');
-            const isOnline = onlineUsers.includes(username);
-            const statusDot = element.querySelector('.status-dot');
-
-			if (statusDot) {
-                statusDot.classList.remove('green-dot', 'gray-dot');
-                statusDot.classList.add(isOnline ? 'green-dot' : 'gray-dot');
-            }
-        });
     }
 
 	renderChatElements(chats) {
@@ -40,24 +18,27 @@ export class ChatRenderer {
 					container.appendChild(chatElement);
 				}
 			});
+		} else {
+			console.warn("chat_element_container not found.")
 		}
     }
 
 	createChatElement(chat) {
 		try {
 			const chatHtml = `
-				<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4" data-username="${chat.other_user_username}">
+				<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
 					<button class="open_chat_btn btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative"
 							style="width: 102px; height: 102px;"
 							data-bs-target="#messages_modal"
 							data-bs-toggle="modal"
 							data-chatroom_name="${chat.chatroom_name}">
-						<img src="${chat.other_user_avatar_url || ''}"
+						<img src="${chat.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
 							 style="width: 100px; height: 100px;"
 							 class="rounded-circle"
 							 alt="Circle Image">
 						<div class="status-dot position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status ? 'green' : 'gray'}-dot p-2"
-							 style="top:90%; left:85%;">
+						data-online-username="${chat.other_user_username}"
+						style="top:90%; left:85%;">
 						</div>
 					</button>
 					<p class="text-light mt-2">${chat.other_user_username}</p>
@@ -76,7 +57,7 @@ export class ChatRenderer {
 
 	renderChatMessages(messages, currentUser, isPublicChat) {
 		if (messages) {
-			const container = document.querySelector('#chat_messages');
+			const container = document.getElementById('chat_messages');
 
 			if (container) {
 				container.innerHTML = '';
@@ -84,8 +65,10 @@ export class ChatRenderer {
 				messages.forEach(message => {
 					this.addMessageElement(message, currentUser, isPublicChat);
 				});
-				
+
 				this.chatModal.chatRenderer.scrollToBottom(200);
+			} else {
+				console.warn('chat_messages not found.')
 			}
 		}
 	}
@@ -99,10 +82,12 @@ export class ChatRenderer {
 		template.innerHTML = messageHtml.trim();
 		const messageElement = template.content.firstChild;
 
-		const chatMessages = document.querySelector('#chat_messages');
+		const chatMessages = document.getElementById('chat_messages');
 
 		if (chatMessages) {
 			chatMessages.appendChild(messageElement);
+		} else {
+			console.warn('chat_messages not found.')
 		}
 	}
 
@@ -124,12 +109,12 @@ export class ChatRenderer {
 	createOtherUserMessageContent(message, isPublicChat) {
 		if (isPublicChat) {
 			const userBtn = `
-			<button type="button" class="btn p-0" data-bs-toggle="dropdown" data-username="${message.author.username}">
-				<div class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" style="top:90%; left:90%;"></div>
+			<button type="button" class="btn p-0" data-bs-toggle="dropdown">
+				<div class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" data-online-username="${message.author.username}" style="top:90%; left:90%;"></div>
 				<img
 					class="rounded-circle"
 					style="width: 32px; height: 32px;"
-					src="${message.author.avatar}"
+					src="${message.author.avatar || '/assets/images/default_avatar.jpg'}"
 				>
 			</button>`;
 			return `
@@ -175,10 +160,10 @@ export class ChatRenderer {
 	}
 
 	renderChatHeader(isPublicChat, data) {
-		const chatHeader = document.getElementById('chat_header_content');
+		const container = document.getElementById('chat_header_content');
 
-		if (chatHeader) {
-			chatHeader.innerHTML = '';
+		if (container) {
+			container.innerHTML = '';
 
 			const headerHtml = isPublicChat ?
 				this.createPublicChatHeaderContent() :
@@ -188,7 +173,9 @@ export class ChatRenderer {
 			template.innerHTML = headerHtml.trim();
 			const headerElement = template.content.firstChild;
 
-			chatHeader.appendChild(headerElement);
+			container.appendChild(headerElement);
+		} else {
+			console.warn('chat_header_content not found.');
 		}
 	}
 
@@ -208,12 +195,11 @@ export class ChatRenderer {
 					type="button"
 					class="btn p-0"
 					data-bs-toggle="dropdown"
-					data-username="${data.other_user.username}"
 				>
-					<div class="status-dot position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot" style="top:90%; left:90%;"></div>
+					<div class="status-dot position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot" data-online-username="${data.other_user.username}" style="top:90%; left:90%;"></div>
 					<img
 						class="rounded-circle"
-						src="${data.other_user.avatar}"
+						src="${data.other_user.avatar || '/assets/images/default_avatar.jpg'}"
 						style="width: 32px; height: 32px;"
 					>
 				</button>
@@ -234,8 +220,6 @@ export class ChatRenderer {
 		const chatMessageInput = document.getElementById('chat_message_input');
     	const chatMessageSubmit = document.getElementById('chat_message_submit');
 
-
-
         if (messageInputContainer && chatMessageInput && chatMessageSubmit) {
             const existingMessage = messageInputContainer.querySelector('.block-status-message');
             if (existingMessage) {
@@ -251,13 +235,14 @@ export class ChatRenderer {
 
 				if (blockStatus === "blocker" && otherUser) {
 					const unblockBtn = document.getElementById('unblock_btn');
+
 					if (unblockBtn) {
-						unblockBtn.addEventListener('click', () => {
+						this.chatModal.addEventListener(unblockBtn, 'click', () => {
 							handleBlockUnblock('unblock', otherUser.username, () => {
 								this.removeBlockStatusMessage();
 								this.toggleInputState(chatMessageInput, chatMessageSubmit, false);
 							});
-						});
+						})
 					}
 				}
             } else {
@@ -305,7 +290,9 @@ export class ChatRenderer {
             const container = document.getElementById("chat_messages_container");
             if (container) {
                 container.scrollTop = container.scrollHeight;
-            }
+            } else {
+				console.warn('chat_messages_container not found.')
+			}
         }, time);
     }
 }

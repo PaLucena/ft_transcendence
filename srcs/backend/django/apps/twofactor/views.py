@@ -21,7 +21,6 @@ def Has2faEnabled(user):
 @api_view(["POST"])
 @default_authentication_required
 def check2fa(request):
-	print("returning: ", Has2faEnabled(request.user))
 	return Response({"has2faEnabled": Has2faEnabled(request.user)}, status=status.HTTP_200_OK)
 
 # Create your views here.
@@ -35,7 +34,6 @@ def	enable2fa(request):
 	if created or not device.confirmed:
 		otp_uri = device.config_url
 		qr = qrcode.make(otp_uri)
-		imgs_dir = settings.MEDIA_ROOT + "/qrs/"
 		imgs_dir = os.path.join(settings.MEDIA_ROOT, "qrs")
 		img_name = user.username + ".jpg"
 		img_path = os.path.join(imgs_dir, img_name)
@@ -70,6 +68,7 @@ def disable2fa(request):
 	user = userModel.objects.get(username=request.user)
 	try:
 		device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
+		os.remove(os.path.join(settings.MEDIA_ROOT, "qrs") + "/" + user.username + ".jpg")
 		TOTPDevice.delete(device)
 	except TOTPDevice.DoesNotExist:
 		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)

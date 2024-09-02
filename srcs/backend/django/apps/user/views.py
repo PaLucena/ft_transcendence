@@ -90,6 +90,10 @@ def login(request):
         return Response(
             {"error": "All fields are required."}, status=status.HTTP_400_BAD_REQUEST
         )
+    try:
+        user = AppUser.objects.get(username=username)
+    except AppUser.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
     authenticated_user: AbstractUser | None = authenticate(
         username=username, password=password
@@ -112,7 +116,7 @@ def login(request):
         print("Refresh Token Expiry:", refresh["exp"])
         return response
     else:
-        return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "Incorrect password"}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["POST"])

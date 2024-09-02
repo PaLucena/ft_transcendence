@@ -7,8 +7,8 @@ import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 export function initTwoFactorAuth(jsonData) {
 	const inputs = document.querySelectorAll('.otp-input');
     const form = document.getElementById('twoFactorForm');
-	const TwoFactorModalElement = document.getElementById('twoFactorModal');
 	const overlayElement = document.getElementById('customOverlay');
+	const TwoFactorModalElement = document.getElementById('twoFactorModal');
 	let TwoFactorModal = new bootstrap.Modal(TwoFactorModalElement, {backdrop: false, keyboard: true})
 
 	TwoFactorModalElement.addEventListener('shown.bs.modal', () => {
@@ -17,7 +17,7 @@ export function initTwoFactorAuth(jsonData) {
 			inputs[0].focus();
 		}
 	});
-	
+
 	function showModal() {
 		console.log('showing modal')
         overlayElement.style.display = 'block';
@@ -109,7 +109,8 @@ export function initTwoFactorAuth(jsonData) {
 			})
         })
         .catch(error => {
-            customAlert('danger', `Error: ${error.message}`, '');
+            customAlert('danger', `Errorr: ${error.message}`, '');
+			console.log(error)
         });
     }
 }

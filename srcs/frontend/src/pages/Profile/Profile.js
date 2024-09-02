@@ -123,12 +123,10 @@ export class Profile extends Component {
 			if (data["has2faEnabled"] == true) {
 				EnableButtonPlaceholder.style.display = "none";
 				DisableButtonPlaceholder.style.display = "block";
-				console.log("2fa is enabled")
 			}
 			else {
 				EnableButtonPlaceholder.style.display = "block";
 				DisableButtonPlaceholder.style.display = "none";
-				console.log("2fa is disabled")
 			}
 		})
 		.catch(error => {

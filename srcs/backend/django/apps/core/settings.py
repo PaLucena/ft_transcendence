@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import hashlib
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -29,6 +30,10 @@ AUTH_USER_MODEL = "user.AppUser"
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
+# def generate_secret_key():
+#     return hashlib.sha256(os.urandom(64)).hexdigest()
+
+# SECRET_KEY = generate_secret_key()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -49,6 +54,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+	"adrf",
     "user",
     "friends",
     "user_stats",
