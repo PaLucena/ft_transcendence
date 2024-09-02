@@ -59,10 +59,17 @@ export class Play extends Component {
 		plusPrivateBtn.addEventListener("click", () => {
 			this.createTournament('private');
 		});
-		//local game
+
+		// local
 		const	localBtn = document.getElementById("localBtn");
 		localBtn.addEventListener("click", () => {
 			this.playLocal();
+		});
+
+		// ai
+		const	aiBtn = document.getElementById("aiBtn");
+		aiBtn.addEventListener("click", () => {
+			this.playAi();
 		});
 
 		const	tournamentModalElement = document.getElementById("tournamentModal");
@@ -72,9 +79,36 @@ export class Play extends Component {
 		});
 	}
 
-	//local logic
+	// local match
 	playLocal() {
 		fetch("/api/start_local_match/", {
+			method: "POST",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			customAlert('success', data.message, '3000');
+			navigateTo("/pong");
+			
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
+	}
+
+	// ai logic
+	playAi() {
+		fetch("/api/start_ai_match/", {
 			method: "POST",
 			headers: {
 				'Content-Type': 'application/json'

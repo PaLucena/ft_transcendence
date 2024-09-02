@@ -17,10 +17,10 @@ class BaseMatch(APIView):
 		try:
 			user = request.user
 			user_id = user.pk
-			match_id = await sync_to_async(generate_unique_match_id)()
-
+			tournament = await sync_to_async(ensure_private_tournament_exists)()
+			match_id = await sync_to_async(generate_unique_match_id)(tournament)
 			await sync_to_async(Match.objects.create)(
-				tournament=ensure_private_tournament_exists(),
+				tournament=tournament,
 				match_id=match_id,
 			)
 
@@ -46,9 +46,8 @@ class BaseMatch(APIView):
 			print(f"Error handling match result: {e}")
 
 
-def generate_unique_match_id():
-	tournament=ensure_private_tournament_exists()
-	last_match = Match.objects.get(tournament=tournament).order_by('match_id').last()
+def generate_unique_match_id(tournament):
+	last_match = Match.objects.filter(tournament=tournament).order_by('match_id').last()
 	return last_match.match_id + 1 if last_match else 1
 
 
