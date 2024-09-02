@@ -28,38 +28,33 @@
 		</div>
 		<div id="userEdit" class="user-edit bg-light align-items-center rounded-5 shadow">
 			<form id="editForm" class="edit-form d-flex mt-0 mt-md-5 justify-content-center align-items-center">
-				<div class="edit-profile-input form-floating mt-5">
+				<div class="col-9 form-floating mt-3">
 					<input type="text" class="form-control" id="username" name="username" placeholder="">
 					<label for="username">username</label>
 				</div>
-				<div class="edit-profile-input form-floating mt-3">
+				<div class="col-9 form-floating mt-3">
 					<input type="file" class="form-control" id="avatar" name="avatar" placeholder="avatar">
 					<label for="avatar">avatar</label>
 				</div>
-				<p class="d-inline-flex gap-1 mt-5">
-					<button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapse" aria-expanded="false" aria-controls="collapseExample">
-						New password
-					</button>
-				</p>
-				<div class="collapse" id="collapse">
-					<div class="edit-profile-input w-100 form-floating">
-						<input type="password" class="form-control" id="old_password" name="old_password" placeholder="">
-						<label for="old_password">password</label>
-					</div>
-					<div class="edit-profile-input  w-100 form-floating mt-3">
+				<div class="col-9 col form-floating mt-3">
+					<input type="password" class="form-control" id="old_password" name="old_password" placeholder="" data-bs-toggle="collapse" data-bs-target="#collapse">
+					<label for="old_password" id="oldPasswordLabel">Change password</label>
+				</div>
+				<div class="collapse col-9" id="collapse">
+					<div class="form-floating mt-3">
 						<input type="password" class="form-control" id="new_password" name="new_password" placeholder="">
 						<label for="new_password">new password</label>
 					</div>
-					<div class="edit-profile-input w-100 form-floating mt-3">
+					<div class="form-floating mt-3">
 						<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="">
 						<label for="confirm_password">confirm new password</label>
 					</div>
-				</div>		
+				</div>
 			</form>
-			<div id="twofaBtn" class="d-flex col mt-5 align-items-center justify-content-center">
-				<button class="btn btn-dark col-8" id="2faBtn">2FA</button>
+			<div id="twofaBtn" class="d-flex col mt-4 align-items-center justify-content-center">
+				<button class="btn btn-dark col-6" id="2faBtn">2FA</button>
 			</div>
-			<div id="saveInfo" class="d-flex col my-3 justify-content-center">
+			<div id="saveInfo" class="d-flex col mt-4 mb-3 justify-content-center">
 				<button type="submit" form="editForm" class="btn btn-primary col-10">SAVE</button>
 			</div>
 		</div>

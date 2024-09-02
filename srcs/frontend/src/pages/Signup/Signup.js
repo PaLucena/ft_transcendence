@@ -20,8 +20,9 @@ export class Signup extends Component {
 	}
 
 	initSubmitForm() {
-		$('#username').find('[autofocus]').focus();
-		$('#signup_form').on('submit', function (event) {
+		const signup_form = document.getElementById('signup_form')
+		
+		this.addEventListener(signup_form, 'submit', (event) => {
 			let password = $('#password').val();
 			let confirmPassword = $('#confirm_password').val();
 			let formIsValid = true;
@@ -31,15 +32,21 @@ export class Signup extends Component {
 				$('#confirm_password').addClass('is-invalid').removeClass('is-valid');
 				$('#confirm_password')[0].setCustomValidity('Passwords do not match.');
 				formIsValid = false;
-			} else {
+			}
+			else {
 				$('#confirm_password').removeClass('is-invalid').addClass('is-valid');
 				$('#confirm_password')[0].setCustomValidity('');
 			}
+			console.log("AAAA");
 
-			if (!this.checkValidity()) {
+			/* if (!this.checkValidity()) {
 				event.preventDefault();
 				formIsValid = false;
-			}
+				console.log("C");
+			} */
+			console.log("D");
+
+			setTimeout(console.log("Sleeping", 5000))
 
 			if (formIsValid) {
 				event.preventDefault();
@@ -80,25 +87,20 @@ export class Signup extends Component {
 				});
 			}
 
-
 			this.classList.add('was-validated');
 		});
 
-		const passwords = document.querySelectorAll("#password");
+		$('#confirm_password, #password').on('input', function() {
+			let password = $('#password').val();
+			let confirmPassword = $('#confirm_password').val();
 
-		passwords.forEach(password => {
-			this.addEventListener(password, 'input', function() {
-				let password = document.getElementById('password').val();
-				let confirmPassword = document.getElementById('confirm_password').val();
-
-				if (password !== confirmPassword) {
-					document.getElementById('confirm_password').addClass('is-invalid').removeClass('is-valid');
-					document.getElementById('confirm_password')[0].setCustomValidity('Passwords do not match.');
-				} else {
-					document.getElementById('confirm_password').removeClass('is-invalid').addClass('is-valid');
-					document.getElementById('confirm_password')[0].setCustomValidity('');
-				}
-			});
-		})
+			if (password !== confirmPassword) {
+				$('#confirm_password').addClass('is-invalid').removeClass('is-valid');
+				$('#confirm_password')[0].setCustomValidity('Passwords do not match.');
+			} else {
+				$('#confirm_password').removeClass('is-invalid').addClass('is-valid');
+				$('#confirm_password')[0].setCustomValidity('');
+			}
+		});
 	}
 }

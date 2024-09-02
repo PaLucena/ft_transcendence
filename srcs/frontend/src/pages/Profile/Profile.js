@@ -54,17 +54,32 @@ export class Profile extends Component {
 	}
 
 	editUserBtn(userData) {
-		let editBtn = document.getElementById("editBtn");
+		const editBtn = document.getElementById("editBtn");
 
 		this.addEventListener(editBtn, "click", () => {
 			document.getElementById("userInfo").style.display = "none";
 			document.getElementById("userEdit").style.display = "block";
 			document.getElementById("username").value = `${userData["username"]}`;
+
+			this.startPasswordEL();
+		});
+	}
+
+	startPasswordEL() {
+		const oldPwsd = document.getElementById('old_password');
+		const pswdLabel = document.getElementById('oldPasswordLabel');
+
+		this.addEventListener(oldPwsd, 'focus', () => {
+			pswdLabel.innerHTML = "Password";
+		});
+
+		this.addEventListener(oldPwsd, 'blur', () => {
+			pswdLabel.innerHTML = "Change password";
 		});
 	}
 
 	saveInfoBtn() {
-		let editForm = document.getElementById("editForm");
+		const editForm = document.getElementById("editForm");
 
 		/* this.addEventListener(saveInfo, "click", () => {
 			
@@ -82,7 +97,7 @@ export class Profile extends Component {
 				jsonData[key] = value;
 			});
 
-			fetch("/api/create_tournament/", {
+			fetch("/api/update_user_info/", {
 				method: "POST",
 				headers: {
 					'Content-Type': 'application/json'
@@ -146,9 +161,8 @@ export class Profile extends Component {
 				const ModalElement = document.getElementById('imageModal');
 				const overlayElement = document.getElementById('customOverlay');
 				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
-				const csrftoken = getCSRFToken('csrftoken');
 				const imageSpan = document.getElementById('modalImageContainer');
-				console.log(data['qrpath'])
+
 				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
 				qrmodal.show()
 			})
