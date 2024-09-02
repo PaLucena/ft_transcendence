@@ -72,6 +72,12 @@ export class Play extends Component {
 			this.playAi();
 		});
 
+		// remote
+		// const	remoteBtn = document.getElementById("remoteBtn");
+		// remoteBtn.addEventListener("click", () => {
+		// 	this.playRemote();
+		// });
+
 		const	tournamentModalElement = document.getElementById("tournamentModal");
 		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
 		tournamentModalElement.addEventListener('shown.bs.modal', () => {
@@ -113,6 +119,36 @@ export class Play extends Component {
 			headers: {
 				'Content-Type': 'application/json'
 			},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			customAlert('success', data.message, '3000');
+			navigateTo("/pong");
+			
+		})
+		.catch((error) => {
+			customAlert('danger', `Error: ` + error.message, '');
+		})
+	}
+
+	// remote logic
+	playRemote() {
+		fetch("/api/start_remote_match/", {
+			method: "POST",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				player_2_username: player2Username, // the username of the invited player
+			}),
 			credentials: 'include'
 		})
 		.then(response => {

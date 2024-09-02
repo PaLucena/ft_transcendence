@@ -40,18 +40,22 @@ class GameConsumer(AsyncWebsocketConsumer):
             print(f"Player {self.player_id} is player 1") # DEBUG
             self.game_logic.player_1_channel = self.channel_name
             self.game_logic.player_1_name = user.username
+            self.game_logic.player_1_avatar = user.avatar.url 
             self.controls_side = 1
         elif self.player_id == self.room.player_2_id:
             print(f"Player {self.player_id} is player 2") # DEBUG
             self.game_logic.player_2_channel = self.channel_name
             self.game_logic.player_2_name = user.username
+            self.game_logic.player_2_avatar = user.avatar.url 
             self.controls_side = 2
         else:
             print(f"Player {self.player_id} is not in the room")
             await self.close()
             return
 
-
+        player_1_avatar = getattr(self.game_logic, 'player_1_avatar', 'default/anonymous.jpg')
+        player_2_avatar = getattr(self.game_logic, 'player_2_avatar', 'default/anonymous.jpg')
+    
         await self.channel_layer.group_add(
             self.room_name,
             self.channel_name
@@ -64,7 +68,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             'controls_mode': self.game_logic.controls_mode,
             'controls_side': self.controls_side,
             'player_1_name': self.game_logic.player_1_name,
+            'player_1_avatar': player_1_avatar,
             'player_2_name': self.game_logic.player_2_name,
+            'player_2_avatar': player_2_avatar,
             'goals_to_win': self.game_logic.GOALS_TO_WIN,
             'goals_diff': self.game_logic.GOALS_DIFFERENCE,
         }))

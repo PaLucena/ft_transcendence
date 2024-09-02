@@ -134,9 +134,9 @@ def display_tournaments(request):
 	try:
 		user = request.user
 		public_tournaments = Tournament.objects.filter(
-			type=Tournament.PUBLIC, is_active=False)
+			type=Tournament.PUBLIC, is_active=False).exclude(id=0)
 		private_tournaments = Tournament.objects.filter(
-			type=Tournament.PRIVATE, is_active=False)
+			type=Tournament.PRIVATE, is_active=False).exclude(id=0)
 		def serialize_tournament(tournament):
 			return {
 				'name': tournament.name,

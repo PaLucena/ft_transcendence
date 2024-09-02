@@ -44,14 +44,19 @@ class GameManager:
 		game_logic.controls_mode = controls_mode
 		if controls_mode == "local":
 			game_logic.player_2_name = "Guest"
+			game_logic.player_2_avatar = 'media/default/anonymous.jpg'
 		elif controls_mode == "AI":
 			if player_1_id == 0:
 				game_logic.ai_side = 1
 				game_logic.player_1_name = "AI"
+				game_logic.player_1_avatar = 'media/default/anonymous.jpg'
+
+
 				game_logic.player_1_ready = True
 			else:
 				game_logic.ai_side = 2
 				game_logic.player_2_name = "AI"
+				game_logic.player_2_avatar = 'media/default/anonymous.jpg'
 				game_logic.player_2_ready = True
 		ai_player = AiPlayer(game_logic)
 
