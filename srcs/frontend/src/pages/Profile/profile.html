@@ -45,8 +45,13 @@
 					</div>
 				</div>
 			</form>
-			<div id="twofaBtn" class="d-flex col mt-4 align-items-center justify-content-center">
-				<button class="btn btn-dark col-6" id="2faBtn">2FA</button>
+			<div class="row col-8 mx-auto" id="2faButtonPlaceholder">
+				<div id="Enable2faButtonPlaceholder" class=" col mt-5 align-items-center d-flex justify-content-center twofactorButtons">
+					<button class="btn btn-dark" id="Enable2faBtn">ENABLE 2FA</button>
+				</div>
+				<div id="Disable2faButtonPlaceholder" class=" col mt-5 align-items-center d-flex justify-content-center twofactorButtons">
+					<button class="btn btn-danger" id="Disable2faBtn">DISABLE 2FA</button>
+				</div>
 			</div>
 			<div id="saveInfo" class="d-flex col mt-4 mb-3 justify-content-center">
 				<button type="submit" form="editForm" class="btn btn-primary col-10">SAVE</button>
