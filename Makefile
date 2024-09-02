@@ -14,7 +14,7 @@ endif
 all:
 	-@ echo "Containers directory is set to: $(CONTAINERS_DIR)"
 	-@ mkdir -p $(CONTAINERS_DIR) $(CONTAINERS_DIR)/db_volume
-	-@ DATABASE_CONTAINER_PATH=$(CONTAINERS_DIR) docker-compose -f docker-compose.yml up --build -d
+	-@ DATABASE_CONTAINER_PATH=$(CONTAINERS_DIR) docker compose -f docker-compose.yml up --build -d
 
 up:
 	-@ docker compose -f docker-compose.yml up -d

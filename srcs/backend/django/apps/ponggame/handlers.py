@@ -2,16 +2,17 @@ import json
 
 
 async def handle_player_ready(consumer, player):
-    if player == 1:
-        consumer.game_logic.player_1_ready = True
-    elif player == 2:
-        consumer.game_logic.player_2_ready = True
+    if consumer.game_logic.game_state == "waiting":
+        if player == 1:
+            consumer.game_logic.player_1_ready = True
+        elif player == 2:
+            consumer.game_logic.player_2_ready = True
 
-    await consumer.send(text_data=json.dumps({
-        'type': 'game_state',
-        'state': 'player_ready',
-        'player': player
-    }))
+        await consumer.send(text_data=json.dumps({
+            'type': 'game_state',
+            'state': 'player_ready',
+            'player': player
+        }))
 
 
 async def handle_quit(consumer):

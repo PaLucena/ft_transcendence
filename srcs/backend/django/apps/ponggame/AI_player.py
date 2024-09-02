@@ -15,8 +15,8 @@ class AiPlayer:
         self.ball_vel_y = 0
         self.ball_dir_x = 0
         self.ball_dir_y = 0
-        self.ia_y = 0
-        self.ia_side = self.game.ai_side
+        self.ai_y = 0
+        self.ai_side = self.game.ai_side
         self.opponent_y = 0
 
         # Calculating next move
@@ -34,27 +34,27 @@ class AiPlayer:
         self.ball_vel_y = self.game.ball_vel_y * self.game.ball_dir_y
         self.ball_dir_x = self.game.ball_dir_x
         self.ball_dir_y = self.game.ball_dir_y
-        if self.ia_side == 1:
-            self.ia_y = self.game.pad_1_y
+        if self.ai_side == 1:
+            self.ai_y = self.game.pad_1_y
             self.opponent_y = self.game.pad_2_y
         else:
-            self.ia_y = self.game.pad_2_y
+            self.ai_y = self.game.pad_2_y
             self.opponent_y = self.game.pad_1_y
 
 
     def move(self):
-        distance = self.ia_y - self.new_position
+        distance = self.ai_y - self.new_position
         if distance < 0 and distance < -self.game.PADDLE_SPEED:
-            self.game.move_paddle(self.ia_side, 1)
-            self.ia_y += self.game.PADDLE_SPEED
+            self.game.move_paddle(self.ai_side, 1)
+            self.ai_y += self.game.PADDLE_SPEED
         elif distance > 0 and distance > self.game.PADDLE_SPEED:
-            self.game.move_paddle(self.ia_side, -1)
-            self.ia_y -= self.game.PADDLE_SPEED
+            self.game.move_paddle(self.ai_side, -1)
+            self.ai_y -= self.game.PADDLE_SPEED
 
 
     def think(self):
-        if (((self.ia_side == 1 and self.ball_dir_x < 0) or
-                (self.ia_side == 2 and self.ball_dir_x > 0)) and
+        if (((self.ai_side == 1 and self.ball_dir_x < 0) or
+             (self.ai_side == 2 and self.ball_dir_x > 0)) and
                 self.game.game_state == "playing"):
             self.calc_collision_point()
             self.calc_target_point()
@@ -64,7 +64,7 @@ class AiPlayer:
             self.new_position = self.game.TABLE_HEIGHT / 2
 
     def calc_collision_point(self):
-        if self.ia_side == 2:
+        if self.ai_side == 2:
             self.distance_x = (self.game.TABLE_WIDTH - self.game.GOAL_TAB_MARGIN
                                - self.ball_x - self.game.BALL_RADIUS)
         else:
@@ -87,7 +87,7 @@ class AiPlayer:
     def print_data(self):
         print("Ball: ", self.ball_x, self.ball_y)
         print("Velocity: ", self.ball_vel_x, self.ball_vel_y)
-        print("IA position: ", self.ia_y)
+        print("IA position: ", self.ai_y)
         print("Opponent position: ", self.opponent_y)
         print("Distance in X to AI: ", self.distance_x)
         print("Time to collision: ", self.col_x_time)
