@@ -121,3 +121,7 @@
     margin: 0 5px;
 }
 
+.twofactorButtons {
+	display: none;
+}
+
