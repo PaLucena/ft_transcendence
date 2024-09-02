@@ -5,6 +5,7 @@ import random
 from channels.layers import get_channel_layer
 from .game_logic import GameLogic
 from .handlers import send_positions, send_game_state, send_score
+from .AI_player import AiPlayer
 
 
 class GameManager:
@@ -27,12 +28,11 @@ class GameManager:
 			JSON object with the result of the match.
 			{tournament_id, match_id, player_1_id, player_2_id, player_1_goals, player_2_goals}
 		"""
-		
+
 		# Generate random scores for AI vs AI match
 		if player_1_id == 0 and player_2_id == 0:
 			return self.random_ai_game(tournament_id, match_id, player_1_id, player_2_id)
-			
-	
+
 		print(f"Starting match between (ID {player_1_id}) and (ID {player_2_id})") # DEBUG
 
 		# Create game room and game logic
@@ -44,15 +44,23 @@ class GameManager:
 		game_logic.controls_mode = controls_mode
 		if controls_mode == "local":
 			game_logic.player_2_name = "Guest"
+			game_logic.player_2_avatar = 'media/default/anonymous.jpg'
 		elif controls_mode == "AI":
 			if player_1_id == 0:
+				game_logic.ai_side = 1
 				game_logic.player_1_name = "AI"
+				game_logic.player_1_avatar = 'media/default/anonymous.jpg'
+
+
 				game_logic.player_1_ready = True
 			else:
+				game_logic.ai_side = 2
 				game_logic.player_2_name = "AI"
+				game_logic.player_2_avatar = 'media/default/anonymous.jpg'
 				game_logic.player_2_ready = True
+		ai_player = AiPlayer(game_logic)
 
-		await self.run_game_loop(game_room, game_logic)
+		await self.run_game_loop(game_room, game_logic, ai_player)
 
 		# Get the game results
 		result = game_room.get_result(tournament_id, match_id)
@@ -62,7 +70,8 @@ class GameManager:
 
 		return result
 
-	async def run_game_loop(self, game_room, game_logic):
+	async def run_game_loop(self, game_room, game_logic, ai_player):
+		loop_count = 0
 		while game_logic.game_state != "game_over":
 			start_time = time.time()
 			await game_logic.game_loop()
@@ -70,6 +79,12 @@ class GameManager:
 			await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
 			if game_logic.game_state == "scored":
 				await send_score(self.channel_layer, game_room.game_room_id, game_logic)
+			if game_logic.ai_side:
+				if loop_count % game_logic.FPS == 0:
+					ai_player.data_update()
+					ai_player.think()
+				ai_player.move()
+			loop_count += 1
 			elapsed_time = time.time() - start_time
 			await asyncio.sleep(max(0.0, game_logic.FRAME_TIME - elapsed_time))
 		await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)

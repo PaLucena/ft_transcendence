@@ -12,12 +12,6 @@ from user.decorators import default_authentication_required
 @api_view(["GET"])
 @default_authentication_required
 def chat_view(request, chatroom_name):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     try:
         chat_group = ChatGroup.objects.filter(group_name=chatroom_name).first()
 
@@ -70,15 +64,22 @@ def chat_view(request, chatroom_name):
         )
 
 
+def create_private_chat_if_not_exists(user1, user2):
+    chatroom = (
+        ChatGroup.objects.filter(is_private=True, members=user1)
+        .filter(members=user2)
+        .first()
+    )
+
+    if not chatroom:
+        chatroom = ChatGroup.objects.create(is_private=True)
+        chatroom.members.add(user1, user2)
+        chatroom.save()
+
+
 @api_view(["GET"])
 @default_authentication_required
 def get_or_create_chatroom(request, username):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     if request.user.username == username:
         return Response(
             {"detail": "You cannot create a private chat with yourself"},
@@ -93,17 +94,13 @@ def get_or_create_chatroom(request, username):
             status=status.HTTP_404_NOT_FOUND,
         )
 
-    my_chatrooms = request.user.chat_group.filter(is_private=True)
-    chatroom = None
+    create_private_chat_if_not_exists(request.user, other_user)
 
-    for room in my_chatrooms:
-        if other_user in room.members.all():
-            chatroom = room
-            break
-
-    if not chatroom:
-        chatroom = ChatGroup.objects.create(is_private=True)
-        chatroom.members.add(other_user, request.user)
+    chatroom = (
+        ChatGroup.objects.filter(is_private=True, members=request.user)
+        .filter(members=other_user)
+        .first()
+    )
 
     return Response(
         {"chatroom_name": chatroom.group_name},
@@ -114,12 +111,6 @@ def get_or_create_chatroom(request, username):
 @api_view(["GET"])
 @default_authentication_required
 def get_all_private_chats_view(request):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     try:
         private_chats = ChatGroup.objects.filter(
             is_private=True,
@@ -153,12 +144,6 @@ def get_all_private_chats_view(request):
 @api_view(["POST"])
 @default_authentication_required
 def block_or_unblock_user_view(request):
-    if not request.user.is_authenticated:
-        return Response(
-            {"detail": "Authentication required"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     try:
         blocker = request.user
         blocked_username = request.data.get("blocked_username")

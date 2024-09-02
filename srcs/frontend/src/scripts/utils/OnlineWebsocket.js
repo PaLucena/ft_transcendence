@@ -1,6 +1,6 @@
 import { eventEmitter } from './EventEmitter.js';
 import { updateOnlineStatus } from './rtchatUtils.js'
-
+import customAlert from './customAlert.js'; 
 class OnlineWebsocket {
     constructor() {
         this.onlineSocket = null;
@@ -11,12 +11,12 @@ class OnlineWebsocket {
         try {
             this.onlineSocket = new WebSocket('/ws/online-status/');
         } catch (error) {
-            this.handleError(null, 'Failed to create WebSocket');
+            this.handleError(null, 'Failed to create WebSocket', true);
             return;
         }
 
         this.onlineSocket.onmessage = (e) => this.handleMessage(e);
-        this.onlineSocket.onerror = (e) => {this.handleError(null, e);}
+        this.onlineSocket.onerror = (e) => {this.handleError(null, e, true);}
         this.onlineSocket.onclose = (e) => this.handleClose(e);
 
         this.initOnlineStatusListener();
@@ -30,10 +30,44 @@ class OnlineWebsocket {
         eventEmitter.on('onlineUsersUpdated', this.onlineUsersUpdatedListener);
     }
 
+	sendMessage(message, to_user) {
+        if (this.onlineSocket && this.onlineSocket.readyState === WebSocket.OPEN) {
+            try {
+                const data = {
+					'to_user': to_user,
+					'message': message
+				}
+                this.onlineSocket.send(JSON.stringify(data));
+                console.log("Message sent:", data);
+            } catch (error) {
+                this.handleError(null, 'Failed to send message', false);
+            }
+        } else {
+            console.error("WebSocket is not open. Cannot send message.");
+        }
+    }
+
+	sendMessage(message, to_user) {
+        if (this.onlineSocket && this.onlineSocket.readyState === WebSocket.OPEN) {
+            try {
+                const data = {
+					'to_user': to_user,
+					'message': message
+				}
+                this.onlineSocket.send(JSON.stringify(data));
+                console.log("Message sent:", data);
+            } catch (error) {
+                this.handleError(null, 'Failed to send message', false);
+            }
+        } else {
+            console.error("WebSocket is not open. Cannot send message.");
+        }
+    }
+
     handleMessage(event) {
         try {
             const data = JSON.parse(event.data);
-
+			console.log("data: ", data)
             if (data.error) {
                 this.handleError(data.errorCode, data.errorMessage);
                 return;
@@ -41,11 +75,14 @@ class OnlineWebsocket {
 
             if (data.online_users) {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
-            } else {
-                this.handleError(null, 'Invalid data format received.');
+            } else if (data.message) {
+				customAlert('info', data.message, 3000);
+			}
+			else {
+                this.handleError(null, 'Invalid data format received.', false);
             }
         } catch (error) {
-            this.handleError(null, error);
+            this.handleError(null, error, false);
         }
     }
 
@@ -57,9 +94,10 @@ class OnlineWebsocket {
         this.removeOnlineUpdateListeners();
     }
 
-    handleError(errorCode, errorMessage) {
+    handleError(errorCode, errorMessage, close) {
         console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
-        this.closeWebSocket();
+        if (close == true)
+			this.closeWebSocket();
     }
 
     closeWebSocket() {

@@ -44,13 +44,15 @@ class GameLogic:
     player_1_id = None
     player_2_id = None
     player_1_name = 'Default'
+    player_1_avatar = None
     player_2_name = 'Default'
+    player_2_avatar = None
     player_1_ready = False
     player_2_ready = False
     player_1_goals = 0
     player_2_goals = 0
     controls_mode = "local"
-    ai_mode = 0
+    ai_side = 0
     countdown = CONNECT_TIMEOUT * FPS
 
     player_1_channel = None

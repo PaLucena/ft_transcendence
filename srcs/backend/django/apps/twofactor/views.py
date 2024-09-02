@@ -13,10 +13,15 @@ def Has2faEnabled(user):
 	if user == None:
 		return False
 	try:
-		device = TOTPDevice.objects.get(user=user, confirmed=False)
+		device = TOTPDevice.objects.get(user=user, confirmed=True)
 		return True
 	except TOTPDevice.DoesNotExist:
 		return False
+
+@api_view(["POST"])
+@default_authentication_required
+def check2fa(request):
+	return Response({"has2faEnabled": Has2faEnabled(request.user)}, status=status.HTTP_200_OK)
 
 # Create your views here.
 @api_view(["POST"])
@@ -29,7 +34,6 @@ def	enable2fa(request):
 	if created or not device.confirmed:
 		otp_uri = device.config_url
 		qr = qrcode.make(otp_uri)
-		imgs_dir = settings.MEDIA_ROOT + "/qrs/"
 		imgs_dir = os.path.join(settings.MEDIA_ROOT, "qrs")
 		img_name = user.username + ".jpg"
 		img_path = os.path.join(imgs_dir, img_name)
@@ -50,10 +54,34 @@ def verifyTwoFactor(request):
 
 	user=userModel.objects.get(username=username)
 	try:
-		device = TOTPDevice.objects.get(user=user.pk, confirmed=False)
+		device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
 		if device.verify_token(otp_code):
 			return Response({'success': True, 'message': 'OTP verified successfully.'}, status=200)
 		else:
 			return Response({'success': False, 'message': 'Invalid OTP code.'}, status=400)
 	except TOTPDevice.DoesNotExist:
 		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+
+@api_view(["POST"])
+@default_authentication_required
+def disable2fa(request):
+	user = userModel.objects.get(username=request.user)
+	try:
+		device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
+		os.remove(os.path.join(settings.MEDIA_ROOT, "qrs") + "/" + user.username + ".jpg")
+		TOTPDevice.delete(device)
+	except TOTPDevice.DoesNotExist:
+		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+	return Response(status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+@default_authentication_required
+def confirmDevice(request):
+	user=userModel.objects.get(username=request.user)
+	try:
+		device = TOTPDevice.objects.get(user=user.pk, confirmed=False)
+		device.confirmed = True
+		device.save()
+	except TOTPDevice.DoesNotExist:
+		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+	return Response(status=status.HTTP_200_OK)

@@ -23,6 +23,10 @@ export class Profile extends Component {
 		this.logout();
 		this.saveInfoBtn();
 		Navbar.focus()
+		this.show2faButton();
+		this.enable2fa();
+		this.disable2fa();
+		this.sendServerMessage();
 	}
 
 	displayUserInfo() {
@@ -121,7 +125,6 @@ export class Profile extends Component {
 				console.log("Edit user error:", error);
 			})
 		})
-		this.enable2fa();
 	}
 
 	logout() {
@@ -143,9 +146,61 @@ export class Profile extends Component {
 		});
 	}
 
-	enable2fa() {
-		let twofaBtn = document.getElementById("2faBtn");
+	show2faButton() {
+		let ButtonPlaceholder = document.getElementById("2faButtonPlaceholder");
+		let EnableButtonPlaceholder = document.getElementById("Enable2faButtonPlaceholder");
+		let DisableButtonPlaceholder = document.getElementById("Disable2faButtonPlaceholder");
+		fetch("/api/2fa/check2fa/", {
+			method: "POST",
+			credentials: 'include',
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json()
+		})
+		.then(data => {
+			if (data["has2faEnabled"] == true) {
+				EnableButtonPlaceholder.style.display = "none";
+				DisableButtonPlaceholder.style.display = "block";
+			}
+			else {
+				EnableButtonPlaceholder.style.display = "block";
+				DisableButtonPlaceholder.style.display = "none";
+			}
+		})
+		.catch(error => {
+			customAlert('danger', `Error: ${error.message}`, '');
+		});
+	}
 
+	enable2fa() {
+		let twofaBtn = document.getElementById("Enable2faBtn");
+
+		function hideModal() {
+			const response = fetch("/api/2fa/confirmDevice/", {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+			.then(response => {
+				if (!response.ok) {
+					return response.json().then(errData => {
+						throw new Error(errData.error || `Response status: ${response.status}`);
+					});
+				}
+			})
+			.catch(error => {
+				customAlert('danger', `Error: ${error.message}`, '');
+			});
+			this.show2faButton();
+		}
+		
 		this.addEventListener(twofaBtn, "click", (event) => {
 			const response = fetch("/api/2fa/enable2fa/", {
 				method: 'POST',
@@ -162,10 +217,34 @@ export class Profile extends Component {
 				const overlayElement = document.getElementById('customOverlay');
 				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
 				const imageSpan = document.getElementById('modalImageContainer');
-
 				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
-				qrmodal.show()
+				ModalElement.addEventListener('hidden.bs.modal', hideModal);
+				qrmodal.show(); // TODO: adjust hidden modal
 			})
+		})
+	}
+	
+	
+	disable2fa() {
+		let TwofaBtn = document.getElementById("Disable2faBtn");
+		TwofaBtn.addEventListener("click", (event) => {
+			const response = fetch("/api/2fa/disable2fa/", {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+			.then(response => {
+				this.show2faButton();
+			})
+		})
+	}
+	
+	sendServerMessage() {
+		let testBtn = document.getElementById('testBtn');
+		testBtn.addEventListener("click", (event) => {
+			onlineSocket.sendMessage("test", "ealgar-c")
 		})
 	}
 }

@@ -98,8 +98,10 @@ export class Pong extends Component {
 
 			player_1_name = gameState["player_1_name"];
 			p_1_name.innerHTML = `${gameState["player_1_name"]}`;
+			p_1_avatar.src = gameState.player_1_avatar;
 			player_2_name = gameState["player_2_name"];
 			p_2_name.innerHTML = `${gameState["player_2_name"]}`;
+			p_2_avatar.src = gameState.player_2_avatar;
 			win_goals.innerHTML = gameState["goals_to_win"] + ' (dif.' + gameState["goals_diff"] + ')';
 
 			if (gameState.controls_mode === 'remote' || gameState.controls_mode === 'AI') {

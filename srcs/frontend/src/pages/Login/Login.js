@@ -53,6 +53,7 @@ export class Login extends Component {
 				})
 				.then(response => {
 					if (!response.ok) {
+						console.log('test')
 						return response.json().then(errData => {
 							throw new Error(errData.error || `Response status: ${response.status}`);
 						});
@@ -69,7 +70,8 @@ export class Login extends Component {
 					}
 				})
 				.catch(error => {
-					customAlert('danger', `Error: ${error.message}`, '');
+					customAlert('danger', `Erroor: ${error.message}`, '');
+					console.log(error);
 				});
 			}
 
