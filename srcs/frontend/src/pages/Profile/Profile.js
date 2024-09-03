@@ -23,10 +23,9 @@ export class Profile extends Component {
 		this.logout();
 		this.saveInfoBtn(this.params.username);
 		Navbar.focus()
-		/* this.show2faButton();
 		this.enable2fa();
 		this.disable2fa();
-		this.sendServerMessage(); */
+		// this.sendServerMessage();
 	}
 
 	async displayUserInfo(username) {
@@ -59,7 +58,7 @@ export class Profile extends Component {
 			document.getElementById("photoContainer").src = `${data["avatar"]}`;
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
 			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
-
+			
 			this.editUserBtn(data);
 		})
 		.catch((error) => {
@@ -83,12 +82,13 @@ export class Profile extends Component {
 
 	editUserBtn() {
 		const editBtn = document.getElementById("editBtn");
-
+		
 		this.addEventListener(editBtn, "click", () => {
 			document.getElementById("userInfo").style.display = "none";
 			document.getElementById("userEdit").style.display = "block";
 
 			this.startPasswordEL();
+			this.show2faButton();
 		});
 	}
 
@@ -149,7 +149,7 @@ export class Profile extends Component {
 	logout() {
 		let	logoutBtn = document.getElementById("logoutBtn");
 
-		this.addEventListener(logoutBtn, "click", (event) => {
+		this.addEventListener(logoutBtn, "click", () => {
 			fetch("/api/logout/", {
 				method: "GET",
 				credentials: 'include'
@@ -164,10 +164,9 @@ export class Profile extends Component {
 		});
 	}
 
-	/* show2faButton() {
-		let ButtonPlaceholder = document.getElementById("2faButtonPlaceholder");
-		let EnableButtonPlaceholder = document.getElementById("Enable2faButtonPlaceholder");
-		let DisableButtonPlaceholder = document.getElementById("Disable2faButtonPlaceholder");
+	show2faButton() {
+		let EnableButtonPlaceholder = document.getElementById("Enable2faBtn");
+		let DisableButtonPlaceholder = document.getElementById("Disable2faBtn");
 		fetch("/api/2fa/check2fa/", {
 			method: "POST",
 			credentials: 'include',
@@ -195,29 +194,30 @@ export class Profile extends Component {
 		});
 	}
 
+	hideModal() {
+		const response = fetch("/api/2fa/confirmDevice/", {
+			method: 'POST',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+
+			this.show2faButton();
+		})
+		.catch(error => {
+			customAlert('danger', `Error: ${error.message}`, '');
+		});
+	}
+
 	enable2fa() {
 		let twofaBtn = document.getElementById("Enable2faBtn");
-
-		function hideModal() {
-			const response = fetch("/api/2fa/confirmDevice/", {
-				method: 'POST',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			})
-			.then(response => {
-				if (!response.ok) {
-					return response.json().then(errData => {
-						throw new Error(errData.error || `Response status: ${response.status}`);
-					});
-				}
-			})
-			.catch(error => {
-				customAlert('danger', `Error: ${error.message}`, '');
-			});
-			this.show2faButton();
-		}
 		
 		this.addEventListener(twofaBtn, "click", (event) => {
 			const response = fetch("/api/2fa/enable2fa/", {
@@ -232,16 +232,16 @@ export class Profile extends Component {
 			})
 			.then(data => {
 				const ModalElement = document.getElementById('imageModal');
-				const overlayElement = document.getElementById('customOverlay');
 				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
 				const imageSpan = document.getElementById('modalImageContainer');
+
 				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
-				ModalElement.addEventListener('hidden.bs.modal', hideModal);
-				qrmodal.show(); // TODO: adjust hidden modal
+				qrmodal.show();
+				this.addEventListener(ModalElement, 'hidden.bs.modal', () => {this.hideModal()});
 			})
 		})
 	}
-	
+
 	
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
@@ -258,7 +258,7 @@ export class Profile extends Component {
 			})
 		})
 	}
-	
+	/*
 	sendServerMessage() {
 		let testBtn = document.getElementById('testBtn');
 		if (testBtn) {
