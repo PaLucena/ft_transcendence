@@ -28,7 +28,6 @@ export class ChatModal extends Component {
         this.uiSetup.setupChatModal();
         this.uiSetup.setupMessagesModal();
         this.uiSetup.setupMessagesModalClose();
-        this.uiSetup.setupScrollEvent();
         this.uiSetup.setupMessageInputEvent();
     }
 }

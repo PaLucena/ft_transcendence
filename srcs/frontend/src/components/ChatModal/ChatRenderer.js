@@ -1,5 +1,3 @@
-import { handleBlockUnblock } from '../../scripts/utils/rtchatUtils.js';
-
 export class ChatRenderer {
     constructor(chatModal) {
         this.chatModal = chatModal;
@@ -109,7 +107,7 @@ export class ChatRenderer {
 	createOtherUserMessageContent(message, isPublicChat) {
 		if (isPublicChat) {
 			const userBtn = `
-			<button type="button" class="btn p-0" data-bs-toggle="dropdown">
+			<button type="button" class="btn p-0 position-relative">
 				<div class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" data-online-username="${message.author.username}" style="top:90%; left:90%;"></div>
 				<img
 					class="rounded-circle"
@@ -120,15 +118,7 @@ export class ChatRenderer {
 			return `
 			<li class="fade-in-up d-flex mb-2 flex-column justify-start">
 				<div class="d-flex align-items-end">
-					<div class="d-flex align-items-end me-2 dropup">
 						${userBtn}
-						<ul class="dropdown-menu dropdown-menu-dark">
-							<li><a href="" class="dropdown-item">Profile</a></li>
-							<li><hr class="dropdown-divider"></li>
-							<li><a class="dropdown-item" href="#">Invite to Play</a></li>
-							<li><a class="dropdown-item" href="#">Unblock</a></li>
-						</ul>
-					</div>
 					<div class="d-flex align-items-end">
 						<svg height="13" width="8">
 							<path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
@@ -188,6 +178,11 @@ export class ChatRenderer {
 	}
 
 	createPrivateChatHeaderContent(data) {
+		const blockStatus = data.block_status;
+		const isBlocker = blockStatus === "blocker";
+		const action = isBlocker ? 'unblock' : 'block';
+		const buttonText = isBlocker ? 'Unblock' : 'Block';
+
 		return `
 		<div class="d-flex align-items-center">
 			<div class="d-flex align-items-end me-2 dropup">
@@ -207,7 +202,13 @@ export class ChatRenderer {
 					<li><a href="" class="dropdown-item">Profile</a></li>
 					<li><hr class="dropdown-divider"></li>
 					<li><a class="dropdown-item" href="#">Invite to Play</a></li>
-					<li><a class="dropdown-item" href="#">Unblock</a></li>
+					<li>
+						<button class="dropdown-item block-unblock-btn"
+							data-block-action="${action}"
+							data-block-username="${data.other_user.username}">
+							${buttonText}
+						</button>
+                	</li>
 				</ul>
 			</div>
 			<span class="text-light">${data.other_user.username}</span>
@@ -216,47 +217,27 @@ export class ChatRenderer {
 	}
 
 	renderMessageInputContainer(blockStatus, otherUser) {
-        const messageInputContainer = document.querySelector('.message-input-container');
-		const chatMessageInput = document.getElementById('chat_message_input');
-    	const chatMessageSubmit = document.getElementById('chat_message_submit');
+        const messageInputContainer = document.getElementById('message_input_container');
+        if (messageInputContainer) {
+            this.removeBlockStatusMessage();
 
-        if (messageInputContainer && chatMessageInput && chatMessageSubmit) {
-            const existingMessage = messageInputContainer.querySelector('.block-status-message');
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-
-            const blockMessage = this.createInputBlockMessage(blockStatus);
+            const blockMessage = this.createInputBlockMessage(blockStatus, otherUser);
 
             if (blockMessage) {
                 messageInputContainer.insertAdjacentHTML('afterbegin', blockMessage);
-
-				this.toggleInputState(chatMessageInput, chatMessageSubmit, true);
-
-				if (blockStatus === "blocker" && otherUser) {
-					const unblockBtn = document.getElementById('unblock_btn');
-
-					if (unblockBtn) {
-						this.chatModal.addEventListener(unblockBtn, 'click', () => {
-							handleBlockUnblock('unblock', otherUser.username, () => {
-								this.removeBlockStatusMessage();
-								this.toggleInputState(chatMessageInput, chatMessageSubmit, false);
-							});
-						})
-					}
-				}
+                this.toggleInputState(true);
             } else {
-				this.toggleInputState(chatMessageInput, chatMessageSubmit, false);
-			}
+                this.toggleInputState(false);
+            }
         }
     }
 
-	createInputBlockMessage (blockStatus) {
+	createInputBlockMessage(blockStatus, username) {
 		if (blockStatus === "blocker") {
 			 return `
 			 	<div class="text-light block-status-message mb-2">
 					You have blocked this user.
-					<a id="unblock_btn" class="unblock-btn">Unblock</a>.
+					<a id="unblock_btn" class="unblock-btn" data-block-action="unblock" data-block-username="${username}">Unblock</a>.
 				</div>
 			`;
 		} else if (blockStatus === "blocked") {
@@ -271,7 +252,7 @@ export class ChatRenderer {
 	}
 
 	removeBlockStatusMessage() {
-		const messageInputContainer = document.querySelector('.message-input-container');
+		const messageInputContainer = document.getElementById('message_input_container');
 		if (messageInputContainer) {
 			const blockStatusMessage = messageInputContainer.querySelector('.block-status-message');
 			if (blockStatusMessage) {
@@ -280,9 +261,14 @@ export class ChatRenderer {
 		}
 	}
 
-	toggleInputState(inputElement, submitButton, disable) {
-		inputElement.disabled = disable;
-		submitButton.disabled = disable;
+	toggleInputState(disable) {
+		const chatMessageInput = document.getElementById('chat_message_input');
+		const chatMessageSubmit = document.getElementById('chat_message_submit');
+
+		if (chatMessageInput && chatMessageSubmit) {
+			chatMessageInput.disabled = disable;
+			chatMessageSubmit.disabled = disable;
+		}
 	}
 
     scrollToBottom(time=0) {
