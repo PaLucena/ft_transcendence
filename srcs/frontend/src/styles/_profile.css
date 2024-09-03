@@ -58,6 +58,7 @@
 }
 
 .container-user .user-info {
+	position: relative;
 	display: block;
 	margin: 0 auto;
 	color: black;
@@ -71,16 +72,22 @@
 	justify-content: center;
 }
 
-.profile-photo-container {
+.user-info .photo .profile-photo-container {
 	position: absolute;
 	height: 120%;
 	bottom: 0;
 }
 
-.profile-photo-container .profile-photo {
+.user-info .photo .profile-photo-container .profile-photo {
 	position: absolute;
 	height: 120%;
 	border: 2px solid #192e2f;
+}
+
+.user-info .profile-bottom-btns {
+	position: absolute;
+	bottom: 0;
+	margin-bottom: 5%;
 }
 
 .container-stats {
@@ -129,6 +136,6 @@
 	margin: 0 5px;
 }
 
-.twofactorButtons {
+.hide {
 	display: none;
 }

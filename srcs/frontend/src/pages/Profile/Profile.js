@@ -29,10 +29,9 @@ export class Profile extends Component {
 		this.sendServerMessage(); */
 	}
 
-	displayUserInfo(username) {
+	async displayUserInfo(username) {
 		const fetchUrl = username ? `/api/get_other_user_data/${username}` : "/api/get_user_data/";
-
-		console.log("Debería buscar en", fetchUrl);
+		const myUsername = await this.getOwnName();
 
 		fetch(fetchUrl, {
 			method: "GET",
@@ -50,6 +49,13 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
+			if (myUsername === data["username"]) {
+				document.getElementById("editBtn").style.display = "block";
+				document.getElementById("logoutBtn").style.display = "block";
+			}
+			else
+				document.getElementById("blockBtn").style.display = "block";
+
 			document.getElementById("photoContainer").src = `${data["avatar"]}`;
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
 			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
@@ -61,13 +67,26 @@ export class Profile extends Component {
 		})
 	}
 
-	editUserBtn(userData) {
+	async getOwnName() {
+		const response = await fetch('/api/get_user_data/', {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			credentials: 'include'
+		});
+
+		const data = await response.json();
+		return data["username"];
+	}
+	
+
+	editUserBtn() {
 		const editBtn = document.getElementById("editBtn");
 
 		this.addEventListener(editBtn, "click", () => {
 			document.getElementById("userInfo").style.display = "none";
 			document.getElementById("userEdit").style.display = "block";
-			document.getElementById("username").value = `${userData["username"]}`;
 
 			this.startPasswordEL();
 		});
@@ -137,7 +156,6 @@ export class Profile extends Component {
 			})
 			.then(response => {
 				onlineSocket.closeWebSocket();
-				console.log("Respuesta a logout: ", response); // TODO: esto es debuggeo
 				navigateTo("/login");
 			})
 			.catch((error) => {
