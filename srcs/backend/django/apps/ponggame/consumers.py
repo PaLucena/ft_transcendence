@@ -94,7 +94,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         data = json.loads(text_data)
 
-        if data['type'] == 'player_ready':
+        if data['type'] == 'player_ready' and self.game_logic.game_state == 'waiting':
             await handle_player_ready(self, data['player'])
 
         elif data['type'] == 'quit':

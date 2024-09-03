@@ -120,6 +120,9 @@ CACHES = {
     }
 }
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases

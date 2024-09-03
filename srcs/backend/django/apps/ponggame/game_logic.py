@@ -1,5 +1,6 @@
 import math
 import random
+import time
 
 
 class GameLogic:
@@ -38,6 +39,7 @@ class GameLogic:
     ball_dir_y = -1 if random.uniform(-1, 1) <= 0.5 else 1
     ball_vel_x = BALL_SPEED_INIT
     ball_vel_y = BALL_SPEED_INIT
+    start_time = time.time()
 
     # Game variables
     game_state = "waiting"
@@ -54,6 +56,7 @@ class GameLogic:
     controls_mode = "local"
     ai_side = 0
     countdown = CONNECT_TIMEOUT * FPS
+    new_direction = True
 
     player_1_channel = None
     player_2_channel = None
@@ -77,6 +80,7 @@ class GameLogic:
                 self.pad_2_y = self.TABLE_HEIGHT - self.PADDLE_HEIGHT / 2 - self.GOAL_TAB_MARGIN
 
     def check_collision(self):
+        last_direction = self.ball_dir_x
         # Check collision with walls
         if self.ball_y - self.BALL_RADIUS <= 0 or self.ball_y + self.BALL_RADIUS >= self.TABLE_HEIGHT:
             self.ball_dir_y *= -1
@@ -88,12 +92,14 @@ class GameLogic:
             self.new_angle(1)
             self.ball_vel_y += self.BALL_SPEED_INC
             self.ball_vel_x += self.BALL_SPEED_INC
+            self.new_direction = True
         elif (self.pad_2_x <= self.ball_x + self.BALL_RADIUS <= self.pad_2_x + self.PADDLE_WIDTH and
               self.pad_2_y - self.PADDLE_HEIGHT / 2 <= self.ball_y <= self.pad_2_y + self.PADDLE_HEIGHT / 2 and
               self.ball_dir_x > 0):
             self.new_angle(2)
             self.ball_vel_y += self.BALL_SPEED_INC
             self.ball_vel_x += self.BALL_SPEED_INC
+            self.new_direction = True
 
     def new_angle(self, pad):
         if pad == 1:
@@ -125,6 +131,7 @@ class GameLogic:
         self.ball_vel_y = self.BALL_SPEED_INIT
         self.ball_dir_x = -1 if random.uniform(-1, 1) <= 0.5 else 1
         self.ball_dir_y = -1 if random.uniform(-1, 1) <= 0.5 else 1
+        self.new_direction = True
 
     def end_game(self):
         if (self.player_1_goals >= self.GOALS_TO_WIN and
@@ -140,6 +147,7 @@ class GameLogic:
 
     async def game_loop(self):
         if self.game_state == "playing":
+            self.new_direction = False
             self.move_ball()
             self.check_collision()
             goal = self.check_goal()

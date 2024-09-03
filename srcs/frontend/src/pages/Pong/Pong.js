@@ -53,8 +53,14 @@ export class Pong extends Component {
 		const controls_1 = getCSSSelector('.controls-1');
 		const controls_2 = getCSSSelector('.controls-2');
 
+		let playing = true;
+
 		// Websocket setup
-		const socket = new WebSocket('/ws/ponggame/');
+		let socket = null;
+		connect_socket(socket);
+		function connect_socket() {
+			socket = new WebSocket('/ws/ponggame/');
+		}
 
 		// Apply game settings
 		p_1_name.innerHTML = player_1_name;
@@ -81,6 +87,10 @@ export class Pong extends Component {
 		socket.onclose = function(event) {
 			if (event.wasClean) {
 				console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+				if (playing) {
+					console.log('Game is still running, reconnecting...');
+					connect_socket();
+				}
 			} else {
 				console.log('Connection died');
 			}
@@ -165,6 +175,7 @@ export class Pong extends Component {
 				message_line_main.innerHTML = 'Game Over';
 				controls_1.innerHTML = '';
 				controls_2.innerHTML = '';
+				playing = false;
 			}
 		}
 

@@ -84,7 +84,8 @@ export class Tournament extends Component {
 			return response.json();
 		})
 		.then(data => {
-			document.getElementById('invitationCode').innerHTML = data.code;
+			if (data.code !== null)
+				document.getElementById('invitationCode').innerHTML = `Code: ${data.code}`;
 
 			console.log("Código de acceso al torneo: ", data.code);
 		})
