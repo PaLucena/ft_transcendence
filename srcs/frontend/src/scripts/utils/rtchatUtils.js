@@ -25,8 +25,6 @@ export async function handleBlockUnblock(action, username, callback) {
         });
 
         await handleResponse(response, data => {
-            const message = data.detail || `User has been ${action === 'block' ? 'blocked' : 'unblocked'} successfully.`;
-            customAlert('success', message, 3000);
             if (callback) {
                 callback();
             }

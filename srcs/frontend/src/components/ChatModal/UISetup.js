@@ -1,4 +1,5 @@
 import customAlert from "../../scripts/utils/customAlert.js";
+import { handleBlockUnblock } from "../../scripts/utils/rtchatUtils.js";
 
 export class UISetup {
     constructor(chatModal) {
@@ -47,6 +48,30 @@ export class UISetup {
                     console.warn("chat_message_input not found.");
                 }
             });
+
+
+            this.chatModal.addEventListener(messagesModalElement, 'click', (event) => {
+                console.log(event.target);
+
+                const blockButton = event.target.closest('[data-block-action]');
+                if (blockButton) {
+                    const action = blockButton.getAttribute('data-block-action');
+                    const username = blockButton.getAttribute('data-block-username');
+                    if (action && username) {
+                        handleBlockUnblock(action, username, () => {
+                            this.chatModal.chatRenderer.updateBlockButton(blockButton, action);
+                            this.chatModal.chatRenderer.removeBlockStatusMessage();
+
+                            if (action === 'block') {
+                                this.chatModal.chatRenderer.renderMessageInputContainer('blocker', { username });
+                            } else if (action === 'unblock') {
+                                this.chatModal.chatRenderer.toggleInputState(false);
+                            }
+                        });
+                    }
+                }
+            });
+
         } else {
             console.warn("messages_modal not found.");
         }
@@ -107,21 +132,6 @@ export class UISetup {
             messageForm.onsubmit = null;
         } else {
             console.warn('chat_message_form not found.')
-        }
-    }
-
-    setupScrollEvent() {
-        const chatMessagesContainer = document.getElementById('chat_messages_container');
-
-        if (chatMessagesContainer) {
-            this.chatModal.addEventListener(chatMessagesContainer, 'scroll', () => {
-                const expandedButton = document.querySelector('button[aria-expanded="true"]');
-                if (expandedButton) {
-                    expandedButton.click();
-                }
-            });
-        } else {
-            console.warn("chat_messages_container not found.");
         }
     }
 
