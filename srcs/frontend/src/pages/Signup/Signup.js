@@ -16,7 +16,19 @@ export class Signup extends Component {
     }
 
 	init() {
+		this.showTermsAndConditions();
 		this.initSubmitForm()
+	}
+
+	showTermsAndConditions() {
+		const tAndC = document.getElementById("tAndC");
+
+		this.addEventListener(tAndC, 'click', () => {
+			const	tcModalElement = document.getElementById('t&cModal');
+			const	tcModal = new bootstrap.Modal(tcModalElement, {backdrop: false, keyboard: true});
+			
+			tcModal.show();
+		});
 	}
 
 	initSubmitForm() {
