@@ -59,6 +59,21 @@ def get_user_data(request):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(["GET"])
+@default_authentication_required
+def get_other_user_data(request, username):
+    try:
+        user = AppUser.objects.get(username=username)
+        user_data = {
+            "username": user.username,
+            "avatar": user.avatar.url,
+            "number_of_friends": get_friend_count(user),
+        }
+        return Response(user_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(["POST"])
 def signup(request):
     serializer = UserSerializerClass(data=request.data)
@@ -220,10 +235,13 @@ def update_user_info(request):
 
         user.save()
 
-        user.refresh_from_db()
+        #user.refresh_from_db()
 
         #update_session_auth_hash(request, user)
         auth_logout(request)
+        # authenticated_user: AbstractUser | None = authenticate(
+        # username=new_username, password=new_password
+        # )
         auth_login(request, user)
 
 
