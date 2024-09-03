@@ -24,7 +24,7 @@ export class Profile extends Component {
 		this.displayUserInfo(this.params.username);
 		this.logout();
 		this.saveInfoBtn(this.params.username);
-		Navbar.focus()
+		//Navbar.focus()
 		this.enable2fa();
 		this.disable2fa();
 		// this.sendServerMessage();

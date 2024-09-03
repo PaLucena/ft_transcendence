@@ -1,6 +1,6 @@
 #navbar {
 	max-width: 400px;
-    margin: 0 auto;
+	margin: 0 auto;
 }
 
 .navbar {
@@ -10,46 +10,39 @@
 	padding: 0;
 	background-color: #2d2c3e;
 	border-radius: 45px;
-    margin-top: 15px;
+	margin-top: 15px;
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 
-  .title {
-	font-family: 'Lato', sans-serif;
-	font-size: 36px;
-	font-weight: 300;
-	color: #FFFFFF;
-	margin-bottom: 30px;
-  }
-
-  .icon-container {
+.icon-container {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	text-align: center;
 	padding: 0px;
-    margin: 0px;
+	margin: 0px;
 	gap: 10px;
-  }
+}
 
-  .icon {
+.icon {
 	cursor: pointer;
 	position: relative;
 	width: 60px;
 	height: 60px;
 	border-radius: 30px;
 	overflow: hidden;
-  }
+}
 
-  .icon i {
+.icon i {
 	position: relative;
 	color: #FFFFFF;
 	font-size: 30px;
 	margin-top: 15px;
 	transition: all 0.25s ease;
-  }
+}
 
-  .icon::before,
-  .icon::after {
+.icon::before,
+.icon::after {
 	content: '';
 	position: absolute;
 	top: 0;
@@ -58,96 +51,96 @@
 	width: 100%;
 	transition: all 0.25s ease;
 	border-radius: 30px;
-  }
+}
 
-  /* Стиль для icon-fill */
-  .icon-fill::before {
+/* icon-fill */
+.icon-fill::before {
 	transition-duration: 0.5s;
 	box-shadow: inset 0 0 0 1px #16A085;
-  }
+}
 
-  .icon-fill:hover::before {
+.icon-fill:hover::before {
 	box-shadow: inset 0 0 0 60px #16A085;
-  }
+}
 
-  /* Стиль для icon-enter */
-  .icon-enter::after {
+/* icon-enter */
+.icon-enter::after {
 	box-shadow: inset 0 0 0 1px #EB9532;
-  }
+}
 
-  .icon-enter::before {
+.icon-enter::before {
 	border-radius: 0;
 	margin-left: -100%;
 	box-shadow: inset 0 0 0 60px #EB9532;
-  }
+}
 
-  .icon-enter:hover::before {
+.icon-enter:hover::before {
 	margin-left: 0;
-  }
+}
 
-  /* Стиль для icon-expand */
-  .icon-expand::after {
+/* Стиль для icon-expand */
+.icon-expand::after {
 	box-shadow: inset 0 0 0 1px #C82647;
-  }
+}
 
-  .icon-expand::before {
+.icon-expand::before {
 	background: #C82647;
 	box-shadow: inset 0 0 0 60px #2d2c3e;
-  }
+}
 
-  .icon-expand:hover::before {
+.icon-expand:hover::before {
 	box-shadow: inset 0 0 0 1px #2d2c3e;
-  }
+}
 
-  /* Стиль для icon-collapse */
-  .icon-collapse::before {
+/* Стиль для icon-collapse */
+.icon-collapse::before {
 	border-radius: 0;
-  }
+}
 
-  .icon-collapse:hover::before {
+.icon-collapse:hover::before {
 	box-shadow:
-	  inset 0 30px 0 0 #8CC63F,
-	  inset 0 -30px 0 0 #8CC63F;
-  }
+	inset 0 30px 0 0 #8CC63F,
+	inset 0 -30px 0 0 #8CC63F;
+}
 
-  .icon-collapse::after {
+.icon-collapse::after {
 	box-shadow: inset 0 0 0 1px #8CC63F;
-  }
+}
 
-  /* Стиль для icon-rotate */
-  .icon-rotate {
+/* Стиль для icon-rotate */
+.icon-rotate {
 	box-shadow: inset 0 0 0 1px #7E3661;
-  }
+}
 
-  .icon-rotate::after,
-  .icon-rotate::before {
+.icon-rotate::after,
+.icon-rotate::before {
 	border: 0px solid transparent;
-  }
+}
 
-  .icon-rotate:hover::before {
+.icon-rotate:hover::before {
 	transition:
-	  border-top-width 0.3s ease,
-	  border-top-color 0.3s ease;
+	border-top-width 0.3s ease,
+	border-top-color 0.3s ease;
 	border-width: 60px;
 	border-top-color: #7E3661;
-  }
+}
 
-  .icon-rotate:hover::after {
+.icon-rotate:hover::after {
 	transition:
-	  border-left-width 0.3s ease,
-	  border-left-color 0.3s ease;
+	border-left-width 0.3s ease,
+	border-left-color 0.3s ease;
 	border-width: 60px;
 	border-left-color: #7E3661;
-  }
+}
 
-  .icon-rotate:hover {
+.icon-rotate:hover {
 	transition: background 0.001s ease 0.3s;
 	background: #7E3661;
-  }
+}
 
-  .icon-rotate i {
+.icon-rotate i {
 	z-index: 1;
-  }
+}
 
 @media (max-width: 	540px) {
 	#navbar {
