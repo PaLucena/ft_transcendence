@@ -1,3 +1,4 @@
+import time
 
 
 class AiPlayer:
@@ -26,6 +27,20 @@ class AiPlayer:
         self.new_position = 0
         self.col_x_time = 0
 
+        self.loop_count = 0
+        self.new_ball_dir_x = 0
+
+
+    def ai_turn(self, new_direction):
+        if new_direction:
+            self.loop_count = 0
+            self.new_ball_dir_x = self.game.ball_dir_x
+        if self.loop_count % self.game.FPS == 0:
+            self.data_update()
+        self.think()
+        self.move()
+        self.loop_count += 1
+
 
     def data_update(self):
         self.ball_x = self.game.ball_x
@@ -40,6 +55,7 @@ class AiPlayer:
         else:
             self.ia_y = self.game.pad_2_y
             self.opponent_y = self.game.pad_1_y
+        # print(f"AI read time: {time.time() - self.game.start_time:.3f}") # DEBUG
 
 
     def move(self):
@@ -59,9 +75,10 @@ class AiPlayer:
             self.calc_collision_point()
             self.calc_target_point()
             self.calc_new_position()
-            self.print_data() # DEBUG
+            # self.print_data() # DEBUG
         else:
             self.new_position = self.game.TABLE_HEIGHT / 2
+
 
     def calc_collision_point(self):
         if self.ia_side == 2:
@@ -71,18 +88,20 @@ class AiPlayer:
             self.distance_x = self.ball_x - self.game.GOAL_TAB_MARGIN - self.game.BALL_RADIUS
         self.col_x_time = self.distance_x / abs(self.ball_vel_x)
         self.collision_y = self.ball_y + self.ball_vel_y * self.col_x_time
-        print("First collision: ", self.collision_y) # DEBUG
         while self.collision_y < self.BOARD_START or self.collision_y > self.BOARD_END:
             if self.collision_y < self.BOARD_START:
                 self.collision_y = (self.collision_y - self.game.BALL_RADIUS) * -1
             else:
                 self.collision_y = 2 * self.BOARD_END - self.collision_y
 
+
     def calc_target_point(self):
         pass
 
+
     def calc_new_position(self):
         self.new_position = self.collision_y
+
 
     def print_data(self):
         print("Ball: ", self.ball_x, self.ball_y)

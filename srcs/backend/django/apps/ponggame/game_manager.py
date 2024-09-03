@@ -8,6 +8,21 @@ from .handlers import send_positions, send_game_state, send_score
 from .AI_player import AiPlayer
 
 
+def random_ai_game(tournament_id, match_id, player_1_id, player_2_id):
+	player_1_goals = 6
+	player_2_goals = random.randint(0, 4)
+	print(f"AI vs AI result: {player_1_goals} - {player_2_goals}")
+
+	return {
+		'tournament_id': tournament_id,
+		'match_id': match_id,
+		'player_1_id': player_1_id,
+		'player_2_id': player_2_id,
+		'player_1_goals': player_1_goals,
+		'player_2_goals': player_2_goals,
+	}
+
+
 class GameManager:
 	def __init__(self):
 		self.rooms = {}
@@ -31,7 +46,12 @@ class GameManager:
 
 		# Generate random scores for AI vs AI match
 		if player_1_id == 0 and player_2_id == 0:
-			return self.random_ai_game(tournament_id, match_id, player_1_id, player_2_id)
+			return random_ai_game(tournament_id, match_id, player_1_id, player_2_id)
+
+		if player_1_id != 0 and self.player_to_room.get(player_1_id):
+			return None
+		if player_2_id != 0 and self.player_to_room.get(player_2_id):
+			return None
 
 		print(f"Starting match between (ID {player_1_id}) and (ID {player_2_id})") # DEBUG
 
@@ -71,20 +91,15 @@ class GameManager:
 		return result
 
 	async def run_game_loop(self, game_room, game_logic, ai_player):
-		loop_count = 0
 		while game_logic.game_state != "game_over":
 			start_time = time.time()
+			if game_logic.ai_side:
+				ai_player.ai_turn(game_logic.new_direction)
 			await game_logic.game_loop()
 			await send_positions(self.channel_layer, game_room.game_room_id, game_logic)
 			await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
 			if game_logic.game_state == "scored":
 				await send_score(self.channel_layer, game_room.game_room_id, game_logic)
-			if game_logic.ai_side:
-				if loop_count % game_logic.FPS == 0:
-					ai_player.data_update()
-					ai_player.think()
-				ai_player.move()
-			loop_count += 1
 			elapsed_time = time.time() - start_time
 			await asyncio.sleep(max(0.0, game_logic.FRAME_TIME - elapsed_time))
 		await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
@@ -114,20 +129,6 @@ class GameManager:
 			del self.player_to_room[room.player_1_id]
 			del self.player_to_room[room.player_2_id]
 			del self.rooms[game_room_id]
-	
-	def random_ai_game(self, tournament_id, match_id, player_1_id, player_2_id):
-		player_1_goals = 6
-		player_2_goals = random.randint(0, 4)
-		print(f"AI vs AI result: {player_1_goals} - {player_2_goals}")
-			
-		return {
-			'tournament_id': tournament_id,
-			'match_id': match_id,
-			'player_1_id': player_1_id,
-			'player_2_id': player_2_id,
-			'player_1_goals': player_1_goals,
-			'player_2_goals': player_2_goals,
-		}
 
 
 class GameRoom:
