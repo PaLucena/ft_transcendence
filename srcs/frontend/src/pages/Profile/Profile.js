@@ -148,8 +148,8 @@ export class Profile extends Component {
 
 	 show2faButton() {
 		let ButtonPlaceholder = document.getElementById("2faButtonPlaceholder");
-		let EnableButtonPlaceholder = document.getElementById("Enable2faButtonPlaceholder");
-		let DisableButtonPlaceholder = document.getElementById("Disable2faButtonPlaceholder");
+		let EnableButtonPlaceholder = document.getElementById("Enable2faBtn");
+		let DisableButtonPlaceholder = document.getElementById("Disable2faBtn");
 		fetch("/api/2fa/check2fa/", {
 			method: "POST",
 			credentials: 'include',
@@ -198,7 +198,6 @@ export class Profile extends Component {
 			.catch(error => {
 				customAlert('danger', `Error: ${error.message}`, '');
 			});
-			this.show2faButton();
 		}
 		
 		this.addEventListener(twofaBtn, "click", (event) => {
@@ -214,12 +213,12 @@ export class Profile extends Component {
 			})
 			.then(data => {
 				const ModalElement = document.getElementById('imageModal');
-				const overlayElement = document.getElementById('customOverlay');
 				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
 				const imageSpan = document.getElementById('modalImageContainer');
 				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
 				ModalElement.addEventListener('hidden.bs.modal', hideModal);
-				qrmodal.show(); // TODO: adjust hidden modal
+				qrmodal.show();
+				this.show2faButton();
 			})
 		})
 	}
