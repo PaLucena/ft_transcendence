@@ -49,9 +49,14 @@ export class UISetup {
                 }
             });
 
-
             this.chatModal.addEventListener(messagesModalElement, 'click', (event) => {
                 const blockButton = event.target.closest('[data-block-action]');
+                const profileLink = event.target.closest('a[href^="/profile/"]');
+
+                if (profileLink) {
+                    const modalInstance = bootstrap.Modal.getInstance(messagesModalElement);
+                    modalInstance.hide();
+                }
 
                 if (blockButton) {
                     const action = blockButton.getAttribute('data-block-action');
@@ -193,11 +198,11 @@ export class UISetup {
                         }
                     }
                 } else {
-                    console.warn("chat_message_input not found.");
+                    console.warn('chat_message_input not found.');
                 }
             };
         } else {
-            console.warn("chat_message_form not found.");
+            console.warn('chat_message_form not found.');
         }
     }
 }
