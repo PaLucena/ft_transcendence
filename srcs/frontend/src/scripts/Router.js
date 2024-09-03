@@ -11,7 +11,6 @@ import { Tournament } from '../pages/Tournament/Tournament.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
 import { onlineSocket } from './utils/OnlineWebsocket.js';
 import { handleResponse } from './utils/rtchatUtils.js';
-import customAlert from '../../scripts/utils/customAlert.js';
 
 class Router {
 	constructor() {
@@ -21,10 +20,11 @@ class Router {
 			'/login': () => new Login(),
 			'/signup': () => new Signup(),
 			'/play': () => new Play(),
-			'/play/:playId': params => new Play(params),
+		//	'/play/:playId': params => new Play(params),
 			'/friends': () => new Friends(),
 			'/friends/:filter': params => new Friends(params),
 			'/profile': () => new Profile(),
+			'/profile/:username': params => new Profile(params),
 			'/auth': () => new Auth(),
 			'/pong': () => new Pong(),
 			'/tournament': () => new Tournament(),

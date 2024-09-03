@@ -8,20 +8,20 @@ import customAlert from "../../scripts/utils/customAlert.js";
 // import { showQRmodal } from '../../components/Show2faQRModal'
 
 export class Profile extends Component {
-	constructor() {
+	constructor(params = {}) {
 		console.log('Profile Constructor');
-		super('/pages/Profile/profile.html')
+		super('/pages/Profile/profile.html', params);
 	}
 
 	destroy() {
 		console.log("Profile Custom destroy");
-		this.removeAllEventListeners();
+		this.removeAllEventListeners(this.params);
     }
 
 	init() {
-		this.displayUserInfo();
+		this.displayUserInfo(this.params.username);
 		this.logout();
-		this.saveInfoBtn();
+		this.saveInfoBtn(this.params.username);
 		Navbar.focus()
 		/* this.show2faButton();
 		this.enable2fa();
@@ -29,8 +29,12 @@ export class Profile extends Component {
 		this.sendServerMessage(); */
 	}
 
-	displayUserInfo() {
-		fetch("/api/get_user_data/", {
+	displayUserInfo(username) {
+		const fetchUrl = username ? `/api/get_other_user_data/${username}` : "/api/get_user_data/";
+
+		console.log("Debería buscar en", fetchUrl);
+
+		fetch(fetchUrl, {
 			method: "GET",
 			headers: {
 				'Content-Type': 'application/json'
@@ -82,15 +86,9 @@ export class Profile extends Component {
 		});
 	}
 
-	saveInfoBtn() {
+	saveInfoBtn(username) {
 		const editForm = document.getElementById("editForm");
 
-		/* this.addEventListener(saveInfo, "click", () => {
-			
-			//TODO: aquí falta hacer un fetch con post para guardar la información de usuario
-			document.getElementById("userEdit").style.display = "none"; // Esto es solo si la información
-			document.getElementById("userInfo").style.display = "block";  // nueva es válida
-		}); */
 		this.addEventListener(editForm, "submit", (event) => {
 			event.preventDefault();
 
@@ -119,7 +117,9 @@ export class Profile extends Component {
 			})
 			.then(data => {
 				customAlert('success', data.message, '3000');
-				//location.reload();
+				document.getElementById("userInfo").style.display = "block";
+				document.getElementById("userEdit").style.display = "none";
+				this.displayUserInfo(username);
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');

@@ -122,7 +122,7 @@ export class UISetup {
     }
 
     setupFriendButtons() {
-        const container = document.getElementById('friends_elemets_container');
+        const container = document.getElementById('friends_elements_container');
 
         if (container) {
             this.friends.addEventListener(container, 'click', async (event) => {
@@ -134,13 +134,13 @@ export class UISetup {
                     const action = targetButton.getAttribute('data-action');
                     const username = targetButton.getAttribute('data-username');
 
-                    if (action && username) {
+                    if (action && username) {handleError
                         await this.handleFriendAction(action, username);
                     }
                 }
             });
         } else {
-            console.warn("friends_elemets_container not found");
+            console.warn("friends_elements_container not found");
         }
     }
 
