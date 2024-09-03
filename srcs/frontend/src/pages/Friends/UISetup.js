@@ -134,7 +134,7 @@ export class UISetup {
                     const action = targetButton.getAttribute('data-action');
                     const username = targetButton.getAttribute('data-username');
 
-                    if (action && username) {handleError
+                    if (action && username) {
                         await this.handleFriendAction(action, username);
                     }
                 }

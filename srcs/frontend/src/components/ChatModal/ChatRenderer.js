@@ -107,18 +107,20 @@ export class ChatRenderer {
 	createOtherUserMessageContent(message, isPublicChat) {
 		if (isPublicChat) {
 			const userBtn = `
-			<button type="button" class="btn p-0 position-relative">
+			<a class="btn p-0 position-relative" href="/profile/${message.author.username}" >
 				<div class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" data-online-username="${message.author.username}" style="top:90%; left:90%;"></div>
 				<img
 					class="rounded-circle"
 					style="width: 32px; height: 32px;"
 					src="${message.author.avatar || '/assets/images/default_avatar.jpg'}"
 				>
-			</button>`;
+			</a>`;
 			return `
 			<li class="fade-in-up d-flex mb-2 flex-column justify-start">
 				<div class="d-flex align-items-end">
+					<div class="me-2">
 						${userBtn}
+					</div>
 					<div class="d-flex align-items-end">
 						<svg height="13" width="8">
 							<path fill="white" d="M2.8,13L8,13L8,0.2C7.1,5.5,6.5,8.7,1.7,10.4C-1.6,11.5,1,13,2.8,13z"></path>
@@ -195,11 +197,11 @@ export class ChatRenderer {
 					<img
 						class="rounded-circle"
 						src="${data.other_user.avatar || '/assets/images/default_avatar.jpg'}"
-						style="width: 32px; height: 32px;"
+						style="width: 42px; height: 42px;"
 					>
 				</button>
 				<ul class="dropdown-menu dropdown-menu-dark">
-					<li><a href="" class="dropdown-item">Profile</a></li>
+					<li><a href="/profile/${data.other_user.username}" class="dropdown-item">Profile</a></li>
 					<li><hr class="dropdown-divider"></li>
 					<li><a class="dropdown-item" href="#">Invite to Play</a></li>
 					<li>
