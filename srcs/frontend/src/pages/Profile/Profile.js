@@ -101,7 +101,7 @@ export class Profile extends Component {
 				jsonData[key] = value;
 			});
 
-			fetch("/api/updateuserinfo/", {
+			fetch("/api/update_user_info/", {
 				method: "POST",
 				headers: {
 					'Content-Type': 'application/json'
@@ -122,7 +122,7 @@ export class Profile extends Component {
 				//location.reload();
 			})
 			.catch((error) => {
-				console.log("Edit user error:", error);
+				customAlert('danger', `Error: ` + error.message, '');
 			})
 		})
 	}

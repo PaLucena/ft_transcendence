@@ -27,11 +27,16 @@ from .decorators import default_authentication_required
 from django.http import JsonResponse
 from twofactor.views import Has2faEnabled
 from .consumers import OnlineStatusConsumer as OSocketConsumers
+from django.db import transaction
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.sessions.backends.db import SessionStore
+from django.core.cache import cache
 
 @api_view(["GET"])
 @default_authentication_required
 def check_auth(request):
-    print("USER: ", request.user)
+    user = request.user
+    print("USER: ", user)
     if request.user.is_authenticated:
         return JsonResponse({"authenticated": True})
     else:
@@ -149,12 +154,12 @@ def TestView(request):
 def logout(request):
     user = request.user  # delete later
     print("USER in logout: ", user)
+    auth_logout(request)
     response = Response(
         {"message": "Logged out successfully"}, status=status.HTTP_200_OK
     )
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
-    auth_logout(request)
     return response
 
 
@@ -164,11 +169,20 @@ def update_user_info(request):
     try:
         user = request.user
         new_username = request.data.get("new_username")
-        new_nickname = request.data.get("nickname")
-        new_avatar = request.FILES.get("image")
+        new_avatar = request.FILES.get("avatar")
         old_password = request.data.get("old_password")
         new_password = request.data.get("new_password")
         confirm_password = request.data.get("confirm_password")
+
+        if user.is_superuser or user.is_staff:
+            print("HERE user.username", user.username)
+            print("HERE new_username", new_username)
+            if new_username and new_username != user.username:
+                print("HERE 2")
+                return Response(
+                    {"error": "Admin username cannot be changed."},
+                    status=status.HTTP_403_FORBIDDEN,
+                )
 
         if new_username:
             if (
@@ -181,9 +195,6 @@ def update_user_info(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             user.username = new_username
-
-        if new_nickname:
-            set_nickname(request)
 
         if new_avatar:
             upload_avatar(request)
@@ -208,10 +219,20 @@ def update_user_info(request):
             user.password = make_password(new_password)
 
         user.save()
-        return Response(
-            {"message": "User info updated successfully."}, status=status.HTTP_200_OK
+
+        user.refresh_from_db()
+
+        #update_session_auth_hash(request, user)
+        auth_logout(request)
+        auth_login(request, user)
+
+
+        response = Response(
+            {"message": "User info updated successfully."}, status=status.HTTP_201_CREATED
         )
 
+
+        return response
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
 
