@@ -65,19 +65,17 @@ class GameManager:
 			game_logic.controls_mode = controls_mode
 			if controls_mode == "local":
 				game_logic.player_2_name = "Guest"
-				game_logic.player_2_avatar = 'media/default/anonymous.jpg'
+				game_logic.player_2_avatar = 'media/default/anonymous_player.jpg'
 			elif controls_mode == "AI":
 				if player_1_id == 0:
 					game_logic.ai_side = 1
 					game_logic.player_1_name = "AI"
-					game_logic.player_1_avatar = 'media/default/anonymous.jpg'
-
-
+					game_logic.player_1_avatar = 'media/default/AI_player.jpg'
 					game_logic.player_1_ready = True
 				else:
 					game_logic.ai_side = 2
 					game_logic.player_2_name = "AI"
-					game_logic.player_2_avatar = 'media/default/anonymous.jpg'
+					game_logic.player_2_avatar = 'media/default/AI_player.jpg'
 					game_logic.player_2_ready = True
 			ai_player = AiPlayer(game_logic)
 
@@ -109,6 +107,8 @@ class GameManager:
 				if game_logic.FRAME_TIME - elapsed_time < 0:
 					print("**** ALERT: Game loop is running too slow ****")
 				await asyncio.sleep(max(0.0, game_logic.FRAME_TIME - elapsed_time))
+			if game_logic.game_state == "game_over":
+				await send_score(self.channel_layer, game_room.game_room_id, game_logic)
 			await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
 		except Exception as e:
 			print(f"Error running game loop: {e}")

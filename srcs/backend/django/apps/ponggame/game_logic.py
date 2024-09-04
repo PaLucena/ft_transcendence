@@ -35,8 +35,8 @@ class GameLogic:
     pad_2_y = TABLE_MID_HEIGHT
     ball_x = TABLE_MID_WIDTH
     ball_y = TABLE_MID_HEIGHT
-    ball_dir_x = -1 if random.uniform(-1, 1) <= 0.5 else 1
-    ball_dir_y = -1 if random.uniform(-1, 1) <= 0.5 else 1
+    ball_dir_x = -1 if random.uniform(0, 1) <= 0.5 else 1
+    ball_dir_y = -1 if random.uniform(0, 1) <= 0.5 else 1
     ball_vel_x = BALL_SPEED_INIT
     ball_vel_y = BALL_SPEED_INIT
     start_time = time.time()
@@ -56,7 +56,7 @@ class GameLogic:
     controls_mode = "local"
     ai_side = 0
     countdown = CONNECT_TIMEOUT * FPS
-    new_direction = True
+    new_direction = False
 
     player_1_channel = None
     player_2_channel = None
@@ -144,8 +144,8 @@ class GameLogic:
         self.ball_y = self.TABLE_MID_HEIGHT
         self.ball_vel_x = self.BALL_SPEED_INIT
         self.ball_vel_y = self.BALL_SPEED_INIT
-        self.ball_dir_x = -1 if random.uniform(-1, 1) <= 0.5 else 1
-        self.ball_dir_y = -1 if random.uniform(-1, 1) <= 0.5 else 1
+        self.ball_dir_x = -1 if random.uniform(0, 1) <= 0.5 else 1
+        self.ball_dir_y = -1 if random.uniform(0, 1) <= 0.5 else 1
         self.new_direction = True
 
     def end_game(self):
@@ -176,8 +176,10 @@ class GameLogic:
                         self.reset_game()
             elif self.game_state == "countdown":
                 if self.countdown > self.FPS:
+                    self.new_direction = False
                     self.countdown -= 1
                 else:
+                    self.new_direction = True
                     self.game_state = "playing"
             elif self.game_state == "scored":
                 self.game_state = "countdown"
@@ -203,9 +205,3 @@ class GameLogic:
             "player_2_score": self.player_2_goals,
         }
 
-    # Debugging methods
-    def print_positions(self):
-        print(f"Ball: ({self.ball_x}, {self.ball_y})")
-        print(f"Pad 1: ({self.pad_1_x}, {self.pad_1_y})")
-        print(f"Pad 2: ({self.pad_2_x}, {self.pad_2_y})")
-        print(f"Score: {self.player_1_goals} - {self.player_2_goals}")

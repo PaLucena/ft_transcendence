@@ -1,3 +1,7 @@
+import random
+from statistics import variance
+
+
 class AiPlayer:
     def __init__(self, game):
         self.game = game
@@ -24,9 +28,12 @@ class AiPlayer:
         self.new_position = 0
         self.col_x_time = 0
 
+        # AI settings
+        self.ai_handicap = 2
+        self.error_base = self.game.PADDLE_HEIGHT / 4
+
         self.loop_count = 0
         self.new_ball_dir_x = 0
-
 
     def ai_turn(self, new_direction):
         if new_direction:
@@ -34,7 +41,7 @@ class AiPlayer:
             self.new_ball_dir_x = self.game.ball_dir_x
         if self.loop_count % self.game.FPS == 0:
             self.data_update()
-        self.think()
+            self.think()
         self.move()
         self.loop_count += 1
 
@@ -43,6 +50,7 @@ class AiPlayer:
         try:
             self.ball_x = self.game.ball_x
             self.ball_y = self.game.ball_y
+
             self.ball_vel_x = self.game.ball_vel_x
             self.ball_vel_y = self.game.ball_vel_y * self.game.ball_dir_y
             self.ball_dir_x = self.game.ball_dir_x
@@ -79,26 +87,33 @@ class AiPlayer:
                 self.calc_collision_point()
                 self.calc_target_point()
                 self.calc_new_position()
+            elif self.game.game_state == "playing":
+                handicap = random.uniform(-self.error_base * 4, self.error_base * 4)
+                self.new_position = self.game.TABLE_MID_HEIGHT + handicap
             else:
-                self.new_position = self.game.TABLE_HEIGHT / 2
+                self.new_position = self.game.TABLE_MID_HEIGHT
         except Exception as e:
             print(f"Error thinking (AI): {e}")
 
 
     def calc_collision_point(self):
         try:
+            while_protection = 0
             if self.ia_side == 2:
                 self.distance_x = (self.game.TABLE_WIDTH - self.game.PADDLE_TAB_MARGIN
                                    - self.ball_x - self.game.BALL_RADIUS)
             else:
                 self.distance_x = self.ball_x - self.game.PADDLE_TAB_MARGIN - self.game.BALL_RADIUS
             self.col_x_time = self.distance_x / self.ball_vel_x
-            self.collision_y = self.ball_y + self.ball_vel_y * self.col_x_time
-            while self.collision_y < self.BOARD_START or self.collision_y > self.BOARD_END:
+            self.collision_y = (self.ball_y + self.ball_vel_y * self.col_x_time)
+            while (self.collision_y < self.BOARD_START or self.collision_y > self.BOARD_END) and while_protection < 10:
                 if self.collision_y < self.BOARD_START:
-                    self.collision_y = (self.collision_y - self.game.BALL_RADIUS) * -1
+                    self.collision_y = abs(self.collision_y) + self.game.BALL_RADIUS
                 else:
-                    self.collision_y = 2 * self.BOARD_END - self.collision_y
+                    self.collision_y = self.BOARD_END - abs(self.BOARD_END - self.collision_y)
+                while_protection += 1
+            if while_protection >= 10:
+                print(f"Error calculating collision: while protection at {self.collision_y}")
         except Exception as e:
             print(f"Error calculating collision point (AI): {e}")
 
@@ -108,17 +123,6 @@ class AiPlayer:
 
 
     def calc_new_position(self):
-        self.new_position = self.collision_y
+        handicap_index = random.uniform(-self.error_base, self.error_base) * self.ai_handicap
+        self.new_position = self.collision_y + handicap_index
 
-
-    def print_data(self):
-        print("*************************")
-        print("Ball: ", self.ball_x, self.ball_y)
-        print("Velocity: ", self.ball_vel_x, self.ball_vel_y)
-        print("Opponent position: ", self.opponent_y)
-        print("Distance in X to AI: ", self.distance_x)
-        print("Time to collision: ", self.col_x_time)
-        print("Collision point in Y: ", self.collision_y)
-        print("Target point: ", self.target_point)
-        print("Position to reach: ", self.new_position)
-        print("*************************")
