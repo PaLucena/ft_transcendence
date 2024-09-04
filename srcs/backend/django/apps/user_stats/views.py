@@ -12,20 +12,21 @@ from blockchain.views import get_player_matches as bc_get_player_matches
 def player_statistics(request, username):
 	try:
 		user = AppUser.objects.get(username=username)
-		player_id = user.pk
-		stats = get_player_statistics(player_id)
+		player_id = user.id
+		stats = get_player_statistics(request, player_id)
 		return Response(stats, status=status.HTTP_200_OK)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def get_player_statistics(player_id):
-	tournaments = bc_get_player_tournaments(player_id)
+def get_player_statistics(request, player_id):
+	tournaments = bc_get_player_tournaments(request, player_id)
 	tournament_ids = [t['tournament_id'] for t in tournaments['tournaments']]
 
 	matches = []
 	for tournament_id in tournament_ids:
-		tournament_matches = bc_get_tournament(tournament_id)
+		print("123123")
+		tournament_matches = bc_get_tournament(request, tournament_id)
 		for match in tournament_matches['matches']:
 			if match['player_1_id'] == player_id or match['player_2_id'] == player_id:
 				matches.append(match)

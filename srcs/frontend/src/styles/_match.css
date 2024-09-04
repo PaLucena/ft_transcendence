@@ -1,4 +1,129 @@
 .root-match {
 	height: 90vh;
-	flex-direction: row;
+	width: 100%;
+}
+
+@media only screen and (max-width: 799px) {
+	.root-match {
+		flex-direction: column;
+	}
+
+	.match-left {
+		justify-content: center;
+		width: 100%;
+		height: 45%;
+	}
+
+	.match-left .player-container {
+		margin-right: 0;
+	}
+
+	.match-right {
+		justify-content: center;
+		width: 100%;
+		height: 45%;
+		margin-bottom: 6%;
+	}
+
+	.match-right .player-container {
+		margin-left: 0;
+	}
+
+	.match-avatar {
+		width: 22vh;
+		height: 22vh;
+		border: 2px solid black;
+	}
+
+	.vs-match {
+		font-size: 300%;
+		width: 100%;
+		height: 10%;
+	}
+}
+
+@media only screen and (min-width: 800px) and (max-width: 1199px) {
+	.root-match {
+		flex-direction: row;
+	}
+
+	.match-left {
+		justify-content: end;
+		width: 45%;
+	}
+
+	.match-left .player-container {
+		margin-right: 20%;
+	}
+
+	.match-right {
+		justify-content: start;
+		width: 45%;
+	}
+
+	.match-right .player-container {
+		margin-left: 20%;
+	}
+
+	.match-avatar {
+		width: 30vh;
+		height: 30vh;
+		border: 2px solid black;
+	}
+
+	.vs-match {
+		font-size: 600%;
+		width: 10%;
+	}
+}
+
+@media only screen and (min-width: 1200px) {
+	.root-match {
+		flex-direction: row;
+	}
+	
+	.match-left {
+		justify-content: end;
+		width: 45%;
+	}
+	
+	.match-left .player-container {
+		margin-right: 20%;
+	}
+	
+	.match-right {
+		justify-content: start;
+		width: 45%;
+	}
+	
+	.match-right .player-container {
+		margin-left: 20%;
+	}
+	
+	.match-avatar {
+		width: 40vh;
+		height: 40vh;
+		border: 2px solid black;
+	}
+	
+	.vs-match {
+		font-size: 600%;
+		width: 10%;
+	}
+}
+
+.match-nickname {
+	border: 2px solid black;
+}
+
+.accept-match-btn {
+	position: absolute;
+	bottom: 10vh;
+	margin-bottom: 4vh;
+	height: 10%;
+}
+
+.accept-btn {
+	width: 20%;
+	font-size: 200%;
 }

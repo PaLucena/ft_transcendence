@@ -84,13 +84,13 @@ export class Profile extends Component {
 					throw new Error(errData.error || `Response status: ${response.status}`);
 				});
 			}
-			return response.json();5
+			return response.json();
 		})
 		.then(data => {
 			console.log("Stats:", data);
 		})
 		.catch(error => {
-			console.log("Error(displayUserStats):", error.message);
+			console.log("Error(displayUserStats):", error);
 		})
 	}
 

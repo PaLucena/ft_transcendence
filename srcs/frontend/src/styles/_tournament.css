@@ -7,10 +7,6 @@
 	margin-top: 2vh;
 }
 
-.root-tournament .close-btn, .root-tournament .exit-btn {
-	display: none;
-}
-
 .match-container {
 	max-width: 100%;
 	flex-wrap: wrap;
@@ -41,20 +37,12 @@
 		width: 12vh;
 		height: 12vh;
 	}
-
-	.vs-tournament {
-		font-size: 150%;
-	}
 }
 
 @media only screen and (min-width: 1000px) {
 	.player-container .avatar {
 		width: 15vh;
 		height: 15vh;
-	}
-	
-	.vs-tournament {
-		font-size: 230%;
 	}
 
 	.root-tournament .top-half {
