@@ -1,10 +1,14 @@
 import { eventEmitter } from './EventEmitter.js';
 import { updateOnlineStatus } from './rtchatUtils.js'
-import customAlert from './customAlert.js'; 
+import customAlert from './customAlert.js';
+
 class OnlineWebsocket {
     constructor() {
         this.onlineSocket = null;
         this.onlineUsersUpdatedListener = null;
+        this.reconnectDelay = 5000;
+        this.maxReconnectAttempts = 10;
+        this.reconnectAttempts = 0;
     }
 
     initWebSocket() {
@@ -30,30 +34,13 @@ class OnlineWebsocket {
         eventEmitter.on('onlineUsersUpdated', this.onlineUsersUpdatedListener);
     }
 
-	sendMessage(message, to_user) {
+    sendMessage(message, to_user) {
         if (this.onlineSocket && this.onlineSocket.readyState === WebSocket.OPEN) {
             try {
                 const data = {
-					'to_user': to_user,
-					'message': message
-				}
-                this.onlineSocket.send(JSON.stringify(data));
-                console.log("Message sent:", data);
-            } catch (error) {
-                this.handleError(null, 'Failed to send message', false);
-            }
-        } else {
-            console.error("WebSocket is not open. Cannot send message.");
-        }
-    }
-
-	sendMessage(message, to_user) {
-        if (this.onlineSocket && this.onlineSocket.readyState === WebSocket.OPEN) {
-            try {
-                const data = {
-					'to_user': to_user,
-					'message': message
-				}
+                    'to_user': to_user,
+                    'message': message
+                };
                 this.onlineSocket.send(JSON.stringify(data));
                 console.log("Message sent:", data);
             } catch (error) {
@@ -67,7 +54,7 @@ class OnlineWebsocket {
     handleMessage(event) {
         try {
             const data = JSON.parse(event.data);
-		//https://localhost:8080/profile	console.log("data: ", data)
+
             if (data.error) {
                 this.handleError(data.errorCode, data.errorMessage);
                 return;
@@ -76,9 +63,8 @@ class OnlineWebsocket {
             if (data.online_users) {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
             } else if (data.message) {
-				customAlert('info', data.message, 3000);
-			}
-			else {
+                customAlert('info', data.message, 3000);
+            } else {
                 this.handleError(null, 'Invalid data format received.', false);
             }
         } catch (error) {
@@ -89,6 +75,19 @@ class OnlineWebsocket {
     handleClose(event) {
         if (!event.wasClean) {
             console.error('Online socket closed unexpectedly:', event.reason || 'Unknown reason');
+
+            if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                this.reconnectAttempts++;
+                console.log(`Reconnecting in ${this.reconnectDelay / 1000} seconds... (Attempt ${this.reconnectAttempts})`);
+
+                setTimeout(() => {
+                    this.initWebSocket();
+                }, this.reconnectDelay);
+            } else {
+                console.error('Maximum reconnect attempts reached. Connection closed.');
+            }
+        } else {
+            console.log('WebSocket connection closed cleanly.');
         }
 
         this.removeOnlineUpdateListeners();
@@ -96,8 +95,9 @@ class OnlineWebsocket {
 
     handleError(errorCode, errorMessage, close) {
         console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
-        if (close == true)
-			this.closeWebSocket();
+        if (close === true) {
+            this.closeWebSocket();
+        }
     }
 
     closeWebSocket() {
