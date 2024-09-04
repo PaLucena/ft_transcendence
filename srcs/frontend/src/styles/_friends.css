@@ -7,10 +7,13 @@
     border-radius: 50%;
 }
 
-.friends-elemets-container {
+.friends-elements-container {
 	margin: 0;
 }
-
+.search-friends-container {
+	overflow-y: auto;
+	overflow-x: hidden;
+}
 .search-friends-container .container {
 	padding: 0;
 }
@@ -46,7 +49,7 @@
 }
 
 @media (max-width: 720px) {
-	.friends-elemets-container {
+	.friends-elements-container {
 		margin: 0 auto;
 	}
 }
@@ -63,8 +66,6 @@
 	}
 
 	.search-friends-container {
-		overflow-y: auto;
-		overflow-x: hidden;
 		padding-left: 10px;
 		padding-right: 10px;
 	}
