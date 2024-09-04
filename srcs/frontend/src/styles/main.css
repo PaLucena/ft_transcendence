@@ -41,3 +41,16 @@ nav {
 	padding: 0;
 	font-family: monospace;
 }
+
+
+
+/* for cutom scroll bar
+::-webkit-scrollbar {
+    background: #e6ecf8;
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #61b2ff, #ff50ef);
+}
+*/

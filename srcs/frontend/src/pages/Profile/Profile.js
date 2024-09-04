@@ -149,7 +149,7 @@ export class Profile extends Component {
 	logout() {
 		let	logoutBtn = document.getElementById("logoutBtn");
 
-		this.addEventListener(logoutBtn, "click", (event) => {
+		this.addEventListener(logoutBtn, "click", () => {
 			fetch("/api/logout/", {
 				method: "GET",
 				credentials: 'include'
