@@ -242,7 +242,7 @@ def update_user_info(request):
             user.save()
         print(" 1  Session data after update:", user)
 
-        AppUser.objects.filter(pk=user.pk).update(username=new_username)
+        #AppUser.objects.filter(pk=user.pk).update(username=new_username)
         #update_last_login(None, user)
         user.save()
         user.refresh_from_db()

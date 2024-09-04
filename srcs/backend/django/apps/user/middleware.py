@@ -37,7 +37,7 @@ class JWTAuthMiddleware:
 						User = get_user_model()
 						try:
 							user = await sync_to_async(User.objects.get, thread_sensitive=True)(id=user_id)
-							#user.arefresh_from_db()
+							user.arefresh_from_db()
 							#await sync_to_async(user.refresh_from_db, thread_sensitive=True)()
 							print(f"User loaded from session: {user}")
 							scope['user'] = user
