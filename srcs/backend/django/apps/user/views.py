@@ -27,10 +27,8 @@ from .decorators import default_authentication_required
 from django.http import JsonResponse
 from twofactor.views import Has2faEnabled
 from .consumers import OnlineStatusConsumer as OSocketConsumers
-from django.db import transaction
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.sessions.backends.db import SessionStore
-from django.core.cache import cache
+
 
 @api_view(["GET"])
 @default_authentication_required
@@ -123,7 +121,7 @@ def login(request):
         user.save()
         if Has2faEnabled(user):
             return Response({"has_2fa": True}, status=status.HTTP_200_OK)
-        auth_login(request, user)
+        auth_login(request, authenticated_user)
         refresh = RefreshToken.for_user(user)
         access = refresh.access_token
         response = Response(
@@ -177,7 +175,8 @@ def logout(request):
     response.delete_cookie("refresh_token")
     return response
 
-
+from django.db import connection, reset_queries
+from django.db import connections
 @api_view(["POST"])
 @default_authentication_required
 def update_user_info(request):
@@ -232,17 +231,18 @@ def update_user_info(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             user.password = make_password(new_password)
+            update_session_auth_hash(request, user)
+            user.save()
+        print(" 1  Session data after update:", user)
 
         user.save()
-
         #user.refresh_from_db()
-
-        #update_session_auth_hash(request, user)
-        auth_logout(request)
+        #auth_logout(request)
         # authenticated_user: AbstractUser | None = authenticate(
-        # username=new_username, password=new_password
+        #     username=new_username, password=new_password
         # )
-        auth_login(request, user)
+        #auth_login(request, user)
+        print(" 2  Session data after update:", user)
 
 
         response = Response(
