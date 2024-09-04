@@ -54,3 +54,7 @@
 .btn-light, .bg-light {
 	background-color: #edeef0;
 }
+
+.btn-white, .bg-white {
+	background-color: white;
+}

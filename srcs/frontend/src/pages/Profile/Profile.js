@@ -88,6 +88,13 @@ export class Profile extends Component {
 		})
 		.then(data => {
 			console.log("Stats:", data);
+
+			let winRate = (data['wins'] * 100 / data['total_matches']) || 0;
+			winRate = winRate < 6 ? Math.round(winRate) : Math.round(winRate * 10) / 10;
+
+			const winRateBar = document.getElementById('winRateBar');
+			winRateBar.innerHTML = `${winRate}%`;
+			winRateBar.style.width = `${winRate}%`;
 		})
 		.catch(error => {
 			console.log("Error(displayUserStats):", error);

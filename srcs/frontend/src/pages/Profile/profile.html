@@ -1,6 +1,6 @@
 <div id="rootProfile" class="root-profile d-flex">
 	<div class="container-user">
-		<div id="userInfo" class="user-info bg-light rounded-5 shadow">
+		<div id="userInfo" class="user-info rounded-5 bg-white shadow">
 			<div class="photo row col-10 mx-auto">
 				<div class="profile-photo-container col-4 m-0 d-flex justify-content-center">
 					<img id="photoContainer" class="profile-photo rounded-circle h-100 square shadow"/>
@@ -55,10 +55,31 @@
 		</div>
 	</div>
 	<div class="container-stats">
-		<div class="stats row align-items-center justify-content-center bg-light rounded-5 shadow">
-			<div class="text-center">
-				<p class="display-1">Stats go here</p>
+		<div class="stats row d-flex align-items-center justify-content-center rounded-5 bg-white shadow">
+			<div class="col-10">
+				Win Rate
+				<div class="progress" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
+					<div id="winRateBar" class="progress-bar" style="width: 25%">25%</div>
+				  </div>
 			</div>
+			<ul class="stats-list list-group col-8 h-60">
+				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+					<div class="col-6 d-flex justify-content-start">Total matches</div>
+					<div class="col-6 d-flex justify-content-end" id="total_matches">2</div>
+				</li>
+				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+					<div class="col-6 d-flex justify-content-start">Total points</div>
+					<div class="col-6 d-flex justify-content-end" id="total_goals">2</div>
+				</li>
+				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+					<div class="col-6 d-flex justify-content-start">Average score</div>
+					<div class="col-6 d-flex justify-content-end" id="average_score">2</div>
+				</li>
+				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+					<div class="col-6 d-flex justify-content-start">Highest score</div>
+					<div class="col-6 d-flex justify-content-end" id="highest_score">2</div>
+				</li>
+			</ul>
 		</div>
 	</div>
 </div>

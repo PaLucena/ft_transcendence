@@ -99,6 +99,10 @@
 	width: 90%;
 }
 
+.container-stats .stats .stats-list {
+	margin-bottom: 5%;
+}
+
 .container-user .user-edit {
 	display: none;
 	margin: 0 auto;
