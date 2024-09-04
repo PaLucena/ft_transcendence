@@ -23,7 +23,8 @@ class JWTAuthMiddleware:
 			print(f"Session ID: {session_id}")
 			if session_id:
 				try:
-					await sync_to_async(connection.close, thread_sensitive=True)()
+					print("HERE")
+					#await sync_to_async(connection.close, thread_sensitive=True)()
 					session = await sync_to_async(Session.objects.get, thread_sensitive=True)(session_key=session_id)
 					
 					session_expiry_date = session.expire_date
@@ -32,15 +33,14 @@ class JWTAuthMiddleware:
 					else:
 						session_data = session.get_decoded()
 						user_id = session_data.get('_auth_user_id', None)
-						username = session_data.get('username', None)
 					if user_id:
-						await sync_to_async(connection.close, thread_sensitive=True)()
+						#await sync_to_async(connection.close, thread_sensitive=True)()
 						User = get_user_model()
 						try:
 							user = await sync_to_async(User.objects.get, thread_sensitive=True)(id=user_id)
-							print(f"User loaded from session: {user.username}")
+							print(f"User loaded from session: {user}")
 							await database_sync_to_async(user.refresh_from_db)()
-							print(f"User loaded from session (refreshed): {user.username}")
+							print(f"User loaded from session (refreshed): {user}")
 							scope['user'] = user
 						except User.DoesNotExist:
 							scope['user'] = None

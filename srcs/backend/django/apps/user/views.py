@@ -177,6 +177,11 @@ def logout(request):
 
 from django.db import connection, reset_queries
 from django.db import connections
+
+from django.contrib.auth.models import update_last_login
+from django.contrib.auth.signals import user_logged_in
+
+
 @api_view(["POST"])
 @default_authentication_required
 def update_user_info(request):
@@ -231,17 +236,25 @@ def update_user_info(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             user.password = make_password(new_password)
-            update_session_auth_hash(request, user)
             user.save()
         print(" 1  Session data after update:", user)
 
+        AppUser.objects.filter(pk=user.pk).update(username=new_username)
+        update_last_login(None, user)
         user.save()
-        #user.refresh_from_db()
-        #auth_logout(request)
-        # authenticated_user: AbstractUser | None = authenticate(
+        request.session.flush()
+        user.refresh_from_db()
+        auth_logout(request)
+        # authenticated_user = authenticate(
         #     username=new_username, password=new_password
         # )
-        #auth_login(request, user)
+        # if authenticated_user is not None:
+        #     user = AppUser.objects.get(username=new_username)
+        #     user.save()
+
+        auth_login(request, user)
+        update_session_auth_hash(request, user)
+        #user_logged_in.send(sender=user.__class__, request=request, user=user)
         print(" 2  Session data after update:", user)
 
 
