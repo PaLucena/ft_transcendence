@@ -67,7 +67,7 @@ class OnlineWebsocket {
     handleMessage(event) {
         try {
             const data = JSON.parse(event.data);
-			console.log("data: ", data)
+		//https://localhost:8080/profile	console.log("data: ", data)
             if (data.error) {
                 this.handleError(data.errorCode, data.errorMessage);
                 return;

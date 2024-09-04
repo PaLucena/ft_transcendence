@@ -20,6 +20,15 @@
 	position: relative;
 }
 
+.root-tournament .top-half, .root-tournament .bottom-half {
+	height: 45%;
+	flex-direction: column;
+}
+
+.root-tournament .bottom-half .mc-4 {
+	margin-bottom: 3%;;
+}
+
 @media only screen and (max-width: 699px) {
 	.player-container .avatar {
 		width: 9vh;
@@ -47,6 +56,20 @@
 	.vs-tournament {
 		font-size: 230%;
 	}
+
+	.root-tournament .top-half {
+		height: 40%;
+		flex-direction: row;
+	}
+	
+	.root-tournament .bottom-half {
+		height: 60%;
+		flex-direction: row;
+	}
+
+	.root-tournament .bottom-half .mc-4 {
+		margin-bottom: 0;
+	}
 }
 
 .player-container .avatar {
@@ -59,7 +82,6 @@
 
 .player-container .nickname-placeholder .nickname {
 	border: 2px solid black;
-	position: absolute;
 }
 
 .close-exit-btn {

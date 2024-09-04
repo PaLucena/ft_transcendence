@@ -14,7 +14,6 @@ document.addEventListener("click", (event) => {
 
 	if (clickableElement && clickableElement.hasAttribute("href")) {
 		event.preventDefault();
-		//console.log("Navigating to:", clickableElement.getAttribute("href"));
 		navigateTo(clickableElement.getAttribute("href"));
 	}
 });

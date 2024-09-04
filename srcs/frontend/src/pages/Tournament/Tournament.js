@@ -139,6 +139,9 @@ export class Tournament extends Component {
 	}
 
 	displayInfo(tournamentId) {
+		
+		// cuando haya datos nuevos:
+
 		fetch("/api/display_tournaments/", {
 			method: "GET",
 			headers: {
@@ -171,7 +174,7 @@ export class Tournament extends Component {
 				userStatus = tournamentInfo.players[player.id.substring(6, 7) - 1];
 
 				player.querySelector('[id^="nickname-"]').innerHTML =  userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].nickname : "AI";
-				player.querySelector('[id^="avatar-"]').src = userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].avatar : 'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg';
+				player.querySelector('[id^="avatar-"]').src = userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].avatar : '../../assets/images/default_avatar.jpg';
 			});
 		})
 		.catch((error) => {

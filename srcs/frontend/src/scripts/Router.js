@@ -8,6 +8,7 @@ import { Profile } from '../pages/Profile/Profile.js';
 import { Auth } from '../pages/Auth/Auth.js';
 import { Pong } from '../pages/Pong/Pong.js';
 import { Tournament } from '../pages/Tournament/Tournament.js';
+import { Match } from '../pages/Match/Match.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
 import { onlineSocket } from './utils/OnlineWebsocket.js';
 import { handleResponse } from './utils/rtchatUtils.js';
@@ -29,6 +30,7 @@ class Router {
 			'/pong': () => new Pong(),
 			'/tournament': () => new Tournament(),
 			'/tournament/:tournamentId': params => new Tournament(params),
+			'/match': () => new Match(),
 		};
 		this.currentComponent = null;
 		this.previousPath = null;
@@ -42,8 +44,11 @@ class Router {
 	}
 
 	async navigateToOnBootup() {
-		if (window.location.pathname === "/") {
-			navigateTo(this.checkAuthentication() ? '/play' : '/Login');
+		if (window.location.pathname === "/" || window.location.pathname === "/login") {
+			navigateTo(this.checkAuthentication() ? '/play' : '/login');
+		}
+		else if (window.location.pathname === "/register") {
+			navigateTo(this.checkAuthentication() ? '/play' : '/signup')
 		}
 		else {
 			this.router();

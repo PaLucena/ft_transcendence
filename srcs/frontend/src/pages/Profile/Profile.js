@@ -48,6 +48,8 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
+			this.displayUserStats(data["username"]);
+
 			if (myUsername === data["username"]) {
 				document.getElementById("editBtn").style.display = "block";
 				document.getElementById("logoutBtn").style.display = "block";
@@ -61,8 +63,34 @@ export class Profile extends Component {
 			
 			this.editUserBtn(data);
 		})
-		.catch((error) => {
+		.catch(error => {
 			customAlert('danger', `Error: ` + error.message, '');
+			if (error.message === "AppUser matching query does not exist.")
+			document.getElementById("rootProfile").style.justifyContent = 'center';
+			document.getElementById("rootProfile").style.alignItems = 'center';
+			document.getElementById("rootProfile").innerHTML = '<p class="display-1">User not found<p>';
+		})
+	}
+
+	displayUserStats(username) {
+		fetch(`/api/player_statistics/${username}/`, {
+			method: "POST",
+			headers: {'Content-Type': 'application/json'},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();5
+		})
+		.then(data => {
+			console.log("Stats:", data);
+		})
+		.catch(error => {
+			console.log("Error(displayUserStats):", error.message);
 		})
 	}
 
