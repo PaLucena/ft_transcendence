@@ -32,6 +32,7 @@ contract PongTournament {
 
     constructor() payable {
         owner_ = msg.sender;
+        tournamentsIds.push(0);
     }
 
     modifier OnlyOwner(address _dir) {
@@ -55,18 +56,19 @@ contract PongTournament {
 
     function recordMatch(uint256 tournId, uint256 matchId, uint256 p1Id, uint256 p2Id, uint256 p1Sc, uint256 p2Sc, uint256 winId) public OnlyOwner(msg.sender) {
         require(matches_[matchId].matchId_ == 0, "Match already exists");
-        if (tournId != 0) {
-            Tournament storage tournament = tournaments_[tournId];
-            require(tournament.tournamentId_ == tournId, "Incorrect tournament");
-            require(tournament.playerExists_[p1Id], "P1 not in tournament");
-            require(tournament.playerExists_[p2Id], "P2 not in tournament");
+        Tournament storage tournament = tournaments_[tournId];
+        require(tournament.tournamentId_ == tournId, "Incorrect tournament");
+        if (tournId == 0) {
+            tournament.playerExists_[p1Id] = true;
+            tournament.playerExists_[p2Id] = true;
         }
+        require(tournament.playerExists_[p1Id], "P1 not in tournament");
+        require(tournament.playerExists_[p2Id], "P2 not in tournament");
+
         require(p1Id != p2Id, "Players error");
 
         matches_[matchId] = Match(tournId, matchId, p1Id, p2Id, p1Sc, p2Sc, winId);
-        if (tournId != 0) {
-            tournaments_[tournId].matchIds_.push(matchId);
-        }
+        tournaments_[tournId].matchIds_.push(matchId);
         player_Matches_[p1Id].push(matchId);
         player_Matches_[p2Id].push(matchId);
 

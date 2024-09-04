@@ -28,6 +28,7 @@ from django.http import JsonResponse
 from twofactor.views import Has2faEnabled
 from .consumers import OnlineStatusConsumer as OSocketConsumers
 from django.contrib.auth import update_session_auth_hash
+from blockchain.views import load_test_data
 
 
 @api_view(["GET"])
@@ -132,6 +133,8 @@ def login(request):
 
         print("Access Token Expiry:", access["exp"])
         print("Refresh Token Expiry:", refresh["exp"])
+        load_test_data(request)
+
         return response
     else:
         return Response({"error": "Incorrect password"}, status=status.HTTP_404_NOT_FOUND)
@@ -240,11 +243,11 @@ def update_user_info(request):
         print(" 1  Session data after update:", user)
 
         AppUser.objects.filter(pk=user.pk).update(username=new_username)
-        update_last_login(None, user)
+        #update_last_login(None, user)
         user.save()
-        request.session.flush()
         user.refresh_from_db()
-        auth_logout(request)
+        #request.session.flush()
+        #auth_logout(request)
         # authenticated_user = authenticate(
         #     username=new_username, password=new_password
         # )
@@ -252,8 +255,8 @@ def update_user_info(request):
         #     user = AppUser.objects.get(username=new_username)
         #     user.save()
 
-        auth_login(request, user)
-        update_session_auth_hash(request, user)
+        #auth_login(request, user)
+        #update_session_auth_hash(request, user)
         #user_logged_in.send(sender=user.__class__, request=request, user=user)
         print(" 2  Session data after update:", user)
 
