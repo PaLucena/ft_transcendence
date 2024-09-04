@@ -4,6 +4,8 @@ import { Navbar } from '../../components/Navbar/Navbar.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
+import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
+import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
 
 // import { showQRmodal } from '../../components/Show2faQRModal'
 
@@ -52,18 +54,65 @@ export class Profile extends Component {
 				document.getElementById("editBtn").style.display = "block";
 				document.getElementById("logoutBtn").style.display = "block";
 			}
-			else
+			else {
 				document.getElementById("blockBtn").style.display = "block";
+				this.renderChatBtn(data["username"]);
+			}
 
 			document.getElementById("photoContainer").src = `${data["avatar"]}`;
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
 			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
-			
+
 			this.editUserBtn(data);
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
 		})
+	}
+
+	renderChatBtn(username) {
+		const chatBtn = document.createElement("button");
+		chatBtn.innerHTML = `Chat with ${username}`;
+		chatBtn.classList.add("btn", "btn-primary");
+		chatBtn.id = "chatBtn";
+
+		const profileBottomBtns = document.getElementById("profile_bottom_btns");
+
+		profileBottomBtns.insertBefore(chatBtn, profileBottomBtns.firstChild);
+
+		this.addEventListener(chatBtn, "click", async () => {
+			try {
+				const response = await fetch(`/api/chat/user/${username}/`, {
+					method: 'GET',
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: 'include',
+				});
+
+				await handleResponse(response, data => {
+					const chatModalInstance = staticComponentsRenderer.getComponentInstance('ChatModal');
+					if (chatModalInstance) {
+						const messagesModal = document.getElementById('messages_modal');
+
+						if (messagesModal) {
+							const bootstrapModal = new bootstrap.Modal(messagesModal);
+							bootstrapModal.show();
+							chatModalInstance.chatLoader.initChatroom(data.chatroom_name);
+						} else {
+							console.error("messages_modal not found.");
+						}
+
+					} else {
+						console.error("ChatModal instance is not initialized");
+					}
+
+				});
+
+			} catch (error) {
+				console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+			}
+		});
 	}
 
 	async getOwnName() {
@@ -78,11 +127,11 @@ export class Profile extends Component {
 		const data = await response.json();
 		return data["username"];
 	}
-	
+
 
 	editUserBtn() {
 		const editBtn = document.getElementById("editBtn");
-		
+
 		this.addEventListener(editBtn, "click", () => {
 			document.getElementById("userInfo").style.display = "none";
 			document.getElementById("userEdit").style.display = "block";
@@ -218,7 +267,7 @@ export class Profile extends Component {
 
 	enable2fa() {
 		let twofaBtn = document.getElementById("Enable2faBtn");
-		
+
 		this.addEventListener(twofaBtn, "click", (event) => {
 			const response = fetch("/api/2fa/enable2fa/", {
 				method: 'POST',
@@ -242,7 +291,7 @@ export class Profile extends Component {
 		})
 	}
 
-	
+
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
 		TwofaBtn.addEventListener("click", (event) => {
