@@ -6,30 +6,28 @@ from user.decorators import default_authentication_required
 from blockchain.views import get_player_tournaments as bc_get_player_tournaments
 from blockchain.views import get_tournament as bc_get_tournament
 from blockchain.views import get_player_matches as bc_get_player_matches
+from blockchain.views import load_test_data
+
 
 @api_view(["POST"])
 @default_authentication_required
 def player_statistics(request, username):
 	try:
 		user = AppUser.objects.get(username=username)
-		player_id = user.id
-		stats = get_player_statistics(request, player_id)
+		player_id = user.pk
+
+		matches_response = bc_get_player_matches(request, player_id)
+
+		if matches_response == "error":
+			return Response({'error': 'Could not retrieve player matches'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+		stats = calculate_player_statistics(matches_response, player_id)
+
 		return Response(stats, status=status.HTTP_200_OK)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-def get_player_statistics(request, player_id):
-	tournaments = bc_get_player_tournaments(request, player_id)
-	tournament_ids = [t['tournament_id'] for t in tournaments['tournaments']]
-
-	matches = []
-	for tournament_id in tournament_ids:
-		print("123123")
-		tournament_matches = bc_get_tournament(request, tournament_id)
-		for match in tournament_matches['matches']:
-			if match['player_1_id'] == player_id or match['player_2_id'] == player_id:
-				matches.append(match)
+def calculate_player_statistics(matches, player_id):
 
 	stats = {
 		'total_matches': len(matches),
@@ -41,13 +39,29 @@ def get_player_statistics(request, player_id):
 	}
 
 	total_goals = 0
+
 	for match in matches:
-		player_goals = match['player_1_goals'] if match['player_1_id'] == player_id else match['player_2_goals']
-		opponent_goals = match['player_2_goals'] if match['player_1_id'] == player_id else match['player_1_goals']
+		tournament_id = match[0]
+		match_id = match[1]
+		player_1_id = match[2]
+		player_2_id = match[3]
+		player_1_goals = match[4]
+		player_2_goals = match[5]
+		winner_id = match[6]
+
+		# Determine if the player is Player 1 or Player 2
+		if player_1_id == player_id:
+			player_goals = player_1_goals
+			opponent_goals = player_2_goals
+		elif player_2_id == player_id:
+			player_goals = player_2_goals
+			opponent_goals = player_1_goals
+		else:
+			continue  # If the player is not in the match, skip this match (optional safety check)
 
 		total_goals += player_goals
 
-		if player_goals > opponent_goals:
+		if winner_id == player_id:
 			stats['wins'] += 1
 		else:
 			stats['losses'] += 1
@@ -55,11 +69,12 @@ def get_player_statistics(request, player_id):
 		if player_goals > stats['highest_score']:
 			stats['highest_score'] = player_goals
 
-	stats['average_score'] = total_goals / len(matches) if matches else 0
+	if stats['total_matches'] > 0:
+		stats['average_score'] = total_goals / stats['total_matches']
+
 	stats['total_goals'] = total_goals
 
 	return stats
-
 
 #will be called after every match to update user data
 # @login_required

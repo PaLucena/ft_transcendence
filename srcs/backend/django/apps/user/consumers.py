@@ -5,7 +5,7 @@ from user.models import AppUser
 class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.user = self.scope.get("user")
-        print('user::::::', self.user)
+        #print('user: ', self.scope)
         self.group_name = "online-status"
         if "channels_store" not in self.scope:
             self.scope["channels_store"] = {}

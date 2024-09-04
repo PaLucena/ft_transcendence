@@ -156,6 +156,10 @@ def block_or_unblock_user_view(request):
         blocked_username = request.data.get("blocked_username")
         action = request.data.get("action")
 
+        print(
+            f"blocker: {blocker}, blocked_username: {blocked_username}, action: {action}"
+        )
+
         if not blocked_username:
             return Response(
                 {"detail": "No username provided"},
