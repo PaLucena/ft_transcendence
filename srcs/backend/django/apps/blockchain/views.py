@@ -86,9 +86,9 @@ def get_player_matches(request, player_id):
 def get_face2face(request, player1_id, player2_id):
     try:
         matches = bc_get_face2face(player1_id, player2_id)
-        return JsonResponse({'matches': matches})
+        return (matches)
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        return ("error")
 
 
 def load_test_data(request):

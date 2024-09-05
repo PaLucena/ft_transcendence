@@ -6,7 +6,7 @@ from user.decorators import default_authentication_required
 from blockchain.views import get_player_tournaments as bc_get_player_tournaments
 from blockchain.views import get_tournament as bc_get_tournament
 from blockchain.views import get_player_matches as bc_get_player_matches
-from blockchain.views import load_test_data
+from blockchain.views import get_face2face as bc_get_face2face
 
 
 @api_view(["POST"])
@@ -15,7 +15,6 @@ def player_statistics(request, username):
 	try:
 		user = AppUser.objects.get(username=username)
 		player_id = user.pk
-
 		matches_response = bc_get_player_matches(request, player_id)
 
 		if matches_response == "error":
@@ -26,6 +25,7 @@ def player_statistics(request, username):
 		return Response(stats, status=status.HTTP_200_OK)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 def calculate_player_statistics(matches, player_id):
 
@@ -49,7 +49,6 @@ def calculate_player_statistics(matches, player_id):
 		player_2_goals = match[5]
 		winner_id = match[6]
 
-		# Determine if the player is Player 1 or Player 2
 		if player_1_id == player_id:
 			player_goals = player_1_goals
 			opponent_goals = player_2_goals
@@ -57,7 +56,7 @@ def calculate_player_statistics(matches, player_id):
 			player_goals = player_2_goals
 			opponent_goals = player_1_goals
 		else:
-			continue  # If the player is not in the match, skip this match (optional safety check)
+			continue
 
 		total_goals += player_goals
 
