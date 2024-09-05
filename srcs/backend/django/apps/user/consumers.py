@@ -1,11 +1,12 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from user.models import AppUser
+from asgiref.sync import sync_to_async
 
 class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
-        self.user = self.scope.get("user")
-        #print('user: ', self.scope)
+        self.user = self.scope["user"]
+        print('user: ', self.scope)
         self.group_name = "online-status"
         if "channels_store" not in self.scope:
             self.scope["channels_store"] = {}
@@ -102,12 +103,14 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def add_user_to_online_list(self, user):
         if user.is_authenticated:
+            user.refresh_from_db()
             user.is_online = True
             user.save()
 
     @database_sync_to_async
     def remove_user_from_online_list(self, user):
         if user.is_authenticated:
+            user.refresh_from_db()
             user.is_online = False
             user.save()
 
