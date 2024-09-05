@@ -95,6 +95,13 @@ export class Profile extends Component {
 			const winRateBar = document.getElementById('winRateBar');
 			winRateBar.innerHTML = `${winRate}%`;
 			winRateBar.style.width = `${winRate}%`;
+
+			const liStats = document.querySelectorAll('#statsList li');
+
+			liStats.forEach(liStat => {
+				let currStat = liStat.querySelectorAll('div')[1];
+				currStat.innerHTML = data[currStat.id];
+			});
 		})
 		.catch(error => {
 			console.log("Error(displayUserStats):", error);
