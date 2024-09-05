@@ -25,7 +25,6 @@ export class Component {
 	async fetchHtmlFromFile(route) {
 		if (route) {
 			try {
-				console.log("ROUTE: ", route)
                 const response = await fetch(route);
 				if (response.ok) return await response.text();
 				else {

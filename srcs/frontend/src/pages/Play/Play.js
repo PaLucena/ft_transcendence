@@ -67,7 +67,7 @@ export class Play extends Component {
 			this.playAi();
 		});
 
-		// remote
+		// online
 		// const	remoteBtn = document.getElementById("remoteBtn");
 		// remoteBtn.addEventListener("click", () => {
 		// 	this.playRemote();

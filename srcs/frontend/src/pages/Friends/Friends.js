@@ -17,15 +17,15 @@ export class Friends extends Component {
         this.uiSetup = new UISetup(this);
 		//Navbar.focus();
 	}
-	
+
 	destroy() {
 		console.log('Friends Custom destroy');
-		
+
 		this.removeAllEventListeners();
 		this.uiSetup.removeOnlineUpdateListeners();
 		this.uiSetup.removeSearchFormEvents();
 	}
-	
+
 	async init() {
 		await Navbar.focus();
 		await this.friendsLoader.loadFriendsData();

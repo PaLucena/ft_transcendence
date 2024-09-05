@@ -1,4 +1,5 @@
 import customAlert from "../../scripts/utils/customAlert.js";
+import { handleBlockUnblock } from "../../scripts/utils/rtchatUtils.js";
 
 export class UISetup {
     constructor(chatModal) {
@@ -47,8 +48,51 @@ export class UISetup {
                     console.warn("chat_message_input not found.");
                 }
             });
+
+            this.chatModal.addEventListener(messagesModalElement, 'click', (event) => {
+                const blockButton = event.target.closest('[data-block-action]');
+                const profileLink = event.target.closest('a[href^="/profile/"]');
+
+                if (profileLink) {
+                    const modalInstance = bootstrap.Modal.getInstance(messagesModalElement);
+                    modalInstance.hide();
+                }
+
+                if (blockButton) {
+                    const action = blockButton.getAttribute('data-block-action');
+                    const username = blockButton.getAttribute('data-block-username');
+
+                    if (action && username) {
+                        handleBlockUnblock(action, username, () => {
+                            const blockButtons = messagesModalElement.querySelectorAll('[data-block-action]');
+
+                            blockButtons.forEach(button => {
+                                this.updateBlockButton(button, action);
+                            });
+
+                            this.chatModal.chatRenderer.removeBlockStatusMessage();
+
+                            if (action === 'block') {
+                                this.chatModal.chatRenderer.renderMessageInputContainer('blocker', username);
+                            } else if (action === 'unblock') {
+                                this.chatModal.chatRenderer.toggleInputState(false);
+                            }
+                        });
+                    }
+                }
+            });
         } else {
             console.warn("messages_modal not found.");
+        }
+    }
+
+    updateBlockButton(button, action) {
+        if (action === 'block') {
+            button.setAttribute('data-block-action', 'unblock');
+            button.textContent = 'Unblock';
+        } else if (action === 'unblock') {
+            button.setAttribute('data-block-action', 'block');
+            button.textContent = 'Block';
         }
     }
 
@@ -94,7 +138,15 @@ export class UISetup {
                     console.warn("chat_header_content not found.");
                 }
 
-                this.removeMessageFormEvents();
+                const chatForm = document.getElementById('message_input_container');
+                if (chatForm) {
+                    this.chatModal.chatRenderer.removeBlockStatusMessage();
+                    this.chatModal.chatRenderer.toggleInputState(false);
+                    this.removeMessageFormEvents();
+                    this.cleanMessageTextInput();
+                } else {
+                    console.warn("message_input_container not found.");
+                }
             });
         } else {
             console.warn("messages_modal element not found.");
@@ -110,18 +162,12 @@ export class UISetup {
         }
     }
 
-    setupScrollEvent() {
-        const chatMessagesContainer = document.getElementById('chat_messages_container');
-
-        if (chatMessagesContainer) {
-            this.chatModal.addEventListener(chatMessagesContainer, 'scroll', () => {
-                const expandedButton = document.querySelector('button[aria-expanded="true"]');
-                if (expandedButton) {
-                    expandedButton.click();
-                }
-            });
+    cleanMessageTextInput() {
+        const messageInputDom = document.getElementById('chat_message_input');
+        if (messageInputDom) {
+            messageInputDom.value = '';
         } else {
-            console.warn("chat_messages_container not found.");
+            console.warn('chat_message_input not found.')
         }
     }
 
@@ -152,11 +198,11 @@ export class UISetup {
                         }
                     }
                 } else {
-                    console.warn("chat_message_input not found.");
+                    console.warn('chat_message_input not found.');
                 }
             };
         } else {
-            console.warn("chat_message_form not found.");
+            console.warn('chat_message_form not found.');
         }
     }
 }

@@ -4,7 +4,7 @@ export class FriendsRenderer {
     }
 
     renderUsersElements(users) {
-        const container = document.getElementById('friends_elemets_container');
+        const container = document.getElementById('friends_elements_container');
 
         if (container) {
             container.innerHTML = '';
@@ -17,7 +17,7 @@ export class FriendsRenderer {
                 }
             });
         } else {
-            console.warn("friends_elemets_container not found.");
+            console.warn("friends_elements_container not found.");
         }
     }
 
@@ -39,13 +39,13 @@ export class FriendsRenderer {
             const commonHtml = `
                 <div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
                     <div class="img-nick">
-                        <button class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative">
+                        <a class="btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative" href="/profile/${user.username}">
                             <img
                                 src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
                                 class="${borderClass} border border-2 rounded-circle" alt="Circle Image"
                             >
                             ${showStatusDot ? statusDotHtml : ''}
-                        </button>
+                        </a>
                         <p class="text-light mt-2 fw-bold">${user.username}</p>
                     </div>
                     ${this.getActionButtons(user, filterType)}

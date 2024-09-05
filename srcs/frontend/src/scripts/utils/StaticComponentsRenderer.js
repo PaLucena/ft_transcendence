@@ -55,6 +55,13 @@ class StaticComponentsRenderer {
             }
         }
     }
+
+    getComponentInstance(componentName) {
+        const component = this.componentsToRender.find(
+            component => component.instance && component.instance.constructor.name === componentName
+        );
+        return component ? component.instance : null;
+    }
 }
 
 export const staticComponentsRenderer = new StaticComponentsRenderer();

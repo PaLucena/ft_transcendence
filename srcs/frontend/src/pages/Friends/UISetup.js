@@ -122,12 +122,10 @@ export class UISetup {
     }
 
     setupFriendButtons() {
-        const container = document.getElementById('friends_elemets_container');
+        const container = document.getElementById('friends_elements_container');
 
         if (container) {
             this.friends.addEventListener(container, 'click', async (event) => {
-                console.log(event.target);
-
                 const targetButton = event.target.closest('button[data-action]');
 
                 if (targetButton) {
@@ -140,7 +138,7 @@ export class UISetup {
                 }
             });
         } else {
-            console.warn("friends_elemets_container not found");
+            console.warn("friends_elements_container not found");
         }
     }
 
@@ -200,8 +198,6 @@ export class UISetup {
 
     updateFilter(data) {
         this.friends.filter = data;
-        console.log(this.friends.filter);
-
     }
 
     removeOnlineUpdateListeners() {
