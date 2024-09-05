@@ -24,7 +24,7 @@ export class Profile extends Component {
 		this.displayUserInfo(this.params.username);
 		this.logout();
 		this.saveInfoBtn(this.params.username);
-		Navbar.focus()
+		///Navbar.focus()
 		this.enable2fa();
 		this.disable2fa();
 		// this.sendServerMessage();
@@ -91,10 +91,10 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
-			console.log("Stats:", data);
 
 			let winRate = (data['wins'] * 100 / data['total_matches']) || 0;
 			winRate = winRate < 6 ? Math.round(winRate) : Math.round(winRate * 10) / 10;
+			data['average_score'] = Math.round(data['average_score'] * 100) / 100;
 
 			const winRateBar = document.getElementById('winRateBar');
 			winRateBar.innerHTML = `${winRate}%`;

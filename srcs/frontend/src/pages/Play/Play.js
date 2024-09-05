@@ -16,7 +16,7 @@ export class Play extends Component {
 
 	init() {
 		this.setupEventListeners();
-		Navbar.focus();
+		//Navbar.focus();
 	}
 
 	setupEventListeners() {
