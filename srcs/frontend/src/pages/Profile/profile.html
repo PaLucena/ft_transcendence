@@ -6,19 +6,15 @@
 					<img id="photoContainer" class="profile-photo rounded-circle h-100 square shadow"/>
 				</div>
 			</div>
-			<div class="d-flex col-8 mt-4 mx-auto align-items-center justify-content-center">
-				<p id="usernamePlaceholder" class="display-6 fw-bold">‎</p>
+			<div id="userTopContainer" class="d-flex col-8 mt-4 mx-auto align-items-center justify-content-center">
+				<span id="usernamePlaceholder" class="display-6 fw-bold">‎</span>
+				<button id="chatBtn" class="btn btn-primary ml-3 rounded-circle square hide"><img src="../../assets/icons/chat.svg" alt="Play icon" class="h-100"></button>
 			</div>
 			<div class="d-flex col-8 mx-auto align-items-center justify-content-center">
-				<p><span id="friendsNbPlaceholder">0</span> friends</p>
+				<p><span id="friendsNbPlaceholder">0</span> <span id="friendsText">friends</span></p>
 			</div>
-			<div class="row col-4 mx-auto d-flex mt-3 justify-content-center">
-				<button id="editBtn" class="btn btn-success hide">EDIT PROFILE</button>
-			</div>
-			<div id="profile_bottom_btns"  class="profile-bottom-btns row col-12 mx-auto d-flex justify-content-center">
-				<button id="blockBtn" class="btn btn-danger col-6 hide">BLOCK</button>
-				<button id="logoutBtn" class="btn btn-outline-dark col-6 hide">LOGOUT</button>
-			</div>
+			<div id="editPlaceholder" class="row col-4 mx-auto d-flex mt-3 justify-content-center"> </div>
+			<div id="profile_bottom_btns"  class="profile-bottom-btns row col-12 mx-auto d-flex justify-content-center"> </div>
 		</div>
 		<div id="userEdit" class="user-edit bg-light align-items-center rounded-5 shadow">
 			<form id="editForm" class="edit-form d-flex mt-0 mt-md-5 justify-content-center align-items-center">
@@ -65,19 +61,19 @@
 			<ul id="statsList" class="stats-list list-group col-8 h-60">
 				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 					<div class="col-6 d-flex justify-content-start">Total matches</div>
-					<div class="col-6 d-flex justify-content-end" id="total_matches">2</div>
+					<div class="col-6 d-flex justify-content-end" id="total_matches"></div>
 				</li>
 				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 					<div class="col-6 d-flex justify-content-start">Total points</div>
-					<div class="col-6 d-flex justify-content-end" id="total_goals">2</div>
+					<div class="col-6 d-flex justify-content-end" id="total_goals"></div>
 				</li>
 				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 					<div class="col-6 d-flex justify-content-start">Average score</div>
-					<div class="col-6 d-flex justify-content-end" id="average_score">2</div>
+					<div class="col-6 d-flex justify-content-end" id="average_score"></div>
 				</li>
 				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 					<div class="col-6 d-flex justify-content-start">Highest score</div>
-					<div class="col-6 d-flex justify-content-end" id="highest_score">2</div>
+					<div class="col-6 d-flex justify-content-end" id="highest_score"></div>
 				</li>
 			</ul>
 		</div>

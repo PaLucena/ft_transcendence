@@ -22,9 +22,9 @@ export class Profile extends Component {
 
 	init() {
 		this.displayUserInfo(this.params.username);
-		this.logout();
 		this.saveInfoBtn(this.params.username);
-		///Navbar.focus()
+		if (typeof this.params.username === "undefined")
+			Navbar.focus();
 		this.enable2fa();
 		this.disable2fa();
 		// this.sendServerMessage();
@@ -53,22 +53,25 @@ export class Profile extends Component {
 			this.displayUserStats(data["username"]);
 
 			if (myUsername === data["username"]) {
-				document.getElementById("editBtn").style.display = "block";
-				document.getElementById("logoutBtn").style.display = "block";
+				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-success">EDIT PROFILE</button>`;
+				document.getElementById("profile_bottom_btns").innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-6">LOGOUT</button>`;
+				this.editUserBtn(data);
+				this.logout(); 
 			}
 			else {
-				document.getElementById("blockBtn").style.display = "block";
+				document.getElementById("profile_bottom_btns").innerHTML = `<button id="blockBtn" class="btn btn-danger col-6">BLOCK</button>`;
 				this.renderChatBtn(data["username"]);
 			}
 
 			document.getElementById("photoContainer").src = `${data["avatar"]}`;
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
 			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
-
-			this.editUserBtn(data);
+			if (data["number_of_friends"] == 1)
+				document.getElementById("friendsText").innerHTML = 'friend';
 		})
 		.catch(error => {
 			customAlert('danger', `Error: ` + error.message, '');
+			console.log('Error(displayUserInfo):', error);
 			if (error.message === "AppUser matching query does not exist.")
 			document.getElementById("rootProfile").style.justifyContent = 'center';
 			document.getElementById("rootProfile").style.alignItems = 'center';
@@ -113,14 +116,7 @@ export class Profile extends Component {
 	}
 
 	renderChatBtn(username) {
-		const chatBtn = document.createElement("button");
-		chatBtn.innerHTML = `Chat with ${username}`;
-		chatBtn.classList.add("btn", "btn-primary");
-		chatBtn.id = "chatBtn";
-
-		const profileBottomBtns = document.getElementById("profile_bottom_btns");
-
-		profileBottomBtns.insertBefore(chatBtn, profileBottomBtns.firstChild);
+		document.getElementById('chatBtn').style.display = 'block';
 
 		this.addEventListener(chatBtn, "click", async () => {
 			try {

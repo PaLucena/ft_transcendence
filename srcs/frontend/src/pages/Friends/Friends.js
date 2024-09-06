@@ -15,7 +15,6 @@ export class Friends extends Component {
 		this.friendsRenderer = new FriendsRenderer(this);
         this.friendsLoader = new FriendsLoader(this);
         this.uiSetup = new UISetup(this);
-		Navbar.focus();
 	}
 
 	destroy() {
