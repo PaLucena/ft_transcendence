@@ -55,7 +55,6 @@ export class Profile extends Component {
 				document.getElementById("logoutBtn").style.display = "block";
 			}
 			else {
-				document.getElementById("blockBtn").style.display = "block";
 				this.renderChatBtn(data["username"]);
 			}
 
@@ -74,7 +73,7 @@ export class Profile extends Component {
 		const chatBtn = document.createElement("button");
 		chatBtn.innerHTML = `Chat with ${username}`;
 		chatBtn.classList.add("btn", "btn-primary");
-		chatBtn.id = "chatBtn";
+		chatBtn.id = "profile_chat_btn";
 
 		const profileBottomBtns = document.getElementById("profile_bottom_btns");
 
