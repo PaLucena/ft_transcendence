@@ -7,8 +7,8 @@
 				</div>
 			</div>
 			<div id="userTopContainer" class="d-flex col-8 mt-4 mx-auto align-items-center justify-content-center">
-				<span id="usernamePlaceholder" class="display-6 fw-bold">‎</span>
-				<button id="chatBtn" class="btn btn-primary ml-3 rounded-circle square hide"><img src="../../assets/icons/chat.svg" alt="Play icon" class="h-100"></button>
+				<div id="usernamePlaceholder" class="display-6 fw-bold h-100 mx-2">‎</div>
+				<div id="chatBtnPlaceholder"></div>
 			</div>
 			<div class="d-flex col-8 mx-auto align-items-center justify-content-center">
 				<p><span id="friendsNbPlaceholder">0</span> <span id="friendsText">friends</span></p>
@@ -51,31 +51,43 @@
 		</div>
 	</div>
 	<div class="container-stats">
-		<div class="stats row d-flex align-items-center justify-content-center rounded-5 bg-white shadow">
-			<div class="col-10">
-				Win Rate
-				<div class="progress" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
-					<div id="winRateBar" class="progress-bar" style="width: 25%">25%</div>
-				  </div>
+		<div class="stats row rounded-5 bg-white shadow">
+			<div class="h-10 d-flex justify-content-center align-items-end">
+				<div class="btn-group col-6 gap-2">
+					<button id="ownStatsBtn" class="btn btn-outline-success active position-relative">
+						Stats
+					</button>
+					<button id="friendsStatsBtn" class="btn btn-outline-success position-relative">
+						Friends
+					</button>
+				</div>
 			</div>
-			<ul id="statsList" class="stats-list list-group col-8 h-60">
-				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
-					<div class="col-6 d-flex justify-content-start">Total matches</div>
-					<div class="col-6 d-flex justify-content-end" id="total_matches"></div>
-				</li>
-				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
-					<div class="col-6 d-flex justify-content-start">Total points</div>
-					<div class="col-6 d-flex justify-content-end" id="total_goals"></div>
-				</li>
-				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
-					<div class="col-6 d-flex justify-content-start">Average score</div>
-					<div class="col-6 d-flex justify-content-end" id="average_score"></div>
-				</li>
-				<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
-					<div class="col-6 d-flex justify-content-start">Highest score</div>
-					<div class="col-6 d-flex justify-content-end" id="highest_score"></div>
-				</li>
-			</ul>
+			<div id="statsOwn" class="stats-own h-90 gap-4 d-flex justify-content-center align-items-center">
+				<div class="col-10">
+					Win Rate
+					<div class="progress" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
+						<div id="winRateBar" class="progress-bar" style="width: 25%">25%</div>
+					</div>
+				</div>
+				<ul id="statsList" class="stats-list list-group mt-5 col-8 h-60">
+					<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+						<div class="col-6 d-flex justify-content-start">Total matches</div>
+						<div class="col-6 d-flex justify-content-end" id="total_matches"></div>
+					</li>
+					<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+						<div class="col-6 d-flex justify-content-start">Total points</div>
+						<div class="col-6 d-flex justify-content-end" id="total_goals"></div>
+					</li>
+					<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+						<div class="col-6 d-flex justify-content-start">Average score</div>
+						<div class="col-6 d-flex justify-content-end" id="average_score"></div>
+					</li>
+					<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+						<div class="col-6 d-flex justify-content-start">Highest score</div>
+						<div class="col-6 d-flex justify-content-end" id="highest_score"></div>
+					</li>
+				</ul>
+			</div>
 		</div>
 	</div>
 </div>

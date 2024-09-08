@@ -49,16 +49,6 @@ export class Signup extends Component {
 				$('#confirm_password').removeClass('is-invalid').addClass('is-valid');
 				$('#confirm_password')[0].setCustomValidity('');
 			}
-			console.log("AAAA");
-
-			/* if (!this.checkValidity()) {
-				event.preventDefault();
-				formIsValid = false;
-				console.log("C");
-			} */
-			console.log("D");
-
-			setTimeout(console.log("Sleeping", 5000))
 
 			if (formIsValid) {
 				event.preventDefault();

@@ -1,8 +1,4 @@
-.h-90 {
-	height: 90vh;
-}
-
-.max-width-containe {
+.max-width-container {
 	max-width: 1475px;
 }
 
@@ -25,6 +21,10 @@
 
 .h-10 {
 	height: 10%;
+}
+
+.h-20 {
+	height: 20%;
 }
 
 .h-40 {
@@ -50,6 +50,21 @@
 .btn-green, .bg-green {
 	background-color: #3a595c;
 }
+
+.btn-green:hover {
+	background-color: #263b3d;
+}
+
+.btn-outline-green {
+	border-color: #3a595c;
+	color: #3a595c;
+}
+
+/* .btn-outline-green:active, .btn-outline-green:hover {
+	background-color: #3a595c;
+	border-color: #3a595c;
+	color: white;
+} */
 
 .btn-light, .bg-light {
 	background-color: #edeef0;

@@ -27,6 +27,7 @@ export class Profile extends Component {
 			Navbar.focus();
 		this.enable2fa();
 		this.disable2fa();
+		this.selectStats();
 		// this.sendServerMessage();
 	}
 
@@ -116,7 +117,8 @@ export class Profile extends Component {
 	}
 
 	renderChatBtn(username) {
-		document.getElementById('chatBtn').style.display = 'block';
+		document.getElementById('chatBtnPlaceholder').innerHTML = '<button id="chatBtn" class="btn btn-green d-flex justify-content-center align-items-center ml-3 rounded-circle square"><img src="../../assets/icons/chat.svg" alt="Play icon" class="h-75"></button>';
+		const chatBtn = document.getElementById("chatBtn");
 
 		this.addEventListener(chatBtn, "click", async () => {
 			try {
@@ -329,6 +331,22 @@ export class Profile extends Component {
 		})
 	}
 
+	selectStats() {
+		let ownStatsBtn = document.getElementById("ownStatsBtn");
+		let friendsStatsBtn = document.getElementById("friendsStatsBtn");
+
+		this.addEventListener(ownStatsBtn, 'click', () => {
+			console.log("si");
+			ownStatsBtn.classList.add('active');
+			friendsStatsBtn.classList.remove('active');
+		});
+
+		this.addEventListener(friendsStatsBtn, 'click', () => {
+			console.log("no");
+			friendsStatsBtn.classList.add('active');
+			ownStatsBtn.classList.remove('active');
+		});
+	}
 
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
@@ -345,8 +363,8 @@ export class Profile extends Component {
 			})
 		})
 	}
-	/*
-	sendServerMessage() {
+
+	/* sendServerMessage() {
 		let testBtn = document.getElementById('testBtn');
 		if (testBtn) {
 			testBtn.addEventListener("click", (event) => {

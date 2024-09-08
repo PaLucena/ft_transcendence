@@ -103,6 +103,10 @@
 	margin-bottom: 5%;
 }
 
+.container-stats .stats-own {
+	flex-direction: column;
+}
+
 .container-user .user-edit {
 	display: none;
 	margin: 0 auto;

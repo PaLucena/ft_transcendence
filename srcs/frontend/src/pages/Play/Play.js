@@ -14,9 +14,13 @@ export class Play extends Component {
 		this.removeAllEventListeners();
 	}
 
-	init() {
+	async init() {
+		this.checkRunningTournaments()
+		.then(tournamentId => {
+			document.getElementById("tournamentBtn").innerHTML = tournamentId ? "<h1>Back to tournament</h1>" : "<h1>Tournament</h1>";
+		})
 		this.setupEventListeners();
-		//Navbar.focus();
+		Navbar.focus();
 	}
 
 	setupEventListeners() {
@@ -28,9 +32,20 @@ export class Play extends Component {
 
 		const	tournamentBtn = document.getElementById("tournamentBtn");
 		this.addEventListener(tournamentBtn, "click", () => {
-			document.getElementById("btns").style.display = "none";
-			document.getElementById("dropdownTournaments").style.display = "block";
-			this.displayTournaments();
+
+			this.checkRunningTournaments()
+			.then(tournamentId => {
+				if (tournamentId)
+					navigateTo(`/tournament/${tournamentId}`);
+				else {
+					document.getElementById("btns").style.display = "none";
+					document.getElementById("dropdownTournaments").style.display = "block";
+					this.displayTournaments();
+				}
+			})
+			.catch((error) => {
+				customAlert('danger', `Error(checkRunningTournaments): ` + error.message, '');
+			})
 		});
 
 		const	backOne = document.getElementById("backOne");
@@ -48,7 +63,7 @@ export class Play extends Component {
 		const	plusPublicBtn = document.getElementById("plusPublicBtn");
 		this.addEventListener(plusPublicBtn, "click", () => {
 			this.createTournament('public');
-		});
+		});	
 
 		const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
 		this.addEventListener(plusPrivateBtn, "click", () => {
@@ -78,6 +93,34 @@ export class Play extends Component {
 		tournamentModalElement.addEventListener('shown.bs.modal', () => {
 			document.getElementById('name-input').focus();
 		});
+	}
+
+	async checkRunningTournaments() {
+		try {
+			const response = await fetch('/api/display_tournaments/', {
+				method: "GET",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include'
+			});
+	
+			const data = await response.json();
+	
+			let	joinedTournament = data.public_tournaments.find(tournament => 
+				tournament.players.some(players => players.nickname === 'you')
+			);
+			if (!joinedTournament) { // Verificamos si es undefined o null
+				joinedTournament = data.private_tournaments.find(tournament => 
+					tournament.players.some(players => players.nickname === 'you')
+				);
+			}
+			return (joinedTournament ? joinedTournament.id : null);
+		}
+		catch (error) {
+			console.log("ERROR", error)
+			throw error;
+		}
 	}
 
 	// local match
@@ -221,6 +264,8 @@ export class Play extends Component {
 			return response.json();
 		})
 		.then(data => {
+			console.log("TORNEOS: ",  data.private_tournaments)
+			console.log("TORNEOS: ",  data.public_tournaments)
 			if (tournamentType === 'private') {
 				const	tournamentData = data.private_tournaments.find(object => object.name === name);
 				navigateTo("/tournament/" + tournamentData.id)
@@ -330,7 +375,8 @@ export class Play extends Component {
 
 	displayJoinModal(type) {
 		if (type === 'private')
-			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required><label for="code">Invitation code</label>`;
+			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
+																<label for="code">Invitation code</label>`;
 		else
 			document.querySelector('#codeInput').innerHTML = ``;
 		
@@ -339,7 +385,7 @@ export class Play extends Component {
 
 		joinModal.show();
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			const joinForm = document.querySelector("#joinForm");
 
 			this.addEventListener(joinForm, "submit", (event) => {
