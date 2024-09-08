@@ -126,8 +126,6 @@ export class UISetup {
 
         if (container) {
             this.friends.addEventListener(container, 'click', async (event) => {
-                console.log(event.target);
-
                 const targetButton = event.target.closest('button[data-action]');
 
                 if (targetButton) {
@@ -200,8 +198,6 @@ export class UISetup {
 
     updateFilter(data) {
         this.friends.filter = data;
-        console.log(this.friends.filter);
-
     }
 
     removeOnlineUpdateListeners() {

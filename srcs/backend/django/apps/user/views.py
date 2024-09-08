@@ -28,9 +28,9 @@ from django.http import JsonResponse
 from twofactor.views import Has2faEnabled
 from .consumers import OnlineStatusConsumer as OSocketConsumers
 from django.contrib.auth import update_session_auth_hash
-from blockchain.views import load_test_data
-
-
+from blockchain.views import load_test_data, get_face2face
+from friends.views import get_friendship_status
+from friends.models import Friend
 
 @api_view(["GET"])
 @default_authentication_required
@@ -63,11 +63,26 @@ def get_user_data(request):
 @default_authentication_required
 def get_other_user_data(request, username):
     try:
-        user = AppUser.objects.get(username=username)
+        this_user = request.user
+        other_user = AppUser.objects.get(username=username)
+
+        if get_friendship_status(this_user, other_user) == "accepted":
+            friendship = True
+        else:
+            friendship = False
+
+        matches_in_common = get_face2face(request, this_user.id, other_user.id)
+        if not matches_in_common:
+            matches_in_common = False
+        else:
+            matches_in_common = True
+
         user_data = {
-            "username": user.username,
-            "avatar": user.avatar.url,
-            "number_of_friends": get_friend_count(user),
+            "username": other_user.username,
+            "avatar": other_user.avatar.url,
+            "number_of_friends": get_friend_count(other_user),
+            "friendship": friendship,
+            "matches_in_common": matches_in_common
         }
         return Response(user_data, status=status.HTTP_200_OK)
     except Exception as e:
@@ -135,7 +150,6 @@ def login(request):
         print("Access Token Expiry:", access["exp"])
         print("Refresh Token Expiry:", refresh["exp"])
         load_test_data(request)
-
         return response
     else:
         return Response({"error": "Incorrect password"}, status=status.HTTP_404_NOT_FOUND)
@@ -181,6 +195,11 @@ def logout(request):
 
 from django.db import connection, reset_queries
 from django.db import connections
+
+from django.contrib.auth.models import update_last_login
+from django.contrib.auth.signals import user_logged_in
+
+
 @api_view(["POST"])
 @default_authentication_required
 def update_user_info(request):
@@ -193,10 +212,7 @@ def update_user_info(request):
         confirm_password = request.data.get("confirm_password")
 
         if user.is_superuser or user.is_staff:
-            print("HERE user.username", user.username)
-            print("HERE new_username", new_username)
             if new_username and new_username != user.username:
-                print("HERE 2")
                 return Response(
                     {"error": "Admin username cannot be changed."},
                     status=status.HTTP_403_FORBIDDEN,
@@ -235,26 +251,26 @@ def update_user_info(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             user.password = make_password(new_password)
-            update_session_auth_hash(request, user)
             user.save()
-        print(" 1  Session data after update:", user)
 
-        AppUser.objects.filter(pk=user.pk).update(username=new_username)
-        #update_last_login(None, user)
         user.save()
-        #user.refresh_from_db()
+        user.refresh_from_db()
+        #request.session.flush()
         #auth_logout(request)
-        # authenticated_user: AbstractUser | None = authenticate(
+        # authenticated_user = authenticate(
         #     username=new_username, password=new_password
         # )
-        #auth_login(request, user)
-        print(" 2  Session data after update:", user)
+        # if authenticated_user is not None:
+        #     user = AppUser.objects.get(username=new_username)
+        #     user.save()
 
+        #auth_login(request, user)
+        #update_session_auth_hash(request, user)
+        #user_logged_in.send(sender=user.__class__, request=request, user=user)
 
         response = Response(
             {"message": "User info updated successfully."}, status=status.HTTP_201_CREATED
         )
-
 
         return response
     except Exception as e:
