@@ -1,6 +1,7 @@
 import { Component } from '../Component.js';
 import { Navbar } from "../../components/Navbar/Navbar.js";
 import { ChatModal } from '../../components/ChatModal/ChatModal.js';
+import { Get2faCode } from '../../components/Get2faModal/Get2faModal.js';
 import routerInstance from '../Router.js'
 
 class StaticComponentsRenderer {
@@ -18,6 +19,13 @@ class StaticComponentsRenderer {
                 containerId: 'chat_modal',
                 routesToExclude: ["/login", "/signup", "/auth", "/404"]
             },
+			{
+				instance: null,
+				getInstance: () => new Get2faCode (),
+				containerId: 'get2faCode_modal',
+                routesToExclude: []
+
+			}
         ];
     }
 

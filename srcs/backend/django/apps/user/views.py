@@ -169,8 +169,8 @@ def loginWith2fa(request):
     response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
     response.set_cookie("twofactor_refresh_token", str(twofactor_refresh), httponly=True, secure=True)
     response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
-    print("Access Token Expiry:", access["exp"])
-    print("Refresh Token Expiry:", refresh["exp"])
+    print("Access Token Expiry:", twofactor_access["exp"])
+    print("Refresh Token Expiry:", twofactor_refresh["exp"])
     return response
 
 
