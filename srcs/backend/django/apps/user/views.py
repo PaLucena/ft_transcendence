@@ -150,7 +150,6 @@ def login(request):
         print("Access Token Expiry:", access["exp"])
         print("Refresh Token Expiry:", refresh["exp"])
         load_test_data(request)
-
         return response
     else:
         return Response({"error": "Incorrect password"}, status=status.HTTP_404_NOT_FOUND)
@@ -254,8 +253,6 @@ def update_user_info(request):
             user.password = make_password(new_password)
             user.save()
 
-        #AppUser.objects.filter(pk=user.pk).update(username=new_username)
-        #update_last_login(None, user)
         user.save()
         user.refresh_from_db()
         #request.session.flush()

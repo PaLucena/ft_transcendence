@@ -25,6 +25,7 @@ def player_statistics(request, username):
 		return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+# call this if player and his friend have matches in common
 @api_view(["GET"])
 @default_authentication_required
 def player_comparison(request, username):
@@ -35,12 +36,17 @@ def player_comparison(request, username):
 		viewed_player_id = viewed_user.id
 
 		if get_friendship_status(user, viewed_user) != "accepted":
+			print("USER 1: ", user)
+			print("USER 2: ", viewed_user)
 			return Response({'error': 'You can only compare statistics with friends.'}, status=status.HTTP_403_FORBIDDEN)
 
 		matches_response = bc_get_face2face(request, player_id, viewed_player_id)
 
 		if matches_response == "error":
-			return Response({'error': 'Could not retrieve face-to-face matches'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+			return Response({'error': 'Could not retrieve face-to-face matches.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+		
+		if matches_response == []:
+			return Response({'error': 'You have no matches in common.'}, status=status.HTTP_400_BAD_REQUEST)
 
 		comparison_stats = calculate_face2face_statistics(matches_response, player_id, viewed_player_id)
 
@@ -123,18 +129,15 @@ def calculate_face2face_statistics(matches, player1_id, player2_id):
 		if player_1_id == player1_id:
 			comparison_stats['player1_total_goals'] += player_1_goals
 			comparison_stats['player2_total_goals'] += player_2_goals
-			if winner_id == player1_id:
-				comparison_stats['player1_wins'] += 1
-			elif winner_id == player2_id:
-				comparison_stats['player2_wins'] += 1
 
 		elif player_2_id == player1_id:
 			comparison_stats['player1_total_goals'] += player_2_goals
 			comparison_stats['player2_total_goals'] += player_1_goals
-			if winner_id == player1_id:
-				comparison_stats['player1_wins'] += 1
-			elif winner_id == player2_id:
-				comparison_stats['player2_wins'] += 1
+
+		if winner_id == player1_id:
+			comparison_stats['player1_wins'] += 1
+		elif winner_id == player2_id:
+			comparison_stats['player2_wins'] += 1
 
 	total_matches = comparison_stats['total_matches']
 
@@ -144,12 +147,5 @@ def calculate_face2face_statistics(matches, player1_id, player2_id):
 		
 		comparison_stats['player1_win_percentage'] = round((comparison_stats['player1_wins'] / total_matches) * 100, 2)
 		comparison_stats['player2_win_percentage'] = round((comparison_stats['player2_wins'] / total_matches) * 100, 2)
-
-	if comparison_stats['player1_wins'] > comparison_stats['player2_wins']:
-		comparison_stats['head_to_head_winner'] = f"Player 1 ({player1_id})"
-	elif comparison_stats['player2_wins'] > comparison_stats['player1_wins']:
-		comparison_stats['head_to_head_winner'] = f"Player 2 ({player2_id})"
-	else:
-		comparison_stats['head_to_head_winner'] = "It's a tie!"
 
 	return comparison_stats
