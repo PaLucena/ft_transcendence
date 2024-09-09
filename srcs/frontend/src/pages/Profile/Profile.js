@@ -53,6 +53,8 @@ export class Profile extends Component {
 		.then(data => {
 			this.displayUserStats(data["username"]);
 
+			console.log("User data:", data);
+
 			if (myUsername === data["username"]) {
 				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-success">EDIT PROFILE</button>`;
 				document.getElementById("profile_bottom_btns").innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-6">LOGOUT</button>`;
@@ -336,13 +338,11 @@ export class Profile extends Component {
 		let friendsStatsBtn = document.getElementById("friendsStatsBtn");
 
 		this.addEventListener(ownStatsBtn, 'click', () => {
-			console.log("si");
 			ownStatsBtn.classList.add('active');
 			friendsStatsBtn.classList.remove('active');
 		});
 
 		this.addEventListener(friendsStatsBtn, 'click', () => {
-			console.log("no");
 			friendsStatsBtn.classList.add('active');
 			ownStatsBtn.classList.remove('active');
 		});

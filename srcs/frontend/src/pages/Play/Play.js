@@ -264,8 +264,6 @@ export class Play extends Component {
 			return response.json();
 		})
 		.then(data => {
-			console.log("TORNEOS: ",  data.private_tournaments)
-			console.log("TORNEOS: ",  data.public_tournaments)
 			if (tournamentType === 'private') {
 				const	tournamentData = data.private_tournaments.find(object => object.name === name);
 				navigateTo("/tournament/" + tournamentData.id)
@@ -298,9 +296,8 @@ export class Play extends Component {
 		})
 		.then(data => {
 			const	displayPublic = data.public_tournaments;
-			console.log("Torneos publicos:", displayPublic);
 			const	displayPrivate = data.private_tournaments;
-			console.log("Torneos privados:", displayPrivate);
+
 			if (displayPublic.length === 0)
 				document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
 			else {
