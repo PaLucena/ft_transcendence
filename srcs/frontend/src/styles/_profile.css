@@ -103,8 +103,20 @@
 	margin-bottom: 5%;
 }
 
-.container-stats .stats-own {
+.both-stats {
+	position: relative;
+}
+
+.both-stats .stats-own {
 	flex-direction: column;
+	position: absolute;
+	z-index: 2;
+}
+
+.both-stats .stats-shared {
+	flex-direction: column;
+	position: absolute;
+	z-index: 1;
 }
 
 .container-user .user-edit {

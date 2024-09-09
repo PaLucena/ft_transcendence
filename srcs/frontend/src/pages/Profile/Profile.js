@@ -27,7 +27,6 @@ export class Profile extends Component {
 			Navbar.focus();
 		this.enable2fa();
 		this.disable2fa();
-		this.selectStats();
 		// this.sendServerMessage();
 	}
 
@@ -56,14 +55,27 @@ export class Profile extends Component {
 			console.log("User data:", data);
 
 			if (myUsername === data["username"]) {
-				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-success">EDIT PROFILE</button>`;
+				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-green text-white">EDIT PROFILE</button>`;
 				document.getElementById("profile_bottom_btns").innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-6">LOGOUT</button>`;
 				this.editUserBtn(data);
 				this.logout(); 
+				
 			}
 			else {
 				document.getElementById("profile_bottom_btns").innerHTML = `<button id="blockBtn" class="btn btn-danger col-6">BLOCK</button>`;
 				this.renderChatBtn(data["username"]);
+				document.getElementById("ownStatsBtn").innerHTML = `${data['username']} stats`;
+
+				if (!data['friendship']) {
+					document.getElementById('statsPlaceholder').innerHTML = `<div class="h-100 w-100 d-flex justify-content-center align-items-center"><h1>Friendn't</h1></div>`;
+				}
+
+				if (data['friendship'] && data['matches_in_common']) {
+					document.getElementById('statsSelector').innerHTML += `<button id="friendshipStatsBtn" class="btn btn-outline-dark position-relative">Our stats</button>`;
+					document.getElementById('friendName').innerHTML = data['username'];
+					this.displayFriendshipStats(data['username']);
+					this.selectStats();
+				}
 			}
 
 			document.getElementById("photoContainer").src = `${data["avatar"]}`;
@@ -84,7 +96,7 @@ export class Profile extends Component {
 
 	displayUserStats(username) {
 		fetch(`/api/player_statistics/${username}/`, {
-			method: "POST",
+			method: "GET",
 			headers: {'Content-Type': 'application/json'},
 			credentials: 'include'
 		})
@@ -106,7 +118,39 @@ export class Profile extends Component {
 			winRateBar.innerHTML = `${winRate}%`;
 			winRateBar.style.width = `${winRate}%`;
 
-			const liStats = document.querySelectorAll('#statsList li');
+			const liStats = document.querySelectorAll('#ownStatsList li');
+
+			liStats.forEach(liStat => {
+				let currStat = liStat.querySelectorAll('div')[1];
+				currStat.innerHTML = data[currStat.id];
+			});
+		})
+		.catch(error => {
+			console.log("Error(displayUserStats):", error);
+		})
+	}
+
+	displayFriendshipStats(username) {
+		fetch(`/api/player_comparison/${username}/`, {
+			method: "GET",
+			headers: {'Content-Type': 'application/json'},
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			console.log("Friendship stats:", data);
+
+			document.getElementById('friendshipWinRateBar').innerHTML = data['player1_win_percentage'];
+			document.getElementById('friendshipWinRateBar').style.width = `${data['player1_win_percentage']}%`;
+
+			const liStats = document.querySelectorAll('#friendshipStatsList li');
 
 			liStats.forEach(liStat => {
 				let currStat = liStat.querySelectorAll('div')[1];
@@ -335,16 +379,22 @@ export class Profile extends Component {
 
 	selectStats() {
 		let ownStatsBtn = document.getElementById("ownStatsBtn");
-		let friendsStatsBtn = document.getElementById("friendsStatsBtn");
+		let friendshipStatsBtn = document.getElementById("friendshipStatsBtn");
+		const ownStats = document.getElementById("ownStatsDisplay");
+		const friendshipStats = document.getElementById("friendshipStatsDisplay");
 
 		this.addEventListener(ownStatsBtn, 'click', () => {
 			ownStatsBtn.classList.add('active');
-			friendsStatsBtn.classList.remove('active');
+			ownStats.classList.remove('hide');
+			friendshipStatsBtn.classList.remove('active');
+			friendshipStats.classList.add('hide');
 		});
 
-		this.addEventListener(friendsStatsBtn, 'click', () => {
-			friendsStatsBtn.classList.add('active');
+		this.addEventListener(friendshipStatsBtn, 'click', () => {
+			friendshipStatsBtn.classList.add('active');
+			friendshipStats.classList.remove('hide');
 			ownStatsBtn.classList.remove('active');
+			ownStats.classList.add('hide');
 		});
 	}
 

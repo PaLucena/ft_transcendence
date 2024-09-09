@@ -23,6 +23,10 @@
 	height: 10%;
 }
 
+.h-15 {
+	height: 15%;
+}
+
 .h-20 {
 	height: 20%;
 }
@@ -72,4 +76,8 @@
 
 .btn-white, .bg-white {
 	background-color: white;
+}
+
+.text-white {
+	color: white;
 }
