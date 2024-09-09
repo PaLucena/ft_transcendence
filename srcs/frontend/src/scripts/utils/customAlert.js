@@ -8,115 +8,94 @@
  */
 
 export default function customAlert(type, text, time, customStyle = '') {
-    const customAlert = document.querySelector('#alert');
-    if (customAlert) {
-        const baseClasses = ['custom-alert'];
+    const alertContainer = document.querySelector('#alert-container');
 
-        const classesToRemove = [];
-        customAlert.classList.forEach(className => {
-            if (!baseClasses.includes(className)) {
-                classesToRemove.push(className);
-            }
-        });
+    const customAlert = document.createElement('aside');
+    customAlert.classList.add('custom-alert');
 
-        classesToRemove.forEach(className => {
-            customAlert.classList.remove(className);
-        });
+    let icon = '';
+    let messageTitle = '';
 
-        let icon = '';
-        let messageTitle = '';
+    switch (type) {
+        case 'success':
+            icon = '<i class="alert-icon fa-solid fa-check"></i>';
+            messageTitle = 'Success';
+            break;
+        case 'danger':
+            icon = '<i class="alert-icon fa-solid fa-exclamation"></i>';
+            messageTitle = 'Error';
+            break;
+        case 'warning':
+            icon = '<i class="alert-icon fa-solid fa-exclamation"></i>';
+            messageTitle = 'Warning';
+            break;
+        case 'info':
+            icon = '<i class="alert-icon fa-solid fa-info"></i>';
+            messageTitle = 'Info';
+            break;
+        default:
+            icon = '<i class="alert-icon fa-regular fa-bell"></i>';
+            break;
+    }
 
-        switch (type) {
-            case 'success':
-                icon = '<i class="alert-icon fa-solid fa-check"></i>';
-                messageTitle = 'Success';
-                break;
-            case 'danger':
-                icon = '<i class="alert-icon fa-solid fa-exclamation"></i>';
-                messageTitle = 'Error';
-                break;
-            case 'warning':
-                icon = '<i class="alert-icon fa-solid fa-exclamation"></i>';
-                messageTitle = 'Warning';
-                break;
-            case 'info':
-                icon = '<i class="alert-icon fa-solid fa-info"></i>';
-                messageTitle = 'Info';
-                break;
-            default:
-                icon = '<i class="alert-icon fa-regular fa-bell"></i>';
-                break;
-        }
-
-        customAlert.innerHTML = `
-            <div class="me-2 d-flex justify-content-md-center align-items-center">
-                ${icon}
-                <div class="message">
-                    <span class="text-1 fw-bold">${messageTitle}</span>
-                    <span class="text-2 ">${text}</span>
-                </div>
+    customAlert.innerHTML = `
+        <div class="me-2 d-flex justify-content-md-center align-items-center">
+            ${icon}
+            <div class="message">
+                <span class="text-1 fw-bold">${messageTitle}</span>
+                <span class="text-2 ">${text}</span>
             </div>
-            <i id="alert_close" class="fa-solid fa-xmark close" aria-hidden="true"></i>
-            <div class="progress"></div>
+        </div>
+        <i id="alert_close" class="fa-solid fa-xmark close" aria-hidden="true"></i>
+        <div class="progress"></div>
+    `;
+
+    customAlert.classList.add('alert', `alert-${type}`, 'active');
+
+    if (customStyle) {
+        customAlert.classList.add(customStyle);
+    }
+
+    alertContainer.appendChild(customAlert);
+
+    const progressBar = customAlert.querySelector('.progress');
+
+    if (time && time !== '') {
+        const animationStyle = document.createElement('style');
+        animationStyle.innerHTML = `
+            @keyframes customProgress {
+                100% {
+                    right: 100%;
+                }
+            }
+            .custom-alert .progress.active:before {
+                animation: progress ${time}ms linear forwards;
+            }
         `;
+        document.head.appendChild(animationStyle);
 
-        customAlert.classList.add('alert', `alert-${type}`, 'active');
+        progressBar.classList.add('active');
 
-        if (customStyle) {
-            customAlert.classList.add(customStyle);
-        }
-
-        const progressBar = customAlert.querySelector('.progress');
-
-        if (time && time !== '') {
-            const animationStyle = document.createElement('style');
-            animationStyle.innerHTML = `
-                @keyframes customProgress {
-                    100% {
-                        right: 100%;
-                    }
-                }
-                .custom-alert .progress.active:before {
-                    animation: progress ${time}ms linear forwards;
-                }
-            `;
-            document.head.appendChild(animationStyle);
-
-            progressBar.classList.add('active');
+        setTimeout(() => {
+            customAlert.classList.add('hide');
 
             setTimeout(() => {
-                customAlert.classList.remove('active');
-                progressBar.classList.remove('active');
+                customAlert.remove();
+                document.head.removeChild(animationStyle);
+            }, 400);
+        }, time);
+    } else {
+        progressBar.classList.remove('active');
+    }
 
-                setTimeout(() => {
-                    customAlert.classList.remove('alert', `alert-${type}`);
-                    if (customStyle) {
-                        customAlert.classList.remove(customStyle);
-                    }
+    const closeButtonElement = customAlert.querySelector('#alert_close');
+    if (closeButtonElement) {
+        closeButtonElement.addEventListener('click', () => {
+            customAlert.classList.add('hide');
 
-                    customAlert.innerHTML = '';
-                    document.head.removeChild(animationStyle);
-                }, 200);
-            }, time);
-        } else {
-            progressBar.classList.remove('active');
-        }
-
-        const closeButtonElement = customAlert.querySelector('#alert_close');
-        if (closeButtonElement) {
-            closeButtonElement.addEventListener('click', () => {
-                customAlert.classList.remove('active');
-                progressBar.classList.remove('active');
-
-                setTimeout(() => {
-                    customAlert.classList.remove('alert', `alert-${type}`);
-                    if (customStyle) {
-                        customAlert.classList.remove(customStyle);
-                    }
-
-                    customAlert.innerHTML = '';
-                }, 200);
-            });
-        }
+            setTimeout(() => {
+                customAlert.remove();
+            }, 400);
+        });
     }
 };
