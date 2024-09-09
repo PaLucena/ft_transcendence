@@ -3,19 +3,16 @@ from rest_framework import status
 from user.models import AppUser
 from rest_framework.response import Response
 from user.decorators import default_authentication_required
-from blockchain.views import get_player_tournaments as bc_get_player_tournaments
-from blockchain.views import get_tournament as bc_get_tournament
 from blockchain.views import get_player_matches as bc_get_player_matches
-from blockchain.views import load_test_data
+from blockchain.views import get_face2face as bc_get_face2face
+from friends.views import get_friendship_status
 
-
-@api_view(["POST"])
+@api_view(["GET"])
 @default_authentication_required
 def player_statistics(request, username):
 	try:
 		user = AppUser.objects.get(username=username)
 		player_id = user.pk
-
 		matches_response = bc_get_player_matches(request, player_id)
 
 		if matches_response == "error":
@@ -26,6 +23,31 @@ def player_statistics(request, username):
 		return Response(stats, status=status.HTTP_200_OK)
 	except Exception as e:
 		return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["GET"])
+@default_authentication_required
+def player_comparison(request, username):
+	try:
+		user = request.user
+		player_id = user.id
+		viewed_user = AppUser.objects.get(username=username)
+		viewed_player_id = viewed_user.id
+
+		if get_friendship_status(user, viewed_user) != "accepted":
+			return Response({'error': 'You can only compare statistics with friends.'}, status=status.HTTP_403_FORBIDDEN)
+
+		matches_response = bc_get_face2face(request, player_id, viewed_player_id)
+
+		if matches_response == "error":
+			return Response({'error': 'Could not retrieve face-to-face matches'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+		comparison_stats = calculate_face2face_statistics(matches_response, player_id, viewed_player_id)
+
+		return Response(comparison_stats, status=status.HTTP_200_OK)
+	except Exception as e:
+		return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 def calculate_player_statistics(matches, player_id):
 
@@ -49,7 +71,6 @@ def calculate_player_statistics(matches, player_id):
 		player_2_goals = match[5]
 		winner_id = match[6]
 
-		# Determine if the player is Player 1 or Player 2
 		if player_1_id == player_id:
 			player_goals = player_1_goals
 			opponent_goals = player_2_goals
@@ -57,7 +78,7 @@ def calculate_player_statistics(matches, player_id):
 			player_goals = player_2_goals
 			opponent_goals = player_1_goals
 		else:
-			continue  # If the player is not in the match, skip this match (optional safety check)
+			continue
 
 		total_goals += player_goals
 
@@ -76,52 +97,59 @@ def calculate_player_statistics(matches, player_id):
 
 	return stats
 
-#will be called after every match to update user data
-# @login_required
-# @api_view(["POST"])
-# def user_stats_update(request):
-# 	try:
-# 		player_1_data = request.data.get(['player_1'])
-# 		player_2_data = request.data.get(['player_2'])
 
-# 		if not player_1_data or not player_2_data:
-# 			return Response({'error': 'Missing player data'}, status=status.HTTP_400_BAD_REQUEST)
+def calculate_face2face_statistics(matches, player1_id, player2_id):
+	comparison_stats = {
+		'total_matches': len(matches),
+		'player1_wins': 0,
+		'player2_wins': 0,
+		'player1_total_goals': 0,
+		'player2_total_goals': 0,
+		'player1_average_goals_per_match': 0,
+		'player2_average_goals_per_match': 0,
+		'player1_win_percentage': 0,
+		'player2_win_percentage': 0,
+	}
 
-# 		player_1 = AppUser.objects.filter(pk=player_1.user_id)
-# 		player_2 = AppUser.objects.filter(pk=player_2.user_id)
+	for match in matches:
+		tournament_id = match[0]
+		match_id = match[1]
+		player_1_id = match[2]
+		player_2_id = match[3]
+		player_1_goals = match[4]
+		player_2_goals = match[5]
+		winner_id = match[6]
 
-# 		stats_1 = UserStats.objects.filter(user=player_1)
-# 		stats_2 = UserStats.objects.filter(user=player_2)
-# 		stats_1.update_stats(player_1['won'], player_1['score'])
-# 		stats_2.update_stats(player_2['won'], player_2['score'])
+		if player_1_id == player1_id:
+			comparison_stats['player1_total_goals'] += player_1_goals
+			comparison_stats['player2_total_goals'] += player_2_goals
+			if winner_id == player1_id:
+				comparison_stats['player1_wins'] += 1
+			elif winner_id == player2_id:
+				comparison_stats['player2_wins'] += 1
 
-# 		return Response({'message': 'Statistics updated successfully.'}, status=status.HTTP_200_OK)
+		elif player_2_id == player1_id:
+			comparison_stats['player1_total_goals'] += player_2_goals
+			comparison_stats['player2_total_goals'] += player_1_goals
+			if winner_id == player1_id:
+				comparison_stats['player1_wins'] += 1
+			elif winner_id == player2_id:
+				comparison_stats['player2_wins'] += 1
 
-# 	except Exception as e:
-# 		return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
+	total_matches = comparison_stats['total_matches']
 
-
-# #user requests to see it's statistics
-# @login_required
-# @api_view(["GET"])
-# def show_stats(request):
-# 	try:
-# 		user = request.user
-# 		stats = UserStats.objects.get(user=user)
-
-# 		data = {
-# 			"games_played": stats.games_played,
-# 			"games_won": stats.games_won,
-# 			"games_lost": stats.games_lost,
-# 			"winning_streak": stats.winning_streak,
-# 			"losing_streak": stats.losing_streak,
-# 			"highest_score": stats.highest_score,
-# 			"average_score": stats.average_score,
-# 			"win_rate": stats.win_rate,
-# 		}
+	if total_matches > 0:
+		comparison_stats['player1_average_goals_per_match'] = round(comparison_stats['player1_total_goals'] / total_matches, 2)
+		comparison_stats['player2_average_goals_per_match'] = round(comparison_stats['player2_total_goals'] / total_matches, 2)
 		
-# 		return Response(data, status=status.HTTP_200_OK)
-# 	except UserStats.DoesNotExist:
-# 		return Response({'error': 'User statistics not found'}, status=status.HTTP_404_NOT_FOUND)
-	
+		comparison_stats['player1_win_percentage'] = round((comparison_stats['player1_wins'] / total_matches) * 100, 2)
+		comparison_stats['player2_win_percentage'] = round((comparison_stats['player2_wins'] / total_matches) * 100, 2)
 
+	if comparison_stats['player1_wins'] > comparison_stats['player2_wins']:
+		comparison_stats['head_to_head_winner'] = f"Player 1 ({player1_id})"
+	elif comparison_stats['player2_wins'] > comparison_stats['player1_wins']:
+		comparison_stats['head_to_head_winner'] = f"Player 2 ({player2_id})"
+	else:
+		comparison_stats['head_to_head_winner'] = "It's a tie!"
+
+	return comparison_stats

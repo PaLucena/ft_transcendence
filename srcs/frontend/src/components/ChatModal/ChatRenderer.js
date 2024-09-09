@@ -31,7 +31,7 @@ export class ChatRenderer {
 							data-bs-toggle="modal"
 							data-chatroom_name="${chat.chatroom_name}">
 						<img src="${chat.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-							 style="width: 100px; height: 100px;"
+							 style="max-width: 100px; min-width: 100px; height: 100px;"
 							 class="rounded-circle"
 							 alt="Circle Image">
 						<div class="status-dot position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status ? 'green' : 'gray'}-dot p-2"
