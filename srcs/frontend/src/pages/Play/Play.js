@@ -5,18 +5,48 @@ import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Play extends Component {
 	constructor(params = {}) {
-		console.log('Play Constructor');
 		super('/pages/Play/play.html', params);
+		console.log('Play Constructor');
+		this.t_socket = null;
 	}
 
 	destroy() {
 		console.log("Play Custom destroy");
+		// if (this.t_socket) {
+		// 	this.t_socket.close();
+		// }
 		this.removeAllEventListeners();
 	}
 
 	init() {
 		this.setupEventListeners();
 		Navbar.focus();
+	}
+
+	createTournamentWebSocket(tournament_name) {
+		try {
+			this.t_socket = new WebSocket(`ws/tournament/${tournament_name}/`)
+		} catch (error) {
+			this.handleError(null, 'Failed to create WebSocket');
+			customAlert('danger', 'Failed to connect', 5000);
+			return;
+		}
+		
+		this.t_socket.onopen = () => {
+			console.log("Connection established");
+		};
+
+		this.t_socket.onclose = (event) => {
+			if (event.wasClean) {
+				console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+			} else {
+				console.log('Connection died');
+			}
+		}
+
+		this.t_socket.onerror = (error) => {
+			console.log(`Error: ${error.message}`);
+		}
 	}
 
 	setupEventListeners() {
@@ -197,6 +227,7 @@ export class Play extends Component {
 			.then(data => {
 				customAlert('success', data.message, '3000');
 				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
+				this.createTournamentWebSocket(jsonData["name"]);
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
@@ -319,6 +350,7 @@ export class Play extends Component {
 				.then(data => {
 					// TODO: Añadir modal para insertar nickname
 					navigateTo("/tournament/" + tournamentData.id);
+					this.createTournamentWebSocket(tournamentName);
 					console.log(data);
 				})
 				.catch((error) => {
