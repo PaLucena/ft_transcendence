@@ -30,7 +30,7 @@ export class Test extends Component {
 
 		const alertInfo = document.getElementById('custom_alert_info');
 		this.addEventListener(alertInfo, 'click', () => {
-			customAlert('info', 'Hey its info alert!!', 2800);
+			customAlert('info', 'Hey its info alert!!', '');
 		});
 
 	}
