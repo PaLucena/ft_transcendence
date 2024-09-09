@@ -12,6 +12,7 @@ import { Match } from '../pages/Match/Match.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
 import { onlineSocket } from './utils/OnlineWebsocket.js';
 import { handleResponse } from './utils/rtchatUtils.js';
+import { Test } from '../pages/Test/Test.js';
 
 class Router {
 	constructor() {
@@ -30,6 +31,7 @@ class Router {
 			'/tournament': () => new Tournament(),
 			'/tournament/:tournamentId': params => new Tournament(params),
 			'/match': () => new Match(),
+			'/test': () => new Test(),
 		};
 		this.currentComponent = null;
 		this.previousPath = null;
