@@ -21,7 +21,6 @@ class Router {
 			'/login': () => new Login(),
 			'/signup': () => new Signup(),
 			'/play': () => new Play(),
-		//	'/play/:playId': params => new Play(params),
 			'/friends': () => new Friends(),
 			'/friends/:filter': params => new Friends(params),
 			'/profile': () => new Profile(),

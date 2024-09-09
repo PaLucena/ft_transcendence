@@ -4,9 +4,9 @@ import { Navbar } from '../../components/Navbar/Navbar.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Play extends Component {
-	constructor(params = {}) {
+	constructor() {
 		console.log('Play Constructor');
-		super('/pages/Play/play.html', params);
+		super('/pages/Play/play.html');
 	}
 
 	destroy() {
@@ -63,7 +63,7 @@ export class Play extends Component {
 		const	plusPublicBtn = document.getElementById("plusPublicBtn");
 		this.addEventListener(plusPublicBtn, "click", () => {
 			this.createTournament('public');
-		});	
+		});
 
 		const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
 		this.addEventListener(plusPrivateBtn, "click", () => {
@@ -104,14 +104,14 @@ export class Play extends Component {
 				},
 				credentials: 'include'
 			});
-	
+
 			const data = await response.json();
-	
-			let	joinedTournament = data.public_tournaments.find(tournament => 
+
+			let	joinedTournament = data.public_tournaments.find(tournament =>
 				tournament.players.some(players => players.nickname === 'you')
 			);
 			if (!joinedTournament) { // Verificamos si es undefined o null
-				joinedTournament = data.private_tournaments.find(tournament => 
+				joinedTournament = data.private_tournaments.find(tournament =>
 					tournament.players.some(players => players.nickname === 'you')
 				);
 			}
@@ -143,7 +143,7 @@ export class Play extends Component {
 		.then(data => {
 			customAlert('success', data.message, '3000');
 			navigateTo("/pong");
-			
+
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -170,7 +170,7 @@ export class Play extends Component {
 		.then(data => {
 			customAlert('success', data.message, '3000');
 			navigateTo("/pong");
-			
+
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -200,7 +200,7 @@ export class Play extends Component {
 		.then(data => {
 			customAlert('success', data.message, '3000');
 			navigateTo("/pong");
-			
+
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -341,7 +341,7 @@ export class Play extends Component {
 				const jsonData = await this.displayJoinModal(type);
 				console.log("hola");
 				console.log(jsonData);
-				
+
 				fetch(`/api/join_tournament/${tournamentData.id}/`, {
 					method: "POST",
 					headers: {
@@ -376,7 +376,7 @@ export class Play extends Component {
 																<label for="code">Invitation code</label>`;
 		else
 			document.querySelector('#codeInput').innerHTML = ``;
-		
+
 		const	joinModalElement = document.getElementById('joinModal');
 		const	joinModal = new bootstrap.Modal(joinModalElement, {backdrop: false, keyboard: true});
 

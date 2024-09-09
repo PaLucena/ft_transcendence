@@ -24,33 +24,40 @@ export default function customAlert(type, text, time, customStyle = '') {
         });
 
         let icon = '';
+        let messageTitle = '';
 
         switch (type) {
             case 'success':
-                icon = '<i class="fa-solid fa-thumbs-up"></i>';
+                icon = '<i class="alert-icon fa-solid fa-check"></i>';
+                messageTitle = 'Success';
                 break;
             case 'danger':
-                icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                icon = '<i class="alert-icon fa-solid fa-exclamation"></i>';
+                messageTitle = 'Error';
                 break;
             case 'warning':
-                icon = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                icon = '<i class="alert-icon fa-solid fa-exclamation"></i>';
+                messageTitle = 'Warning';
                 break;
             case 'info':
-                icon = '<i class="fa-solid fa-circle-info"></i>';
+                icon = '<i class="alert-icon fa-solid fa-info"></i>';
+                messageTitle = 'Info';
                 break;
             default:
-                icon = '<i class="fa-regular fa-bell"></i>';
+                icon = '<i class="alert-icon fa-regular fa-bell"></i>';
                 break;
         }
 
         customAlert.innerHTML = `
-            <div class="alert-icon me-2 d-flex justify-content-md-center align-items-center gap-3">
+            <div class="me-2 d-flex justify-content-md-center align-items-center">
                 ${icon}
-                <span class='text-start'>${text}</span>
+                <div class="message">
+                    <span class="text-1 fw-bold">${messageTitle}</span>
+                    <span class="text-2 ">${text}</span>
+                </div>
             </div>
-            <button type="button" id="alert_close" class="btn btn-close rounded-circle p-0 btn-window-action">
-                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-            </button>
+            <i id="alert_close" class="fa-solid fa-xmark close" aria-hidden="true"></i>
+            <div class="progress"></div>
         `;
 
         customAlert.classList.add('alert', `alert-${type}`, 'active');
@@ -59,13 +66,50 @@ export default function customAlert(type, text, time, customStyle = '') {
             customAlert.classList.add(customStyle);
         }
 
+        const progressBar = customAlert.querySelector('.progress');
+
+        if (time && time !== '') {
+            const animationStyle = document.createElement('style');
+            animationStyle.innerHTML = `
+                @keyframes customProgress {
+                    100% {
+                        right: 100%;
+                    }
+                }
+                .custom-alert .progress.active:before {
+                    animation: progress ${time}ms linear forwards;
+                }
+            `;
+            document.head.appendChild(animationStyle);
+
+            progressBar.classList.add('active');
+
+            setTimeout(() => {
+                customAlert.classList.remove('active');
+                progressBar.classList.remove('active');
+
+                setTimeout(() => {
+                    customAlert.classList.remove('alert', `alert-${type}`);
+                    if (customStyle) {
+                        customAlert.classList.remove(customStyle);
+                    }
+
+                    customAlert.innerHTML = '';
+                    document.head.removeChild(animationStyle);
+                }, 200);
+            }, time);
+        } else {
+            progressBar.classList.remove('active');
+        }
+
         const closeButtonElement = customAlert.querySelector('#alert_close');
         if (closeButtonElement) {
             closeButtonElement.addEventListener('click', () => {
                 customAlert.classList.remove('active');
+                progressBar.classList.remove('active');
+
                 setTimeout(() => {
                     customAlert.classList.remove('alert', `alert-${type}`);
-
                     if (customStyle) {
                         customAlert.classList.remove(customStyle);
                     }
@@ -73,22 +117,6 @@ export default function customAlert(type, text, time, customStyle = '') {
                     customAlert.innerHTML = '';
                 }, 200);
             });
-        }
-
-        if (time && time !== '') {
-            setTimeout(() => {
-                customAlert.classList.remove('active');
-
-                setTimeout(() => {
-                    customAlert.classList.remove('alert', `alert-${type}`);
-
-                    if (customStyle) {
-                        customAlert.classList.remove(customStyle);
-                    }
-
-                    customAlert.innerHTML = '';
-                }, 200);
-            }, time);
         }
     }
 };
