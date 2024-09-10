@@ -37,19 +37,20 @@ export class FriendsRenderer {
 				</div>`;
 
 			const commonHtml = `
-				<div class="chat-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
+				<div class="friends-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
 					<div class="img-nick">
-						<a class="btn rounded-circle bg-light d-flex justify-content-center align-items-center position-relative" href="/profile/${user.username}">
-							<img
-								src="${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-								class="${borderClass} border border-2 rounded-circle" alt="Circle Image"
-							>
+						<a
+							class="user-profile-picture ${borderClass} border border-2 btn rounded-circle bg-light d-flex justify-content-center align-items-center position-relative" href="/profile/${user.username}"
+							style="
+									background-image: url(${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'});"
+						>
 							${showStatusDot ? statusDotHtml : ''}
 						</a>
 						<p class="text-dark mt-2 fw-bold">${user.username}</p>
 					</div>
 					${this.getActionButtons(user, filterType)}
 				</div>`;
+
 
 			const template = document.createElement('template');
 			template.innerHTML = commonHtml.trim();
@@ -143,7 +144,7 @@ export class FriendsRenderer {
 						</div>`;
 			case 'incoming':
 				return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
-							<button class="btn btn-green"
+							<button class="btn btn-green text-light"
 								data-action="accept"
 								data-username="${user.username}">
 								Accept

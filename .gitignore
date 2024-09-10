@@ -5,6 +5,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+srcs/backend/django/apps/media/avatars/
 # /srcs/requirements/backend/django/apps/media/
 # https://docs.djangoproject.com/en/5.0/topics/migrations/
 # migrations/

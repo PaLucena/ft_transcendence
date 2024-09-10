@@ -25,19 +25,17 @@ export class ChatRenderer {
 		try {
 			const chatHtml = `
 				<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
-					<button class="open_chat_btn btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative"
-							style="width: 102px; height: 102px;"
-							data-bs-target="#messages_modal"
-							data-bs-toggle="modal"
-							data-chatroom_name="${chat.chatroom_name}">
-						<img src="${chat.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-							 style="max-width: 100px; min-width: 100px; height: 100px;"
-							 class="rounded-circle"
-							 alt="Circle Image">
-						<div class="status-dot position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status ? 'green' : 'gray'}-dot p-2"
-						data-online-username="${chat.other_user_username}"
-						style="top:90%; left:85%;">
-						</div>
+					<button
+						class="user-profile-picture open_chat_btn btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative"
+						style="background-image: url(${chat.other_user_avatar_url || '/assets/images/default_avatar.jpg'});"
+						data-bs-target="#messages_modal"
+						data-bs-toggle="modal"
+						data-chatroom_name="${chat.chatroom_name}"
+					>
+						<div
+							class="status-dot position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status ? 'green' : 'gray'}-dot p-2"
+							data-online-username="${chat.other_user_username}"
+							style="top:90%; left:85%;"></div>
 					</button>
 					<p class="text-light mt-2">${chat.other_user_username}</p>
 				</div>
@@ -107,13 +105,18 @@ export class ChatRenderer {
 	createOtherUserMessageContent(message, isPublicChat) {
 		if (isPublicChat) {
 			const userBtn = `
-			<a class="btn p-0 position-relative" href="/profile/${message.author.username}" >
-				<div class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" data-online-username="${message.author.username}" style="top:90%; left:90%;"></div>
-				<img
-					class="rounded-circle"
-					style="width: 32px; height: 32px;"
-					src="${message.author.avatar || '/assets/images/default_avatar.jpg'}"
-				>
+			<a
+				class="public-message user-profile-picture btn p-0 position-relative"
+				href="/profile/${message.author.username}"
+				style="
+					background-image: url(${message.author.avatar || '/assets/images/default_avatar.jpg'});
+					width: 35px;
+					height: 35px;"
+			>
+				<div
+					class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot"
+					data-online-username="${message.author.username}"
+					style="top:90%; left:90%;"></div>
 			</a>`;
 			return `
 			<li class="fade-in-up d-flex mb-2 flex-column justify-start">
@@ -190,15 +193,17 @@ export class ChatRenderer {
 			<div class="d-flex align-items-end me-2 dropup">
 				<button
 					type="button"
-					class="btn p-0"
+					class="private-header user-profile-picture btn p-0"
 					data-bs-toggle="dropdown"
+					style="
+						background-image: url(${data.other_user.avatar || '/assets/images/default_avatar.jpg'});
+						width: 42px;
+						height: 42px;"
 				>
-					<div class="status-dot position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot" data-online-username="${data.other_user.username}" style="top:90%; left:90%;"></div>
-					<img
-						class="rounded-circle"
-						src="${data.other_user.avatar || '/assets/images/default_avatar.jpg'}"
-						style="width: 42px; height: 42px;"
-					>
+					<div
+						class="status-dot position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot"
+						data-online-username="${data.other_user.username}"
+						style="top:90%; left:90%;"></div>
 				</button>
 				<ul class="dropdown-menu dropdown-menu-dark">
 					<li><a href="/profile/${data.other_user.username}" class="dropdown-item">Profile</a></li>
