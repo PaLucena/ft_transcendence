@@ -1,29 +1,25 @@
 <div id="rootProfile" class="root-profile d-flex">
 	<div class="container-user">
-		<div id="userInfo" class="user-info bg-light rounded-5 shadow">
+		<div id="userInfo" class="user-info rounded-5 bg-white shadow">
 			<div class="photo row col-10 mx-auto">
 				<div class="profile-photo-container col-4 m-0 d-flex justify-content-center">
 					<img id="photoContainer" class="profile-photo rounded-circle h-100 square shadow"/>
 				</div>
 			</div>
-			<div class="d-flex col-8 mt-4 mx-auto align-items-center justify-content-center">
-				<p id="usernamePlaceholder" class="display-6 fw-bold">‎</p>
+			<div id="userTopContainer" class="d-flex col-8 mt-4 mx-auto align-items-center justify-content-center">
+				<div id="usernamePlaceholder" class="display-6 fw-bold h-100 mx-2">‎</div>
+				<div id="chatBtnPlaceholder"></div>
 			</div>
 			<div class="d-flex col-8 mx-auto align-items-center justify-content-center">
-				<p><span id="friendsNbPlaceholder">0</span> friends</p>
+				<p><span id="friendsNbPlaceholder">0</span> <span id="friendsText">friends</span></p>
 			</div>
-			<div class="row col-4 mx-auto d-flex mt-3 justify-content-center">
-				<button id="editBtn" class="btn btn-success hide">EDIT PROFILE</button>
-			</div>
-			<div id="profile_bottom_btns"  class="profile-bottom-btns row col-12 mx-auto d-flex justify-content-center">
-				<button id="blockBtn" class="btn btn-danger col-6 hide">BLOCK</button>
-				<button id="logoutBtn" class="btn btn-outline-dark col-6 hide">LOGOUT</button>
-			</div>
+			<div id="editPlaceholder" class="row col-4 mx-auto d-flex mt-3 justify-content-center"> </div>
+			<div id="profile_bottom_btns"  class="profile-bottom-btns row col-12 mx-auto d-flex justify-content-center"> </div>
 		</div>
 		<div id="userEdit" class="user-edit bg-light align-items-center rounded-5 shadow">
 			<form id="editForm" class="edit-form d-flex mt-0 mt-md-5 justify-content-center align-items-center">
 				<div class="col-9 form-floating mt-3">
-					<input type="text" class="form-control" id="new_username" name="new_username" placeholder="">
+					<input type="text" class="form-control" id="new_username" name="new_username" placeholder="" autocomplete="username">
 					<label for="new_username">username</label>
 				</div>
 				<div class="col-9 form-floating mt-3">
@@ -31,16 +27,16 @@
 					<label for="avatar">avatar</label>
 				</div>
 				<div class="col-9 col form-floating mt-3">
-					<input type="password" class="form-control" id="old_password" name="old_password" placeholder="" data-bs-toggle="collapse" data-bs-target="#collapse">
+					<input type="password" class="form-control" id="old_password" name="old_password" placeholder="" autocomplete="current-password" data-bs-toggle="collapse" data-bs-target="#collapse">
 					<label for="old_password" id="oldPasswordLabel">Change password</label>
 				</div>
 				<div class="collapse col-9" id="collapse">
 					<div class="form-floating mt-3">
-						<input type="password" class="form-control" id="new_password" name="new_password" placeholder="">
+						<input type="password" class="form-control" id="new_password" name="new_password" placeholder="" autocomplete="new-password">
 						<label for="new_password">new password</label>
 					</div>
 					<div class="form-floating mt-3">
-						<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="">
+						<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="" autocomplete="new-password">
 						<label for="confirm_password">confirm new password</label>
 					</div>
 				</div>
@@ -55,9 +51,87 @@
 		</div>
 	</div>
 	<div class="container-stats">
-		<div class="stats row align-items-center justify-content-center bg-light rounded-5 shadow">
-			<div class="text-center">
-				<p class="display-1">Stats go here</p>
+		<div class="stats row rounded-5 bg-white shadow">
+			<div class="h-10 d-flex justify-content-center align-items-end">
+				<div id="statsSelector" class="btn-group col-6 gap-2">
+					<button id="ownStatsBtn" class="btn btn-outline-dark active position-relative">
+						My stats
+					</button>
+				</div>
+			</div>
+			<div id="statsPlaceholder" class="both-stats h-90">
+				<div id="ownStatsDisplay" class="h-100 w-100">
+					<div class="stats-own h-100 w-100 gap-4 d-flex justify-content-center align-items-center">
+						<div class="col-10">
+							Win Rate
+							<div class="progress" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
+								<div id="winRateBar" class="progress-bar" style="width: 25%">25%</div>
+							</div>
+						</div>
+						<ul id="ownStatsList" class="stats-list list-group mt-5 col-8 h-60">
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Total matches</div>
+								<div class="col-6 d-flex justify-content-end" id="total_matches"></div>
+							</li>
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Total points</div>
+								<div class="col-6 d-flex justify-content-end" id="total_goals"></div>
+							</li>
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Average score</div>
+								<div class="col-6 d-flex justify-content-end" id="average_score"></div>
+							</li>
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Highest score</div>
+								<div class="col-6 d-flex justify-content-end" id="highest_score"></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div id="friendshipStatsDisplay" class="h-100 w-100 hide">
+					<div class="stats-shared h-100 w-100 gap-4 m-0 d-flex justify-content-center align-items-center">
+						<div class="col-10">
+							Win Rate
+							<div class="progress" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
+								<div id="friendshipWinRateBar" class="progress-bar" style="width: 25%">25%</div>
+							</div>
+							<div class="d-flex justify-content-center">
+								<div class="col-5 d-flex justify-content-start">You</div>
+								<div id="friendName" class="col-5 d-flex justify-content-end"></div>
+							</div>
+						</div>
+						<ul id="friendshipStatsList" class="stats-list list-group mt-5 col-8 h-60">
+							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Total matches</div>
+								<div class="col-6 d-flex justify-content-end" id="total_matches"></div>
+							</li>
+							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Your wins</div>
+								<div class="col-6 d-flex justify-content-end" id="player1_wins"></div>
+							</li>
+							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Their wins</div>
+								<div class="col-6 d-flex justify-content-end" id="player2_wins"></div>
+							</li>
+							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Your total points</div>
+								<div class="col-6 d-flex justify-content-end" id="player1_total_goals"></div>
+							</li>
+							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Their total points</div>
+								<div class="col-6 d-flex justify-content-end" id="player2_total_goals"></div>
+							</li>
+							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Your average score</div>
+								<div class="col-6 d-flex justify-content-end" id="player1_average_goals_per_match"></div>
+							</li>
+							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start">Their average score</div>
+								<div class="col-6 d-flex justify-content-end" id="player2_average_goals_per_match"></div>
+							</li>
+						</ul>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

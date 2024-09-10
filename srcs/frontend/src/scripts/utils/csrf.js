@@ -12,6 +12,5 @@ export function getCSRFToken(csrftoken) {
 			}
 		}
 	}
-	console.log("CSRF: ", cookieValue)
 	return cookieValue;
 }

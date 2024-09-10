@@ -42,9 +42,6 @@ nav {
 	font-family: monospace;
 }
 
-
-
-/* for cutom scroll bar
 ::-webkit-scrollbar {
     background: #e6ecf8;
     width: 6px;
@@ -53,4 +50,18 @@ nav {
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, #61b2ff, #ff50ef);
 }
-*/
+
+.user-profile-picture {
+	border-radius: 50%;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	background-size: cover;
+	opacity: 1;
+	transition: opacity 0.4s;
+	border: 1px;
+}
+
+.user-profile-picture:hover {
+	opacity: 0.7;
+}
+

@@ -4,9 +4,9 @@ import { Navbar } from '../../components/Navbar/Navbar.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Play extends Component {
-	constructor(params = {}) {
+	constructor() {
 		console.log('Play Constructor');
-		super('/pages/Play/play.html', params);
+		super('/pages/Play/play.html');
 	}
 
 	destroy() {
@@ -14,7 +14,11 @@ export class Play extends Component {
 		this.removeAllEventListeners();
 	}
 
-	init() {
+	async init() {
+		this.checkRunningTournaments()
+		.then(tournamentId => {
+			document.getElementById("tournamentBtn").innerHTML = tournamentId ? "<h1>Back to tournament</h1>" : "<h1>Tournament</h1>";
+		})
 		this.setupEventListeners();
 		Navbar.focus();
 	}
@@ -28,9 +32,20 @@ export class Play extends Component {
 
 		const	tournamentBtn = document.getElementById("tournamentBtn");
 		this.addEventListener(tournamentBtn, "click", () => {
-			document.getElementById("btns").style.display = "none";
-			document.getElementById("dropdownTournaments").style.display = "block";
-			this.displayTournaments();
+
+			this.checkRunningTournaments()
+			.then(tournamentId => {
+				if (tournamentId)
+					navigateTo(`/tournament/${tournamentId}`);
+				else {
+					document.getElementById("btns").style.display = "none";
+					document.getElementById("dropdownTournaments").style.display = "block";
+					this.displayTournaments();
+				}
+			})
+			.catch((error) => {
+				customAlert('danger', `Error(checkRunningTournaments): ` + error.message, '');
+			})
 		});
 
 		const	backOne = document.getElementById("backOne");
@@ -80,6 +95,34 @@ export class Play extends Component {
 		});
 	}
 
+	async checkRunningTournaments() {
+		try {
+			const response = await fetch('/api/display_tournaments/', {
+				method: "GET",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include'
+			});
+
+			const data = await response.json();
+
+			let	joinedTournament = data.public_tournaments.find(tournament =>
+				tournament.players.some(players => players.nickname === 'you')
+			);
+			if (!joinedTournament) { // Verificamos si es undefined o null
+				joinedTournament = data.private_tournaments.find(tournament =>
+					tournament.players.some(players => players.nickname === 'you')
+				);
+			}
+			return (joinedTournament ? joinedTournament.id : null);
+		}
+		catch (error) {
+			console.log("ERROR", error)
+			throw error;
+		}
+	}
+
 	// local match
 	playLocal() {
 		fetch("/api/start_local_match/", {
@@ -100,7 +143,7 @@ export class Play extends Component {
 		.then(data => {
 			customAlert('success', data.message, '3000');
 			navigateTo("/pong");
-			
+
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -127,7 +170,7 @@ export class Play extends Component {
 		.then(data => {
 			customAlert('success', data.message, '3000');
 			navigateTo("/pong");
-			
+
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -157,7 +200,7 @@ export class Play extends Component {
 		.then(data => {
 			customAlert('success', data.message, '3000');
 			navigateTo("/pong");
-			
+
 		})
 		.catch((error) => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -253,9 +296,8 @@ export class Play extends Component {
 		})
 		.then(data => {
 			const	displayPublic = data.public_tournaments;
-			console.log("Torneos publicos:", displayPublic);
 			const	displayPrivate = data.private_tournaments;
-			console.log("Torneos privados:", displayPrivate);
+
 			if (displayPublic.length === 0)
 				document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
 			else {
@@ -299,7 +341,7 @@ export class Play extends Component {
 				const jsonData = await this.displayJoinModal(type);
 				console.log("hola");
 				console.log(jsonData);
-				
+
 				fetch(`/api/join_tournament/${tournamentData.id}/`, {
 					method: "POST",
 					headers: {
@@ -330,16 +372,17 @@ export class Play extends Component {
 
 	displayJoinModal(type) {
 		if (type === 'private')
-			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required><label for="code">Invitation code</label>`;
+			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
+																<label for="code">Invitation code</label>`;
 		else
 			document.querySelector('#codeInput').innerHTML = ``;
-		
+
 		const	joinModalElement = document.getElementById('joinModal');
 		const	joinModal = new bootstrap.Modal(joinModalElement, {backdrop: false, keyboard: true});
 
 		joinModal.show();
 
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			const joinForm = document.querySelector("#joinForm");
 
 			this.addEventListener(joinForm, "submit", (event) => {

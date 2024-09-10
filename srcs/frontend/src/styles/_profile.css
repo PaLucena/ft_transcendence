@@ -99,6 +99,26 @@
 	width: 90%;
 }
 
+.container-stats .stats .stats-list {
+	margin-bottom: 5%;
+}
+
+.both-stats {
+	position: relative;
+}
+
+.both-stats .stats-own {
+	flex-direction: column;
+	position: absolute;
+	z-index: 2;
+}
+
+.both-stats .stats-shared {
+	flex-direction: column;
+	position: absolute;
+	z-index: 1;
+}
+
 .container-user .user-edit {
 	display: none;
 	margin: 0 auto;

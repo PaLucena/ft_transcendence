@@ -10,40 +10,37 @@
 .friends-elements-container {
 	margin: 0;
 }
+
 .search-friends-container {
 	overflow-y: auto;
 	overflow-x: hidden;
 }
+
 .search-friends-container .container {
 	padding: 0;
 }
 
-.search-friends-container .chat-element {
+.search-friends-container .friends-element {
 	padding: 0;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
 
-.search-friends-container .chat-element .img-nick {
+.search-friends-container .friends-element .img-nick {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
 
-.search-friends-container .chat-element  .img-nick p {
+.search-friends-container .friends-element .img-nick p {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	max-width: 150px;
 }
 
-.search-friends-container .chat-element  .img-nick  .btn {
-	width: 102px;
-	height: 102px;
-}
-
-.search-friends-container .chat-element  .img-nick .btn img {
+.search-friends-container .friends-element .img-nick .user-profile-picture {
 	width: 100px;
 	height: 100px;
 }
@@ -70,33 +67,27 @@
 		padding-right: 10px;
 	}
 
-	.search-friends-container .chat-element {
+	.search-friends-container .friends-element {
 		padding: 0;
 		flex-direction: row;
 		justify-content: space-between;
 		width: 100%;
 	}
-	.search-friends-container .chat-element .img-nick {
+	.search-friends-container .friends-element .img-nick {
 		gap: 10px;
 		flex-direction: row;
 	}
 
-	.search-friends-container .chat-element .img-nick p {
+	.search-friends-container .friends-element .img-nick p {
 		max-width: 100px;
 	}
 
-	.search-friends-container .chat-element .custon-btn-group {
+	.search-friends-container .friends-element .custon-btn-group {
 		justify-content: end!important;
 	}
 
-	.search-friends-container .chat-element  .img-nick  .btn {
-		width: 82px;
-		height: 82px;
-	}
-
-	.search-friends-container .chat-element  .img-nick .btn img {
+	.search-friends-container .friends-element .img-nick .user-profile-picture {
 		width: 80px;
 		height: 80px;
 	}
-
 }

@@ -16,19 +16,7 @@ export class Signup extends Component {
     }
 
 	init() {
-		this.showTermsAndConditions();
 		this.initSubmitForm()
-	}
-
-	showTermsAndConditions() {
-		const tAndC = document.getElementById("tAndC");
-
-		this.addEventListener(tAndC, 'click', () => {
-			const	tcModalElement = document.getElementById('t&cModal');
-			const	tcModal = new bootstrap.Modal(tcModalElement, {backdrop: false, keyboard: true});
-			
-			tcModal.show();
-		});
 	}
 
 	initSubmitForm() {
@@ -49,16 +37,6 @@ export class Signup extends Component {
 				$('#confirm_password').removeClass('is-invalid').addClass('is-valid');
 				$('#confirm_password')[0].setCustomValidity('');
 			}
-			console.log("AAAA");
-
-			/* if (!this.checkValidity()) {
-				event.preventDefault();
-				formIsValid = false;
-				console.log("C");
-			} */
-			console.log("D");
-
-			setTimeout(console.log("Sleeping", 5000))
 
 			if (formIsValid) {
 				event.preventDefault();

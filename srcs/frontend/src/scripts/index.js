@@ -1,4 +1,5 @@
 import routerInstance, { navigateTo, navigateToOnBootup } from './Router.js';
+import customAlert from './utils/customAlert.js';
 
 window.addEventListener("DOMContentLoaded", () => {
 	navigateToOnBootup();
@@ -14,7 +15,6 @@ document.addEventListener("click", (event) => {
 
 	if (clickableElement && clickableElement.hasAttribute("href")) {
 		event.preventDefault();
-		//console.log("Navigating to:", clickableElement.getAttribute("href"));
 		navigateTo(clickableElement.getAttribute("href"));
 	}
 });
