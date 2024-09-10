@@ -64,7 +64,6 @@ export class Login extends Component {
 					if (data.has_2fa === true) {
 						const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
 						await TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
-						console.log('ayudame porfa')
 					}
 
 					onlineSocket.initWebSocket(jsonData["username"]);

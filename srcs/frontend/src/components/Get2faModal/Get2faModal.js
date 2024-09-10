@@ -22,14 +22,12 @@ export class Get2faCode extends Component {
 	}
 
 	showModal(overlayElement, inputs, TwoFactorModal) {
-		this.clearModal(inputs);
-		overlayElement.style.display = 'block';
 		TwoFactorModal.show();
+		this.clearModal(inputs);
 	}
 
 
 	hideModal(overlayElement, inputs, TwoFactorModal) {
-		overlayElement.style.display = 'none';
 		this.clearModal(inputs);
 		TwoFactorModal.hide();
 	}
@@ -37,7 +35,6 @@ export class Get2faCode extends Component {
 	async initTwoFactorAuth(jsonData) {
 		const overlayElement = document.getElementById('customOverlay');
 		const inputs = document.querySelectorAll('.otp-input');
-		const form = document.getElementById('twoFactorForm');
 		const TwoFactorModalElement = document.getElementById('twoFactorModal');
 		let TwoFactorModal = new bootstrap.Modal(TwoFactorModalElement, { backdrop: false, keyboard: true })
 
@@ -47,7 +44,7 @@ export class Get2faCode extends Component {
 			inputs.forEach((input, index) => {
 				input.addEventListener('input', (event) => {
 					const value = event.target.value;
-
+					
 					if (!/^\d$/.test(value)) {
 						event.target.value = '';
 						return;
@@ -56,10 +53,10 @@ export class Get2faCode extends Component {
 						inputs[index + 1].focus();
 					}
 					if (index === inputs.length - 1 && Array.from(inputs).every(input => input.value)) {
-						submit2FAForm(jsonData, inputs);
+						submit2FAForm(jsonData, overlayElement, inputs, TwoFactorModal);
 					}
 				});
-
+				
 				input.addEventListener('keydown', (event) => {
 					if (event.key === 'Backspace' && input.value === '') {
 						if (index > 0) {
@@ -68,8 +65,9 @@ export class Get2faCode extends Component {
 					}
 				});
 			});
-
-			function submit2FAForm(username, inputs) {
+			
+			inputs[0].focus();
+			const submit2FAForm = (username, overlayElement, inputs, TwoFactorModal) => {
 				const otpCode = Array.from(inputs).map(input => input.value).join('');
 				const csrftoken = getCSRFToken('csrftoken');
 
@@ -107,9 +105,13 @@ export class Get2faCode extends Component {
 					}).then(response => {
 						return response.json();
 					})
-						.then(data => {
-							resolve
-						})
+					.then(() => {
+						console.log("resolving")
+						resolve();
+						console.log("resolved")
+						this.hideModal(overlayElement, inputs, TwoFactorModal);
+						console.log("cleared")
+					})
 				})
 				.catch(error => {
 					customAlert('danger', `Errorr: ${error.message}`, '');
