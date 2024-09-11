@@ -72,7 +72,6 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
         return self.scope["channels_store"].get(username, None)
 
     async def send_message_from_server(self, message, username):
-
         try:
             channel_name = await self.get_user_channel(username)
             if channel_name:

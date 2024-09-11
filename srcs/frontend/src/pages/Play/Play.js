@@ -2,6 +2,7 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
 import customAlert from '../../scripts/utils/customAlert.js';
+import { notificationsSocket  } from '../../scripts/utils/NotificationsWebsocket.js';
 
 export class Play extends Component {
 	constructor() {
