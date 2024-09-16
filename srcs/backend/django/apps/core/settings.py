@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-	"adrf",
+    "adrf",
     "user",
     "friends",
     "user_stats",
@@ -67,7 +67,7 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
     "twofactor",
     "qrcode",
-	"notifications"
+    "notifications",
 ]
 
 MIDDLEWARE = [
@@ -199,7 +199,7 @@ SESSION_ENGINE = (
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Europe/Madrid'
 
 USE_I18N = True
 

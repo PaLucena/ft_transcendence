@@ -71,7 +71,7 @@ export class Login extends Component {
 					}
 				})
 				.catch(error => {
-					customAlert('danger', `Erroor: ${error.message}`, '');
+					customAlert('danger', `Error: ${error.message}`, '');
 					console.log(error);
 				});
 			}
