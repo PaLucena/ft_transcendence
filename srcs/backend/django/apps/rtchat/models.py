@@ -4,14 +4,11 @@ from user.models import AppUser
 import shortuuid
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from channels.db import database_sync_to_async
+from django.utils import timezone
 
 
 class ChatGroup(models.Model):
     group_name = models.CharField(max_length=128, unique=True, blank=True)
-    users_online = models.ManyToManyField(
-        AppUser, related_name="online_in_groups", blank=True
-    )
     members = models.ManyToManyField(AppUser, related_name="chat_group", blank=True)
     is_private = models.BooleanField(default=False)
 
@@ -49,13 +46,44 @@ class Block(models.Model):
     def __str__(self):
         return f"{self.blocker} blocked {self.blocked}"
 
-    @staticmethod
-    @database_sync_to_async
-    def is_blocked(blocker, blocked):
-        return Block.objects.filter(blocker=blocker, blocked=blocked).exists()
 
+class Invite(models.Model):
+    sender = models.ForeignKey(
+        AppUser, related_name="sent_invites", on_delete=models.CASCADE
+    )
+    receiver = models.ForeignKey(
+        AppUser, related_name="received_invites", on_delete=models.CASCADE
+    )
+    group_name = models.CharField(max_length=128, unique=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_accepted = models.BooleanField(default=False)
+    is_cancelled = models.BooleanField(default=False)
 
-@receiver(pre_save, sender=ChatGroup)
-def set_group_name(sender, instance, **kwargs):
+    def has_expired(self):
+        return timezone.now() > self.expires_at
+
+    def start_game(self):
+        if self.is_accepted and not self.has_expired():
+            pass
+
+    def cancel_invite(self):
+        self.is_cancelled = True
+        self.save()
+
+    def accept_invite(self):
+        if not self.has_expired():
+            self.is_accepted = True
+            self.save()
+
+def generate_group_name(instance):
     if not instance.group_name:
         instance.group_name = shortuuid.uuid()
+
+@receiver(pre_save, sender=Invite)
+def set_group_name_for_invite(sender, instance, **kwargs):
+    generate_group_name(instance)
+
+@receiver(pre_save, sender=ChatGroup)
+def set_group_name_for_chatgroup(sender, instance, **kwargs):
+    generate_group_name(instance)
