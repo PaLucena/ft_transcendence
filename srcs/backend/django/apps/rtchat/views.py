@@ -1,4 +1,5 @@
 import threading
+import time
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -227,6 +228,8 @@ def block_or_unblock_user_view(request):
 @default_authentication_required
 def create_invite(request, username):
     try:
+        invitation_lifetime = 60
+
         if request.user.username == username:
             return Response(
                 {"detail": "You cannot invite yourself"},
@@ -250,19 +253,27 @@ def create_invite(request, username):
             .first()
         )
 
+        current_time = timezone.now()
+
         if existing_invite:
-            return Response(
-                {"detail": "An invite between these users already exists"},
-                status=status.HTTP_409_CONFLICT,
-            )
+            time_remaining = (existing_invite.expires_at - current_time).total_seconds()
+            if time_remaining > 0:
+                return Response(
+                    {
+                        "detail": f"You need to wait {int(time_remaining)} seconds to send this user another request."
+                    },
+                    status=status.HTTP_409_CONFLICT,
+                )
+
+        expires_at = current_time + timezone.timedelta(seconds=invitation_lifetime)
 
         invite = Invite.objects.create(
             sender=request.user,
             receiver=other_user,
-            expires_at=timezone.now() + timezone.timedelta(seconds=90),
+            expires_at=expires_at,
         )
 
-        delete_invite_after_delay(invite.id, 90)
+        delete_invite_after_delay(invite.id, invitation_lifetime)
 
         return Response(
             {"invite_id": invite.id, "group_name": invite.group_name},
