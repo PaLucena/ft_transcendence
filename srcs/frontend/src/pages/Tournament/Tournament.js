@@ -1,6 +1,7 @@
 import { Component } from "../../scripts/Component.js";
 import { navigateTo } from '../../scripts/Router.js';
 import customAlert from '../../scripts/utils/customAlert.js';
+import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 
 export class Tournament extends Component {
 	constructor(params = {}) {
@@ -15,7 +16,7 @@ export class Tournament extends Component {
 	}
 
 	init() {
-		this.getTournamentCode(this.params.tournamentId);
+		//this.getTournamentCode(this.params.tournamentId);
 		this.checkCreator(this.params.tournamentId);
 		this.displayInfo(this.params.tournamentId);
 	}
@@ -129,6 +130,7 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
+				tournamentSocket.closeWebSocket();
 				navigateTo('/play');
 			})
 			.catch((error) => {

@@ -3,19 +3,16 @@ import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { notificationsSocket  } from '../../scripts/utils/NotificationsWebsocket.js';
+import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 
 export class Play extends Component {
 	constructor() {
 		super('/pages/Play/play.html');
 		console.log('Play Constructor');
-		this.t_socket = null;
 	}
 
 	destroy() {
 		console.log("Play Custom destroy");
-		// if (this.t_socket) {
-		// 	this.t_socket.close();
-		// }
 		this.removeAllEventListeners();
 	}
 
@@ -28,31 +25,33 @@ export class Play extends Component {
 		Navbar.focus();
 	}
 
-	createTournamentWebSocket(tournament_name) {
-		try {
-			this.t_socket = new WebSocket(`ws/tournament/${tournament_name}/`)
-		} catch (error) {
-			this.handleError(null, 'Failed to create WebSocket');
-			customAlert('danger', 'Failed to connect', 5000);
-			return;
-		}
+	// createTournamentWebSocket(tournament_name) {
+	// 	console.log("tournament_name: ", tournament_name);
+
+	// 	try {
+	// 		this.t_socket = new WebSocket(`ws/tournament/${tournament_name}/`)
+	// 	} catch (error) {
+	// 		this.handleError(null, 'Failed to create WebSocket');
+	// 		customAlert('danger', 'Failed to connect', 5000);
+	// 		return;
+	// 	}
 		
-		this.t_socket.onopen = () => {
-			console.log("Connection established");
-		};
+	// 	this.t_socket.onopen = () => {
+	// 		console.log("Connection established");
+	// 	};
 
-		this.t_socket.onclose = (event) => {
-			if (event.wasClean) {
-				console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-			} else {
-				console.log('Connection died');
-			}
-		}
+	// 	this.t_socket.onclose = (event) => {
+	// 		if (event.wasClean) {
+	// 			console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+	// 		} else {
+	// 			console.log('Connection died');
+	// 		}
+	// 	}
 
-		this.t_socket.onerror = (error) => {
-			console.log(`Error: ${error.message}`);
-		}
-	}
+	// 	this.t_socket.onerror = (error) => {
+	// 		console.log(`Error: ${error.message}`);
+	// 	}
+	// }
 
 	setupEventListeners() {
 		const	oneVSoneBtn = document.getElementById("oneVSoneBtn");
@@ -271,7 +270,8 @@ export class Play extends Component {
 			.then(data => {
 				customAlert('success', data.message, '3000');
 				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
-				this.createTournamentWebSocket(jsonData["name"]);
+				//this.createTournamentWebSocket(jsonData["name"]);
+				tournamentSocket.initWebSocket(jsonData["name"]);
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
@@ -392,8 +392,9 @@ export class Play extends Component {
 				})
 				.then(data => {
 					// TODO: Añadir modal para insertar nickname
+					//this.createTournamentWebSocket(tournamentName);
+					tournamentSocket.initWebSocket(tournamentName);
 					navigateTo("/tournament/" + tournamentData.id);
-					this.createTournamentWebSocket(tournamentName);
 					console.log(data);
 				})
 				.catch((error) => {
