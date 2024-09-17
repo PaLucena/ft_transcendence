@@ -25,19 +25,17 @@ export class ChatRenderer {
 		try {
 			const chatHtml = `
 				<div class="chat-element col-6 col-md-4 col-lg-2 d-flex flex-column align-items-center mb-4">
-					<button class="open_chat_btn btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative"
-							style="width: 102px; height: 102px;"
-							data-bs-target="#messages_modal"
-							data-bs-toggle="modal"
-							data-chatroom_name="${chat.chatroom_name}">
-						<img src="${chat.other_user_avatar_url || '/assets/images/default_avatar.jpg'}"
-							 style="max-width: 100px; min-width: 100px; height: 100px;"
-							 class="rounded-circle"
-							 alt="Circle Image">
-						<div class="status-dot position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status ? 'green' : 'gray'}-dot p-2"
-						data-online-username="${chat.other_user_username}"
-						style="top:90%; left:85%;">
-						</div>
+					<button
+						class="user-profile-picture open_chat_btn btn rounded-circle bg-dark d-flex justify-content-center align-items-center position-relative"
+						style="background-image: url(${chat.other_user_avatar_url || '/assets/images/default_avatar.jpg'});"
+						data-bs-target="#messages_modal"
+						data-bs-toggle="modal"
+						data-chatroom_name="${chat.chatroom_name}"
+					>
+						<div
+							class="status-dot position-absolute translate-middle border border-3 border-dark ${chat.other_user_online_status ? 'green' : 'gray'}-dot p-2"
+							data-online-username="${chat.other_user_username}"
+							style="top:90%; left:85%;"></div>
 					</button>
 					<p class="text-light mt-2">${chat.other_user_username}</p>
 				</div>
@@ -107,13 +105,18 @@ export class ChatRenderer {
 	createOtherUserMessageContent(message, isPublicChat) {
 		if (isPublicChat) {
 			const userBtn = `
-			<a class="btn p-0 position-relative" href="/profile/${message.author.username}" >
-				<div class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot" data-online-username="${message.author.username}" style="top:90%; left:90%;"></div>
-				<img
-					class="rounded-circle"
-					style="width: 32px; height: 32px;"
-					src="${message.author.avatar || '/assets/images/default_avatar.jpg'}"
-				>
+			<a
+				class="public-message user-profile-picture btn p-0 position-relative"
+				href="/profile/${message.author.username}"
+				style="
+					background-image: url(${message.author.avatar || '/assets/images/default_avatar.jpg'});
+					width: 35px;
+					height: 35px;"
+			>
+				<div
+					class="status-dot position-absolute translate-middle border border-3 border-dark ${message.author.is_online ? 'green' : 'gray'}-dot"
+					data-online-username="${message.author.username}"
+					style="top:90%; left:90%;"></div>
 			</a>`;
 			return `
 			<li class="fade-in-up d-flex mb-2 flex-column justify-start">
@@ -190,20 +193,29 @@ export class ChatRenderer {
 			<div class="d-flex align-items-end me-2 dropup">
 				<button
 					type="button"
-					class="btn p-0"
+					class="private-header user-profile-picture btn p-0"
 					data-bs-toggle="dropdown"
+					style="
+						background-image: url(${data.other_user.avatar || '/assets/images/default_avatar.jpg'});
+						width: 42px;
+						height: 42px;"
 				>
-					<div class="status-dot position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot" data-online-username="${data.other_user.username}" style="top:90%; left:90%;"></div>
-					<img
-						class="rounded-circle"
-						src="${data.other_user.avatar || '/assets/images/default_avatar.jpg'}"
-						style="width: 42px; height: 42px;"
-					>
+					<div
+						class="status-dot position-absolute translate-middle border border-3 border-dark ${data.other_user.is_online ? 'green' : 'gray'}-dot"
+						data-online-username="${data.other_user.username}"
+						style="top:90%; left:90%;"></div>
 				</button>
 				<ul class="dropdown-menu dropdown-menu-dark">
 					<li><a href="/profile/${data.other_user.username}" class="dropdown-item">Profile</a></li>
 					<li><hr class="dropdown-divider"></li>
-					<li><a class="dropdown-item" href="#">Invite to Play</a></li>
+					<li>
+						<button
+							id="invite_to_play_btn"
+							class="dropdown-item"
+							data-invite-to-play-username="${data.other_user.username}">
+							Invite to Play
+						</button>
+					</li>
 					<li>
 						<button class="dropdown-item block-unblock-btn"
 							data-block-action="${action}"
@@ -251,6 +263,61 @@ export class ChatRenderer {
 		else {
 			return null;
 		}
+	}
+
+	renderInviteModal() {
+		const container = document.getElementById('match_waiting_modal_container');
+
+		if (container) {
+			container.innerHTML = '';
+            const inviteModalHtml = this.createInviteModal();
+
+			if (inviteModalHtml) {
+				const template = document.createElement('template');
+				template.innerHTML = inviteModalHtml.trim();
+				const inviteModalElement = template.content.firstChild;
+
+				container.appendChild(inviteModalElement);
+			}
+        } else {
+			console.warn('match_waiting_modal_container not found.');
+		}
+	}
+
+	createInviteModal() {
+		return `
+			<div id="match_waiting_modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+				<div class="modal-bg">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header justify-content-center">
+								<h1 class="modal-title fs-5">Waiting for players!</h1>
+							</div>
+							<div class="modal-body">
+								<div class="container d-flex align-items-center text-center justify-content-center gap-4">
+									<div class="accepted player-container">
+										<div class="img" style="background-image: url(/assets/images/Bart.jpeg);">
+										</div>
+										<span>Bart</span>
+									</div>
+									<div class="vs">
+										<i class="fa-solid fa-v"></i> / <i class="fa-solid fa-s"></i>
+									</div>
+									<div class="canceled player-container">
+										<div class="img" style="background-image: url(/assets/images/back_hole.webp);"></div>
+										<span>Black Hole</span>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<div class="timer">0:60</div>
+								<div class="btn action-btn accept">Accept</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		`;
 	}
 
 	removeBlockStatusMessage() {

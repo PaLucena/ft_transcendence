@@ -34,23 +34,6 @@ class OnlineWebsocket {
         eventEmitter.on('onlineUsersUpdated', this.onlineUsersUpdatedListener);
     }
 
-    sendMessage(message, to_user) {
-        if (this.onlineSocket && this.onlineSocket.readyState === WebSocket.OPEN) {
-            try {
-                const data = {
-                    'to_user': to_user,
-                    'message': message
-                };
-                this.onlineSocket.send(JSON.stringify(data));
-                console.log("Message sent:", data);
-            } catch (error) {
-                this.handleError(null, 'Failed to send message', false);
-            }
-        } else {
-            console.error("WebSocket is not open. Cannot send message.");
-        }
-    }
-
     handleMessage(event) {
         try {
             const data = JSON.parse(event.data);
@@ -62,8 +45,6 @@ class OnlineWebsocket {
 
             if (data.online_users) {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
-            } else if (data.message) {
-                customAlert('info', data.message, 3000);
             } else {
                 this.handleError(null, 'Invalid data format received.', false);
             }

@@ -4,6 +4,7 @@ import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 import { initTwoFactorAuth } from '../../components/Get2faModal/Get2faModal.js'; // Adjust path as needed
+import { notificationsSocket  } from '../../scripts/utils/NotificationsWebsocket.js';
 
 export class Login extends Component {
 	constructor() {
@@ -64,6 +65,7 @@ export class Login extends Component {
 						initTwoFactorAuth(jsonData);
 					} else {
 						onlineSocket.initWebSocket(jsonData["username"]);
+						notificationsSocket.initWebSocket();
 						customAlert('success', 'Login successful', 3000);
 						navigateTo("/play");
 					}

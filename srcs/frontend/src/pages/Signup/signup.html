@@ -6,7 +6,7 @@
 		<form id="signup_form" class="needs-validation d-flex justify-content-center" novalidate>
 			<div class="d-flex flex-column gap-3 mb-4 justify-content-center text-center" style="max-width: 350px;">
 				<div class="form-floating">
-					<input type="text" class="form-control" id="username" name="username" placeholder="Username" autofocus required>
+					<input type="text" class="form-control" id="username" name="username" placeholder="Username" autocomplete="username" autofocus required>
 					<label for="username">Username</label>
 					<div class="invalid-feedback">
 						Please choose a username.
@@ -20,14 +20,14 @@
 					</div>
 				</div>
 				<div class="form-floating">
-					<input type="password" class="form-control" id="password" name="password" placeholder="Create password" required>
+					<input type="password" class="form-control" id="password" name="password" placeholder="Create password" autocomplete="new-password" required>
 					<label for="password">Create password</label>
 					<div class="invalid-feedback">
 						Please enter a password.
 					</div>
 				</div>
 				<div class="form-floating">
-					<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+					<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" autocomplete="new-password" required>
 					<label for="confirm_password">Confirm password</label>
 					<div class="valid-feedback">
 						Passwords do match!
@@ -36,40 +36,6 @@
 						Passwords do not match.
 					</div>
 				</div>
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
-					<label class="form-check-label" for="invalidCheck">
-					  Agree to<span class="btn btn-link" id="tAndC">terms and conditions</span>
-					</label>
-					<div class="invalid-feedback">
-					  You must agree before submitting.
-					</div>
-				</div>
-
-				<!-- Modal -->
-				<div class="modal fade modal-background" id="t&cModal" tabindex="-1" aria-labelledby="t&cModalLabel" aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h1 class="modal-title fs-5" id="t&cModalLabel">Terms and conditions</h1>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-						</div>
-						<div class="modal-body mb-2">
-							Lorem ipsum dolor sit amet, consectetur
-							adipiscing elit. Sed do eiusmod tempor
-							incididunt ut labore et dolore magna aliqua. Ut
-							enim ad minim veniam, quis nostrud exercitation
-							ullamco laboris nisi ut aliquip ex ea commodo
-							consequat. Duis aute irure dolor in
-							reprehenderit in voluptate velit esse cillum
-							dolore eu fugiat nulla pariatur. Excepteur sint
-							occaecat cupidatat non proident, sunt in culpa
-							qui officia deserunt mollit anim id est laborum.
-						</div>
-					</div>
-					</div>
-				</div>
-
 				<div class="d-flex text-center col-8 mx-auto pt-3 pb-2 justify-content-center w-100">
 					<button type="submit" class="btn btn-primary fw-bold w-100">CREATE ACCOUNT</button>
 				</div>
