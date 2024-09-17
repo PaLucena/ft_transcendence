@@ -200,6 +200,7 @@ def remove_participation(request, tournament_id):
 			if user == tournament.creator:
 				if tournament.participants.count() != 0:
 					tournament.creator = tournament.participants.first()
+					tournament.save()
 
 			if tournament.participants.count() == 0:
 				tournament.delete()

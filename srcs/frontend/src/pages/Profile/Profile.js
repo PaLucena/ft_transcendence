@@ -1,6 +1,7 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
+import { Navbar } from '../../components/Navbar/Navbar.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";

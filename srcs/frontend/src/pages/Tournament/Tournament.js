@@ -21,8 +21,6 @@ export class Tournament extends Component {
 	}
 
 	getTournamentCode(tournamentId) {
-		console.log("Tournament ID: ", tournamentId);
-
 		fetch(`/api/get_code/${tournamentId}`, {
 			method: "GET",
 			headers: {
@@ -41,8 +39,6 @@ export class Tournament extends Component {
 		.then(data => {
 			if (data.code !== null)
 				document.getElementById('invitationCode').innerHTML = `Code: ${data.code}`;
-
-			console.log("Código de acceso al torneo: ", data.code);
 		})
 		.catch((error) => {
 			console.log(error);
@@ -70,10 +66,8 @@ export class Tournament extends Component {
 				document.getElementById('closeBtn').style.display = 'block';
 				this.closeTournament(tournamentId)
 			}
-			else {
-				document.getElementById('exitBtn').style.display = 'block';
-				this.exitTournament(tournamentId);
-			}
+			document.getElementById('exitBtn').style.display = 'block';
+			this.exitTournament(tournamentId);
 		})
 		.catch((error) => {
 			console.log(error);

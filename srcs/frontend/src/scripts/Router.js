@@ -48,7 +48,7 @@ class Router {
 		if (window.location.pathname === "/" || window.location.pathname === "/login") {
 			navigateTo(this.checkAuthentication() ? '/play' : '/login');
 		}
-		else if (window.location.pathname === "/register") {
+		else if (window.location.pathname === "/signup") {
 			navigateTo(this.checkAuthentication() ? '/play' : '/signup')
 		}
 		else {
