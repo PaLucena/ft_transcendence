@@ -26,7 +26,6 @@ from django.contrib.auth import login as auth_login
 from .decorators import default_authentication_required
 from django.http import JsonResponse
 from twofactor.views import Has2faEnabled
-from .consumers import OnlineStatusConsumer as OSocketConsumers
 from django.contrib.auth import update_session_auth_hash
 from blockchain.views import load_test_data, get_face2face
 from friends.views import get_friendship_status

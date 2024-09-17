@@ -152,6 +152,17 @@
 	height: 100%;
 	width: 100%;
 	background-color: #fff;
+	animation: none;
+}
+
+.custom-alert .progress.active::before {
+    animation: progress var(--progress-time) linear forwards;
+}
+
+@keyframes progress {
+    100% {
+        right: 100%;
+    }
 }
 
 .custom-alert.alert-primary .progress:before {
@@ -184,12 +195,6 @@
 
 .custom-alert.alert-dark .progress:before {
 	background-color: var(--bs-dark-border-subtle);
-}
-
-@keyframes progress {
-	100% {
-		right: 100%;
-	}
 }
 
 @media (max-width: 720px) {

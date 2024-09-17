@@ -10,6 +10,8 @@ from user import consumers
 from user import routing as UserAppRouting
 from rtchat import routing as RtchatAppRouting
 from ponggame import routing as PonggameAppRouting
+from notifications import routing as NotificationsAppRouting
+from tournament import routing as TournamentAppRouting
 from user.middleware import JWTAuthMiddleware
 # from YourAppHere import consumers
 
@@ -18,7 +20,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 websocket_urlpatterns = (
     UserAppRouting.websocket_urlpatterns +
     RtchatAppRouting.websocket_urlpatterns +
-    PonggameAppRouting.websocket_urlpatterns
+    PonggameAppRouting.websocket_urlpatterns +
+	NotificationsAppRouting.websocket_urlpatterns +
+	TournamentAppRouting.websocket_urlpatterns
 )
 
 # ProtocolTypeRouter for routing different protocols

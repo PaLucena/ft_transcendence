@@ -208,7 +208,14 @@ export class ChatRenderer {
 				<ul class="dropdown-menu dropdown-menu-dark">
 					<li><a href="/profile/${data.other_user.username}" class="dropdown-item">Profile</a></li>
 					<li><hr class="dropdown-divider"></li>
-					<li><a class="dropdown-item" href="#">Invite to Play</a></li>
+					<li>
+						<button
+							id="invite_to_play_btn"
+							class="dropdown-item"
+							data-invite-to-play-username="${data.other_user.username}">
+							Invite to Play
+						</button>
+					</li>
 					<li>
 						<button class="dropdown-item block-unblock-btn"
 							data-block-action="${action}"
@@ -256,6 +263,61 @@ export class ChatRenderer {
 		else {
 			return null;
 		}
+	}
+
+	renderInviteModal() {
+		const container = document.getElementById('match_waiting_modal_container');
+
+		if (container) {
+			container.innerHTML = '';
+            const inviteModalHtml = this.createInviteModal();
+
+			if (inviteModalHtml) {
+				const template = document.createElement('template');
+				template.innerHTML = inviteModalHtml.trim();
+				const inviteModalElement = template.content.firstChild;
+
+				container.appendChild(inviteModalElement);
+			}
+        } else {
+			console.warn('match_waiting_modal_container not found.');
+		}
+	}
+
+	createInviteModal() {
+		return `
+			<div id="match_waiting_modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+				<div class="modal-bg">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header justify-content-center">
+								<h1 class="modal-title fs-5">Waiting for players!</h1>
+							</div>
+							<div class="modal-body">
+								<div class="container d-flex align-items-center text-center justify-content-center gap-4">
+									<div class="accepted player-container">
+										<div class="img" style="background-image: url(/assets/images/Bart.jpeg);">
+										</div>
+										<span>Bart</span>
+									</div>
+									<div class="vs">
+										<i class="fa-solid fa-v"></i> / <i class="fa-solid fa-s"></i>
+									</div>
+									<div class="canceled player-container">
+										<div class="img" style="background-image: url(/assets/images/back_hole.webp);"></div>
+										<span>Black Hole</span>
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<div class="timer">0:60</div>
+								<div class="btn action-btn accept">Accept</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		`;
 	}
 
 	removeBlockStatusMessage() {

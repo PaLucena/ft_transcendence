@@ -12,6 +12,7 @@ import { Match } from '../pages/Match/Match.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
 import { onlineSocket } from './utils/OnlineWebsocket.js';
 import { handleResponse } from './utils/rtchatUtils.js';
+import { AlertTest } from '../pages/AlertTest/AlertTest.js';
 
 class Router {
 	constructor() {
@@ -30,6 +31,7 @@ class Router {
 			'/tournament': () => new Tournament(),
 			'/tournament/:tournamentId': params => new Tournament(params),
 			'/match': () => new Match(),
+			'/test': () => new AlertTest(),
 		};
 		this.currentComponent = null;
 		this.previousPath = null;
@@ -43,11 +45,13 @@ class Router {
 	}
 
 	async navigateToOnBootup() {
+		console.log("HEREEEEE: navigateToOnBootup")
 		if (window.location.pathname === "/" || window.location.pathname === "/login") {
-			navigateTo(this.checkAuthentication() ? '/play' : '/login');
+			console.log("RESPONSE:  ", await this.checkAuthentication());
+			navigateTo(await this.checkAuthentication() ? '/play' : '/login');
 		}
-		else if (window.location.pathname === "/register") {
-			navigateTo(this.checkAuthentication() ? '/play' : '/signup')
+		else if (window.location.pathname === "/signup") {
+			navigateTo(await this.checkAuthentication() ? '/play' : '/signup')
 		}
 		else {
 			this.router();
@@ -73,6 +77,7 @@ class Router {
 		const isProtectedRoute = matchedRoute && matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
 
 		if (isProtectedRoute) {
+			console.log("HOLA: 123", matchedRoute)
 			const isAuthenticated = await this.checkAuthentication();
 			if (!isAuthenticated) {
 				this.navigateTo("/login");
@@ -104,6 +109,7 @@ class Router {
 	}
 
 	async checkAuthentication() {
+		console.log("HEREEEEE: checkAuthentication")
 		try {
 			const response = await fetch('/api/check_auth', {
 				method: 'GET',

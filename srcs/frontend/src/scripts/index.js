@@ -1,12 +1,10 @@
 import routerInstance, { navigateTo, navigateToOnBootup } from './Router.js';
-import customAlert from './utils/customAlert.js';
 
 window.addEventListener("DOMContentLoaded", () => {
 	navigateToOnBootup();
 });
 
 window.addEventListener("popstate", () => {
-	// console.log("popstate event triggered");
 	routerInstance.router();
 });
 

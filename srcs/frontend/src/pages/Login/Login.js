@@ -67,6 +67,7 @@ export class Login extends Component {
 					}
 
 					onlineSocket.initWebSocket(jsonData["username"]);
+					notificationsSocket.initWebSocket();
 					customAlert('success', 'Login successful', 3000);
 					navigateTo("/play");
 
