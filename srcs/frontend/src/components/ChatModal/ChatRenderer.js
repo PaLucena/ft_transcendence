@@ -310,7 +310,7 @@ export class ChatRenderer {
 								</div>
 							</div>
 							<div class="modal-footer">
-								<div class="timer">0:60</div>
+								<div class="timer">0:30</div>
 								<div class="btn action-btn accept">Accept</button>
 							</div>
 						</div>
