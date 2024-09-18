@@ -390,3 +390,10 @@ def ftapiLogin(request):
     response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
     response.set_cookie("access_token", str(access), httponly=True, secure=True)
     return response
+
+
+	@api_view(["GET"])
+	@default_authentication_required
+	def user_from_intra(request):
+		user = request.user
+		return Response(status=status.HTTP_200_OK, {"intra_login": user.api42auth})

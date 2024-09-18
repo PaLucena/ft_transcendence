@@ -13,4 +13,5 @@ urlpatterns = [
     path("delete_account/", views.delete_account, name="delete_account"),
     path("42api-login/", views.ftapiLogin, name="ftapiLogin"),
     path("2fa-login/", views.loginWith2fa, name="loginWith2fa"),
+    path("user_from_intra/", views.user_from_intra, name="user_from_intra"),
 ]
