@@ -1,7 +1,7 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
-import { Navbar } from '../../components/Navbar/Navbar.js';
+import { LanguageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
@@ -22,6 +22,7 @@ export class Profile extends Component {
     }
 
 	init() {
+		this.selectLanguage();
 		this.displayUserInfo(this.params.username);
 		this.saveInfoBtn(this.params.username);
 		if (typeof this.params.username === "undefined")
@@ -29,6 +30,10 @@ export class Profile extends Component {
 		this.enable2fa();
 		this.disable2fa();
 		// this.sendServerMessage();
+	}
+
+	selectLanguage() {
+		
 	}
 
 	async displayUserInfo(username) {
@@ -52,8 +57,6 @@ export class Profile extends Component {
 		})
 		.then(data => {
 			this.displayUserStats(data["username"]);
-
-			console.log("User data:", data);
 
 			if (myUsername === data["username"]) {
 				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-green text-white">EDIT PROFILE</button>`;
@@ -401,7 +404,7 @@ export class Profile extends Component {
 
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
-		TwofaBtn.addEventListener("click", (event) => {
+		this.addEventListener(TwofaBtn, "click", (event) => {
 			const response = fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',
@@ -418,7 +421,7 @@ export class Profile extends Component {
 	/* sendServerMessage() {
 		let testBtn = document.getElementById('testBtn');
 		if (testBtn) {
-			testBtn.addEventListener("click", (event) => {
+			this.addEventListener(testBtn, "click", (event) => {
 				onlineSocket.sendMessage("test", "ealgar-c")
 			})
 		}
