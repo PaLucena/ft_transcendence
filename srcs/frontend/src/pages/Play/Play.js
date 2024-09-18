@@ -13,6 +13,7 @@ export class Play extends Component {
 
 	destroy() {
 		console.log("Play Custom destroy");
+		tournamentSocket.closeWebSocket();
 		this.removeAllEventListeners();
 	}
 

@@ -14,9 +14,25 @@ class TournamentWebsocket {
             return;
         }
 
+        this.t_socket.onmessage = (e) => this.handleMessage(e);
         this.t_socket.onerror = (e) => {this.handleError(null, e, true);}
         this.t_socket.onclose = (e) => this.handleClose(e);
 
+    }
+
+    handleMessage(event) {
+        try {
+            const data = JSON.parse(event.data);
+
+            if (data.error) {
+                this.handleError(data.errorCode, data.errorMessage);
+                return;
+            }
+        console.log(data);
+        
+        } catch (error) {
+            this.handleError(null, error, false);
+        }
     }
 
     handleClose(event) {
@@ -36,7 +52,6 @@ class TournamentWebsocket {
         } else {
             console.log('WebSocket connection closed cleanly.');
         }
-
     }
 
     handleError(errorCode, errorMessage, close) {
