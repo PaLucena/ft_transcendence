@@ -1,7 +1,6 @@
 import { Component } from '../Component.js';
 import { Navbar } from "../../components/Navbar/Navbar.js";
 import { ChatModal } from '../../components/ChatModal/ChatModal.js';
-import { LanguageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import routerInstance from '../Router.js'
 
 class StaticComponentsRenderer {
@@ -18,12 +17,6 @@ class StaticComponentsRenderer {
 				getInstance: () => new ChatModal(),
 				containerId: 'chat_modal',
 				routesToExclude: ["/login", "/signup", "/auth", "/404"]
-			},
-			{
-				instance: null,
-				getInstance: () => new LanguageSelector(),
-				containerId: 'language_selector',
-				routesToExclude: [""]
 			},
 		];
 	}

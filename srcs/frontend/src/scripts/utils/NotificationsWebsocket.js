@@ -14,7 +14,6 @@ class NotificationsWebsocket {
             return;
         }
 
-		console.log("alo presidente") //?? DEBUG
         this.onlineSocket.onmessage = (e) => this.handleMessage(e);
         this.onlineSocket.onerror = (e) => {this.handleError(null, e, true);}
         this.onlineSocket.onclose = (e) => this.handleClose(e);

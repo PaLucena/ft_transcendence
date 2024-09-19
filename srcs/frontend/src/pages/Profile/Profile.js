@@ -1,7 +1,6 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
-import { LanguageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
@@ -22,7 +21,6 @@ export class Profile extends Component {
     }
 
 	init() {
-		this.selectLanguage();
 		this.displayUserInfo(this.params.username);
 		this.saveInfoBtn(this.params.username);
 		if (typeof this.params.username === "undefined")
@@ -30,10 +28,6 @@ export class Profile extends Component {
 		this.enable2fa();
 		this.disable2fa();
 		// this.sendServerMessage();
-	}
-
-	selectLanguage() {
-		
 	}
 
 	async displayUserInfo(username) {
@@ -113,6 +107,8 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
+
+			console.log("User stats:", data)
 
 			let winRate = (data['wins'] * 100 / data['total_matches']) || 0;
 			winRate = winRate < 6 ? Math.round(winRate) : Math.round(winRate * 10) / 10;
@@ -218,7 +214,6 @@ export class Profile extends Component {
 		return data["username"];
 	}
 
-
 	editUserBtn() {
 		const editBtn = document.getElementById("editBtn");
 
@@ -226,9 +221,14 @@ export class Profile extends Component {
 			document.getElementById("userInfo").style.display = "none";
 			document.getElementById("userEdit").style.display = "block";
 
+			this.checkLanguage();
 			this.startPasswordEL();
 			this.show2faButton();
 		});
+	}
+
+	checkLanguage() {
+		// fetch a la view
 	}
 
 	startPasswordEL() {
@@ -247,7 +247,7 @@ export class Profile extends Component {
 	saveInfoBtn(username) {
 		const editForm = document.getElementById("editForm");
 
-		this.addEventListener(editForm, "submit", (event) => {
+		this.addEventListener(editForm, "submit", async () => {
 			event.preventDefault();
 
 			const formData = new FormData(event.target);
@@ -256,6 +256,8 @@ export class Profile extends Component {
 			formData.forEach((value, key) => {
 				jsonData[key] = value;
 			});
+			jsonData['language_selector'] = await this.changeLanguage();
+			console.log("Language selected:", jsonData['language_selector']);
 
 			fetch("/api/update_user_info/", {
 				method: "POST",
@@ -283,6 +285,15 @@ export class Profile extends Component {
 				customAlert('danger', `Error: ` + error.message, '');
 			})
 		})
+	}
+
+	changeLanguage() { // TODO: TERMINAR ESTOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+		console.log("HAZ EL LANGUAGE SELECTOR");
+		return new Promise(resolve => {
+			const languages = document.getElementById('language_selector');
+			const languageSelected = Array.from(languages.options).find(option => option.classList.contains('active'));
+			resolve(languageSelected.value);
+		});
 	}
 
 	logout() {
