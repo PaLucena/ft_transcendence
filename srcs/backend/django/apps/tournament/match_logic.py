@@ -27,7 +27,7 @@ async def start_all_matches(tournament, matches):
 		print(f"Match {match_id} finished with result: {result}")
 		results.append(result)
 
-		next_matches = assign_next_match(tournament, match_id, results)
+		next_matches = assign_next_match(tournament, match_id, result)
 
 		while next_matches:
 			formatted_next_matches = [format_match(m) for m in next_matches]
@@ -36,7 +36,7 @@ async def start_all_matches(tournament, matches):
 
 			next_matches = []
 			for new_result in new_results:
-				next_matches.extend(assign_next_match(tournament, new_result['match_id'], results))
+				next_matches.extend(assign_next_match(tournament, new_result['match_id'], result))
 
 	return results
 
