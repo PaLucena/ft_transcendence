@@ -392,8 +392,8 @@ def ftapiLogin(request):
     return response
 
 
-	@api_view(["GET"])
-	@default_authentication_required
-	def user_from_intra(request):
-		user = request.user
-		return Response(status=status.HTTP_200_OK, {"intra_login": user.api42auth})
+@api_view(["GET"])
+@default_authentication_required
+def user_from_intra(request):
+	user = request.user
+	return Response({"intra_login": user.api42auth}, status=status.HTTP_200_OK)
