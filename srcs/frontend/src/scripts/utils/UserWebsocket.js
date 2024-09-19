@@ -19,7 +19,7 @@ class UserWebsocket {
 
         try {
             console.log("Init userWebsocket");
-            
+
 
             this.socket = new WebSocket('/ws/user-socket/');
         } catch (error) {
@@ -68,13 +68,13 @@ class UserWebsocket {
     handleNotification(notification) {
         switch (notification.type) {
             case 'invite':
-                customAlert('info', notification.message, 3000);
+                customAlert('info', notification.message, 3000, 'New Friend Request');
                 break ;
             case 'accept':
-                customAlert('success', notification.message, 3000);
+                customAlert('success', notification.message, 3000, 'Friendship Confirmed');
                 break ;
             case 'cancel':
-                customAlert('danger', notification.message, 3000);
+                customAlert('danger', notification.message, 3000, 'Friendship Canceled');
                 break ;
         }
     }
