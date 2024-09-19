@@ -14,7 +14,11 @@ async def handle_player_ready(consumer, player):
     }))
 
 
-async def handle_quit(consumer):
+async def handle_quit(consumer, player):
+    if player == 1:
+        consumer.game_logic.forfeit = 1
+    elif player == 2:
+        consumer.game_logic.forfeit = 2
     consumer.game_logic.game_state = "game_over"
 
 

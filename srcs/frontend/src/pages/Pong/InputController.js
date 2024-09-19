@@ -45,8 +45,11 @@ export class InputController {
             case 'player_2_ready':
                 this.socket.send(JSON.stringify({ type: 'player_ready', player: 2 }));
                 break;
-            case 'quit':
-                this.socket.send(JSON.stringify({ type: 'quit' }));
+            case 'quit_p1':
+                this.socket.send(JSON.stringify({ type: 'quit', player: 1 }));
+                break;
+            case 'quit_p2':
+                this.socket.send(JSON.stringify({ type: 'quit', player: 2 }));
                 break;
             case 'player_1_up':
                 this.socket.send(JSON.stringify({ type: 'move', player: 1, direction: -1 }));
