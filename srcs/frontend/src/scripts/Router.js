@@ -46,7 +46,6 @@ class Router {
 
 	async navigateToOnBootup() {
 		if (window.location.pathname === "/" || window.location.pathname === "/login") {
-			console.log("RESPONSE:  ", await this.checkAuthentication());
 			navigateTo(await this.checkAuthentication() ? '/play' : '/login');
 		}
 		else if (window.location.pathname === "/signup") {

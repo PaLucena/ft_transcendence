@@ -52,10 +52,25 @@ def get_user_data(request):
             "avatar": user.avatar.url,
             "email": user.email,
             "number_of_friends": get_friend_count(user),
+            "language": user.language
         }
         return Response(user_data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["POST"])
+@default_authentication_required
+def set_language(request):
+    user = request.user
+    preferred_language = request.data.get('language')
+
+    if preferred_language not in ['EN', 'ES', 'LV']:
+        return Response({'error': 'Invalid language choice'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user.language = preferred_language
+    user.save()
+
+    return Response({'message': 'Language changed'}, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])

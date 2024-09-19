@@ -1,22 +1,22 @@
 from tkinter import CASCADE
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
-from django_otp.plugins.otp_totp.models import TOTPDevice
-
 
 class AppUser(AbstractUser):
     nickname = models.CharField(max_length=100, null=True, blank=True, unique=True)
-    avatar = models.FileField(
-        upload_to="avatars/", default="default/default.jpg", null=True, blank=True
-    )
+    avatar = models.FileField(upload_to="avatars/", default="default/default.jpg", null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
     is_online = models.BooleanField(default=False)
     image_link = models.URLField(null=True, blank=True)
     id_deleted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
     api42auth = models.BooleanField(default=False)
+    language = models.CharField(
+            max_length=2,
+            choices=[('EN', 'English'), ('ES', 'Spanish'), ('LV', 'Latvian')],
+            default='EN'
+        )
 
     def anonymize(self):
         unique_suffix = get_random_string(length=6)
