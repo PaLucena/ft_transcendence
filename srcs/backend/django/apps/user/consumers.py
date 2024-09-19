@@ -1,43 +1,129 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from user.models import AppUser
-from asgiref.sync import sync_to_async
 
-class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
+
+class UserSocketConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.user = self.scope.get("user")
-        self.group_name = "online-status"
-        if "channels_store" not in self.scope:
-            self.scope["channels_store"] = {}
-        await self.accept()
-
         if self.user is None or not self.user.is_authenticated:
             await self.send_error(401, "User is not authenticated.")
             await self.close()
             return
 
+        self.notification_group_name = f"notification-{self.user.username}"
+        self.online_status_group_name = "online-status"
+
         try:
-            await self.channel_layer.group_add(self.group_name, self.channel_name)
+            await self.channel_layer.group_add(
+                self.online_status_group_name, self.channel_name
+            )
+            await self.channel_layer.group_add(
+                self.notification_group_name, self.channel_name
+            )
+
+            await self.accept()
+
             await self.add_user_to_online_list(self.user)
-            await self.add_user_channel(self.user.username, self.channel_name)
             await self.send_online_users_list()
+
         except Exception as e:
-            await self.channel_layer.group_discard(self.group_name, self.channel_name)
+            await self.channel_layer.group_discard(
+                self.online_status_group_name, self.channel_name
+            )
+            await self.channel_layer.group_discard(
+                self.notification_group_name, self.channel_name
+            )
+
             await self.send_error(500, f"Failed to connect: {str(e)}")
             await self.close()
 
     async def disconnect(self, close_code):
-        if self.user is not None and self.user.is_authenticated:
-            try:
-                await self.remove_user_from_online_list(self.user)
-            except Exception as e:
-                await self.send_error(500, f"Failed to remove user from online list: {str(e)}")
 
+        if self.user is not None and self.user.is_authenticated:
+            await self.remove_user_from_online_list(self.user)
+
+        await self.channel_layer.group_discard(
+            self.online_status_group_name, self.channel_name
+        )
+        await self.channel_layer.group_discard(
+            self.notification_group_name, self.channel_name
+        )
+        await self.send_online_users_list()
+
+    async def receive_json(self, data):
+        action = data.get("action")
+
+        if action == "notification":
+            await self.send_notification(data)
+        else:
+            await self.send_error(400, "Unknown UserSocket action.")
+
+    async def send_notification(self, data):
+        notification_type = data.get("notification_type")
+        to_user = data.get("to_user")
+
+        if not notification_type:
+            await self.send_error(400, "Missing notification_type field.")
+            return
+
+        if not to_user:
+            await self.send_error(400, "Missing to_user field.")
+            return
+
+        if not await self.user_exists(to_user):
+            await self.send_error(404, f"User '{to_user}' not found.")
+            return
+
+        if notification_type in ["invite", "accept", "cancel"]:
+            await self.send_friend_notification(notification_type, to_user)
+        else:
+            await self.send_error(
+                404, f"Notification type '{notification_type}' not found."
+            )
+
+    async def send_friend_notification(self, notification_type, username):
         try:
-            await self.channel_layer.group_discard(self.group_name, self.channel_name)
-            await self.send_online_users_list()
+            message = self.get_friend_notification_message(notification_type)
+            if not message:
+                await self.send_error(
+                    400, f"Invalid notification type '{notification_type}'."
+                )
+                return
+
+            group_name = f"notification-{username}"
+            event = {
+                "type": "user.notification",
+                "notification": {
+                    "type": notification_type,
+                    "message": message,
+                },
+            }
+            await self.channel_layer.group_send(group_name, event)
         except Exception as e:
-            await self.send_error(500, f"Failed to discard user from group: {str(e)}")
+            await self.send_error(500, f"Failed to send notification: {str(e)}")
+
+    def get_friend_notification_message(self, notification_type):
+        if notification_type == "invite":
+            return f"You have a new friend invite from {self.user.username}!"
+        elif notification_type == "accept":
+            return f"{self.user.username} has accepted your friend request!"
+        elif notification_type == "cancel":
+            return f"{self.user.username} has canceled the friend request!"
+        return None
+
+    @database_sync_to_async
+    def user_exists(self, username):
+        return AppUser.objects.filter(username=username).exists()
+
+    async def user_notification(self, event):
+        try:
+            notification = event.get("notification")
+            await self.send_json({"notification": notification})
+        except Exception as e:
+            await self.send_error(
+                500, f"Failed to send notification users list: {str(e)}"
+            )
 
     async def send_online_users_list(self):
         try:
@@ -46,71 +132,29 @@ class OnlineStatusConsumer(AsyncJsonWebsocketConsumer):
                 "type": "update_online_users_list",
                 "online_users": online_users,
             }
-            await self.channel_layer.group_send(self.group_name, event)
+            await self.channel_layer.group_send(self.online_status_group_name, event)
         except Exception as e:
             await self.send_error(500, f"Failed to send online users list: {str(e)}")
 
-    async def receive_json(self, data):
-        print("data received =>", data)
-        await self.handle_server_message(data)
-       
-    async def handle_server_message(self, content):
-        if content:
-            await self.send_message_from_server(content["message"], content["to_user"])
-        else:
-            await self.send_error(400, "No message content provided.")
-
-    @database_sync_to_async
-    def add_user_channel(self, username, channel_name):
-        # Store the username and channel_name in a persistent store
-        self.scope["channels_store"][username] = channel_name
-
-
-    @database_sync_to_async
-    def get_user_channel(self, username):
-        # Retrieve the channel_name for the given username.
-        return self.scope["channels_store"].get(username, None)
-
-    async def send_message_from_server(self, message, username):
-        try:
-            channel_name = await self.get_user_channel(username)
-            if channel_name:
-                channel_layer = get_channel_layer()
-                event = {
-                    "type": "user.message",  # Event type you define for the message
-                    "message": message,
-                }
-                await channel_layer.send(channel_name, event)  # Send the message to the specific channel
-            else:
-                await self.send_error(404, f"User {username} is not connected.")
-        except Exception as e:
-            await self.send_error(500, f"Failed to send message to the group: {str(e)}")
-
     async def update_online_users_list(self, event):
         try:
-            await self.send_json({"online_users": event["online_users"]})
-        except Exception as e:
-            await self.send_error(500, f"Failed to update online users list: {str(e)}")
-
-    async def server_message(self, event):
-        try:
-            await self.send_json({"message": event["message"]})
+            await self.send_json(
+                {"online_users": event["online_users"]},
+            )
         except Exception as e:
             await self.send_error(500, f"Failed to update online users list: {str(e)}")
 
     @database_sync_to_async
     def add_user_to_online_list(self, user):
-        if user.is_authenticated:
-            user.refresh_from_db()
-            user.is_online = True
-            user.save()
+        user.refresh_from_db()
+        user.is_online = True
+        user.save()
 
     @database_sync_to_async
     def remove_user_from_online_list(self, user):
-        if user.is_authenticated:
-            user.refresh_from_db()
-            user.is_online = False
-            user.save()
+        user.refresh_from_db()
+        user.is_online = False
+        user.save()
 
     @database_sync_to_async
     def get_online_users(self):

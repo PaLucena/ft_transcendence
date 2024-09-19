@@ -4,10 +4,10 @@
  * @param {string} type - The type of alert corresponding to Bootstrap classes (e.g., 'primary', 'success', 'danger').
  * @param {string} text - The text to be displayed inside the alert.
  * @param {number|string} time - The time in milliseconds after which the alert will be hidden. If an empty string is provided, the alert will be dismissed with the close button.
- * @param {string} [customStyle=''] - An optional custom style class to apply to the alert (e.g., 'transparent-blur').
+ * @param {string} [title] - An optional custom title for the alert (overrides the default).
  */
 
-export default function customAlert(type, text, time, customStyle = '') {
+export default function customAlert(type, text, time, title = '') {
     const alertContainer = document.getElementById('alert-container');
 
     if (alertContainer) {
@@ -15,24 +15,24 @@ export default function customAlert(type, text, time, customStyle = '') {
         customAlert.classList.add('custom-alert');
 
         let icon = '';
-        let messageTitle = '';
+        let messageTitle = title || '';
 
         switch (type) {
             case 'success':
                 icon = '<i class="alert-icon fa-solid fa-check"></i>';
-                messageTitle = 'Success';
+                messageTitle = messageTitle || 'Success';
                 break;
             case 'danger':
                 icon = '<i class="alert-icon fa-solid fa-exclamation"></i>';
-                messageTitle = 'Error';
+                messageTitle = messageTitle || 'Error';
                 break;
             case 'warning':
                 icon = '<i class="alert-icon fa-solid fa-exclamation"></i>';
-                messageTitle = 'Warning';
+                messageTitle = messageTitle || 'Warning';
                 break;
             case 'info':
                 icon = '<i class="alert-icon fa-solid fa-info"></i>';
-                messageTitle = 'Info';
+                messageTitle = messageTitle || 'Info';
                 break;
             default:
                 icon = '<i class="alert-icon fa-regular fa-bell"></i>';
@@ -52,10 +52,6 @@ export default function customAlert(type, text, time, customStyle = '') {
         `;
 
         customAlert.classList.add('alert', `alert-${type}`, 'active');
-
-        if (customStyle) {
-            customAlert.classList.add(customStyle);
-        }
 
         alertContainer.appendChild(customAlert);
 

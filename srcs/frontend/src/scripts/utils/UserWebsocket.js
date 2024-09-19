@@ -2,9 +2,9 @@ import { eventEmitter } from './EventEmitter.js';
 import { updateOnlineStatus } from './rtchatUtils.js'
 import customAlert from './customAlert.js';
 
-class OnlineWebsocket {
+class UserWebsocket {
     constructor() {
-        this.onlineSocket = null;
+        this.socket = null;
         this.onlineUsersUpdatedListener = null;
         this.reconnectDelay = 5000;
         this.maxReconnectAttempts = 10;
@@ -12,16 +12,24 @@ class OnlineWebsocket {
     }
 
     initWebSocket() {
+        if (this.socket && this.socket.readyState !== WebSocket.CLOSED) {
+            console.log("WebSocket is already open or in the process of opening");
+            return;
+        }
+
         try {
-            this.onlineSocket = new WebSocket('/ws/online-status/');
+            console.log("Init userWebsocket");
+
+
+            this.socket = new WebSocket('/ws/user-socket/');
         } catch (error) {
             this.handleError(null, 'Failed to create WebSocket', true);
             return;
         }
 
-        this.onlineSocket.onmessage = (e) => this.handleMessage(e);
-        this.onlineSocket.onerror = (e) => {this.handleError(null, e, true);}
-        this.onlineSocket.onclose = (e) => this.handleClose(e);
+        this.socket.onmessage = (e) => this.handleMessage(e);
+        this.socket.onerror = (e) => {this.handleError(null, e, true);}
+        this.socket.onclose = (e) => this.handleClose(e);
 
         this.initOnlineStatusListener();
     }
@@ -43,13 +51,31 @@ class OnlineWebsocket {
                 return;
             }
 
+            console.log("UserSocket data:", data);
+
             if (data.online_users) {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
+            } else if (data.notification) {
+                this.handleNotification(data.notification);
             } else {
                 this.handleError(null, 'Invalid data format received.', false);
             }
         } catch (error) {
             this.handleError(null, error, false);
+        }
+    }
+
+    handleNotification(notification) {
+        switch (notification.type) {
+            case 'invite':
+                customAlert('info', notification.message, 3000, 'New Friend Request');
+                break ;
+            case 'accept':
+                customAlert('success', notification.message, 3000, 'Friendship Confirmed');
+                break ;
+            case 'cancel':
+                customAlert('danger', notification.message, 3000, 'Friendship Canceled');
+                break ;
         }
     }
 
@@ -82,9 +108,9 @@ class OnlineWebsocket {
     }
 
     closeWebSocket() {
-        if (this.onlineSocket) {
-            this.onlineSocket.close();
-            this.onlineSocket = null;
+        if (this.socket) {
+            this.socket.close();
+            this.socket = null;
         }
 
         this.removeOnlineUpdateListeners();
@@ -98,4 +124,4 @@ class OnlineWebsocket {
     }
 }
 
-export const onlineSocket = new OnlineWebsocket();
+export const userSocket = new UserWebsocket();

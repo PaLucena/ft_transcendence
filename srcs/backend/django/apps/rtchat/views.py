@@ -1,9 +1,13 @@
+import threading
+import time
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.db.models import Q
 from django.http import Http404
-from rtchat.models import ChatGroup, Block
+from rtchat.models import ChatGroup, Block, Invite
 from user.models import AppUser
 from rtchat.serializers import GroupMessageSerializer, UserSerializer
 from user.decorators import default_authentication_required
@@ -218,3 +222,79 @@ def block_or_unblock_user_view(request):
             {"detail": f"An error occurred: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+@api_view(["POST"])
+@default_authentication_required
+def create_invite(request, username):
+    try:
+        invitation_lifetime = 60
+
+        if request.user.username == username:
+            return Response(
+                {"detail": "You cannot invite yourself"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            other_user = get_object_or_404(AppUser, username=username)
+        except Http404:
+            return Response(
+                {"detail": "The user does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        existing_invite = (
+            Invite.objects.select_related("sender", "receiver")
+            .filter(
+                Q(sender=request.user, receiver=other_user)
+                | Q(sender=other_user, receiver=request.user),
+            )
+            .first()
+        )
+
+        current_time = timezone.now()
+
+        if existing_invite:
+            time_remaining = (existing_invite.expires_at - current_time).total_seconds()
+            if time_remaining > 0:
+                return Response(
+                    {
+                        "detail": f"You need to wait {int(time_remaining)} seconds to send this user another request."
+                    },
+                    status=status.HTTP_409_CONFLICT,
+                )
+
+        expires_at = current_time + timezone.timedelta(seconds=invitation_lifetime)
+
+        invite = Invite.objects.create(
+            sender=request.user,
+            receiver=other_user,
+            expires_at=expires_at,
+        )
+
+        delete_invite_after_delay(invite.id, invitation_lifetime)
+
+        return Response(
+            {"invite_id": invite.id, "group_name": invite.group_name},
+            status=status.HTTP_201_CREATED,
+        )
+
+    except Exception as e:
+        return Response(
+            {"detail": f"An error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+def delete_invite_after_delay(invite_id, delay=90):
+    def delete_invite():
+        try:
+            invite = Invite.objects.get(id=invite_id)
+            invite.delete()
+            print(f"Invite {invite_id} deleted after {delay} seconds")
+        except Invite.DoesNotExist:
+            print(f"Invite {invite_id} already deleted")
+
+    timer = threading.Timer(delay, delete_invite)
+    timer.start()

@@ -58,8 +58,55 @@ export class ChatLoader {
         }
     }
 
+    async loadInvitation(username) {
+        try {
+            const response = await fetch(`/api/chat/invite/${username}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            await handleResponse(response, data => {
+                console.log(data);
+
+                try {
+                    this.chatModal.chatRenderer.renderInviteModal();
+                    const invite = document.getElementById('match_waiting_modal');
+
+                    if (invite) {
+                        const inviteInstance = new bootstrap.Modal(invite);
+                        inviteInstance.show();
+
+                        const chat = document.getElementById('messages_modal');
+
+                        if (chat) {
+                            const chatInstance = bootstrap.Modal.getInstance(chat);
+                            chatInstance.hide();
+                        } else {
+                            console.warn('messages_modal not found.');
+                        }
+                    } else {
+                        console.warn('match_waiting_modal not found.');
+                    }
+                }
+                catch (error) {
+                    console.error('Failed to invite to match:', error);
+                    customAlert('danger', 'Failed to invite to match', 5000);
+                }
+            });
+
+        } catch(error) {
+            this.handleError(error.errorCode, error.errorMessage);
+        }
+    }
+
     handleError(errorCode, errorMessage) {
         switch (errorCode) {
+            case 400:
+                customAlert('danger', `${errorMessage ?  errorMessage :  'You can\'t do this with yourself' }`, 5000);
+                break;
             case 401:
                 customAlert('danger', 'You are not authenticated. Please log in.', 5000);
                 break;
@@ -68,6 +115,9 @@ export class ChatLoader {
                 break;
             case 404:
                 customAlert('danger', `${errorCode}: ${errorMessage || 'Not found'}`, 5000);
+                break;
+            case 409:
+                customAlert('danger', `${errorMessage}`, 5000);
                 break;
             case 500:
                 customAlert('danger', 'An internal server error occurred.', 5000);

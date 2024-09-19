@@ -6,4 +6,5 @@ urlpatterns = [
     path("get_all_private_chats/", views.get_all_private_chats_view, name="get_chats"),
     path("chatroom/<str:chatroom_name>/", views.chat_view, name="chatroom"),
     path("user/<str:username>/", views.get_or_create_chatroom, name="start_chat"),
+    path("invite/<str:username>/", views.create_invite, name="create_invite"),
 ]
