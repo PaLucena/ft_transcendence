@@ -1,3 +1,5 @@
+import { Tournament } from "../../pages/Tournament/Tournament.js";
+
 class TournamentWebsocket {
     constructor() {
         this.t_socket = null;
@@ -8,7 +10,7 @@ class TournamentWebsocket {
 
     initWebSocket(tournament_name) {
         try {
-            this.t_socket = new WebSocket(`ws/tournament/${tournament_name}/`);
+            this.t_socket = new WebSocket(`/ws/tournament/${tournament_name}/`);
         } catch (error) {
             this.handleError(null, 'Failed to create WebSocket', true);
             return;
@@ -28,8 +30,9 @@ class TournamentWebsocket {
                 this.handleError(data.errorCode, data.errorMessage);
                 return;
             }
-        console.log(data);
-        
+            if (data.tournament_users) {
+                Tournament.renderPlayers(data.tournament_users);
+            }
         } catch (error) {
             this.handleError(null, error, false);
         }
@@ -44,7 +47,7 @@ class TournamentWebsocket {
                 console.log(`Reconnecting in ${this.reconnectDelay / 1000} seconds... (Attempt ${this.reconnectAttempts})`);
 
                 setTimeout(() => {
-                    this.initWebSocket();
+                    //this.initWebSocket();
                 }, this.reconnectDelay);
             } else {
                 console.error('Maximum reconnect attempts reached. Connection closed.');

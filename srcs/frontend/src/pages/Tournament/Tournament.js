@@ -140,47 +140,133 @@ export class Tournament extends Component {
 		});
 	}
 
-	displayInfo(tournamentId) {
-		
-		// cuando haya datos nuevos:
 
-		fetch("/api/display_tournaments/", {
-			method: "GET",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			let	tournamentInfo = {};
+    displayInfo(tournamentId) {
+        fetch("/api/display_tournaments/", {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errData => {
+                    throw new Error(errData.error || `Response status: ${response.status}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            let tournament = data.public_tournaments.find(t => t.id == tournamentId);
+            if (!tournament) {
+                tournament = data.private_tournaments.find(t => t.id == tournamentId);
+            }
 
-			tournamentInfo = data.public_tournaments.find(object => object.id == tournamentId);
-			if (!tournamentInfo)
-				tournamentInfo = data.private_tournaments.find(object => object.id == tournamentId);
+            if (tournament) {
+				const container = document.getElementById('rootTournament');
 
-			document.getElementById('tournamentName').innerHTML = `<p class="display-4">${tournamentInfo.name}</h1>`;
+				if (container) {
+					container.innerHTML = this.createHtml(tournament.name);
+					tournamentSocket.initWebSocket(tournament.name);
+				} else {
+					console.warn('rootTournament not found.');
+				}
+            } else {
+                console.warn(`Tournament with ID ${tournamentId} not found.`);
+            }
+        })
+        .catch((error) => {
+            console.log("Error: ", error);
+        });
+    }
 
-			const	players = document.querySelectorAll('[id^="player"]');
+	static renderPlayers(players) {
 
-			let	userStatus = "";
-			
-			players.forEach(player => {
-				userStatus = tournamentInfo.players[player.id.substring(6, 7) - 1];
+		console.log("PLayers: ", players);
 
-				player.querySelector('[id^="nickname-"]').innerHTML =  userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].nickname : "AI";
-				player.querySelector('[id^="avatar-"]').src = userStatus ? tournamentInfo.players[player.id.substring(6, 7) - 1].avatar : '../../assets/images/default_avatar.jpg';
+		const topHalf = document.querySelector('.top-half');
+		const bottomHalf = document.querySelector('.bottom-half');
+
+		const totalPlayers = 8;
+
+		const defaultAvatar = '/assets/images/default_avatar.jpg';
+		const defaultNickname = 'IA';
+
+		const fullPlayerList = [...players];
+
+		while (fullPlayerList.length < totalPlayers) {
+			fullPlayerList.push({
+				nickname: defaultNickname,
+				avatar: defaultAvatar
 			});
-		})
-		.catch((error) => {
-			console.log("Error: ", error);
-		})
+		}
+
+		if (topHalf && bottomHalf) {
+			topHalf.innerHTML = '';
+			bottomHalf.innerHTML = '';
+
+			for (let i = 0; i < 4; i += 2) {
+				const matchContainerHtml = `
+					<div class="match-container col d-flex justify-content-center align-items-end ml-0">
+						${createPlayerHtml(fullPlayerList[i], i + 1)}
+						${createPlayerHtml(fullPlayerList[i + 1], i + 2)}
+					</div>
+				`;
+				topHalf.insertAdjacentHTML('beforeend', matchContainerHtml);
+			}
+
+			for (let i = 4; i < 8; i += 2) {
+				const matchContainerHtml = `
+					<div class="match-container col d-flex justify-content-center align-items-end ml-0">
+						${createPlayerHtml(fullPlayerList[i], i + 1)}
+						${createPlayerHtml(fullPlayerList[i + 1], i + 2)}
+					</div>
+				`;
+				bottomHalf.insertAdjacentHTML('beforeend', matchContainerHtml);
+			}
+		} else {
+			console.warn('topHalf или bottomHalf не найдены.');
+		}
+
+		function createPlayerHtml(player, index) {
+			return `
+				<div id="player${index}" class="player-container row d-flex col-6 h-60 justify-content-center">
+					<div class="col-10 col-sm-6">
+						<div class="d-flex justify-content-center">
+							<div class="avatar rounded-circle">
+								<img id="avatar-${index}" class="rounded-circle h-100 square" src="${player.avatar}" alt="">
+							</div>
+						</div>
+						<div class="nickname-placeholder col-12 m-0 d-flex justify-content-center row mt-1">
+							<span id="nickname-${index}" class="nickname bg-light rounded-2 text-center py-1">${player.nickname}</span>
+						</div>
+					</div>
+				</div>
+			`;
+		}
 	}
+
+
+	createHtml(tournament_name) {
+        const html = `
+            <div class="tournament-name col-12 d-flex justify-content-center">
+				<div>
+					<p id="tournamentName">${tournament_name}</p>
+					<div class="d-flex justify-content-center">
+						<p id="invitationCode"></p>
+					</div>
+				</div>
+			</div>
+
+            <div class="top-half d-flex h-40 w-100 m-0"></div>
+            <div class="bottom-half d-flex h-60 w-100 m-0 mt-2"></div>
+
+            <div class="close-exit-btn col-12 d-flex justify-content-center">
+                <button id="closeBtn" class="btn btn-primary hide">CLOSE TOURNAMENT</button>
+                <button id="exitBtn" class="btn btn-danger hide">EXIT TOURNAMENT</button>
+            </div>
+        `;
+        return html;
+    }
 }
