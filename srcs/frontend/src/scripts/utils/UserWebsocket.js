@@ -12,7 +12,15 @@ class UserWebsocket {
     }
 
     initWebSocket() {
+        if (this.socket && this.socket.readyState !== WebSocket.CLOSED) {
+            console.log("WebSocket is already open or in the process of opening");
+            return;
+        }
+
         try {
+            console.log("Init userWebsocket");
+            
+
             this.socket = new WebSocket('/ws/user-socket/');
         } catch (error) {
             this.handleError(null, 'Failed to create WebSocket', true);
