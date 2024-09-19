@@ -82,7 +82,7 @@ export default function customAlert(type, text, time, customStyle = '') {
 
         const closeButtonElement = customAlert.querySelector('#alert_close');
         if (closeButtonElement) {
-            this.addEventListener(closeButtonElement, 'click', () => {
+            closeButtonElement.addEventListener('click', () => {
                 customAlert.classList.add('hide');
 
                 setTimeout(() => {
