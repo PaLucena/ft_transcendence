@@ -151,13 +151,14 @@ def login(request):
         user = AppUser.objects.get(username=username)
         user.save()
         if Has2faEnabled(user):
-            return Response({"has_2fa": True}, status=status.HTTP_200_OK)
+            response = Response({"has_2fa": True}, status=status.HTTP_200_OK)
+        else:
+            response = Response(
+                {"message": "Login successful", "has_2fa": False}, status=status.HTTP_200_OK
+            )
         auth_login(request, authenticated_user)
         refresh = RefreshToken.for_user(user)
         access = refresh.access_token
-        response = Response(
-            {"message": "Login successful", "has_2fa": False}, status=status.HTTP_200_OK
-        )
         response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
         response.set_cookie("access_token", str(access), httponly=True, secure=True)
 
@@ -169,19 +170,20 @@ def login(request):
         return Response({"error": "Incorrect password"}, status=status.HTTP_404_NOT_FOUND)
 
 
+
 @api_view(["POST"])
 def loginWith2fa(request):
     user = request.data.get("username")
     print("username is", user["username"])
     user = AppUser.objects.get(username=user["username"])
     auth_login(request, user)
-    refresh = RefreshToken.for_user(user)
-    access = refresh.access_token
+    twofactor_refresh = RefreshToken.for_user(user)
+    twofactor_access = twofactor_refresh.access_token
     response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-    response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
-    response.set_cookie("access_token", str(access), httponly=True, secure=True)
-    print("Access Token Expiry:", access["exp"])
-    print("Refresh Token Expiry:", refresh["exp"])
+    response.set_cookie("twofactor_refresh_token", str(twofactor_refresh), httponly=True, secure=True)
+    response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
+    print("Access Token Expiry:", twofactor_access["exp"])
+    print("Refresh Token Expiry:", twofactor_refresh["exp"])
     return response
 
 
@@ -403,3 +405,10 @@ def ftapiLogin(request):
     response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
     response.set_cookie("access_token", str(access), httponly=True, secure=True)
     return response
+
+
+@api_view(["GET"])
+@default_authentication_required
+def user_from_intra(request):
+	user = request.user
+	return Response({"intra_login": user.api42auth}, status=status.HTTP_200_OK)

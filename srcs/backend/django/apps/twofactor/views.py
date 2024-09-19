@@ -52,8 +52,9 @@ def verifyTwoFactor(request):
 	userInfo = body_data.get('jsonData')
 	username = userInfo.get('username')
 
-	user=userModel.objects.get(username=username)
+	print(username)
 	try:
+		user=userModel.objects.get(username=username)
 		device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
 		if device.verify_token(otp_code):
 			return Response({'success': True, 'message': 'OTP verified successfully.'}, status=200)
@@ -61,6 +62,9 @@ def verifyTwoFactor(request):
 			return Response({'success': False, 'message': 'Invalid OTP code.'}, status=400)
 	except TOTPDevice.DoesNotExist:
 		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+	except userModel.DoesNotExist:
+		return Response({'success': False, 'message': f'User {request.user} found.'}, status=404)
+		
 
 @api_view(["POST"])
 @default_authentication_required
