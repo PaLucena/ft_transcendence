@@ -2,7 +2,7 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
-import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
@@ -58,8 +58,8 @@ export class Profile extends Component {
 				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-green text-white">EDIT PROFILE</button>`;
 				document.getElementById("profile_bottom_btns").innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-6">LOGOUT</button>`;
 				this.editUserBtn(data);
-				this.logout(); 
-				
+				this.logout();
+
 			}
 			else {
 				document.getElementById("profile_bottom_btns").innerHTML = `<button id="blockBtn" class="btn btn-danger col-6">BLOCK</button>`;
@@ -290,7 +290,7 @@ export class Profile extends Component {
 				credentials: 'include'
 			})
 			.then(response => {
-				onlineSocket.closeWebSocket();
+				userSocket.closeWebSocket();
 				navigateTo("/login");
 			})
 			.catch((error) => {
@@ -418,7 +418,7 @@ export class Profile extends Component {
 		let testBtn = document.getElementById('testBtn');
 		if (testBtn) {
 			testBtn.addEventListener("click", (event) => {
-				onlineSocket.sendMessage("test", "ealgar-c")
+				userSocket.sendMessage("test", "ealgar-c")
 			})
 		}
 	} */

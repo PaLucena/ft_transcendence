@@ -10,9 +10,9 @@ import { Pong } from '../pages/Pong/Pong.js';
 import { Tournament } from '../pages/Tournament/Tournament.js';
 import { Match } from '../pages/Match/Match.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
-import { onlineSocket } from './utils/OnlineWebsocket.js';
+import { userSocket } from './utils/UserWebsocket.js';
 import { handleResponse } from './utils/rtchatUtils.js';
-import { AlertTest } from '../pages/AlertTest/AlertTest.js';
+import { Test } from '../pages/Test/Test.js';
 
 class Router {
 	constructor() {
@@ -31,7 +31,7 @@ class Router {
 			'/tournament': () => new Tournament(),
 			'/tournament/:tournamentId': params => new Tournament(params),
 			'/match': () => new Match(),
-			'/test': () => new AlertTest(),
+			'/test': () => new Test(),
 		};
 		this.currentComponent = null;
 		this.previousPath = null;
@@ -81,8 +81,8 @@ class Router {
 				return;
 			}
 
-			if (!onlineSocket.onlineSocket || onlineSocket.onlineSocket.readyState === WebSocket.CLOSED) {
-				onlineSocket.initWebSocket();
+			if (!userSocket.userSocket || userSocket.userSocket.readyState === WebSocket.CLOSED) {
+				userSocket.initWebSocket();
 			}
 		}
 

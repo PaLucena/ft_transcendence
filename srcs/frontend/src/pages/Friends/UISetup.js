@@ -1,5 +1,6 @@
 import customAlert from '../../scripts/utils/customAlert.js';
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
+import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 
 export class UISetup {
     constructor(friends) {
@@ -145,16 +146,23 @@ export class UISetup {
     async handleFriendAction(action, username) {
         try {
             let endpoint;
+            let notification_type;
 
             switch (action) {
                 case 'invite':
                     endpoint = 'invite_friend';
+                    notification_type = 'invite';
+                    break;
+                case 'cancel':
+                    endpoint = 'remove_friend';
+                    notification_type = 'cancel';
                     break;
                 case 'remove':
                     endpoint = 'remove_friend';
                     break;
                 case 'accept':
                     endpoint = 'accept_invitation';
+                    notification_type = 'accept';
                     break;
                 default:
                     throw { errorCode: 400, errorMessage: 'Invalid action type' };
@@ -170,6 +178,18 @@ export class UISetup {
             });
 
             await handleResponse(response, async () => {
+                if (username && notification_type) {
+                    try {
+                        const message = JSON.stringify({
+                            action: 'notification',
+                            notification_type,
+                            to_user: username
+                        });
+                        userSocket.socket.send(message);
+                    } catch (error) {
+                        console.error('Failed to send notification:', error);
+                    }
+                }
                 await this.friends.friendsLoader.loadFriendsData(window.location.pathname.split('/').pop());
             });
 

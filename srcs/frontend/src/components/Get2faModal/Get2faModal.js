@@ -1,7 +1,7 @@
 import { navigateTo } from '../../scripts/Router.js'
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
 import customAlert from '../../scripts/utils/customAlert.js';
-import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 
 
 export function initTwoFactorAuth(jsonData) {
@@ -104,7 +104,7 @@ export function initTwoFactorAuth(jsonData) {
 				return response.json();
 			})
 			.then(data =>{
-				onlineSocket.initWebSocket();
+				userSocket.initWebSocket();
 				navigateTo("/play");
 			})
         })

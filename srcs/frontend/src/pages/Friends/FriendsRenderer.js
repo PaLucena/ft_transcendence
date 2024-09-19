@@ -116,7 +116,7 @@ export class FriendsRenderer {
 								Accept
 							</button>
 							<button class="btn btn-outline-dark"
-								data-action="remove"
+								data-action="cancel"
 								data-username="${user.username}">
 								Cancel
 							</button>
@@ -150,7 +150,7 @@ export class FriendsRenderer {
 								Accept
 							</button>
 							<button class="btn btn-outline-dark"
-								data-action="remove"
+								data-action="cancel"
 								data-username="${user.username}">
 								Cancel
 							</button>
