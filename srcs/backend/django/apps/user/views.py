@@ -58,20 +58,17 @@ def get_user_data(request):
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["POST"])
+@api_view(["GET"])
 @default_authentication_required
-def set_language(request):
-    user = request.user
-    preferred_language = request.data.get('language')
-
-    if preferred_language not in ['EN', 'ES', 'LV']:
-        return Response({'error': 'Invalid language choice'}, status=status.HTTP_400_BAD_REQUEST)
-
-    user.language = preferred_language
-    user.save()
-
-    return Response({'message': 'Language changed'}, status=status.HTTP_200_OK)
-
+def get_user_language(request):
+    try:
+        user = request.user
+        user_data = {
+            "language": user.language
+        }
+        return Response(user_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
 @default_authentication_required
@@ -226,6 +223,7 @@ def update_user_info(request):
         old_password = request.data.get("old_password")
         new_password = request.data.get("new_password")
         confirm_password = request.data.get("confirm_password")
+        language = request.data.get("language");
 
         if user.is_superuser or user.is_staff:
             if new_username and new_username != user.username:
@@ -268,6 +266,9 @@ def update_user_info(request):
                 )
             user.password = make_password(new_password)
             user.save()
+        
+        if user.language is not language:
+            user.language = language
 
         user.save()
         user.refresh_from_db()
