@@ -20,6 +20,9 @@ def random_ai_game(tournament_id, match_id, player_1_id, player_2_id):
 		'player_2_id': player_2_id,
 		'player_1_goals': player_1_goals,
 		'player_2_goals': player_2_goals,
+		'player_1_hits': 0,
+		'player_2_hits': 0,
+		'match_total_time': 0,
 	}
 
 
@@ -172,6 +175,10 @@ class GameRoom:
 			'player_2_id': self.player_2_id,
 			'player_1_goals': self.game_logic.player_1_goals,
 			'player_2_goals': self.game_logic.player_2_goals,
+			'player_1_max_hits': self.game_logic.player_1_max_hits,
+			'player_2_max_hits': self.game_logic.player_2_max_hits,
+			'match_total_time': self.game_logic.match_total_time,
+			'forfeit': self.game_logic.forfeit,
 		}
 
 # Create the game manager

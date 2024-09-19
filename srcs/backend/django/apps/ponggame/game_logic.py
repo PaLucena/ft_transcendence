@@ -53,10 +53,16 @@ class GameLogic:
     player_2_ready = False
     player_1_goals = 0
     player_2_goals = 0
+    player_1_hits = 0
+    player_2_hits = 0
+    player_1_max_hits = 0
+    player_2_max_hits = 0
     controls_mode = "local"
     ai_side = 0
     countdown = CONNECT_TIMEOUT * FPS
     new_direction = False
+    match_total_time = 0
+    forfeit = 0
 
     player_1_channel = None
     player_2_channel = None
@@ -98,6 +104,7 @@ class GameLogic:
                 self.new_angle(1)
                 self.ball_vel_y += self.BALL_SPEED_INC
                 self.ball_vel_x += self.BALL_SPEED_INC
+                self.player_1_hits += 1
                 self.new_direction = True
             elif (self.pad_2_x <= self.ball_x + self.BALL_RADIUS <= self.pad_2_x + self.PADDLE_WIDTH and
                   self.pad_2_y - self.PADDLE_HEIGHT / 2 <= self.ball_y <= self.pad_2_y + self.PADDLE_HEIGHT / 2 and
@@ -105,6 +112,7 @@ class GameLogic:
                 self.new_angle(2)
                 self.ball_vel_y += self.BALL_SPEED_INC
                 self.ball_vel_x += self.BALL_SPEED_INC
+                self.player_2_hits += 1
                 self.new_direction = True
         except Exception as e:
             print(f"Error checking collision: {e}")
@@ -168,8 +176,15 @@ class GameLogic:
                 self.check_collision()
                 goal = self.check_goal()
                 if goal:
+                    if self.player_1_hits > self.player_1_max_hits:
+                        self.player_1_max_hits = self.player_1_hits
+                    if self.player_2_hits > self.player_2_max_hits:
+                        self.player_2_max_hits = self.player_2_hits
+                    self.player_1_hits = 0
+                    self.player_2_hits = 0
                     if self.end_game():
                         self.game_state = "game_over"
+                        self.match_total_time = round(time.time() - self.match_total_time, 2)
                     else:
                         self.game_state = "scored"
                         self.set_countdown()
@@ -189,6 +204,7 @@ class GameLogic:
                 else:
                     self.game_state = "game_over"
                 if self.player_1_ready and self.player_2_ready:
+                    self.match_total_time = time.time()
                     self.game_state = "countdown"
                     self.set_countdown()
             elif self.game_state == "game_over":
