@@ -184,7 +184,6 @@ class GameLogic:
                     self.player_2_hits = 0
                     if self.end_game():
                         self.game_state = "game_over"
-                        self.match_total_time = round(time.time() - self.match_total_time, 2)
                     else:
                         self.game_state = "scored"
                         self.set_countdown()

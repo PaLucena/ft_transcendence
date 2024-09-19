@@ -98,7 +98,7 @@ class GameManager:
 	async def run_game_loop(self, game_room, game_logic, ai_player):
 		try:
 			while game_logic.game_state != "game_over":
-				start_time = time.time()
+				loop_time = time.time()
 				if game_logic.ai_side:
 					ai_player.ai_turn(game_logic.new_direction)
 				await game_logic.game_loop()
@@ -106,10 +106,11 @@ class GameManager:
 				await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
 				if game_logic.game_state == "scored":
 					await send_score(self.channel_layer, game_room.game_room_id, game_logic)
-				elapsed_time = time.time() - start_time
+				elapsed_time = time.time() - loop_time
 				if game_logic.FRAME_TIME - elapsed_time < 0:
 					print("**** ALERT: Game loop is running too slow ****")
 				await asyncio.sleep(max(0.0, game_logic.FRAME_TIME - elapsed_time))
+			game_logic.match_total_time = round(time.time() - game_logic.start_time, 2)
 			if game_logic.game_state == "game_over":
 				await send_score(self.channel_layer, game_room.game_room_id, game_logic)
 			await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
