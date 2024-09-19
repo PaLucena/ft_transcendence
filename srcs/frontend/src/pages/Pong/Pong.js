@@ -1,5 +1,6 @@
 import { Component } from "../../scripts/Component.js";
 import { InputController } from "./InputController.js";
+import { navigateTo } from "../../scripts/Router.js";
 
 export class Pong extends Component {
 
@@ -12,7 +13,7 @@ export class Pong extends Component {
 		this.player_2_name = 'Player 2';
 		this.inputController = null;
 		this.responsiveValue = null;
-		this.playing = true;
+		this.playing = false;
 		this.reconnectAttempts = 0;
 		this.maxReconnectAttempts = 5;
 	}
@@ -31,6 +32,7 @@ export class Pong extends Component {
 
 	initPong() {
 		this.setupElements();
+		this.safeDefaultValues();
 		this.setupWebsocket();
 		this.setupEventListeners();
 	}
@@ -59,12 +61,25 @@ export class Pong extends Component {
 		this.message_line_sub_2 = this.getCSSSelector('.message-line-sub-2');
 		this.controls_1 = this.getCSSSelector('.controls-1');
 		this.controls_2 = this.getCSSSelector('.controls-2');
+		// Capture - Buttons
+		this.button_return = document.getElementById('button-return');
+		this.button_quit = document.getElementById('button-quit');
+	}
+
+	safeDefaultValues() {
+		this.message_line_super.innerHTML = '';
+		this.message_line_main.innerHTML = '';
+		this.message_line_sub_2.innerHTML = '';
+		this.controls_1.innerHTML = '';
+		this.controls_2.innerHTML = '';
+		this.button_return.style.display = 'none';
 	}
 
 	setupWebsocket() {
 		this.socket = new WebSocket('/ws/ponggame/');
 
 		this.socket.onopen = () => {
+			this.playing = true;
 			console.log("Connection established");
 			this.reconnectAttempts = 0;
 		};
@@ -95,15 +110,19 @@ export class Pong extends Component {
 				console.log('Connection died');
 			}
 
-			if (this.playing && this.reconnectAttempts < this.maxReconnectAttempts) {
-				this.reconnectAttempts++;
-				console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-				setTimeout(() => {
-					this.setupWebsocket();
-				}, 10);
-			} else {
-				console.log('Max reconnect attempts reached');
+			if (!this.playing) {
+				console.log("Redirect to main menu");
+				navigateTo('/play');
 			}
+			// if (this.playing && this.reconnectAttempts < this.maxReconnectAttempts) {
+			// 	this.reconnectAttempts++;
+			// 	console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+			// 	setTimeout(() => {
+			// 		this.setupWebsocket();
+			// 	}, 10);
+			// } else if (this.reconnectAttempts === this.maxReconnectAttempts) {
+			// 	console.log('Max reconnect attempts reached');
+			// }
 		}
 
 		this.socket.onerror = (error) => {
@@ -113,6 +132,12 @@ export class Pong extends Component {
 
 	setupEventListeners() {
 		window.addEventListener('resize', this.updateResizePositions.bind(this));
+		this.button_return.addEventListener('click', () => {
+			navigateTo('/play');
+		});
+		this.button_quit.addEventListener('click', () => {
+			this.inputController.execCommands(`quit_p${this.controls_side}`);
+		});
 	}
 
 	updateResizePositions() {
@@ -199,9 +224,11 @@ export class Pong extends Component {
 		} else if (gameState.state === 'game_over') {
 			this.message_line_super.innerHTML = '';
 			this.message_line_main.innerHTML = 'Game Over';
+			this.message_line_sub_2.innerHTML = "";
 			this.controls_1.innerHTML = '';
 			this.controls_2.innerHTML = '';
 			this.playing = false;
+			this.button_return.style.display = 'block';
 		}
 	}
 

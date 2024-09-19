@@ -9,6 +9,10 @@ contract PongTournament {
         uint256 player2Id_;
         uint256 player1Score_;
         uint256 player2Score_;
+        uint256 player1MaxHits_;
+        uint256 player2MaxHits_;
+        uint256 matchTime_;
+        uint256 forfeit_;
         uint256 winnerId_;
     }
 
@@ -54,7 +58,9 @@ contract PongTournament {
         emit TournamentCreated(tournamentId);
     }
 
-    function recordMatch(uint256 tournId, uint256 matchId, uint256 p1Id, uint256 p2Id, uint256 p1Sc, uint256 p2Sc, uint256 winId) public OnlyOwner(msg.sender) {
+    function recordMatch(uint256 tournId, uint256 matchId, uint256 p1Id, uint256 p2Id,
+                uint256 p1Sc, uint256 p2Sc, uint256 p1MH, uint256 p2MH, uint256 mT, uint256 fF,
+                uint256 winId) public OnlyOwner(msg.sender) {
         require(matches_[matchId].matchId_ == 0, "Match already exists");
         Tournament storage tournament = tournaments_[tournId];
         require(tournament.tournamentId_ == tournId, "Incorrect tournament");
@@ -67,7 +73,7 @@ contract PongTournament {
 
         require(p1Id != p2Id, "Players error");
 
-        matches_[matchId] = Match(tournId, matchId, p1Id, p2Id, p1Sc, p2Sc, winId);
+        matches_[matchId] = Match(tournId, matchId, p1Id, p2Id, p1Sc, p2Sc, p1MH, p2MH, mT, fF, winId);
         tournaments_[tournId].matchIds_.push(matchId);
         player_Matches_[p1Id].push(matchId);
         player_Matches_[p2Id].push(matchId);
@@ -146,6 +152,7 @@ contract PongTournament {
     function randomMatch(uint256 p1Id, uint256 p2Id) private  returns (Match memory) {
         testMatchCounter++;
         uint256 goals1;
+        uint256 hits;
         player_Matches_[p1Id].push(testMatchCounter);
         player_Matches_[p2Id].push(testMatchCounter);
         uint256 goals2 = uint256(keccak256(abi.encodePacked(p1Id, p2Id, block.timestamp))) % 9;
@@ -155,10 +162,12 @@ contract PongTournament {
             goals1 = 6;
         }
         uint256 winner = randomPairNumber();
+        uint randomHash = uint(keccak256(abi.encodePacked(testMatchCounter, "randomHits")));
+        hits = (randomHash % 20) + 1;
         if (winner < 1) {
-            return Match(testTournamentCounter, testMatchCounter, p1Id, p2Id, goals1, goals2, p1Id);
+            return Match(testTournamentCounter, testMatchCounter, p1Id, p2Id, goals1, goals2, hits, hits -1, hits * 6, 0, p1Id);
         } else {
-            return Match(testTournamentCounter, testMatchCounter, p1Id, p2Id, goals2, goals1, p2Id);
+            return Match(testTournamentCounter, testMatchCounter, p1Id, p2Id, goals2, goals1, hits - 1, hits, hits * 6, 0, p2Id);
         }
     }
 

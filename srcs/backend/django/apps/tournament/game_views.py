@@ -5,13 +5,13 @@ from adrf.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from ponggame.game_manager import game_manager
-from blockchain.views import record_match as bc_record_match
 import asyncio
 from user.models import AppUser
 from .models import Match, Tournament
 from asgiref.sync import sync_to_async
 from user.authenticate import DefaultAuthentication
 from .match_logic import format_match_for_bc
+from blockchain.views import record_match
 
 
 class BaseMatch(APIView):
@@ -49,7 +49,7 @@ class BaseMatch(APIView):
 				controls_mode=self.get_controls_mode()
 			)
 			print("SAVING MATCH 1:: ", result)
-			await sync_to_async(bc_record_match)(format_match_for_bc(result))
+			await sync_to_async(record_match)(format_match_for_bc(result))
 			print("SAVING MATCH 2:: ", result)
 		except Exception as e:
 			print(f"Error handling match result: {e}")

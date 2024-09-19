@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from .models import Match
 from .tournament_config import next_match_dependencies, required_matches, assignments
 from user.decorators import default_authentication_required
-from blockchain.views import record_match as bc_record_match
+from blockchain.views import record_match
 import random
 from ponggame.game_manager import game_manager
 import asyncio
@@ -54,7 +54,7 @@ def assign_next_match(tournament, match_id, finished_match_data):
 		if finished_match.player1 == 0 and finished_match.player2 == 0:
 			pass
 		else:
-			bc_record_match(format_match_for_bc(finished_match_data))
+			record_match(format_match_for_bc(finished_match_data))
 
 	for next_match_id in next_possible_matches:
 		if can_assign_match(tournament, next_match_id) and not Match.objects.filter(match_id=next_match_id).exists():
@@ -79,11 +79,19 @@ def set_winner_and_loser(finished_match_data, finished_match):
 	player2_id = finished_match_data.get('player_2_id')
 	player1_goals = finished_match_data.get('player_1_goals')
 	player2_goals = finished_match_data.get('player_2_goals')
+	forfeit = finished_match_data.get('forfeit')
 
 	finished_match.player1 = player1_id
 	finished_match.player2 = player2_id
 
-	if player1_goals > player2_goals:
+	if forfeit:
+		if forfeit == 1:
+			finished_match.winner = player2_id
+			finished_match.loser = player1_id
+		else:
+			finished_match.winner = player1_id
+			finished_match.loser = player2_id
+	elif player1_goals > player2_goals:
 		finished_match.winner = player1_id
 		finished_match.loser = player2_id
 
@@ -231,6 +239,10 @@ def format_match_for_bc(result):
 		'player_2_id': result['player_2_id'],
 		'player_1_goals': result['player_1_goals'],
 		'player_2_goals': result['player_2_goals'],
+		'player_1_max_hits': result['player_1_max_hits'],
+		'player_2_max_hits': result['player_2_max_hits'],
+		'match_total_time': result['match_total_time'],
+		'forfeit': result['forfeit'],
 		'winner_id': result['player_1_id'] if result['player_1_goals'] > result['player_2_goals'] else result['player_2_id'],
 	}
 

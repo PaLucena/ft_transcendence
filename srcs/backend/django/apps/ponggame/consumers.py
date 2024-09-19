@@ -27,7 +27,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.room = game_manager.get_game_room_by_player(self.player_id)
 
         if self.room is None:
-            print(f"Player {self.player_id} has no room") # DEBUG
+            print(f"Player {self.player_id} has no room")# DEBUG
             await self.close()
             return
 
@@ -98,7 +98,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             await handle_player_ready(self, data['player'])
 
         elif data['type'] == 'quit':
-            await handle_quit(self)
+            player = data['player']
+            await handle_quit(self, player)
 
         elif data['type'] == 'move':
             await handle_move(self, data['player'], data['direction'])

@@ -14,8 +14,8 @@ def bc_create_tournament(tournament_id, player_ids):
     return tx_hash
 
 
-def bc_record_match(tourn_id, match_id, p1_id, p2_id, p1_sc, p2_sc, win_id):
-    tx = contract.functions.recordMatch(tourn_id, match_id, p1_id, p2_id, p1_sc, p2_sc, win_id).build_transaction({
+def bc_record_match(tourn_id, match_id, p1_id, p2_id, p1_sc, p2_sc, p1_mh, p2_mh, mt, ff, win_id):
+    tx = contract.functions.recordMatch(tourn_id, match_id, p1_id, p2_id, p1_sc, p2_sc, p1_mh, p2_mh, mt, ff, win_id).build_transaction({
         'from': w3.eth.default_account,
         'nonce': w3.eth.get_transaction_count(w3.eth.default_account),
         'gas': 2000000,
