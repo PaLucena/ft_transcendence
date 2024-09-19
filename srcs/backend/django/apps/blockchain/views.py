@@ -27,14 +27,19 @@ def record_match(data):
         p2_id = data.get('player_2_id')
         p1_sc = data.get('player_1_goals')
         p2_sc = data.get('player_2_goals')
+        p1_mH = data.get('player_1_max_hits')
+        p2_mH = data.get('player_2_max_hits')
+        mT = data.get('match_total_time')
+        fF = data.get('forfeit')
         win_id = data.get('winner_id')
 
-        required_keys = ['tournament_id', 'match_id', 'player_1_id', 'player_2_id', 'player_1_goals', 'player_2_goals', 'winner_id']
+        required_keys = ['tournament_id', 'match_id', 'player_1_id', 'player_2_id', 'player_1_goals', 'player_2_goals',
+                         'player_1_max_hits', 'player_2_max_hits', 'match_total_time', 'forfeit', 'winner_id']
         if not all(key in data for key in required_keys):
             return JsonResponse({'error': 'Invalid input'}, status=400)
 
         try:
-            tx_hash = bc_record_match(tourn_id, match_id, p1_id, p2_id, p1_sc, p2_sc, win_id)
+            tx_hash = bc_record_match(tourn_id, match_id, p1_id, p2_id, p1_sc, p2_sc, p1_mH, p2_mH, mT, fF, win_id)
             return JsonResponse({
                 'message': 'Match recorded successfully',
                 'tx_hash': tx_hash.hex()
