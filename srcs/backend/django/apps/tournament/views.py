@@ -76,7 +76,8 @@ def close_tournament(request, tournament_id):
 		tournament = Tournament.objects.get(pk=tournament_id)
 		participant_count = tournament.participants.count()
 		matches = []
-#(user != tournament.creator) or 
+		if user != tournament.creator:
+			return Response({"error": "You can not close tournament!"}, status=status.HTTP_403_FORBIDDEN)
 		if participant_count < 2:
 			return Response({"error": "To close tournament minimum 2 players are required!"}, status=status.HTTP_403_FORBIDDEN)
 

@@ -48,9 +48,9 @@ class BaseMatch(APIView):
 				player_2_id=player_2_id,
 				controls_mode=self.get_controls_mode()
 			)
-			print("SAVING MATCH 1:: ", result)
+			print("SAVING MATCH before bc:: ", result)
 			await sync_to_async(record_match)(format_match_for_bc(result))
-			print("SAVING MATCH 2:: ", result)
+			print("SAVING MATCH after bc:: ", result)
 		except Exception as e:
 			print(f"Error handling match result: {e}")
 

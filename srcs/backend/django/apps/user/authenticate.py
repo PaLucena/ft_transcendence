@@ -34,7 +34,6 @@ class DefaultAuthentication:
 
 		else:
 			raise exceptions.AuthenticationFailed('No access token provided')
-			#return redirect('login')
 
 		user = self.jwt_auth.get_user(validated_token)
 
@@ -42,7 +41,6 @@ class DefaultAuthentication:
 			raise exceptions.AuthenticationFailed('User does not exist')
 
 		request.user = user
-		print("USER: ", user)
 
 		return user, request.COOKIES.get('access_token')
 
@@ -53,14 +51,3 @@ class DefaultAuthentication:
 		request that was not authenticated.
 		"""
 		return 'Authentication realm="api"'
-
-	# def refresh_access_token(self, refresh_token):
-	# 	try:
-	# 		refresh = RefreshToken(refresh_token)
-	# 		new_access_token = str(refresh.access_token)
-	# 		# Blacklist the old refresh token
-	# 		refresh.blacklist()
-	# 		return new_access_token
-	# 	except TokenError as e:
-	# 		print(f"Token error: {e}")
-	# 		return None
