@@ -57,8 +57,42 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
 
         if action == "notification":
             await self.handle_notification(data)
+        elif action == "invitation_1x1":
+            await self.handle_1x1(data)
         else:
             await self.send_error(400, "Unknown UserSocket action.")
+
+    async def handle_1x1(self, data):
+        invitation_1x1_type = data.get("type")
+        group_name = data.get("group_name")
+        opponent = data.get("opponent")
+
+        if not invitation_1x1_type:
+            await self.send_error(400, "Missing type field.")
+            return
+
+        if not group_name:
+            await self.send_error(400, "Missing group_name field.")
+            return
+
+        if not opponent:
+            await self.send_error(400, "Missing opponent field.")
+            return
+
+        if not await self.user_exists(opponent):
+            await self.send_error(404, f"User '{opponent}' not found.")
+            return
+
+        if invitation_1x1_type == "connect":
+             await self.channel_layer.group_add(
+                group_name, self.channel_name
+            )
+        elif invitation_1x1_type == "accept":
+            pass
+        elif invitation_1x1_type == "reject":
+            pass
+        else:
+            await self.send_error(404, f"1x1 type '{invitation_1x1_type}' not found.")
 
     async def handle_notification(self, data):
         notification_type = data.get("type")
