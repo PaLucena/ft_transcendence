@@ -65,14 +65,17 @@ class UserWebsocket {
 
     handleNotification(notification) {
         switch (notification.type) {
-            case 'invite':
+            case 'friend_invite':
                 customAlert('info', notification.message, 3000, 'New Friend Request');
                 break ;
-            case 'accept':
+            case 'friend_accept':
                 customAlert('success', notification.message, 3000, 'Friendship Confirmed');
                 break ;
-            case 'cancel':
+            case 'friend_cancel':
                 customAlert('danger', notification.message, 3000, 'Friendship Canceled');
+                break ;
+            case '1x1_invite':
+                customAlert('info', notification.message, 3000, 'Info');
                 break ;
         }
     }
