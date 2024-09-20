@@ -1,6 +1,7 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from user.models import AppUser
+from rtchat.models import Invite
 
 
 class UserSocketConsumer(AsyncJsonWebsocketConsumer):
@@ -55,16 +56,16 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
         action = data.get("action")
 
         if action == "notification":
-            await self.send_notification(data)
+            await self.handle_notification(data)
         else:
             await self.send_error(400, "Unknown UserSocket action.")
 
-    async def send_notification(self, data):
-        notification_type = data.get("notification_type")
+    async def handle_notification(self, data):
+        notification_type = data.get("type")
         to_user = data.get("to_user")
 
         if not notification_type:
-            await self.send_error(400, "Missing notification_type field.")
+            await self.send_error(400, "Missing type field.")
             return
 
         if not to_user:
@@ -75,15 +76,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             await self.send_error(404, f"User '{to_user}' not found.")
             return
 
-        if notification_type in ["invite", "accept", "cancel"]:
-            await self.send_friend_notification(notification_type, to_user)
-        else:
-            await self.send_error(
-                404, f"Notification type '{notification_type}' not found."
-            )
-
-    async def send_friend_notification(self, notification_type, username):
-        try:
+        if notification_type in ["friend_invite", "friend_accept", "friend_cancel"]:
             message = self.get_friend_notification_message(notification_type)
             if not message:
                 await self.send_error(
@@ -91,6 +84,26 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                 )
                 return
 
+            await self.send_notification(notification_type, to_user, message)
+        elif notification_type in ["1x1_invite"]:
+            group_name_1x1 = data.get("group_name")
+
+            if not group_name_1x1:
+                await self.send_error(400, "Missing group_name_1x1 field.")
+                return
+
+            if not await self.group_1x1_exists(group_name_1x1):
+                await self.send_error(404, f"Group '{group_name_1x1}' not found.")
+                return
+
+            await self.send_notification(notification_type, to_user, group_name_1x1)
+        else:
+            await self.send_error(
+                404, f"Notification type '{notification_type}' not found."
+            )
+
+    async def send_notification(self, notification_type, username, message):
+        try:
             group_name = f"notification-{username}"
             event = {
                 "type": "user.notification",
@@ -104,17 +117,21 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             await self.send_error(500, f"Failed to send notification: {str(e)}")
 
     def get_friend_notification_message(self, notification_type):
-        if notification_type == "invite":
+        if notification_type == "friend_invite":
             return f"You have a new friend invite from {self.user.username}!"
-        elif notification_type == "accept":
+        elif notification_type == "friend_accept":
             return f"{self.user.username} has accepted your friend request!"
-        elif notification_type == "cancel":
+        elif notification_type == "friend_cancel":
             return f"{self.user.username} has canceled the friend request!"
         return None
 
     @database_sync_to_async
     def user_exists(self, username):
         return AppUser.objects.filter(username=username).exists()
+
+    @database_sync_to_async
+    def group_1x1_exists(self, group_name):
+        return Invite.objects.filter(group_name=group_name).exists()
 
     async def user_notification(self, event):
         try:

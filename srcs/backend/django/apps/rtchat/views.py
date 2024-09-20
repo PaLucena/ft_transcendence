@@ -276,7 +276,7 @@ def create_invite(request, username):
         delete_invite_after_delay(invite.id, invitation_lifetime)
 
         return Response(
-            {"invite_id": invite.id, "group_name": invite.group_name},
+            {"group_name": invite.group_name},
             status=status.HTTP_201_CREATED,
         )
 
