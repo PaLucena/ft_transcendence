@@ -34,21 +34,25 @@ def create_tournament(request):
 	try:
 		creator = request.user
 		name = request.data.get('name')
-		#nickname = request.data.get('nickname')
 		type = request.data.get('type')
 		invitation_code = None
 
 		if Tournament.objects.filter(name=name).exists():
 			return Response({"error": "Tournament name is already taken."}, status=status.HTTP_400_BAD_REQUEST)
 
+		clean_name = name.replace('_', '')
+		if not name or not clean_name.isalnum():
+			return Response({"error": "Tournament name can only contain letters, numbers, and underscores."}, status=status.HTTP_400_BAD_REQUEST)
+
 		nickname_response = set_nickname(request)
 		if nickname_response.status_code != status.HTTP_200_OK:
 			return nickname_response
 
+		active_tournaments = Tournament.objects.filter(creator=creator)
+		if active_tournaments.exists():
+			return Response({"error": "You can only create one tournament at a time."}, status=status.HTTP_400_BAD_REQUEST)
+		
 		if type == Tournament.PRIVATE:
-			private_tournament_count = Tournament.objects.filter(creator=creator, type=Tournament.PRIVATE).count()
-			if private_tournament_count >= 3:
-				return Response({"error": "You can only create up to 3 private tournaments."}, status=status.HTTP_400_BAD_REQUEST)
 			invitation_code = str(random.randint(1000, 9999))
 
 		tournament = Tournament.objects.create(

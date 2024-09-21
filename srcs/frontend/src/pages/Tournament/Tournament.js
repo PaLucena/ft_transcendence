@@ -16,7 +16,7 @@ export class Tournament extends Component {
 	}
 
 	init() {
-		//this.getTournamentCode(this.params.tournamentId);
+		this.getTournamentCode(this.params.tournamentId);
 		this.checkCreator(this.params.tournamentId);
 		this.displayInfo(this.params.tournamentId);
 	}
@@ -125,6 +125,8 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
+				console.log("BLA BLA");
+				
 				tournamentSocket.closeWebSocket();
 				navigateTo('/play');
 			})

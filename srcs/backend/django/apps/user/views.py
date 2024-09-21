@@ -139,23 +139,23 @@ def login(request):
 	except AppUser.DoesNotExist:
 		return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    authenticated_user: AbstractUser | None = authenticate(
-        username=username, password=password
-    )
-    if authenticated_user is not None:
-        user = AppUser.objects.get(username=username)
-        user.save()
-        if Has2faEnabled(user.username):
-            response = Response({"has_2fa": True}, status=status.HTTP_200_OK)
-        else:
-            response = Response(
-                {"message": "Login successful", "has_2fa": False}, status=status.HTTP_200_OK
-            )
-        auth_login(request, authenticated_user)
-        refresh = RefreshToken.for_user(user)
-        access = refresh.access_token
-        response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
-        response.set_cookie("access_token", str(access), httponly=True, secure=True)
+	authenticated_user: AbstractUser | None = authenticate(
+		username=username, password=password
+	)
+	if authenticated_user is not None:
+		user = AppUser.objects.get(username=username)
+		user.save()
+		if Has2faEnabled(user.username):
+			response = Response({"has_2fa": True}, status=status.HTTP_200_OK)
+		else:
+			response = Response(
+				{"message": "Login successful", "has_2fa": False}, status=status.HTTP_200_OK
+			)
+		auth_login(request, authenticated_user)
+		refresh = RefreshToken.for_user(user)
+		access = refresh.access_token
+		response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
+		response.set_cookie("access_token", str(access), httponly=True, secure=True)
 
 		print("Access Token Expiry:", access["exp"])
 		print("Refresh Token Expiry:", refresh["exp"])
@@ -217,6 +217,7 @@ from django.contrib.auth.signals import user_logged_in
 @default_authentication_required
 def update_user_info(request):
 	try:
+		print("TEST 1", request.body)
 		user = request.user
 		new_username = request.data.get("new_username")
 		new_avatar = request.FILES.get("avatar")
@@ -224,7 +225,7 @@ def update_user_info(request):
 		new_password = request.data.get("new_password")
 		confirm_password = request.data.get("confirm_password")
 		language = request.data.get("language")
-
+		print("TEST 1", new_avatar)
 		if user.is_superuser or user.is_staff:
 			if new_username and new_username != user.username:
 				return Response(
@@ -266,12 +267,15 @@ def update_user_info(request):
 				)
 			user.password = make_password(new_password)
 			user.save()
-		
-		if user.language is not language:
-			user.language = language
+			request.session.flush()
+			auth_logout(request)
 
+		print("TEST 3:", language)
+		if language and user.language != language:
+			user.language = language
+		print("TEST 4")
 		user.save()
-		user.refresh_from_db()
+		#user.refresh_from_db()
 		#request.session.flush()
 		#auth_logout(request)
 		# authenticated_user = authenticate(

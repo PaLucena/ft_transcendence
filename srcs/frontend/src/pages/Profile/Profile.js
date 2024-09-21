@@ -282,6 +282,9 @@ export class Profile extends Component {
 			});
 			jsonData['language'] = document.getElementById('language_selector').value;
 
+			console.log("HOLA", jsonData);
+			
+
 			fetch("/api/update_user_info/", {
 				method: "POST",
 				headers: {

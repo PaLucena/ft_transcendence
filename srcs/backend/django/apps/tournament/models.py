@@ -12,12 +12,12 @@ class Tournament(models.Model):
 		(PRIVATE, 'Private'),
 	]
 
-	name = models.CharField(max_length=100, blank=False)
+	name = models.CharField(max_length=20, blank=False)
 	creator = models.ForeignKey(AppUser, on_delete=models.SET_NULL, blank=True, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	participants = models.ManyToManyField(AppUser, related_name='participants') #if deleting, needs to marked as "deleted user"
 	type = models.CharField(max_length=10, choices=TOURNAMENT_TYPES, default=PUBLIC)
-	invitation_code = models.CharField(max_length=10, null=True, blank=True)
+	invitation_code = models.CharField(max_length=5, null=True, blank=True)
 	is_active = models.BooleanField(default=False)
 	player_ids = models.JSONField(default=list)
 	#invitation_time_out =  models.DateTimeField(default=lambda: timezone.now() + timedelta(minutes=10))
