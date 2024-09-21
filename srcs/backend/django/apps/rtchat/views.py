@@ -257,6 +257,14 @@ def create_invite(request, username):
 
         if existing_invite:
             time_remaining = (existing_invite.expires_at - current_time).total_seconds()
+
+            if time_remaining <= 0:
+                existing_invite.delete()
+                return Response(
+                    {"detail": "The invitation has expired. Try again."},
+                    status=status.HTTP_410_GONE,
+                )
+
             if time_remaining > 0:
                 return Response(
                     {
