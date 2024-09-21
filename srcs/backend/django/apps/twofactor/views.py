@@ -68,7 +68,10 @@ def disable2fa(request):
 		TOTPDevice.delete(device)
 	except TOTPDevice.DoesNotExist:
 		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
-	return Response(status=status.HTTP_200_OK)
+	response = Response(status=status.HTTP_200_OK)
+	response.delete_cookie("twofactor_access_token")
+	response.delete_cookie("twofactor_refresh_token")
+	return response
 
 @api_view(["POST"])
 @default_authentication_required
