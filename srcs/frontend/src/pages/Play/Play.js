@@ -102,25 +102,25 @@ export class Play extends Component {
 
 		// local
 		const	localBtn = document.getElementById("localBtn");
-		localBtn.addEventListener("click", () => {
+		this.addEventListener(localBtn, "click", () => {
 			this.playLocal();
 		});
 
 		// ai
 		const	aiBtn = document.getElementById("aiBtn");
-		aiBtn.addEventListener("click", () => {
+		this.addEventListener(aiBtn, "click", () => {
 			this.playAi();
 		});
 
 		// online
 		// const	remoteBtn = document.getElementById("remoteBtn");
-		// remoteBtn.addEventListener("click", () => {
+		// this.addEventListener(remoteBtn, "click", () => {
 		// 	this.playRemote();
 		// });
 
 		const	tournamentModalElement = document.getElementById("tournamentModal");
 		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
-		tournamentModalElement.addEventListener('shown.bs.modal', () => {
+		this.addEventListener(tournamentModalElement, 'shown.bs.modal', () => {
 			document.getElementById('name-input').focus();
 		});
 	}
@@ -362,17 +362,14 @@ export class Play extends Component {
 		const	joinBtns = document.querySelectorAll('.display-tournament-item');
 
 		joinBtns.forEach(joinBtn => {
-			joinBtn.addEventListener('click', async () => {
+			this.addEventListener(joinBtn, 'click', async () => {
 				const	tournamentName = joinBtn.querySelector('.tName').innerHTML;
 
 				const	tournamentData = allTournaments.find(object => object.name === tournamentName);
 				if (!tournamentData)
 					return ;
-				console.log("Tournament data: ", tournamentData);
 
 				const jsonData = await this.displayJoinModal(type);
-				console.log("hola");
-				console.log(jsonData);
 
 				fetch(`/api/join_tournament/${tournamentData.id}/`, {
 					method: "POST",
@@ -395,7 +392,6 @@ export class Play extends Component {
 					//this.createTournamentWebSocket(tournamentName);
 					tournamentSocket.initWebSocket(tournamentName);
 					navigateTo("/tournament/" + tournamentData.id);
-					console.log(data);
 				})
 				.catch((error) => {
 					customAlert('danger', `Error: ` + error.message, '');

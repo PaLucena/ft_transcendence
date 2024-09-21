@@ -26,7 +26,7 @@
 					<input type="file" class="form-control" id="avatar" name="avatar" placeholder="avatar">
 					<label for="avatar">avatar</label>
 				</div>
-				<div class="col-9 col form-floating mt-3">
+				<div class="col-9 form-floating mt-3">
 					<input type="password" class="form-control" id="old_password" name="old_password" placeholder="" autocomplete="current-password" data-bs-toggle="collapse" data-bs-target="#collapse">
 					<label for="old_password" id="oldPasswordLabel">Change password</label>
 				</div>
@@ -40,10 +40,18 @@
 						<label for="confirm_password">confirm new password</label>
 					</div>
 				</div>
+				<div class="col-9 mt-3">
+					<select id="language_selector" class="form-select col-8" aria-label="Default select example">
+						<option selected>Select language</option>
+						<option value="EN">English</option>
+						<option value="ES">Spanish</option>
+						<option value="LV">Latvian</option>
+					</select>
+				</div>
 			</form>
-			<div class="row col-8 mx-auto d-flex mt-4 justify-content-center" id="2faButtonPlaceholder">
-				<button class="btn btn-dark" id="Enable2faBtn">ENABLE 2FA</button>
-				<button class="btn btn-danger" id="Disable2faBtn">DISABLE 2FA</button>
+			<div id="2faButtonPlaceholder" class="row col-8 mx-auto d-flex mt-4 justify-content-center">
+				<button class="btn btn-dark hide" id="Enable2faBtn">ENABLE 2FA</button>
+				<button class="btn btn-danger hide" id="Disable2faBtn">DISABLE 2FA</button>
 			</div>
 			<div id="saveInfo" class="d-flex col mt-4 mb-3 justify-content-center">
 				<button type="submit" form="editForm" class="btn btn-primary col-10">SAVE</button>
@@ -137,7 +145,7 @@
 	</div>
 </div>
 
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+<div class="modal fade modal-background" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -145,10 +153,8 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				<!-- Placeholder for dynamic image -->
-				<span id="modalImageContainer" class="d-flex justify-content-center">
-					<!-- Image will be inserted here -->
-				</span>
+									<!-- Placeholder for dynamic image -->
+				<span id="modalImageContainer" class="d-flex justify-content-center"></span>
 			</div>
 		</div>
 	</div>

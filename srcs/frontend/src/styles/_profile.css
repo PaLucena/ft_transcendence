@@ -97,6 +97,10 @@
 .container-stats .stats {
 	height: 90%;
 	width: 90%;
+	max-height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+
 }
 
 .container-stats .stats .stats-list {

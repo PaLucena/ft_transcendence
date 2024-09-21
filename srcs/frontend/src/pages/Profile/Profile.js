@@ -21,6 +21,7 @@ export class Profile extends Component {
     }
 
 	init() {
+		this.setLanguage();
 		this.displayUserInfo(this.params.username);
 		this.saveInfoBtn(this.params.username);
 		if (typeof this.params.username === "undefined")
@@ -28,6 +29,29 @@ export class Profile extends Component {
 		this.enable2fa();
 		this.disable2fa();
 		// this.sendServerMessage();
+	}
+
+	setLanguage() {
+		fetch('/api/get_user_language', {
+			method: 'GET',
+			credentials: 'include'
+		})
+		.then(response => {
+			if (!response.ok) {
+				return response.json().then(errData => {
+					throw new Error(errData.error || `Response status: ${response.status}`);
+				});
+			}
+			return response.json();
+		})
+		.then(data => {
+			console.log("IDIOMA:", data.language);
+
+			// TODO: switch tocho
+		})
+		.catch(error => {
+			console.log('Error(setLanguage):', error.message);
+		});
 	}
 
 	async displayUserInfo(username) {
@@ -51,8 +75,6 @@ export class Profile extends Component {
 		})
 		.then(data => {
 			this.displayUserStats(data["username"]);
-
-			console.log("User data:", data);
 
 			if (myUsername === data["username"]) {
 				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-green text-white">EDIT PROFILE</button>`;
@@ -109,6 +131,8 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
+
+			console.log("User stats:", data)
 
 			let winRate = (data['wins'] * 100 / data['total_matches']) || 0;
 			winRate = winRate < 6 ? Math.round(winRate) : Math.round(winRate * 10) / 10;
@@ -214,7 +238,6 @@ export class Profile extends Component {
 		return data["username"];
 	}
 
-
 	editUserBtn() {
 		const editBtn = document.getElementById("editBtn");
 
@@ -222,9 +245,14 @@ export class Profile extends Component {
 			document.getElementById("userInfo").style.display = "none";
 			document.getElementById("userEdit").style.display = "block";
 
+			this.checkLanguage();
 			this.startPasswordEL();
 			this.show2faButton();
 		});
+	}
+
+	checkLanguage() {
+		// fetch a la view
 	}
 
 	startPasswordEL() {
@@ -243,7 +271,7 @@ export class Profile extends Component {
 	saveInfoBtn(username) {
 		const editForm = document.getElementById("editForm");
 
-		this.addEventListener(editForm, "submit", (event) => {
+		this.addEventListener(editForm, "submit", async (event) => {
 			event.preventDefault();
 
 			const formData = new FormData(event.target);
@@ -252,6 +280,7 @@ export class Profile extends Component {
 			formData.forEach((value, key) => {
 				jsonData[key] = value;
 			});
+			jsonData['language'] = document.getElementById('language_selector').value;
 
 			fetch("/api/update_user_info/", {
 				method: "POST",
@@ -274,6 +303,7 @@ export class Profile extends Component {
 				document.getElementById("userInfo").style.display = "block";
 				document.getElementById("userEdit").style.display = "none";
 				this.displayUserInfo(username);
+				this.setLanguage();
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
@@ -302,8 +332,9 @@ export class Profile extends Component {
 	show2faButton() {
 		let EnableButtonPlaceholder = document.getElementById("Enable2faBtn");
 		let DisableButtonPlaceholder = document.getElementById("Disable2faBtn");
-		fetch("/api/2fa/check2fa/", {
-			method: "POST",
+		
+		fetch("/api/user_from_intra", {
+			method: "GET",
 			credentials: 'include',
 		})
 		.then(response => {
@@ -312,16 +343,32 @@ export class Profile extends Component {
 					throw new Error(errData.error || `Response status: ${response.status}`);
 				});
 			}
-			return response.json()
+			return response.json();
 		})
 		.then(data => {
-			if (data["has2faEnabled"] == true) {
-				EnableButtonPlaceholder.style.display = "none";
-				DisableButtonPlaceholder.style.display = "block";
-			}
-			else {
-				EnableButtonPlaceholder.style.display = "block";
-				DisableButtonPlaceholder.style.display = "none";
+			if (data['intra_login'] === false) {
+				fetch("/api/2fa/check2fa/", {
+					method: "GET",
+					credentials: 'include',
+				})
+				.then(response => {
+					if (!response.ok) {
+						return response.json().then(errData => {
+							throw new Error(errData.error || `Response status: ${response.status}`);
+						});
+					}
+					return response.json();
+				})
+				.then(data => {
+					if (data["has2faEnabled"] == true) {
+						EnableButtonPlaceholder.style.display = "none";
+						DisableButtonPlaceholder.style.display = "block";
+					}
+					else {
+						EnableButtonPlaceholder.style.display = "block";
+						DisableButtonPlaceholder.style.display = "none";
+					}
+				})
 			}
 		})
 		.catch(error => {
@@ -343,7 +390,6 @@ export class Profile extends Component {
 					throw new Error(errData.error || `Response status: ${response.status}`);
 				});
 			}
-
 			this.show2faButton();
 		})
 		.catch(error => {
@@ -400,7 +446,7 @@ export class Profile extends Component {
 
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
-		TwofaBtn.addEventListener("click", (event) => {
+		this.addEventListener(TwofaBtn, "click", (event) => {
 			const response = fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',
@@ -418,7 +464,7 @@ export class Profile extends Component {
 		let testBtn = document.getElementById('testBtn');
 		if (testBtn) {
 			testBtn.addEventListener("click", (event) => {
-				userSocket.sendMessage("test", "ealgar-c")
+				onlineSocket.sendMessage("test", "ealgar-c")
 			})
 		}
 	} */

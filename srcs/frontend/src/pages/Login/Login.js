@@ -2,8 +2,9 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-import { userSocket } from '../../scripts/utils/UserWebsocket.js';
-import { initTwoFactorAuth } from '../../components/Get2faModal/Get2faModal.js'; // Adjust path as needed
+//import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
+
 
 export class Login extends Component {
 	constructor() {
@@ -19,21 +20,20 @@ export class Login extends Component {
 	destroy() {
 		console.log("Login Custom destroy");
 		this.removeAllEventListeners();
-    }
+	}
 
-	initLoginForm() {
-		//document.getElementById('username').querySelector('[autofocus]').focus();
+	async initLoginForm() {
 		const loginForm = document.getElementById('login_form');
-		this.addEventListener(loginForm, 'submit', function (event) {
+		this.addEventListener(loginForm, 'submit', async function (event) {
 			event.preventDefault();
 			let formIsValid = true;
+
+			// Validate the form
 			if (!this.checkValidity()) {
-				formIsValid = false
+				formIsValid = false;
 			}
 
 			if (formIsValid) {
-				event.preventDefault();
-
 				const formData = new FormData(event.target);
 				const jsonData = {};
 
@@ -42,41 +42,52 @@ export class Login extends Component {
 				});
 
 				const csrftoken = getCSRFToken('csrftoken');
-				fetch("/api/login/", {
-					method: "POST",
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-CSRFToken': csrftoken
-					},
-					body: JSON.stringify(jsonData)
-				})
-				.then(response => {
+
+				try {
+					const response = await fetch("/api/login/", {
+						method: "POST",
+						credentials: 'include',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRFToken': csrftoken
+						},
+						body: JSON.stringify(jsonData)
+					});
+
+					const twofactor_response = fetch("/api/2fa/check2fa", {
+						method: "GET",
+						credentials: 'include',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRFToken': csrftoken
+						},
+					})
 					if (!response.ok) {
-						return response.json().then(errData => {
-							throw new Error(errData.error || `Response status: ${response.status}`);
-						});
+						const errData = await response.json();
+						throw new Error(errData.error || `Response status: ${response.status}`);
 					}
-					return response.json();
-				})
-				.then(data => {
-					if (data.has_2fa == true) {
-						initTwoFactorAuth(jsonData);
-					} else {
-						userSocket.initWebSocket(jsonData["username"]);
-						customAlert('success', 'Login successful', 3000);
-						navigateTo("/play");
+
+					const data = await response.json();
+					if (data.has_2fa === true) {
+						const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
+						await TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
 					}
-				})
-				.catch(error => {
+
+					//onlineSocket.initWebSocket(jsonData["username"]);
+					//notificationsSocket.initWebSocket();
+					customAlert('success', 'Login successful', 3000);
+					navigateTo("/play");
+
+				} catch (error) {
 					customAlert('danger', `Error: ${error.message}`, '');
 					console.log(error);
-				});
+				}
 			}
 
-			this.classList.add('was-validated')
-		})
+			this.classList.add('was-validated');
+		});
 	}
+
 
 	intraLogin() {
 		const intraLogin = document.getElementById('intra_login');

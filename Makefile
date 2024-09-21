@@ -31,7 +31,7 @@ logs:
 clean: down
 	-@ rm -rf $(CONTAINERS_DIR)/db_volume $(CONTAINERS_DIR)
 	-@ rm -rf $(DJANGO_MEDIA)/avatars $(DJANGO_MEDIA)/qrs
-	-@ docker rmi -f $$(docker images -qa); docker volume rm $$(docker volume ls -q); docker network rm $$(docker network ls -q) 2>/dev/null
+	-@ docker rmi -f $$(docker images -qa) 2>/dev/null; docker volume rm $$(docker volume ls -q) 2>/dev/null; docker network rm $$(docker network ls -q) 2>/dev/null
 	-@ clear
 	-@ echo "Transcendence cleaned"
 

@@ -25,7 +25,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
 from .decorators import default_authentication_required
 from django.http import JsonResponse
-from twofactor.views import Has2faEnabled
+from twofactor.utils import Has2faEnabled
 from django.contrib.auth import update_session_auth_hash
 from blockchain.views import load_test_data, get_face2face
 from friends.views import get_friendship_status
@@ -56,20 +56,17 @@ def get_user_data(request):
 	except Exception as e:
 		return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["POST"])
+@api_view(["GET"])
 @default_authentication_required
-def set_language(request):
-	user = request.user
-	preferred_language = request.data.get('language')
-
-	if preferred_language not in ['EN', 'ES', 'LV']:
-		return Response({'error': 'Invalid language choice'}, status=status.HTTP_400_BAD_REQUEST)
-
-	user.language = preferred_language
-	user.save()
-
-	return Response({'message': 'Language changed'}, status=status.HTTP_200_OK)
-
+def get_user_language(request):
+    try:
+        user = request.user
+        user_data = {
+            "language": user.language
+        }
+        return Response(user_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET"])
 @default_authentication_required
@@ -142,22 +139,23 @@ def login(request):
 	except AppUser.DoesNotExist:
 		return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
-	authenticated_user: AbstractUser | None = authenticate(
-		username=username, password=password
-	)
-	if authenticated_user is not None:
-		user = AppUser.objects.get(username=username)
-		user.save()
-		if Has2faEnabled(user):
-			return Response({"has_2fa": True}, status=status.HTTP_200_OK)
-		auth_login(request, authenticated_user)
-		refresh = RefreshToken.for_user(user)
-		access = refresh.access_token
-		response = Response(
-			{"message": "Login successful", "has_2fa": False}, status=status.HTTP_200_OK
-		)
-		response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
-		response.set_cookie("access_token", str(access), httponly=True, secure=True)
+    authenticated_user: AbstractUser | None = authenticate(
+        username=username, password=password
+    )
+    if authenticated_user is not None:
+        user = AppUser.objects.get(username=username)
+        user.save()
+        if Has2faEnabled(user.username):
+            response = Response({"has_2fa": True}, status=status.HTTP_200_OK)
+        else:
+            response = Response(
+                {"message": "Login successful", "has_2fa": False}, status=status.HTTP_200_OK
+            )
+        auth_login(request, authenticated_user)
+        refresh = RefreshToken.for_user(user)
+        access = refresh.access_token
+        response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
+        response.set_cookie("access_token", str(access), httponly=True, secure=True)
 
 		print("Access Token Expiry:", access["exp"])
 		print("Refresh Token Expiry:", refresh["exp"])
@@ -167,20 +165,21 @@ def login(request):
 		return Response({"error": "Incorrect password"}, status=status.HTTP_404_NOT_FOUND)
 
 
+
 @api_view(["POST"])
 def loginWith2fa(request):
-	user = request.data.get("username")
-	print("username is", user["username"])
-	user = AppUser.objects.get(username=user["username"])
-	auth_login(request, user)
-	refresh = RefreshToken.for_user(user)
-	access = refresh.access_token
-	response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-	response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
-	response.set_cookie("access_token", str(access), httponly=True, secure=True)
-	print("Access Token Expiry:", access["exp"])
-	print("Refresh Token Expiry:", refresh["exp"])
-	return response
+    user = request.data.get("username")
+    print("username is", user["username"])
+    user = AppUser.objects.get(username=user["username"])
+    auth_login(request, user)
+    twofactor_refresh = RefreshToken.for_user(user)
+    twofactor_access = twofactor_refresh.access_token
+    response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+    response.set_cookie("twofactor_refresh_token", str(twofactor_refresh), httponly=True, secure=True)
+    response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
+    print("Access Token for 2FA Expiry:", twofactor_access["exp"])
+    print("Refresh Token for 2FA Expiry:", twofactor_refresh["exp"])
+    return response
 
 
 # ...
@@ -195,14 +194,16 @@ def TestView(request):
 @api_view(["GET"])
 @default_authentication_required
 def logout(request):
-	user = request.user  # delete later
-	print("USER in logout: ", user)
+	user = request.user
 	auth_logout(request)
 	response = Response(
 		{"message": "Logged out successfully"}, status=status.HTTP_200_OK
 	)
 	response.delete_cookie("access_token")
 	response.delete_cookie("refresh_token")
+	if (Has2faEnabled(user.username)):
+		response.delete_cookie("twofactor_access_token")
+		response.delete_cookie("twofactor_refresh_token")
 	return response
 
 from django.db import connection, reset_queries
@@ -222,6 +223,7 @@ def update_user_info(request):
 		old_password = request.data.get("old_password")
 		new_password = request.data.get("new_password")
 		confirm_password = request.data.get("confirm_password")
+		language = request.data.get("language")
 
 		if user.is_superuser or user.is_staff:
 			if new_username and new_username != user.username:
@@ -264,6 +266,9 @@ def update_user_info(request):
 				)
 			user.password = make_password(new_password)
 			user.save()
+		
+		if user.language is not language:
+			user.language = language
 
 		user.save()
 		user.refresh_from_db()
@@ -304,7 +309,6 @@ def delete_account(request):
 
 	Friend.objects.filter(Q(from_user=user) | Q(to_user=user)).delete()
 
-	# Mark user in tournaments as deleted
 	user.anonymize()
 	user.is_deleted = True
 	user.is_active = False
@@ -401,3 +405,10 @@ def ftapiLogin(request):
 	response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
 	response.set_cookie("access_token", str(access), httponly=True, secure=True)
 	return response
+
+
+@api_view(["GET"])
+@default_authentication_required
+def user_from_intra(request):
+	user = request.user
+	return Response({"intra_login": user.api42auth}, status=status.HTTP_200_OK)
