@@ -38,7 +38,25 @@
 			<div class="button-return" id="button-return">back</div>
 		</div>
 		<div class="quit">
-			<img class="button-quit" id="button-quit" src="../../assets/images/quit.png" alt="exit">
+			<img id="button-quit" class="button-quit" src="../../assets/images/quit.png" alt="exit">
+		</div>
+		<div class="modal fade modal-background" id="quitModal" tabindex="-1" data-bs-theme="dark">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title text-light">Quitting match</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body d-flex justify-content-center text-light">
+						Are you sure?
+						<br>
+						You will lose this match
+					</div>
+					<div class="modal-footer d-flex justify-content-center">
+						<button id="button-confirm-quit" class="btn btn-danger text-light">Quit</button>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div class="touch-controls">
 			<div class="touch-controls-1">

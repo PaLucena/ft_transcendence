@@ -51,6 +51,10 @@
 	height: 90%;
 }
 
+text-light {
+	color: white; 
+}
+
 .btn-green, .bg-green {
 	background-color: #3a595c;
 }

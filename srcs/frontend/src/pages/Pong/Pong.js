@@ -64,6 +64,7 @@ export class Pong extends Component {
 		// Capture - Buttons
 		this.button_return = document.getElementById('button-return');
 		this.button_quit = document.getElementById('button-quit');
+		this.button_confirm_quit = document.getElementById('button-confirm-quit');
 	}
 
 	safeDefaultValues() {
@@ -129,17 +130,24 @@ export class Pong extends Component {
 			console.log(`Error: ${error.message}`);
 		}
 	}
-
+	
 	setupEventListeners() {
+		const	quitModalElement = document.getElementById("quitModal");
+		const quitModal = new bootstrap.Modal(quitModalElement, {backdrop: false, keyboard: true});
+
 		window.addEventListener('resize', this.updateResizePositions.bind(this));
 		this.button_return.addEventListener('click', () => {
 			navigateTo('/play');
 		});
 		this.button_quit.addEventListener('click', () => {
+			quitModal.show();
+		});
+		this.button_confirm_quit.addEventListener('click', () => {
 			this.inputController.execCommands(`quit_p${this.controls_side}`);
+			quitModal.hide();
 		});
 	}
-
+	
 	updateResizePositions() {
 		let NewResponsiveValue = this.getCSSVar('--responsive');
 		if (this.responsiveValue !== NewResponsiveValue) {
