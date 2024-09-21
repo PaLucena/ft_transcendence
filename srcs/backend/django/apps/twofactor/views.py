@@ -8,20 +8,13 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 from django.shortcuts import render, redirect
 import qrcode, json, os, base64
 from core import settings
+from .utils import Has2faEnabled
+from rest_framework_simplejwt.tokens import RefreshToken
 
-def Has2faEnabled(user):
-	if user == None:
-		return False
-	try:
-		device = TOTPDevice.objects.get(user=user, confirmed=True)
-		return True
-	except TOTPDevice.DoesNotExist:
-		return False
-
-@api_view(["POST"])
+@api_view(["GET"])
 @default_authentication_required
 def check2fa(request):
-	return Response({"has2faEnabled": Has2faEnabled(request.user)}, status=status.HTTP_200_OK)
+	return Response({"has2faEnabled": Has2faEnabled(request.user.username)}, status=status.HTTP_200_OK)
 
 # Create your views here.
 @api_view(["POST"])
@@ -30,7 +23,6 @@ def	enable2fa(request):
 	userlogin = request.user
 	user=userModel.objects.get(username=userlogin)
 	device, created = TOTPDevice.objects.get_or_create(user=request.user, confirmed=False)
-	print("user:", userlogin, flush=True)
 	if created or not device.confirmed:
 		otp_uri = device.config_url
 		qr = qrcode.make(otp_uri)
@@ -86,6 +78,12 @@ def confirmDevice(request):
 		device = TOTPDevice.objects.get(user=user.pk, confirmed=False)
 		device.confirmed = True
 		device.save()
+		response = Response(status=status.HTTP_200_OK)
+		twofactor_refresh = RefreshToken.for_user(user)
+		twofactor_access = twofactor_refresh.access_token
+		response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+		response.set_cookie("twofactor_refresh_token", str(twofactor_refresh), httponly=True, secure=True)
+		response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
+		return response
 	except TOTPDevice.DoesNotExist:
 		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
-	return Response(status=status.HTTP_200_OK)

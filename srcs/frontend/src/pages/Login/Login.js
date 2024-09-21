@@ -54,20 +54,27 @@ export class Login extends Component {
 						body: JSON.stringify(jsonData)
 					});
 
+					const twofactor_response = fetch("/api/2fa/check2fa", {
+						method: "GET",
+						credentials: 'include',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-CSRFToken': csrftoken
+						},
+					})
 					if (!response.ok) {
 						const errData = await response.json();
 						throw new Error(errData.error || `Response status: ${response.status}`);
 					}
 
 					const data = await response.json();
-
 					if (data.has_2fa === true) {
 						const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
 						await TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
 					}
 
-					onlineSocket.initWebSocket(jsonData["username"]);
-					notificationsSocket.initWebSocket();
+					//onlineSocket.initWebSocket(jsonData["username"]);
+					//notificationsSocket.initWebSocket();
 					customAlert('success', 'Login successful', 3000);
 					navigateTo("/play");
 

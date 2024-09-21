@@ -348,7 +348,7 @@ export class Profile extends Component {
 		.then(data => {
 			if (data['intra_login'] === false) {
 				fetch("/api/2fa/check2fa/", {
-					method: "POST",
+					method: "GET",
 					credentials: 'include',
 				})
 				.then(response => {
@@ -390,7 +390,6 @@ export class Profile extends Component {
 					throw new Error(errData.error || `Response status: ${response.status}`);
 				});
 			}
-
 			this.show2faButton();
 		})
 		.catch(error => {

@@ -3,6 +3,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from .models import AppUser
+from twofactor.utils import Has2faEnabled  # Import the 2FA checking function
 
 class DefaultAuthentication:
 
@@ -20,13 +21,10 @@ class DefaultAuthentication:
 			except Exception as e:
 				if refresh_token:
 					try:
-						print("ACCESS TOKEN: ", access_token)
-						print("REFRESH TOKEN: ", refresh_token)
 						refresh = RefreshToken(refresh_token)
 						new_access_token = str(refresh.access_token)
 						validated_token = self.jwt_auth.get_validated_token(new_access_token)
 						request.COOKIES['access_token'] = new_access_token
-						print("NEW ACCESS TOKEN GENERATED: ", request.COOKIES['access_token'])
 					except (TokenError, InvalidToken) as e:
 						raise exceptions.AuthenticationFailed(f'Invalid refresh token: {e}')
 				else:
@@ -41,8 +39,29 @@ class DefaultAuthentication:
 		if not AppUser.objects.filter(pk=user.pk).exists():
 			raise exceptions.AuthenticationFailed('User does not exist')
 
+		if Has2faEnabled(user.username):
+			twofactor_access_token = request.COOKIES.get('twofactor_access_token')
+			twofactor_refresh_token = request.COOKIES.get('twofactor_refresh_token')
+
+			if twofactor_access_token:
+				try:
+					validated_token = self.jwt_auth.get_validated_token(twofactor_access_token)
+				except Exception as e:
+					if twofactor_refresh_token:
+						try:
+							twofactor_refresh = RefreshToken(twofactor_refresh_token)
+							new_twofactor_access_token = str(twofactor_refresh.access_token)
+							validated_token = self.jwt_auth.get_validated_token(new_twofactor_access_token)
+							request.COOKIES['twofactor_access_token'] = new_twofactor_access_token
+						except (TokenError, InvalidToken) as e:
+							raise exceptions.AuthenticationFailed(f'Invalid 2FA refresh token: {e}')
+					else:
+						raise exceptions.AuthenticationFailed('No 2FA refresh token provided')
+			else:
+				raise exceptions.AuthenticationFailed('No 2FA access token provided')
+
+
 		request.user = user
-		print("USER: ", user)
 
 		return user, request.COOKIES.get('access_token')
 
