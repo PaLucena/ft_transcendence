@@ -65,7 +65,6 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
     async def handle_1x1(self, data):
         invitation_1x1_type = data.get("type")
         group_name = data.get("group_name")
-        opponent = data.get("opponent")
 
         if not invitation_1x1_type:
             await self.send_error(400, "Missing type field.")
@@ -75,18 +74,34 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             await self.send_error(400, "Missing group_name field.")
             return
 
-        if not opponent:
-            await self.send_error(400, "Missing opponent field.")
-            return
-
-        if not await self.user_exists(opponent):
-            await self.send_error(404, f"User '{opponent}' not found.")
-            return
-
         if invitation_1x1_type == "connect":
-             await self.channel_layer.group_add(
-                group_name, self.channel_name
-            )
+            try:
+                await self.channel_layer.group_add(group_name, self.channel_name)
+
+                invite_data = await self.get_1x1_data(group_name)
+
+                if not invite_data:
+                    await self.send_error(404, "Invite requires exactly 2 users.")
+                    return
+
+                current_user = self.scope["user"]
+
+                await self.send_json(
+                    {
+                        "invitation_1x1": {
+                            "type": invitation_1x1_type,
+                            "players": invite_data,
+                            "current_user": current_user.username,
+                        }
+                    }
+                )
+            except InviteRoom.DoesNotExist as e:
+                await self.send_error(404, str(e))
+            except ValueError as e:
+                await self.send_error(400, str(e))
+            except Exception as e:
+                await self.send_error(500, f"Unexpected error: {str(e)}")
+
         elif invitation_1x1_type == "accept":
             pass
         elif invitation_1x1_type == "reject":
@@ -166,6 +181,57 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def group_1x1_exists(self, group_name):
         return InviteRoom.objects.filter(group_name=group_name).exists()
+
+    @database_sync_to_async
+    def get_1x1_data(self, group_name):
+        try:
+            invite_room = InviteRoom.objects.get(group_name=group_name)
+
+            invite_users = list(invite_room.invite_users.select_related("user").all())
+            if len(invite_users) != 2:
+                raise ValueError("Invite requires exactly 2 users.")
+
+            current_user = self.scope["user"]
+
+            if (
+                invite_users[0].user != current_user
+                and invite_users[1].user == current_user
+            ):
+                invite_users[0], invite_users[1] = invite_users[1], invite_users[0]
+
+            players = [
+                {
+                    "username": invite_users[0].user.username,
+                    "avatar": (
+                        invite_users[0].user.avatar.url
+                        if invite_users[0].user.avatar
+                        else None
+                    ),
+                    "status": invite_users[0].status,
+                },
+                {
+                    "username": invite_users[1].user.username,
+                    "avatar": (
+                        invite_users[1].user.avatar.url
+                        if invite_users[1].user.avatar
+                        else None
+                    ),
+                    "status": invite_users[1].status,
+                },
+            ]
+
+            return players
+
+        except InviteRoom.DoesNotExist:
+            raise InviteRoom.DoesNotExist(
+                f"InviteRoom with group_name '{group_name}' does not exist."
+            )
+
+        except IndexError:
+            raise ValueError("Invite data is incomplete or corrupt.")
+
+        except Exception as e:
+            raise Exception(f"An unexpected error occurred: {str(e)}")
 
     async def user_notification(self, event):
         try:

@@ -1,6 +1,7 @@
 import { eventEmitter } from './EventEmitter.js';
 import { updateOnlineStatus } from './rtchatUtils.js'
 import customAlert from './customAlert.js';
+import { staticComponentsRenderer } from '../utils/StaticComponentsRenderer.js';
 
 class UserWebsocket {
     constructor() {
@@ -55,11 +56,29 @@ class UserWebsocket {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
             } else if (data.notification) {
                 this.handleNotification(data.notification);
-            } else {
+            } else if (data.invitation_1x1) {
+                this.handleInvitation1x1(data.invitation_1x1)
+            }
+            else {
                 this.handleError(null, 'Invalid data format received.', false);
             }
         } catch (error) {
             this.handleError(null, error, false);
+        }
+    }
+
+
+    handleInvitation1x1 (data) {
+        const chatModalInstance = staticComponentsRenderer.getComponentInstance('ChatModal');
+
+        if (chatModalInstance) {
+            switch (data.type) {
+                case 'connect':
+                    this.onConnect1x1Render(chatModalInstance, data)
+                    break ;
+            }
+        } else {
+            console.error("ChatModal instance is not initialized");
         }
     }
 
@@ -75,8 +94,53 @@ class UserWebsocket {
                 customAlert('danger', notification.message, 3000, 'Friendship Canceled');
                 break ;
             case '1x1_invite':
-                customAlert('info', notification.message, 3000, 'Info');
+                try {
+                    const message = JSON.stringify({
+                        action: 'invitation_1x1',
+                        type: 'connect',
+                        group_name: notification.message
+                    });
+                    this.socket.send(message);
+                } catch (error) {
+                    console.error('Failed to send notification:', error);
+                }
                 break ;
+        }
+    }
+
+    onConnect1x1Render(chatModalInstance, data) {
+        try {
+            chatModalInstance.chatRenderer.renderInviteModal(data.players, data.current_user)
+            const invite = document.getElementById('match_waiting_modal');
+
+            if (invite) {
+                const inviteInstance = new bootstrap.Modal(invite);
+                inviteInstance.show();
+
+                const messages = document.getElementById('messages_modal');
+                if (messages) {
+                    const chatInstance = bootstrap.Modal.getInstance(messages);
+                    if (chatInstance) {
+                        chatInstance.hide();
+                    }
+                } else {
+                    console.warn('messages_modal not found.');
+                }
+
+                const chats = document.getElementById('chats_modal');
+                if (chats) {
+                    const chatInstance = bootstrap.Modal.getInstance(chats);
+                    if (chatInstance) {
+                        chatInstance.hide();
+                    }
+                } else {
+                    console.warn('chats_modal not found.');
+                }
+            } else {
+                console.warn('match_waiting_modal not found.');
+            }
+        } catch (error) {
+                console.error('Failed to invite to match:', error);
         }
     }
 

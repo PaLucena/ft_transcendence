@@ -71,37 +71,22 @@ export class ChatLoader {
 
             await handleResponse(response, data => {
                 console.log(data);
-
-                // try {
-                //     this.chatModal.chatRenderer.renderInviteModal();
-                //     const invite = document.getElementById('match_waiting_modal');
-
-                //     if (invite) {
-                //         const inviteInstance = new bootstrap.Modal(invite);
-                //         inviteInstance.show();
-
-                //         const chat = document.getElementById('messages_modal');
-
-                //         if (chat) {
-                //             const chatInstance = bootstrap.Modal.getInstance(chat);
-                //             chatInstance.hide();
-                //         } else {
-                //             console.warn('messages_modal not found.');
-                //         }
-                //     } else {
-                //         console.warn('match_waiting_modal not found.');
-                //     }
-                // }
-                // catch (error) {
-                //     console.error('Failed to invite to match:', error);
-                //     customAlert('danger', 'Failed to invite to match', 5000);
-                // }
-
                 try {
                     const message = JSON.stringify({
                         action: 'notification',
                         type: "1x1_invite",
                         to_user: username,
+                        group_name: data.group_name
+                    });
+                    userSocket.socket.send(message);
+                } catch (error) {
+                    console.error('Failed to send notification:', error);
+                }
+
+                try {
+                    const message = JSON.stringify({
+                        action: 'invitation_1x1',
+                        type: 'connect',
                         group_name: data.group_name
                     });
                     userSocket.socket.send(message);

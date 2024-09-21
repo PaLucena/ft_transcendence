@@ -82,8 +82,7 @@ export class Test extends Component {
 				const message = JSON.stringify({
 					action: 'invitation_1x1',
 					type: 'connect',
-					group_name: 'SLRZpMnzfjaAjem2NuHC9n',
-					opponent: 'admin'
+					group_name: 'invite_1x1_Bart_to_admin'
 				});
 				userSocket.socket.send(message);
 			} catch (error) {

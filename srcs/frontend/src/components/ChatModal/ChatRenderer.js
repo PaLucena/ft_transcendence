@@ -266,12 +266,14 @@ export class ChatRenderer {
 		}
 	}
 
-	renderInviteModal() {
+	renderInviteModal(players, current_user) {
+		console.log("POP:", players, current_user);
+
 		const container = document.getElementById('match_waiting_modal_container');
 
 		if (container) {
 			container.innerHTML = '';
-            const inviteModalHtml = this.createInviteModal();
+            const inviteModalHtml = this.createInviteModal(players, current_user);
 
 			if (inviteModalHtml) {
 				const template = document.createElement('template');
@@ -285,7 +287,15 @@ export class ChatRenderer {
 		}
 	}
 
-	createInviteModal() {
+	createInviteModal(players, current_user) {
+		const player1 = {
+			username: "You",
+			avatar: players[0].avatar,
+			status: players[0].status,
+		};
+
+		const player2 = players[1]
+
 		return `
 			<div id="match_waiting_modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
 				<div class="modal-bg">
@@ -296,23 +306,44 @@ export class ChatRenderer {
 							</div>
 							<div class="modal-body">
 								<div class="container d-flex align-items-center text-center justify-content-center gap-4">
-									<div class="accepted player-container">
-										<div class="img" style="background-image: url(/assets/images/Bart.jpeg);">
+									<div class="player-container ${
+											player1.status === 0 ? 'waiting'
+											: player1.status === 1 ? 'accepted'
+											: player1.status === -1 ? 'canceled'
+											: ''}">
+										<div class="img"
+											style="background-image: url(${player1.avatar || '/assets/images/default_avatar.jpg'});">
 										</div>
-										<span>Bart</span>
+										<span>${player1.username}</span>
 									</div>
 									<div class="vs">
 										<i class="fa-solid fa-v"></i> / <i class="fa-solid fa-s"></i>
 									</div>
-									<div class="canceled player-container">
-										<div class="img" style="background-image: url(/assets/images/back_hole.webp);"></div>
-										<span>Black Hole</span>
+									<div class="player-container ${
+											player2.status === 0 ? 'waiting'
+											: player2.status === 1 ? 'accepted'
+											: player2.status === -1 ? 'canceled'
+											: ''}">
+										<div class="img"
+											style="background-image: url(${player2.avatar || '/assets/images/default_avatar.jpg'});">
+										</div>
+										<span>${player2.username}</span>
 									</div>
 								</div>
 							</div>
 							<div class="modal-footer">
 								<div class="timer">0:30</div>
-								<div class="btn action-btn accept">Accept</button>
+								<div class="btn action-btn ${
+									player1.status === 0 ? 'accept'
+									: player1.status === 1 ? 'cancel'
+									: player1.status === -1 ? 'anceled'
+									: ''}">
+									${
+										player1.status === 0 ? 'Accept'
+										: player1.status === 1 ? 'Cancel'
+										: player1.status === -1 ? 'Canceled'
+										: ''}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -320,6 +351,8 @@ export class ChatRenderer {
 			</div>
 		`;
 	}
+
+
 
 	removeBlockStatusMessage() {
 		const messageInputContainer = document.getElementById('message_input_container');
