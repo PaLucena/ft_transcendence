@@ -101,6 +101,7 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
+				//tournamentSocket.closeWebSocket();
 				customAlert('success', 'Tournament closed', '3000');
 			})
 			.catch((error) => {

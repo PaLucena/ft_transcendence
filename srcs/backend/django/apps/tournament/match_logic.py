@@ -18,6 +18,7 @@ async def start_all_matches(tournament, matches):
 			match['player_2_id'],
 			match['controls_mode']
 		)
+		#notify players here
 		for match in matches
 	]
 
@@ -231,6 +232,7 @@ def format_match(match):
 		'controls_mode': match.controls_mode
 	}
 
+
 def format_match_for_bc(result):
 	return {
 		'tournament_id': result['tournament_id'],
@@ -245,12 +247,6 @@ def format_match_for_bc(result):
 		'forfeit': result['forfeit'],
 		'winner_id': result['player_1_id'] if result['player_1_goals'] > result['player_2_goals'] else result['player_2_id'],
 	}
-
-def generate_ai_result(match):
-	player1_score = 6
-	player2_score = random.randint(0, 4)
-	match.winner = 0
-	match.loser = 0
 
 
 def tournament_cleanup(tournament):
