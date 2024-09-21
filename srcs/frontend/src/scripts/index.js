@@ -11,7 +11,7 @@ window.addEventListener("popstate", () => {
 document.addEventListener("click", (event) => {
 	const clickableElement = event.target.closest("a, button");
 
-	if (clickableElement && clickableElement.hasAttribute("href")) {
+	if (clickableElement && clickableElement.hasAttribute("href")&& clickableElement.id !== 'rick') {
 		event.preventDefault();
 		navigateTo(clickableElement.getAttribute("href"));
 	}

@@ -41,9 +41,6 @@ export class Tournament extends Component {
 			if (data.code !== null)
 				document.getElementById('invitationCode').innerHTML = `Code: ${data.code}`;
 		})
-		.catch((error) => {
-			console.log(error);
-		})
 	}
 
 	checkCreator(tournamentId) {

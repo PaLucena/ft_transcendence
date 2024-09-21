@@ -77,7 +77,7 @@ export class Signup extends Component {
 				});
 			}
 
-			this.classList.add('was-validated');
+			//this.classList.add('was-validated');
 		});
 
 		$('#confirm_password, #password').on('input', function() {

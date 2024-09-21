@@ -21,7 +21,6 @@ export class Profile extends Component {
     }
 
 	init() {
-		this.setLanguage();
 		this.displayUserInfo(this.params.username);
 		this.saveInfoBtn(this.params.username);
 		if (typeof this.params.username === "undefined")
@@ -29,29 +28,6 @@ export class Profile extends Component {
 		this.enable2fa();
 		this.disable2fa();
 		// this.sendServerMessage();
-	}
-
-	setLanguage() {
-		fetch('/api/get_user_language', {
-			method: 'GET',
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			console.log("IDIOMA:", data.language);
-
-			// TODO: switch tocho
-		})
-		.catch(error => {
-			console.log('Error(setLanguage):', error.message);
-		});
 	}
 
 	async displayUserInfo(username) {
@@ -303,7 +279,6 @@ export class Profile extends Component {
 				document.getElementById("userInfo").style.display = "block";
 				document.getElementById("userEdit").style.display = "none";
 				this.displayUserInfo(username);
-				this.setLanguage();
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
@@ -377,7 +352,7 @@ export class Profile extends Component {
 	}
 
 	hideModal() {
-		const response = fetch("/api/2fa/confirmDevice/", {
+		fetch("/api/2fa/confirmDevice/", {
 			method: 'POST',
 			credentials: 'include',
 			headers: {
@@ -402,7 +377,7 @@ export class Profile extends Component {
 		let twofaBtn = document.getElementById("Enable2faBtn");
 
 		this.addEventListener(twofaBtn, "click", (event) => {
-			const response = fetch("/api/2fa/enable2fa/", {
+			fetch("/api/2fa/enable2fa/", {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
@@ -448,7 +423,7 @@ export class Profile extends Component {
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
 		this.addEventListener(TwofaBtn, "click", (event) => {
-			const response = fetch("/api/2fa/disable2fa/", {
+			fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',
 				headers: {

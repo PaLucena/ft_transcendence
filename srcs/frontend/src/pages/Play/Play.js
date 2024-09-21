@@ -1,6 +1,7 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 
@@ -23,6 +24,7 @@ export class Play extends Component {
 		})
 		this.setupEventListeners();
 		Navbar.focus();
+		languageSelector.updateLanguage();
 	}
 
 	// createTournamentWebSocket(tournament_name) {
