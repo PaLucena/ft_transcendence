@@ -1,7 +1,7 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from user.models import AppUser
-from rtchat.models import Invite
+from rtchat.models import InviteUser, InviteRoom
 
 
 class UserSocketConsumer(AsyncJsonWebsocketConsumer):
@@ -165,7 +165,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def group_1x1_exists(self, group_name):
-        return Invite.objects.filter(group_name=group_name).exists()
+        return InviteRoom.objects.filter(group_name=group_name).exists()
 
     async def user_notification(self, event):
         try:

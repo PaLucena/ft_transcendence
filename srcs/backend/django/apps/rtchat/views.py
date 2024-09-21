@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
 from django.http import Http404
-from rtchat.models import ChatGroup, Block, Invite
+from rtchat.models import ChatGroup, Block, InviteRoom, InviteUser
 from user.models import AppUser
 from rtchat.serializers import GroupMessageSerializer, UserSerializer
 from user.decorators import default_authentication_required
@@ -245,11 +245,11 @@ def create_invite(request, username):
             )
 
         existing_invite = (
-            Invite.objects.select_related("sender", "receiver")
-            .filter(
-                Q(sender=request.user, receiver=other_user)
-                | Q(sender=other_user, receiver=request.user),
+            InviteRoom.objects.filter(
+                invite_users__user__in=[request.user, other_user],
+                invite_users__status=0,
             )
+            .distinct()
             .first()
         )
 
@@ -267,16 +267,18 @@ def create_invite(request, username):
 
         expires_at = current_time + timezone.timedelta(seconds=invitation_lifetime)
 
-        invite = Invite.objects.create(
-            sender=request.user,
-            receiver=other_user,
+        invite_room = InviteRoom.objects.create(
+            group_name=f"invite_1x1_{request.user.username}_to_{other_user.username}",
             expires_at=expires_at,
         )
 
-        delete_invite_after_delay(invite.id, invitation_lifetime)
+        InviteUser.objects.create(invite_room=invite_room, user=request.user, status=0)
+        InviteUser.objects.create(invite_room=invite_room, user=other_user, status=0)
+
+        delete_invite_room_after_delay(invite_room.id, invitation_lifetime)
 
         return Response(
-            {"group_name": invite.group_name},
+            {"group_name": invite_room.group_name},
             status=status.HTTP_201_CREATED,
         )
 
@@ -287,14 +289,14 @@ def create_invite(request, username):
         )
 
 
-def delete_invite_after_delay(invite_id, delay=90):
-    def delete_invite():
+def delete_invite_room_after_delay(room_id, delay=60):
+    def delete_invite_room():
         try:
-            invite = Invite.objects.get(id=invite_id)
-            invite.delete()
-            print(f"Invite {invite_id} deleted after {delay} seconds")
-        except Invite.DoesNotExist:
-            print(f"Invite {invite_id} already deleted")
+            invite_room = InviteRoom.objects.get(id=room_id)
+            invite_room.delete()
+            print(f"InviteRoom {room_id} deleted after {delay} seconds")
+        except InviteRoom.DoesNotExist:
+            print(f"InviteRoom {room_id} already deleted")
 
-    timer = threading.Timer(delay, delete_invite)
+    timer = threading.Timer(delay, delete_invite_room)
     timer.start()
