@@ -18,8 +18,6 @@ export class languageSelector extends Component {
 
 		const data = await response.json();
 
-		console.log(data.language.toLowerCase());
-
 		document.documentElement.lang = data.language.toLowerCase();
 		const langData = await this.fetchLanguageData(data.language.toLowerCase())
 		this.updateContent(langData);
@@ -31,11 +29,9 @@ export class languageSelector extends Component {
 	}
 
 	static updateContent(langData) {
-		console.log(`Response:`, langData);
 		document.querySelectorAll('[data-i18n]').forEach(element => {
 			const key = element.getAttribute('data-i18n');
 			element.innerHTML = langData[key];
-			console.log("Cambiando:", element.id, element.innerHTML);
 		});
 	}
 }

@@ -1,3 +1,5 @@
 {
-	"tournament-button": "<h1>Tournament</h1>"
+	"tournament-button": "<h1>Tournament</h1>",
+	"one-vs-one-button": "<h1>1 vs 1</h1>",
+	"vs-ia-button": "<h2>vs AI</h2>"
 }
