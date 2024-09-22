@@ -333,16 +333,9 @@ export class ChatRenderer {
 							</div>
 							<div class="modal-footer">
 								<div class="timer">0:30</div>
-								<div class="btn action-btn ${
-									player1.status === 0 ? 'accept'
-									: player1.status === 1 ? 'cancel'
-									: player1.status === -1 ? 'anceled'
-									: ''}">
-									${
-										player1.status === 0 ? 'Accept'
-										: player1.status === 1 ? 'Cancel'
-										: player1.status === -1 ? 'Canceled'
-										: ''}
+								<div class="button-container d-flex align-items-center justify-content-center">
+									<button type="button" class="btn action-btn accept">Accept</button>
+									<button type="button" class="btn action-btn cancel">Cancel</button>
 								</div>
 							</div>
 						</div>
