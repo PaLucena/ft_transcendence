@@ -44,7 +44,6 @@ def verifyTwoFactor(request):
 	userInfo = body_data.get('jsonData')
 	username = userInfo.get('username')
 
-	print(username)
 	try:
 		user=userModel.objects.get(username=username)
 		device = TOTPDevice.objects.get(user=user.pk, confirmed=True)

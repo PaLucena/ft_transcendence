@@ -70,6 +70,7 @@ export class Get2faCode extends Component {
 				const otpCode = Array.from(inputs).map(input => input.value).join('');
 				const csrftoken = getCSRFToken('csrftoken');
 
+				console.log(jsonData)
 				console.log("Submiting 2fa form to user", username)
 				fetch("/api/2fa/verify-2fa/", {
 					method: "POST",

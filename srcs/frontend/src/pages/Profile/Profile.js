@@ -28,7 +28,6 @@ export class Profile extends Component {
 			Navbar.focus();
 		this.enable2fa();
 		this.disable2fa();
-		// this.sendServerMessage();
 	}
 
 	setLanguage() {
@@ -446,8 +445,11 @@ export class Profile extends Component {
 
 	disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
-		this.addEventListener(TwofaBtn, "click", (event) => {
-			const response = fetch("/api/2fa/disable2fa/", {
+		this.addEventListener(TwofaBtn, "click", async (event) => {
+			
+			const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
+			await TwoFactorCodeModalInstance.initTwoFactorAuth({username: this.getOwnName()});
+			fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
