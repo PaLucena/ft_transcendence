@@ -75,6 +75,7 @@ class UserWebsocket {
             switch (data.type) {
                 case 'connect':
                     this.onConnect1x1Render(chatModalInstance, data)
+                    chatModalInstance.uiSetup.setUpTimer(5, () => { console.log("END!");})
                     break ;
             }
         } else {

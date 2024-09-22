@@ -332,7 +332,7 @@ export class ChatRenderer {
 								</div>
 							</div>
 							<div class="modal-footer">
-								<div class="timer">0:30</div>
+								<div class="timer">0:00</div>
 								<div class="button-container d-flex align-items-center justify-content-center">
 									<button type="button" class="btn action-btn accept">Accept</button>
 									<button type="button" class="btn action-btn cancel">Cancel</button>

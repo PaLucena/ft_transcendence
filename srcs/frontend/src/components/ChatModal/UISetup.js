@@ -219,4 +219,33 @@ export class UISetup {
             }
         })
     }
+
+    setUpTimer(timeLeft, onTimeUp) {
+        const modal = document.getElementById('match_waiting_modal')
+        if (modal) {
+            const timerElement = modal.querySelector('.timer');
+
+            const intervalId = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                if (timerElement) {
+                    timerElement.textContent = formattedTime;
+                }
+
+                console.log(formattedTime);
+
+                timeLeft--;
+
+                if (timeLeft < 0) {
+                    clearInterval(intervalId);
+
+                    if (typeof onTimeUp === 'function') {
+                        onTimeUp();
+                    }
+                }
+            }, 1000);
+        }
+    }
 }
