@@ -157,9 +157,7 @@ def login(request):
 		response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
 		response.set_cookie("access_token", str(access), httponly=True, secure=True)
 
-		print("Access Token Expiry:", access["exp"])
-		print("Refresh Token Expiry:", refresh["exp"])
-		load_test_data(request)
+		#load_test_data(request)
 		return response
 	else:
 		return Response({"error": "Incorrect password"}, status=status.HTTP_404_NOT_FOUND)
@@ -250,12 +248,6 @@ def update_user_info(request):
 				return Response(avatar_error, status=status.HTTP_400_BAD_REQUEST)
 
 		if old_password and new_password and confirm_password:
-			print(
-				"user.password old_password new_password :",
-				user.password,
-				old_password,
-				new_password,
-			)
 			if not check_password(old_password, user.password):
 				return Response(
 					{"error": "Incorrect old password."},

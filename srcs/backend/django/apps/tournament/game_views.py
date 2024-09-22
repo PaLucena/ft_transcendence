@@ -29,7 +29,6 @@ class BaseMatch(APIView):
 				tournament=tournament,
 				match_id=match_id,
 			)
-
 			# run in the background
 			asyncio.create_task(self.handle_match_and_record(user_id, player_2_id, match_id))
 
@@ -48,9 +47,7 @@ class BaseMatch(APIView):
 				player_2_id=player_2_id,
 				controls_mode=self.get_controls_mode()
 			)
-			print("SAVING MATCH before bc:: ", result)
 			await sync_to_async(record_match)(format_match_for_bc(result))
-			print("SAVING MATCH after bc:: ", result)
 		except Exception as e:
 			print(f"Error handling match result: {e}")
 

@@ -102,10 +102,10 @@ def close_tournament(request, tournament_id):
 				tournament.is_active = True
 				tournament.save()
 				available_matches = create_initial_matches(tournament)
-
-				sync_to_async(asyncio.create_task)(start_all_matches(tournament, available_matches))
-
-				return Response(available_matches,
+				print("BEFORE")
+				results = asyncio.run(start_all_matches(tournament, available_matches))
+				print("AFTER")
+				return Response(results,
 					status=status.HTTP_200_OK)
 
 			else:
