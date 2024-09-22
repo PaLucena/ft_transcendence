@@ -53,8 +53,6 @@
 }
 
 
-
-
 #match_waiting_modal .modal-content .modal-title {
 	padding-bottom: 3px;
 	position: relative;
@@ -112,8 +110,12 @@
 }
 
 
+#match_waiting_modal .modal-content .modal-footer .button-container {
+	width: 100%;
+}
+
 #match_waiting_modal .modal-content .modal-footer .action-btn {
-	width: 250px;
+	width: clamp(45%, 45%, 45%);
 	height: 70px;
 	font-size: 40px;
 	font-weight: bolder;
@@ -122,6 +124,7 @@
 	transition: all 0.5s;
 	border: none;
 }
+
 
 #match_waiting_modal .modal-content .modal-footer .action-btn.accept {
 	color: #2f5b2f;
@@ -154,3 +157,20 @@
 	border-bottom: none;
 	border-top: none;
 }
+
+@media (max-width: 576px) {
+	#match_waiting_modal .modal-content .modal-footer .action-btn {
+		height: 60px;
+		font-size: 30px;
+	}
+}
+
+@media (max-width: 376px) {
+	#match_waiting_modal .modal-content .modal-footer .button-container {
+		flex-direction: column;
+	}
+	#match_waiting_modal .modal-content .modal-footer .action-btn {
+		width: 75%;
+	}
+}
+
