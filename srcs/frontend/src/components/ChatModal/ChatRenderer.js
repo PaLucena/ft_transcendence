@@ -288,13 +288,17 @@ export class ChatRenderer {
 	}
 
 	createInviteModal(players, current_user) {
-		const player1 = {
+		const player1 = players[0].username === current_user ? {
 			username: "You",
 			avatar: players[0].avatar,
 			status: players[0].status,
-		};
+		} : players[1];
 
-		const player2 = players[1]
+		const player2 = players[1].username === current_user ? {
+			username: "You",
+			avatar: players[1].avatar,
+			status: players[1].status,
+		} : players[1];
 
 		return `
 			<div id="match_waiting_modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
@@ -332,7 +336,7 @@ export class ChatRenderer {
 								</div>
 							</div>
 							<div class="modal-footer">
-								<div class="timer">0:00</div>
+								<div class="timer" id="match_waiting_timer"></div>
 								<div class="button-container d-flex align-items-center justify-content-center">
 									<button type="button" class="btn action-btn accept">Accept</button>
 									<button type="button" class="btn action-btn cancel">Cancel</button>
