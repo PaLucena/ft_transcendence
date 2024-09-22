@@ -323,7 +323,7 @@ export class Profile extends Component {
 		.then(data => {
 			if (data['intra_login'] === false) {
 				fetch("/api/2fa/check2fa/", {
-					method: "POST",
+					method: "GET",
 					credentials: 'include',
 				})
 				.then(response => {
@@ -365,7 +365,6 @@ export class Profile extends Component {
 					throw new Error(errData.error || `Response status: ${response.status}`);
 				});
 			}
-
 			this.show2faButton();
 		})
 		.catch(error => {
@@ -420,10 +419,12 @@ export class Profile extends Component {
 		});
 	}
 
-	disable2fa() {
+	async disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
 		this.addEventListener(TwofaBtn, "click", (event) => {
-			fetch("/api/2fa/disable2fa/", {
+			const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
+			if (TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData) === true){}
+			const response = fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',
 				headers: {

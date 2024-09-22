@@ -85,3 +85,8 @@ text-light {
 .text-white {
 	color: white;
 }
+
+.modal {
+	max-height: 100%;
+	overflow: hidden;
+}

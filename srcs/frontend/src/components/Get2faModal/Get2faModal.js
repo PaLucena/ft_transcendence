@@ -93,27 +93,11 @@ export class Get2faCode extends Component {
 					jsonData = {
 						"username": username
 					}
+					this.hideModal(overlayElement, inputs, TwoFactorModal);
 					customAlert('success', '2FA Verified!', 3000);
-					fetch("/api/2fa-login/", {
-						method: "POST",
-						credentials: 'include',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify(jsonData)
-					}).then(response => {
-						return response.json();
-					})
-					.then(() => {
-						console.log("resolving")
-						resolve();
-						console.log("resolved")
-						this.hideModal(overlayElement, inputs, TwoFactorModal);
-						console.log("cleared")
-					})
 				})
 				.catch(error => {
-					customAlert('danger', `Errorr: ${error.message}`, '');
+					customAlert('danger', `Error: ${error.message}`, '');
 					console.log(error)
 				});
 			}

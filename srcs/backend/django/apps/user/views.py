@@ -25,7 +25,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
 from .decorators import default_authentication_required
 from django.http import JsonResponse
-from twofactor.views import Has2faEnabled
+from twofactor.utils import Has2faEnabled
 from django.contrib.auth import update_session_auth_hash
 from blockchain.views import load_test_data, get_face2face
 from friends.views import get_friendship_status
@@ -147,7 +147,7 @@ def login(request):
     if authenticated_user is not None:
         user = AppUser.objects.get(username=username)
         user.save()
-        if Has2faEnabled(user):
+        if Has2faEnabled(user.username):
             response = Response({"has_2fa": True}, status=status.HTTP_200_OK)
         else:
             response = Response(
@@ -179,8 +179,8 @@ def loginWith2fa(request):
     response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
     response.set_cookie("twofactor_refresh_token", str(twofactor_refresh), httponly=True, secure=True)
     response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
-    print("Access Token Expiry:", twofactor_access["exp"])
-    print("Refresh Token Expiry:", twofactor_refresh["exp"])
+    print("Access Token for 2FA Expiry:", twofactor_access["exp"])
+    print("Refresh Token for 2FA Expiry:", twofactor_refresh["exp"])
     return response
 
 
@@ -196,15 +196,17 @@ def TestView(request):
 @api_view(["GET"])
 @default_authentication_required
 def logout(request):
-    user = request.user  # delete later
-    print("USER in logout: ", user)
-    auth_logout(request)
-    response = Response(
-        {"message": "Logged out successfully"}, status=status.HTTP_200_OK
-    )
-    response.delete_cookie("access_token")
-    response.delete_cookie("refresh_token")
-    return response
+	user = request.user
+	auth_logout(request)
+	response = Response(
+		{"message": "Logged out successfully"}, status=status.HTTP_200_OK
+	)
+	response.delete_cookie("access_token")
+	response.delete_cookie("refresh_token")
+	if (Has2faEnabled(user.username)):
+		response.delete_cookie("twofactor_access_token")
+		response.delete_cookie("twofactor_refresh_token")
+	return response
 
 from django.db import connection, reset_queries
 from django.db import connections
