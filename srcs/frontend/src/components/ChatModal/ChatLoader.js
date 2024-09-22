@@ -71,25 +71,23 @@ export class ChatLoader {
 
             await handleResponse(response, data => {
                 console.log(data);
-                try {
-                    const message = JSON.stringify({
+                try {;
+                    userSocket.socket.send(JSON.stringify({
                         action: 'notification',
                         type: "1x1_invite",
                         to_user: username,
                         group_name: data.group_name
-                    });
-                    userSocket.socket.send(message);
+                    }));
                 } catch (error) {
                     console.error('Failed to send notification:', error);
                 }
 
                 try {
-                    const message = JSON.stringify({
+                    userSocket.socket.send(JSON.stringify({
                         action: 'invitation_1x1',
                         type: 'connect',
                         group_name: data.group_name
-                    });
-                    userSocket.socket.send(message);
+                    }));
                 } catch (error) {
                     console.error('Failed to send notification:', error);
                 }
