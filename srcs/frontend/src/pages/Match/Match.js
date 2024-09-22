@@ -1,5 +1,6 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 
 export class Match extends Component {
@@ -11,6 +12,7 @@ export class Match extends Component {
 	destroy() {
 		console.log("Match Custom destroy");
 		this.removeAllEventListeners();
+		setTimeout(() => languageSelector.updateLanguage(), 0);
     }
 
 	init() {

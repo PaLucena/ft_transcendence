@@ -163,6 +163,7 @@ export class ChatRenderer {
 			const headerHtml = isPublicChat ?
 				this.createPublicChatHeaderContent() :
 				this.createPrivateChatHeaderContent(data);
+			setTimeout(() => languageSelector.updateLanguage(), 0);
 
 			const template = document.createElement('template');
 			template.innerHTML = headerHtml.trim();
@@ -177,7 +178,7 @@ export class ChatRenderer {
 	createPublicChatHeaderContent() {
 		return `
 		<div class="d-flex align-items-center">
-			<span class="pr-1 position-absolute top-50 start-50" style="transform: translate(-50%, -50%); color: #34d399">Public chat</span>
+			<span class="pr-1 position-absolute top-50 start-50" style="transform: translate(-50%, -50%); color: #34d399" data-i18n="public-chat"></span>
 		</div>
 		`;
 	}
@@ -186,7 +187,7 @@ export class ChatRenderer {
 		const blockStatus = data.block_status;
 		const isBlocker = blockStatus === "blocker";
 		const action = isBlocker ? 'unblock' : 'block';
-		const buttonText = isBlocker ? 'Unblock' : 'Block';
+		const buttonText = isBlocker ? '<span data-i18n="unlock"></span>' : '<span data-i18n="unblock"></span>';
 
 		return `
 		<div class="d-flex align-items-center">
@@ -206,14 +207,14 @@ export class ChatRenderer {
 						style="top:90%; left:90%;"></div>
 				</button>
 				<ul class="dropdown-menu dropdown-menu-dark">
-					<li><a href="/profile/${data.other_user.username}" class="dropdown-item">Profile</a></li>
+					<li><a href="/profile/${data.other_user.username}" class="dropdown-item" data-i18n="profile"></a></li>
 					<li><hr class="dropdown-divider"></li>
 					<li>
 						<button
 							id="invite_to_play_btn"
 							class="dropdown-item"
 							data-invite-to-play-username="${data.other_user.username}">
-							Invite to Play
+							<span data-i18n="invite-to-play"></span>
 						</button>
 					</li>
 					<li>

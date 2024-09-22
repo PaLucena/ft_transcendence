@@ -3,7 +3,6 @@ import SoloControl from './SoloControl.js';
 
 export class InputController {
     constructor(socket, controls_mode, controls_side) {
-        // Receive values from the backend
         this.controls_mode = controls_mode;
         this.controls_side = controls_side;
 
