@@ -38,6 +38,7 @@ class DefaultAuthentication:
 		if not AppUser.objects.filter(pk=user.pk).exists():
 			raise exceptions.AuthenticationFailed('User does not exist')
 
+		print("USER SIMPLE CHECK DONE", user)
 		if Has2faEnabled(user.username):
 			twofactor_access_token = request.COOKIES.get('twofactor_access_token')
 			twofactor_refresh_token = request.COOKIES.get('twofactor_refresh_token')
@@ -46,6 +47,7 @@ class DefaultAuthentication:
 				try:
 					validated_token = self.jwt_auth.get_validated_token(twofactor_access_token)
 				except Exception as e:
+					print("2fa access token failed")
 					if twofactor_refresh_token:
 						try:
 							twofactor_refresh = RefreshToken(twofactor_refresh_token)
@@ -53,6 +55,7 @@ class DefaultAuthentication:
 							validated_token = self.jwt_auth.get_validated_token(new_twofactor_access_token)
 							request.COOKIES['twofactor_access_token'] = new_twofactor_access_token
 						except (TokenError, InvalidToken) as e:
+							print("2fa refresh token failed")
 							raise exceptions.AuthenticationFailed(f'Invalid 2FA refresh token: {e}')
 					else:
 						raise exceptions.AuthenticationFailed('No 2FA refresh token provided')
@@ -61,7 +64,7 @@ class DefaultAuthentication:
 
 
 		request.user = user
-
+		print("USER IS DECORATOR: ", user)
 		return user, request.COOKIES.get('access_token')
 
 

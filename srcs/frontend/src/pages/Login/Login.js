@@ -10,8 +10,9 @@ export class Login extends Component {
 	constructor() {
 		console.log('Login Constructor');
 		super('/pages/Login/login.html');
+		this.TwoFactorCodeModalInstance = null;
 	}
-
+	
 	async init() {
 		this.initLoginForm();
 		this.intraLogin();
@@ -20,11 +21,14 @@ export class Login extends Component {
 	destroy() {
 		console.log("Login Custom destroy");
 		this.removeAllEventListeners();
+		if (this.TwoFactorCodeModalInstance) 
+			this.TwoFactorCodeModalInstance = null;
 	}
 
 	async initLoginForm() {
 		const loginForm = document.getElementById('login_form');
 		this.addEventListener(loginForm, 'submit', async function (event) {
+			
 			event.preventDefault();
 			let formIsValid = true;
 
@@ -66,12 +70,25 @@ export class Login extends Component {
 						const errData = await response.json();
 						throw new Error(errData.error || `Response status: ${response.status}`);
 					}
-
 					const data = await response.json();
+					
 					if (data.has_2fa === true) {
-						const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
-						await TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
-						fetch("/api/2fa-login/", {
+						if (!this.TwoFactorCodeModalInstance) {
+							this.TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
+
+							const modal = document.getElementById('get2faCode_modal')
+							let btn = modal.querySelector('.btn-close')
+
+							btn.addEventListener('click', (e) => {
+								this.TwoFactorCodeModalInstance.destroy();
+								this.TwoFactorCodeModalInstance = null; 
+							});
+							await this.TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
+							this.TwoFactorCodeModalInstance.destroy();
+							this.TwoFactorCodeModalInstance = null; 
+						}
+						
+						await fetch("/api/2fa-login/", {
 							method: "POST",
 							credentials: 'include',
 							headers: {
@@ -79,9 +96,11 @@ export class Login extends Component {
 							},
 							body: JSON.stringify(jsonData)
 						}).then(response => {
-							return response.json();
+							if (!response.ok){
+								const errData = response.json();
+								throw new Error(errData.error || `Response status: ${response.status}`);
+							}
 						})
-						.then(() => {})
 					}
 
 					customAlert('success', 'Login successful', 3000);

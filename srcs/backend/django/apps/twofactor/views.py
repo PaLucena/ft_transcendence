@@ -44,17 +44,18 @@ def verifyTwoFactor(request):
 	userInfo = body_data.get('jsonData')
 	username = userInfo.get('username')
 
+	print(f"Checking OTP code for user {username}, CODE: {otp_code}")
 	try:
 		user=userModel.objects.get(username=username)
 		device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
 		if device.verify_token(otp_code):
 			return Response({'success': True, 'message': 'OTP verified successfully.'}, status=200)
 		else:
-			return Response({'success': False, 'message': 'Invalid OTP code.'}, status=400)
+			return Response({'success': False, 'error': 'Invalid OTP code.'}, status=400)
 	except TOTPDevice.DoesNotExist:
-		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+		return Response({'success': False, 'error': 'No TOTP device found.'}, status=404)
 	except userModel.DoesNotExist:
-		return Response({'success': False, 'message': f'User {request.user} found.'}, status=404)
+		return Response({'success': False, 'error': f'User {request.user} found.'}, status=404)
 		
 
 @api_view(["POST"])
@@ -66,7 +67,7 @@ def disable2fa(request):
 		os.remove(os.path.join(settings.MEDIA_ROOT, "qrs") + "/" + user.username + ".jpg")
 		TOTPDevice.delete(device)
 	except TOTPDevice.DoesNotExist:
-		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+		return Response({'success': False, 'error': 'No TOTP device found.'}, status=404)
 	response = Response(status=status.HTTP_200_OK)
 	response.delete_cookie("twofactor_access_token")
 	response.delete_cookie("twofactor_refresh_token")
@@ -88,4 +89,4 @@ def confirmDevice(request):
 		response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
 		return response
 	except TOTPDevice.DoesNotExist:
-		return Response({'success': False, 'message': 'No TOTP device found.'}, status=404)
+		return Response({'success': False, 'error': 'No TOTP device found.'}, status=404)

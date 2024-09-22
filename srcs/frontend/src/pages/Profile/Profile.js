@@ -415,10 +415,11 @@ export class Profile extends Component {
 
 	async disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
+		const username = await this.getOwnName()
+		console.log("Hi! im",username)
 		this.addEventListener(TwofaBtn, "click", async (event) => {
-			
 			const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
-			await TwoFactorCodeModalInstance.initTwoFactorAuth({username: this.getOwnName()});
+			await TwoFactorCodeModalInstance.initTwoFactorAuth({"username": username});
 			fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',
@@ -431,13 +432,4 @@ export class Profile extends Component {
 			})
 		})
 	}
-
-	/* sendServerMessage() {
-		let testBtn = document.getElementById('testBtn');
-		if (testBtn) {
-			testBtn.addEventListener("click", (event) => {
-				onlineSocket.sendMessage("test", "ealgar-c")
-			})
-		}
-	} */
 }
