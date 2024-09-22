@@ -1,4 +1,31 @@
 {
-	"tournament-button": "<h1>Torneo</h1>",
-	"one-vs-one-button": "<h1>1 contra 1</h1>"
+	"tournament-button": "Torneo",
+	"back-to-tournament-button": "Volver al torneo",
+	"one-vs-one-button": "1 contra 1",
+	"vs-ia-button": "contra IA",
+	"local-button": "Local",
+	"online-button": "En línea",
+	"back-button": "Atrás",
+	"public-tournament": "Torneos públicos",
+	"private-tournament-button": "Torneos privados",
+	"new-tournament": "Nuevo torneo",
+	"tournament-name": "Nombre del torneo",
+	"nickname": "Apodo",
+	"invitation-code": "Código de invitación",
+	"join-tournament": "Unirse a torneo",
+	"create-button": "Crear",
+	"join-button": "Unirse",
+
+	"close-tournament-button": "CERRAR TORNEO",
+	"exit-tournament-button": "SALIR DEL TORNEO",
+
+	"filter-all": "Todos",
+	"filter-friends": "Amigos",
+	"filter-pending": "Pendientes",
+	"filter-incoming": "Entrantes",
+	"search-friend": "Buscar...",
+	"invite-friend": "Invitar",
+	"cancel-friend": "Cancelar",
+	"accept-friend": "Aceptar",
+	"remove-friend": "Eliminar"
 }

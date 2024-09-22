@@ -1,5 +1,31 @@
 {
-	"tournament-button": "<h1>Tournament</h1>",
-	"one-vs-one-button": "<h1>1 vs 1</h1>",
-	"vs-ia-button": "<h2>vs AI</h2>"
+	"tournament-button": "Tournament",
+	"back-to-tournament-button": "Back to tournament",
+	"one-vs-one-button": "1 vs 1",
+	"vs-ia-button": "vs AI",
+	"local-button": "Local",
+	"online-button": "Online",
+	"back-button": "Back",
+	"public-tournament": "Public tournaments",
+	"private-tournament-button": "Private tournaments",
+	"new-tournament": "New tournament",
+	"tournament-name": "Tournament name",
+	"nickname": "Nickname",
+	"invitation-code": "Invitation code",
+	"join-tournament": "Join tournament",
+	"create-button": "Create",
+	"join-button": "Join",
+
+	"close-tournament-button": "CLOSE TOURNAMENT",
+	"exit-tournament-button": "EXIT TOURNAMENT",
+
+	"filter-all": "All",
+	"filter-friends": "Friends",
+	"filter-pending": "Pending",
+	"filter-incoming": "Incoming",
+	"search-friend": "Search...",
+	"invite-friend": "Invite",
+	"cancel-friend": "Cancel",
+	"accept-friend": "Accept",
+	"remove-friend": "Remove"
 }

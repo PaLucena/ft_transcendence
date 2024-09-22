@@ -31,7 +31,9 @@ export class languageSelector extends Component {
 	static updateContent(langData) {
 		document.querySelectorAll('[data-i18n]').forEach(element => {
 			const key = element.getAttribute('data-i18n');
-			element.innerHTML = langData[key];
+			element.textContent = langData[key];
+			if (!langData[key])
+				console.warn(`No translation found for key: ${key}`);
 		});
 	}
 }
