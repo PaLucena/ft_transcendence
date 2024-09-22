@@ -74,11 +74,14 @@ class UserWebsocket {
         if (chatModalInstance) {
             switch (data.type) {
                 case 'connect':
-                    chatModalInstance.chatRenderer.onConnect1x1Init(data)
+                    chatModalInstance.chatRenderer.onConnect1x1InitRender(data)
                     chatModalInstance.uiSetup.setupTimer(5, () => { console.log("END!");})
                     break ;
                 case 'accept':
-                    chatModalInstance.chatRenderer.initNonStatick1x1(data.players, data.current_user)
+                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players, data.current_user)
+                    break ;
+                case 'reject':
+                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players, data.current_user)
                     break ;
             }
         } else {

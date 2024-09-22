@@ -68,8 +68,9 @@
     backdrop-filter: blur(12px);
 	border: 4px solid #32cd32;
 	animation: shadowPulseGreen 12s ease-in-out infinite;
+	transition: border 0.5s ease, box-shadow 0.5s ease;
 }
-	
+
 #match_waiting_modal .modal-content.canceled {
 	border: 4px solid #dc3545;
 	animation: shadowPulseRed 12s ease-in-out infinite;
@@ -102,23 +103,25 @@
     background-repeat: no-repeat;
     border-radius: 50%;
 	margin-bottom: 10px;
+	transition: all 0.3s;
 }
 
 #match_waiting_modal .modal-content .modal-body .player-container.accepted .img {
 	opacity: 1;
-	box-shadow: 0 0px 2px 2px #76e376,
-				0 -15px 20px 0 #76e376 inset;
+	box-shadow: 0 0 2px 2px rgba(118, 227, 118, 1),
+				0 -15px 20px 0 rgba(118, 227, 118, 1) inset;
 }
 
 #match_waiting_modal .modal-content .modal-body .player-container.canceled .img {
 	opacity: 1;
-	box-shadow: 0 0px 2px 2px #dc3545,
-				0 -15px 20px 0 #dc3545 inset;
+	box-shadow: 0 0 2px 2px rgba(220, 53, 69, 1),
+				0 -15px 20px 0 rgba(220, 53, 69, 1) inset;
 }
 
 #match_waiting_modal .modal-content .modal-body .player-container.waiting .img {
 	opacity: 0.4;
-	box-shadow: 0 0 10px 5px rgba(0,0,0,0.65) inset;
+	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.65),
+				0 0 10px 5px rgba(0,0,0, 0.65) inset;
 }
 
 #match_waiting_modal .modal-content .modal-footer {

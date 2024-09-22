@@ -75,69 +75,78 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             return
 
         if invitation_1x1_type == "connect":
-            try:
-                await self.channel_layer.group_add(group_name, self.channel_name)
-
-                invite_data = await self.get_1x1_data(group_name)
-
-                if not invite_data:
-                    await self.send_error(404, "Invite requires exactly 2 users.")
-                    return
-
-                current_user = self.scope["user"]
-
-                await self.send_json(
-                    {
-                        "invitation_1x1": {
-                            "type": invitation_1x1_type,
-                            "players": invite_data,
-                            "current_user": current_user.username,
-                        }
-                    }
-                )
-            except InviteRoom.DoesNotExist as e:
-                await self.send_error(404, str(e))
-            except ValueError as e:
-                await self.send_error(400, str(e))
-            except Exception as e:
-                await self.send_error(500, f"Unexpected error: {str(e)}")
-
-        elif invitation_1x1_type == "accept":
-            try:
-                invite_data = await self.get_1x1_data(group_name)
-
-                if not invite_data:
-                    await self.send_error(404, "Invite requires exactly 2 users.")
-                    return
-
-                current_user = self.scope["user"]
-
-                for player in invite_data:
-                    if player["username"] == current_user.username:
-                        if player["status"] == 1:
-                            await self.send_error(
-                                400, "You have already accepted the invitation."
-                            )
-                            return
-
-                        await self.update_invite_status(group_name, current_user, 1)
-                        break
-                else:
-                    await self.send_error(404, "User not found in the invite.")
-                    return
-
-                updated_invite_data = await self.get_1x1_data(group_name)
-
-                await self.send_1x1_update(
-                    group_name, "accept", updated_invite_data, self.user
-                )
-            except Exception as e:
-                await self.send_error(500, f"Failed to accept invitation: {str(e)}")
-
-        elif invitation_1x1_type == "reject":
-            pass
+            await self.handle_connection_response_1x1(invitation_1x1_type, group_name)
+        elif invitation_1x1_type in ["accept", "reject"]:
+            await self.handle_invite_response_1x1(invitation_1x1_type, group_name)
         else:
             await self.send_error(404, f"1x1 type '{invitation_1x1_type}' not found.")
+
+    async def handle_connection_response_1x1(self, invitation_1x1_type, group_name):
+        try:
+            await self.channel_layer.group_add(group_name, self.channel_name)
+
+            invite_data = await self.get_1x1_data(group_name)
+
+            if not invite_data:
+                await self.send_error(404, "Invite requires exactly 2 users.")
+                return
+
+            current_user = self.scope["user"]
+
+            await self.send_json(
+                {
+                    "invitation_1x1": {
+                        "type": invitation_1x1_type,
+                        "players": invite_data,
+                        "current_user": current_user.username,
+                        "group_name": group_name
+                    }
+                }
+            )
+        except InviteRoom.DoesNotExist as e:
+            await self.send_error(404, str(e))
+        except ValueError as e:
+            await self.send_error(400, str(e))
+        except Exception as e:
+            await self.send_error(500, f"Unexpected error: {str(e)}")
+
+    async def handle_invite_response_1x1(self, invitation_1x1_type, group_name):
+        try:
+            invite_data = await self.get_1x1_data(group_name)
+
+            if not invite_data:
+                await self.send_error(404, "Invite requires exactly 2 users.")
+                return
+
+            current_user = self.scope["user"]
+            new_status = 1 if invitation_1x1_type == "accept" else -1
+
+            for player in invite_data:
+                if player["username"] == current_user.username:
+                    if player["status"] == new_status:
+                        await self.send_error(
+                            400,
+                            f"You have already {invitation_1x1_type}ed the invitation.",
+                        )
+                        return
+
+                    await self.update_invite_status(
+                        group_name, current_user, new_status
+                    )
+                    break
+            else:
+                await self.send_error(404, "User not found in the invite.")
+                return
+
+            updated_invite_data = await self.get_1x1_data(group_name)
+
+            await self.send_1x1_update(
+                group_name, invitation_1x1_type, updated_invite_data, self.user
+            )
+        except Exception as e:
+            await self.send_error(
+                500, f"Failed to {invitation_1x1_type} invitation: {str(e)}"
+            )
 
     async def handle_notification(self, data):
         notification_type = data.get("type")

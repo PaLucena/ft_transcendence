@@ -258,33 +258,37 @@ export class UISetup {
         }
     }
 
-    setup1x1Buttons() {
+    setup1x1Buttons(group_name) {
         const modal = document.getElementById('match_waiting_buttons_container')
 
         if (modal) {
             this.chatModal.addEventListener(modal, 'click', (event) => {
                 const target = event.target;
-                const acceptButton = document.querySelector('.action-btn.accept');
-                const cancelButton = document.querySelector('.action-btn.cancel');
 
                 if (target.classList.contains('accept')) {
                     try {
                         userSocket.socket.send(JSON.stringify({
                             action: 'invitation_1x1',
                             type: 'accept',
-                            group_name: 'invite_1x1_Bart_to_admin'
+                            group_name
                         }));
 
                         console.log('accepted');
-                        acceptButton.disabled = true;
-                        cancelButton.disabled = false;
                     } catch (error) {
                         console.error('Failed to send notification:', error);
                     }
                 } else if (target.classList.contains('cancel')) {
-                    console.log('rejected');
-                    cancelButton.disabled = true;
-                    acceptButton.disabled = true;
+                    try {
+                        userSocket.socket.send(JSON.stringify({
+                            action: 'invitation_1x1',
+                            type: 'reject',
+                            group_name
+                        }));
+
+                        console.log('rejected');
+                    } catch (error) {
+                        console.error('Failed to send notification:', error);
+                    }
                 }
             });
         }

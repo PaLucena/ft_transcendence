@@ -266,14 +266,17 @@ export class ChatRenderer {
 		}
 	}
 
-	onConnect1x1Init(data) {
+	onConnect1x1InitRender(data) {
         try {
             const container = document.getElementById('match_waiting_modal_container');
 
 			if (container) {
 				this.renderModalLayout1x1();
-				this.initNonStatick1x1(data.players, data.current_user)
-				this.chatModal.uiSetup.setup1x1Buttons();
+				this.renderUsers1x1(data.players, data.current_user);
+				this.renderButtons1x1();
+				this.updateStatusClasses1x1(data.players, data.current_user, data.group_name)
+
+				this.chatModal.uiSetup.setup1x1Buttons(data.group_name);
 			} else {
 				console.warn('match_waiting_modal_container not found.');
 			}
@@ -302,26 +305,6 @@ export class ChatRenderer {
                 console.error('Failed to invite to match:', error);
         }
     }
-
-	initNonStatick1x1(players, current_user) {
-		const container = document.getElementById('match_waiting_modal_container');
-
-		if (container) {
-			const hasRejected = players.some(player => player.status === -1);
-
-			const modalContent = container.querySelector('.modal-content');
-			if (modalContent) {
-				if (hasRejected) {
-					modalContent.classList.add('canceled');
-				}
-			}
-
-			this.renderUsers1x1(players, current_user);
-			this.renderButtons1x1(players, current_user, hasRejected);
-		} else {
-			console.warn('match_waiting_modal_container not found.');
-		}
-	}
 
 	renderModalLayout1x1() {
 		const container = document.getElementById('match_waiting_modal_container');
@@ -366,52 +349,87 @@ export class ChatRenderer {
 		if (playerSection) {
 			const player1 = players[0].username === current_user ? {
 				username: "You",
+				realUsername: players[0].username,
 				avatar: players[0].avatar,
 				status: players[0].status,
 			} : {
 				username: "You",
+				realUsername: players[1].username,
 				avatar: players[1].avatar,
 				status: players[1].status,
 			};
 
+
 			const player2 = players[0].username !== current_user ? players[0] : players[1];
 
 			playerSection.innerHTML = `
-				<div class="player-container ${getStatusClass(player1.status)}">
+				<div class="player-container ${this.getStatusClass(player1.status)}" data-username-1x1="${player1.realUsername}">
 					<div class="img" style="background-image: url(${player1.avatar || '/assets/images/default_avatar.jpg'});"></div>
 					<span>${player1.username}</span>
 				</div>
 				<div class="vs">
 					<i class="fa-solid fa-v"></i> / <i class="fa-solid fa-s"></i>
 				</div>
-				<div class="player-container ${getStatusClass(player2.status)}">
+				<div class="player-container ${this.getStatusClass(player2.status)}" data-username-1x1="${player2.username}">
 					<div class="img" style="background-image: url(${player2.avatar || '/assets/images/default_avatar.jpg'});"></div>
 					<span>${player2.username}</span>
 				</div>
 			`;
 		}
-
-		function getStatusClass(status) {
-			return status === 0 ? 'waiting'
-				: status === 1 ? 'accepted'
-				: status === -1 ? 'canceled'
-				: '';
-		}
 	}
 
-	renderButtons1x1(players, current_user, hasRejected=false) {
+	getStatusClass(status) {
+		return status === 0 ? 'waiting'
+			: status === 1 ? 'accepted'
+			: status === -1 ? 'canceled'
+			: '';
+	}
+
+
+	renderButtons1x1() {
 		const buttonsContainer = document.getElementById('match_waiting_buttons_container');
 
 		if (buttonsContainer) {
-			const currentUserData = players.find(player => player.username === current_user);
-			const isCurrentUserAccepted = currentUserData && currentUserData.status === 1;
-
 			buttonsContainer.innerHTML = `
-				<button type="button" class="btn action-btn accept" ${isCurrentUserAccepted || hasRejected ? 'disabled' : ''}>Accept</button>
-				<button type="button" class="btn action-btn cancel" ${hasRejected ? 'disabled' : ''}>Cancel</button>
+				<button type="button" class="btn action-btn accept">Accept</button>
+				<button type="button" class="btn action-btn cancel">Cancel</button>
 			`;
 		}
 	}
+
+	updateStatusClasses1x1(players, current_user) {
+		const modalContainer = document.getElementById('match_waiting_modal');
+		if (!modalContainer) return;
+
+		const playerContainers = modalContainer.querySelectorAll('.player-container');
+		const modalContent = modalContainer.querySelector('.modal-content');
+		const actionButtons = modalContainer.querySelectorAll('.action-btn');
+
+		let isCanceled = false;
+		let currentUserStatus = null;
+
+		players.forEach(player => {
+			playerContainers.forEach(container => {
+				if (container.getAttribute('data-username-1x1') === player.username) {
+					container.className = `player-container ${this.getStatusClass(player.status)}`;
+					if (player.status === -1) isCanceled = true;
+					if (player.username === current_user) currentUserStatus = player.status;
+				}
+			});
+		});
+
+		if (modalContent) {
+			modalContent.classList.toggle('canceled', isCanceled);
+		}
+
+		actionButtons.forEach(button => {
+			button.disabled = isCanceled || (button.classList.contains('accept') && currentUserStatus === 1);
+			if (!isCanceled && !button.classList.contains('accept')) {
+				button.disabled = false;
+			}
+		});
+	}
+
 
 
 	removeBlockStatusMessage() {
