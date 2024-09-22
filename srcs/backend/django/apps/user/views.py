@@ -217,7 +217,6 @@ from django.contrib.auth.signals import user_logged_in
 @default_authentication_required
 def update_user_info(request):
 	try:
-		print("TEST 1", request.body)
 		user = request.user
 		new_username = request.data.get("new_username")
 		new_avatar = request.FILES.get("avatar")
@@ -225,7 +224,7 @@ def update_user_info(request):
 		new_password = request.data.get("new_password")
 		confirm_password = request.data.get("confirm_password")
 		language = request.data.get("language")
-		print("TEST 1", new_avatar)
+
 		if user.is_superuser or user.is_staff:
 			if new_username and new_username != user.username:
 				return Response(
@@ -246,7 +245,9 @@ def update_user_info(request):
 			user.username = new_username
 
 		if new_avatar:
-			upload_avatar(request)
+			avatar_error = upload_avatar(request)
+			if avatar_error:
+				return Response(avatar_error, status=status.HTTP_400_BAD_REQUEST)
 
 		if old_password and new_password and confirm_password:
 			print(
@@ -270,10 +271,9 @@ def update_user_info(request):
 			request.session.flush()
 			auth_logout(request)
 
-		print("TEST 3:", language)
 		if language and user.language != language:
 			user.language = language
-		print("TEST 4")
+
 		user.save()
 		#user.refresh_from_db()
 		#request.session.flush()

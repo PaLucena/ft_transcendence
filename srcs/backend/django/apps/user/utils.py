@@ -34,30 +34,28 @@ def set_nickname(request):
 def upload_avatar(request):
 	try:
 		user = request.user
-		file = request.FILES.get('image')
+		file = request.FILES.get('avatar')
 
+		if not file:
+			return {'error': 'No file uploaded'}
 		if file.size == 0:
-			return Response({'error': 'File is empty'}, status=status.HTTP_400_BAD_REQUEST)
-		elif not file.content_type.startswith('image'):
-			return Response({'error': 'Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed.'}, status=status.HTTP_400_BAD_REQUEST)
+			return {'error': 'File is empty'}
+		if not file.content_type.startswith('image'):
+			return {'error': 'Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed.'}
 
 		extension = file.name.split('.')[-1]
 		filename = f"{user.username}.{extension}"
 
-		user.avatar.save(filename, ContentFile(file.read()), save=True)
+		if user.avatar and user.avatar.name != "default/default.jpg":
+			old_avatar_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
+			if os.path.exists(old_avatar_path):
+				os.remove(old_avatar_path)
+		try:
+			user.avatar.save(filename, ContentFile(file.read()), save=True)
+		except Exception as e:
+			return {'error': f'File upload failed: {str(e)}'}
 
-		print("user avatar:", user.avatar)
-		return Response({'message': 'Avatar updated successfully.'}, status=status.HTTP_200_OK)
+		return None
 
 	except Exception as e:
-		return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
-
-
-# def get_token_expiry_times():
-# 	access_token_lifetime = settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME']
-# 	refresh_token_lifetime = settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME']
-
-# 	access_token_expiry = (datetime.utcnow() + access_token_lifetime).replace(tzinfo=utc)
-# 	refresh_token_expiry = (datetime.utcnow() + refresh_token_lifetime).replace(tzinfo=utc)
-
-# 	return access_token_expiry, refresh_token_expiry
+		return {'error': str(e)}
