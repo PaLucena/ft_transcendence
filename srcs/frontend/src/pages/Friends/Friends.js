@@ -1,5 +1,6 @@
 import { Component } from '../../scripts/Component.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import { FriendsLoader } from './FriendsLoader.js';
 import { FriendsRenderer } from './FriendsRenderer.js';
 import { UISetup } from './UISetup.js';
@@ -32,5 +33,6 @@ export class Friends extends Component {
 		this.uiSetup.setupSearchForm();
 		this.uiSetup.setupFilterButtons();
 		this.uiSetup.setupFriendButtons();
+		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 }

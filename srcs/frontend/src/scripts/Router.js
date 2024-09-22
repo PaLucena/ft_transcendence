@@ -38,7 +38,11 @@ class Router {
 	}
 
 	async navigateTo(url) {
+		console.log(123123);
+		
 		if (this.previousPath !== url) {
+			console.log("qwewqe");
+			
 			window.history.pushState({}, "", url);
 			this.router();
 		}
@@ -76,14 +80,31 @@ class Router {
 
 		if (isProtectedRoute) {
 			const isAuthenticated = await this.checkAuthentication(matchedRoute);
-			if (!isAuthenticated) {				
-				this.navigateTo("/login");
-				return;
-			}
+			console.log("HERE:", isAuthenticated);
+			await fetch("/api/2fa/check2fa/", {
+					method: "GET",
+					credentials: 'include',
+				})
+				.then(response => {
+					if (!response.ok) {
+						return response.json().then(errData => {
+							throw new Error(errData.error || `Response status: ${response.status}`);
+						});
+					}
+					return response.json();
+				})
+				.then(data => {
+					console.log("data es", data)
+					if (data["has2faEnabled"] == false) {
+						if (!isAuthenticated) {
+							this.navigateTo("/login");
+							return;
+						}
+					}
+				})
 
-			if (!userSocket.userSocket || userSocket.userSocket.readyState === WebSocket.CLOSED) {
+			if (!userSocket.userSocket || userSocket.userSocket.readyState === WebSocket.CLOSED)
 				userSocket.initWebSocket();
-			}
 		}
 
 		if (this.currentComponent && this.previousPath !== path) {

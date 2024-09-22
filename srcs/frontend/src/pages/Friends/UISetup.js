@@ -1,3 +1,4 @@
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 import { userSocket } from '../../scripts/utils/UserWebsocket.js';

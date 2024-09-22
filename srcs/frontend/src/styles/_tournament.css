@@ -72,8 +72,12 @@
 	border: 2px solid black;
 }
 
-.close-exit-btn {
+.close-exit-btn-container {
 	position: absolute;
 	bottom: 10vh;
 	margin-bottom: 4vh;
+}
+
+.close-exit-btn {
+	flex-direction: column;
 }
