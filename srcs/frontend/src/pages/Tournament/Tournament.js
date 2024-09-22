@@ -246,8 +246,8 @@ export class Tournament extends Component {
 
 
 	createHtml(tournament_name) {
-        const html = `
-            <div class="tournament-name col-12 d-flex justify-content-center">
+		const html = `
+			<div class="tournament-name col-12 d-flex justify-content-center">
 				<div>
 					<p id="tournamentName">${tournament_name}</p>
 					<div class="d-flex justify-content-center">
@@ -256,14 +256,14 @@ export class Tournament extends Component {
 				</div>
 			</div>
 
-            <div class="top-half d-flex h-40 w-100 m-0"></div>
-            <div class="bottom-half d-flex h-60 w-100 m-0 mt-2"></div>
+			<div class="top-half d-flex h-40 w-100 m-0"></div>
+			<div class="bottom-half d-flex h-60 w-100 m-0 mt-2"></div>
 
-            <div class="close-exit-btn col-12 d-flex justify-content-center">
-                <button id="closeBtn" class="btn btn-primary hide">CLOSE TOURNAMENT</button>
-                <button id="exitBtn" class="btn btn-danger hide">EXIT TOURNAMENT</button>
-            </div>
-        `;
-        return html;
-    }
+			<div class="close-exit-btn col-12 d-flex justify-content-center">
+				<button id="closeBtn" class="btn btn-primary hide">CLOSE TOURNAMENT</button>
+				<button id="exitBtn" class="btn btn-danger hide">EXIT TOURNAMENT</button>
+			</div>
+		`;
+		return html;
+	}
 }
