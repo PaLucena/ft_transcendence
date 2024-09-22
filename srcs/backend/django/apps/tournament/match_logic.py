@@ -32,7 +32,7 @@ async def start_all_matches(tournament, matches):
 		print("HERE 3")
 
 		next_matches = await sync_to_async(assign_next_match, thread_sensitive=False)(tournament, match_id, result)
-		print("HERE 4")
+		print("HERE 4 ", next_matches)
 
 		while next_matches:
 			print("HERE 7")
@@ -81,7 +81,7 @@ def assign_next_match(tournament, match_id, finished_match_data):
 				print("HERE 6.6")
 				next_matches.append(format_match(match))
 
-	if match_id == 14: # needs change
+	if match_id == 14:
 		tournament_cleanup(tournament)
 
 	return next_matches
