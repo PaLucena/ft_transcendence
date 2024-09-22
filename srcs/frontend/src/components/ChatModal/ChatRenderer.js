@@ -272,19 +272,12 @@ export class ChatRenderer {
 
 			const invite = document.getElementById('match_waiting_modal');
             if (invite) {
-				this.chatModal.uiSetup.setup1x1Buttons();
-
-                const inviteInstance = new bootstrap.Modal(invite);
-                inviteInstance.show();
-
                 const messages = document.getElementById('messages_modal');
                 if (messages) {
                     const chatInstance = bootstrap.Modal.getInstance(messages);
                     if (chatInstance) {
                         chatInstance.hide();
                     }
-                } else {
-                    console.warn('messages_modal not found.');
                 }
 
                 const chats = document.getElementById('chats_modal');
@@ -293,8 +286,6 @@ export class ChatRenderer {
                     if (chatInstance) {
                         chatInstance.hide();
                     }
-                } else {
-                    console.warn('chats_modal not found.');
                 }
             } else {
                 console.warn('match_waiting_modal not found.');
@@ -305,25 +296,107 @@ export class ChatRenderer {
     }
 
 	renderInviteModal(players, current_user) {
-		console.log("POP:", players, current_user);
-
 		const container = document.getElementById('match_waiting_modal_container');
 
 		if (container) {
-			container.innerHTML = '';
-            const inviteModalHtml = this.createInviteModal(players, current_user);
-
-			if (inviteModalHtml) {
-				const template = document.createElement('template');
-				template.innerHTML = inviteModalHtml.trim();
-				const inviteModalElement = template.content.firstChild;
-
-				container.appendChild(inviteModalElement);
-			}
+			this.renderModalLayout1x1()
+			this.renderUsers1x1(players, current_user)
+			this.renderButtons1x1()
+			this.chatModal.uiSetup.setup1x1Buttons()
         } else {
 			console.warn('match_waiting_modal_container not found.');
 		}
 	}
+
+	renderModalLayout1x1() {
+		const container = document.getElementById('match_waiting_modal_container');
+
+		if (container) {
+			container.innerHTML = `
+				<div id="match_waiting_modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+					<div class="modal-bg">
+						<div class="modal-dialog modal-dialog-centered">
+							<div class="modal-content">
+								<div class="modal-header justify-content-center">
+									<h1 class="modal-title fs-5">Waiting for players!</h1>
+								</div>
+								<div class="modal-body">
+									<div id="player_section" class="container d-flex align-items-center text-center justify-content-center gap-4">
+										<!-- Users will be rendered here -->
+									</div>
+								</div>
+								<div class="modal-footer">
+									<div class="timer" id="match_waiting_timer"></div>
+									<div id="match_waiting_buttons_container" class="button-container d-flex align-items-center justify-content-center">
+										<!-- Buttons will be rendered here -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			`;
+
+			const inviteModalElement = document.getElementById('match_waiting_modal');
+			const inviteInstance = new bootstrap.Modal(inviteModalElement);
+			inviteInstance.show();
+		} else {
+			console.warn('match_waiting_modal_container not found.');
+		}
+	}
+
+	renderUsers1x1(players, current_user) {
+		const playerSection = document.getElementById('player_section');
+
+		if (playerSection) {
+			const player1 = players[0].username === current_user ? {
+				username: "You",
+				avatar: players[0].avatar,
+				status: players[0].status,
+			} : players[1];
+
+			const player2 = players[1].username === current_user ? {
+				username: "You",
+				avatar: players[1].avatar,
+				status: players[1].status,
+			} : players[1];
+
+			playerSection.innerHTML = `
+				<div class="player-container ${this.getStatusClass(player1.status)}">
+					<div class="img" style="background-image: url(${player1.avatar || '/assets/images/default_avatar.jpg'});"></div>
+					<span>${player1.username}</span>
+				</div>
+				<div class="vs">
+					<i class="fa-solid fa-v"></i> / <i class="fa-solid fa-s"></i>
+				</div>
+				<div class="player-container ${this.getStatusClass(player2.status)}">
+					<div class="img" style="background-image: url(${player2.avatar || '/assets/images/default_avatar.jpg'});"></div>
+					<span>${player2.username}</span>
+				</div>
+			`;
+		}
+	}
+
+	getStatusClass(status) {
+		return status === 0 ? 'waiting'
+			 : status === 1 ? 'accepted'
+			 : status === -1 ? 'canceled'
+			 : '';
+	}
+
+	renderButtons1x1() {
+		const buttonsContainer = document.getElementById('match_waiting_buttons_container');
+
+		if (buttonsContainer) {
+			buttonsContainer.innerHTML = `
+				<button type="button" class="btn action-btn accept">Accept</button>
+				<button type="button" class="btn action-btn cancel">Cancel</button>
+			`;
+		}
+	}
+
+
+
 
 	createInviteModal(players, current_user) {
 		const player1 = players[0].username === current_user ? {
