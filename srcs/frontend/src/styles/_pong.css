@@ -279,9 +279,10 @@ body.touch-enabled .touch-controls {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100%;
-    width: calc(150px * var(--responsive));
+    height: 70%;
+    width: calc(120px * var(--responsive));
 }
+
 
 .touch-controls-up, .touch-controls-down {
     width: 100%;

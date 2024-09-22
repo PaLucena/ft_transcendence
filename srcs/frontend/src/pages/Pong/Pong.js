@@ -5,9 +5,8 @@ import { navigateTo } from "../../scripts/Router.js";
 export class Pong extends Component {
 
 	constructor() {
-		console.log('Pong Constructor');
 		super("/pages/Pong/pong.html");
-		this.socket = null;
+		this.gameSocket = null;
 		this.controls_side = 0;
 		this.player_1_name = 'Player 1';
 		this.player_2_name = 'Player 2';
@@ -16,13 +15,13 @@ export class Pong extends Component {
 		this.playing = false;
 		this.reconnectAttempts = 0;
 		this.maxReconnectAttempts = 5;
+
+		this.frameCounter = 0;
+		this.init_time = Date.now();
 	}
 
 	destroy() {
 		this.playing = false;
-		if (this.socket) {
-			this.socket.close();
-		}
 		this.removeAllEventListeners();
     }
 
@@ -64,6 +63,13 @@ export class Pong extends Component {
 		// Capture - Buttons
 		this.button_return = document.getElementById('button-return');
 		this.button_quit = document.getElementById('button-quit');
+
+		this.p1_button_up = document.getElementById('p1-up');
+		this.p1_button_down = document.getElementById('p1-down');
+		this.p1_button_ready = document.getElementById('p1-ready');
+		this.p2_button_up = document.getElementById('p2-up');
+		this.p2_button_down = document.getElementById('p2-down');
+		this.p2_button_ready = document.getElementById('p2-ready');
 		this.button_confirm_quit = document.getElementById('button-confirm-quit');
 	}
 
@@ -77,15 +83,15 @@ export class Pong extends Component {
 	}
 
 	setupWebsocket() {
-		this.socket = new WebSocket('/ws/ponggame/');
+		this.gameSocket = new WebSocket('/ws/ponggame/');
 
-		this.socket.onopen = () => {
+		this.gameSocket.onopen = () => {
 			this.playing = true;
 			console.log("Connection established");
 			this.reconnectAttempts = 0;
 		};
 
-		this.socket.onmessage = (event) => {
+		this.gameSocket.onmessage = (event) => {
 			const gameState = JSON.parse(event.data);
 
 			switch (gameState.type) {
@@ -104,7 +110,7 @@ export class Pong extends Component {
 			}
 		}
 
-		this.socket.onclose = (event) => {
+		this.gameSocket.onclose = (event) => {
 			if (event.wasClean) {
 				console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
 			} else {
@@ -115,22 +121,13 @@ export class Pong extends Component {
 				console.log("Redirect to main menu");
 				navigateTo('/play');
 			}
-			// if (this.playing && this.reconnectAttempts < this.maxReconnectAttempts) {
-			// 	this.reconnectAttempts++;
-			// 	console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
-			// 	setTimeout(() => {
-			// 		this.setupWebsocket();
-			// 	}, 10);
-			// } else if (this.reconnectAttempts === this.maxReconnectAttempts) {
-			// 	console.log('Max reconnect attempts reached');
-			// }
 		}
 
-		this.socket.onerror = (error) => {
+		this.gameSocket.onerror = (error) => {
 			console.log(`Error: ${error.message}`);
 		}
 	}
-	
+
 	setupEventListeners() {
 		const	quitModalElement = document.getElementById("quitModal");
 		const quitModal = new bootstrap.Modal(quitModalElement, {backdrop: false, keyboard: true});
@@ -146,21 +143,25 @@ export class Pong extends Component {
 			this.inputController.execCommands(`quit_p${this.controls_side}`);
 			quitModal.hide();
 		});
+		this.p1_button_ready.addEventListener('contextmenu', event => event.preventDefault());
+		this.p1_button_down.addEventListener('contextmenu', event => event.preventDefault());
+		this.p1_button_up.addEventListener('contextmenu', event => event.preventDefault());
+		this.p2_button_ready.addEventListener('contextmenu', event => event.preventDefault());
+		this.p2_button_down.addEventListener('contextmenu', event => event.preventDefault());
+		this.p2_button_up.addEventListener('contextmenu', event => event.preventDefault());
 	}
-	
+
 	updateResizePositions() {
 		let NewResponsiveValue = this.getCSSVar('--responsive');
 		if (this.responsiveValue !== NewResponsiveValue) {
-			this.socket.send(JSON.stringify({ type: 'resize' }));
+			this.gameSocket.send(JSON.stringify({ type: 'resize' }));
 			this.responsiveValue = NewResponsiveValue;
 		}
 	}
 
 	updateGameConfig(gameState) {
 		this.controls_side = gameState.controls_side;
-		console.log("--- control side: " + gameState.controls_side);
-		this.inputController = new InputController(this.socket, gameState.controls_mode, gameState.controls_side);
-		console.log("--- controlMode from controller: " + this.inputController.controls_mode);
+		this.inputController = new InputController(this.gameSocket, gameState.controls_mode, gameState.controls_side);
 
 		this.player_1_name = gameState["player_1_name"];
 		this.p_1_name.innerHTML = `${gameState["player_1_name"]}`;
@@ -176,9 +177,6 @@ export class Pong extends Component {
 	}
 
 	setupRemoteControls(gameState) {
-		console.log("Modifying controls for remote and AI modes");
-		console.log("Previous controls_1 innerHTML: " + this.controls_1.innerHTML);
-		console.log("Previous controls_2 innerHTML: " + this.controls_2.innerHTML);
 		if (this.controls_side === 1) {
 			this.controls_1.innerHTML = this.controls_2.innerHTML;
 			this.controls_2.innerHTML = '';
@@ -200,6 +198,12 @@ export class Pong extends Component {
 		this.ball.style.top = `${gameState["ball_y"] * this.responsiveValue}px`;
 		this.p_1_paddle.style.top = `${gameState["pad_1_y"] * this.responsiveValue}px`;
 		this.p_2_paddle.style.top = `${gameState["pad_2_y"] * this.responsiveValue}px`;
+		this.frameCounter++;
+		if (Date.now() - this.init_time > 1000) {
+			this.init_time = Date.now();
+			console.log(`FPS: ${this.frameCounter}`);
+			this.frameCounter = 0;
+		}
 	}
 
 	updateScore(gameState) {

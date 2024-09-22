@@ -28,44 +28,46 @@ class GameLogic:
     FPS = 64
     FRAME_TIME = 1 / FPS
 
-    # Initial values
-    pad_1_x = PADDLE_TAB_MARGIN
-    pad_1_y = TABLE_MID_HEIGHT
-    pad_2_x = TABLE_WIDTH - PADDLE_TAB_MARGIN
-    pad_2_y = TABLE_MID_HEIGHT
-    ball_x = TABLE_MID_WIDTH
-    ball_y = TABLE_MID_HEIGHT
-    ball_dir_x = -1 if random.uniform(0, 1) <= 0.5 else 1
-    ball_dir_y = -1 if random.uniform(0, 1) <= 0.5 else 1
-    ball_vel_x = BALL_SPEED_INIT
-    ball_vel_y = BALL_SPEED_INIT
-    start_time = time.time()
+    def __init__(self):
+        # Initial values
+        self.pad_1_x = self.PADDLE_TAB_MARGIN
+        self.pad_1_y = self.TABLE_MID_HEIGHT
+        self.pad_2_x = self.TABLE_WIDTH - self.PADDLE_TAB_MARGIN
+        self.pad_2_y = self.TABLE_MID_HEIGHT
+        self.ball_x = self.TABLE_MID_WIDTH
+        self.ball_y = self.TABLE_MID_HEIGHT
+        self.ball_dir_x = -1 if random.uniform(0, 1) <= 0.5 else 1
+        self.ball_dir_y = -1 if random.uniform(0, 1) <= 0.5 else 1
+        self.ball_vel_x = self.BALL_SPEED_INIT
+        self.ball_vel_y = self.BALL_SPEED_INIT
+        self.start_time = 0
 
-    # Game variables
-    game_state = "waiting"
-    player_1_id = None
-    player_2_id = None
-    player_1_name = 'Default'
-    player_1_avatar = None
-    player_2_name = 'Default'
-    player_2_avatar = None
-    player_1_ready = False
-    player_2_ready = False
-    player_1_goals = 0
-    player_2_goals = 0
-    player_1_hits = 0
-    player_2_hits = 0
-    player_1_max_hits = 0
-    player_2_max_hits = 0
-    controls_mode = "local"
-    ai_side = 0
-    countdown = CONNECT_TIMEOUT * FPS
-    new_direction = False
-    match_total_time = 0
-    forfeit = 0
+        # Game variables
+        self.game_state = "waiting"
+        self.player_1_id = None
+        self.player_2_id = None
+        self.player_1_name = 'Default'
+        self.player_1_avatar = None
+        self.player_2_name = 'Default'
+        self.player_2_avatar = None
+        self.player_1_ready = False
+        self.player_2_ready = False
+        self.player_1_goals = 0
+        self.player_2_goals = 0
+        self.player_1_hits = 0
+        self.player_2_hits = 0
+        self.player_1_max_hits = 0
+        self.player_2_max_hits = 0
+        self.controls_mode = "local"
+        self.ai_side = 0
+        self.countdown = self.CONNECT_TIMEOUT * self.FPS
+        self.new_direction = False
+        self.match_total_time = 0
+        self.forfeit = 0
 
-    player_1_channel = None
-    player_2_channel = None
+        self.player_1_channel = None
+        self.player_2_channel = None
+
 
     def move_ball(self):
         try:
@@ -78,16 +80,18 @@ class GameLogic:
         try:
             if player == 1:
                 self.pad_1_y += direction * self.PADDLE_SPEED
-                if self.pad_1_y - self.PADDLE_MID_HEIGHT < self.GOAL_TAB_MARGIN:
-                    self.pad_1_y = self.PADDLE_MID_HEIGHT + self.GOAL_TAB_MARGIN
-                if self.pad_1_y + self.PADDLE_MID_HEIGHT > self.TABLE_HEIGHT - self.GOAL_TAB_MARGIN:
-                    self.pad_1_y = self.TABLE_HEIGHT - self.PADDLE_MID_HEIGHT - self.GOAL_TAB_MARGIN
+                self.pad_1_y = max(
+                    self.PADDLE_MID_HEIGHT + self.GOAL_TAB_MARGIN,
+                    min(
+                        self.pad_1_y,
+                        self.TABLE_HEIGHT - self.PADDLE_MID_HEIGHT - self.GOAL_TAB_MARGIN))
             else:
                 self.pad_2_y += direction * self.PADDLE_SPEED
-                if self.pad_2_y - self.PADDLE_HEIGHT / 2 < self.GOAL_TAB_MARGIN:
-                    self.pad_2_y = self.PADDLE_HEIGHT / 2 + self.GOAL_TAB_MARGIN
-                if self.pad_2_y + self.PADDLE_HEIGHT / 2 > self.TABLE_HEIGHT - self.GOAL_TAB_MARGIN:
-                    self.pad_2_y = self.TABLE_HEIGHT - self.PADDLE_HEIGHT / 2 - self.GOAL_TAB_MARGIN
+                self.pad_2_y = max(
+                    self.PADDLE_HEIGHT / 2 + self.GOAL_TAB_MARGIN,
+                    min(
+                        self.pad_2_y,
+                        self.TABLE_HEIGHT - self.PADDLE_HEIGHT / 2 - self.GOAL_TAB_MARGIN))
         except Exception as e:
             print(f"Error moving paddle: {e}")
 
@@ -203,14 +207,9 @@ class GameLogic:
                 else:
                     self.game_state = "game_over"
                 if self.player_1_ready and self.player_2_ready:
-                    self.match_total_time = time.time()
+                    self.start_time = time.time()
                     self.game_state = "countdown"
                     self.set_countdown()
-            elif self.game_state == "game_over":
-                if not self.player_1_ready:
-                    self.player_1_goals = -1
-                if not self.player_2_ready:
-                    self.player_2_goals = -1
         except Exception as e:
             print(f"Error in game loop: {e}")
 
@@ -220,3 +219,11 @@ class GameLogic:
             "player_2_score": self.player_2_goals,
         }
 
+    def end_game_adjustments(self):
+        self.match_total_time = round(time.time() - self.start_time, 2)
+        if not self.player_1_ready:
+            self.player_1_goals = -1
+            self.match_total_time = 0
+        if not self.player_2_ready:
+            self.player_2_goals = -1
+            self.match_total_time = 0

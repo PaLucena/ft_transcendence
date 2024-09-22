@@ -98,30 +98,36 @@ export default class DualControl {
 
     handleTouchStart(control) {
         switch(control) {
-            case 'p1_up':
-                if (!this.touchIntervals['p1_up']) {
-                    this.touchIntervals['p1_up'] = setInterval(() => {
+            case 'p1-ready':
+                this.execCommands('player_1_ready');
+                break;
+            case 'p1-up':
+                if (!this.touchIntervals['p1-up']) {
+                    this.touchIntervals['p1-up'] = setInterval(() => {
                         this.execCommands('player_1_up');
                     }, 10);
                 }
                 break;
-            case 'p1_down':
-                if (!this.touchIntervals['p1_down']) {
-                    this.touchIntervals['p1_down'] = setInterval(() => {
+            case 'p1-down':
+                if (!this.touchIntervals['p1-down']) {
+                    this.touchIntervals['p1-down'] = setInterval(() => {
                         this.execCommands('player_1_down');
                     }, 10);
                 }
                 break;
-            case 'p2_up':
-                if (!this.touchIntervals['p2_up']) {
-                    this.touchIntervals['p2_up'] = setInterval(() => {
+            case 'p2-ready':
+                this.execCommands('player_2_ready');
+                break;
+            case 'p2-up':
+                if (!this.touchIntervals['p2-up']) {
+                    this.touchIntervals['p2-up'] = setInterval(() => {
                         this.execCommands('player_2_up');
                     }, 10);
                 }
                 break;
-            case 'p2_down':
-                if (!this.touchIntervals['p2_down']) {
-                    this.touchIntervals['p2_down'] = setInterval(() => {
+            case 'p2-down':
+                if (!this.touchIntervals['p2-down']) {
+                    this.touchIntervals['p2-down'] = setInterval(() => {
                         this.execCommands('player_2_down');
                     }, 10);
                 }
