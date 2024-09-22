@@ -71,10 +71,19 @@ export class Login extends Component {
 					if (data.has_2fa === true) {
 						const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
 						await TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
+						fetch("/api/2fa-login/", {
+							method: "POST",
+							credentials: 'include',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify(jsonData)
+						}).then(response => {
+							return response.json();
+						})
+						.then(() => {})
 					}
 
-					//onlineSocket.initWebSocket(jsonData["username"]);
-					//notificationsSocket.initWebSocket();
 					customAlert('success', 'Login successful', 3000);
 					navigateTo("/play");
 

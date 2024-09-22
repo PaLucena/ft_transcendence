@@ -27,11 +27,11 @@ def record_match(data):
         p2_id = data.get('player_2_id')
         p1_sc = data.get('player_1_goals')
         p2_sc = data.get('player_2_goals')
+        win_id = data.get('winner_id')
         p1_mH = data.get('player_1_max_hits')
         p2_mH = data.get('player_2_max_hits')
         mT = data.get('match_total_time')
         fF = data.get('forfeit')
-        win_id = data.get('winner_id')
 
         required_keys = ['tournament_id', 'match_id', 'player_1_id', 'player_2_id', 'player_1_goals', 'player_2_goals',
                          'player_1_max_hits', 'player_2_max_hits', 'match_total_time', 'forfeit', 'winner_id']

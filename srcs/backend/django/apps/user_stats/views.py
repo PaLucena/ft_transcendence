@@ -7,6 +7,7 @@ from blockchain.views import get_player_matches as bc_get_player_matches
 from blockchain.views import get_face2face as bc_get_face2face
 from friends.views import get_friendship_status
 
+
 @api_view(["GET"])
 @default_authentication_required
 def player_statistics(request, username):
@@ -36,8 +37,6 @@ def player_comparison(request, username):
 		viewed_player_id = viewed_user.id
 
 		if get_friendship_status(user, viewed_user) != "accepted":
-			print("USER 1: ", user)
-			print("USER 2: ", viewed_user)
 			return Response({'error': 'You can only compare statistics with friends.'}, status=status.HTTP_403_FORBIDDEN)
 
 		matches_response = bc_get_face2face(request, player_id, viewed_player_id)
@@ -64,6 +63,9 @@ def calculate_player_statistics(matches, player_id):
 		'average_score': 0,
 		'highest_score': 0,
 		'total_goals': 0,
+		'player_1_max_hits': 0,
+		'player_2_max_hits': 0,
+		'match_total_time': -1
 	}
 
 	total_goals = 0
@@ -75,7 +77,10 @@ def calculate_player_statistics(matches, player_id):
 		player_2_id = match[3]
 		player_1_goals = match[4]
 		player_2_goals = match[5]
-		winner_id = match[6]
+		player_1_hits  = match[6]
+		player_2_hits  = match[7]
+		match_time = match[8]
+		winner_id = match[10]
 
 		if player_1_id == player_id:
 			player_goals = player_1_goals
@@ -90,11 +95,22 @@ def calculate_player_statistics(matches, player_id):
 
 		if winner_id == player_id:
 			stats['wins'] += 1
+			if stats['match_total_time'] == -1:
+				stats['match_total_time'] = match_time
+			elif match_time < stats['match_total_time']:
+				stats['match_total_time'] = match_time
 		else:
 			stats['losses'] += 1
 
 		if player_goals > stats['highest_score']:
 			stats['highest_score'] = player_goals
+
+		if player_1_hits > stats['player_1_max_hits']:
+			stats['player_1_max_hits'] = player_1_hits
+
+		if player_2_hits > stats['player_2_max_hits']:
+			stats['player_2_max_hits'] = player_2_hits
+
 
 	if stats['total_matches'] > 0:
 		stats['average_score'] = total_goals / stats['total_matches']
@@ -124,7 +140,7 @@ def calculate_face2face_statistics(matches, player1_id, player2_id):
 		player_2_id = match[3]
 		player_1_goals = match[4]
 		player_2_goals = match[5]
-		winner_id = match[6]
+		winner_id = match[10]
 
 		if player_1_id == player1_id:
 			comparison_stats['player1_total_goals'] += player_1_goals

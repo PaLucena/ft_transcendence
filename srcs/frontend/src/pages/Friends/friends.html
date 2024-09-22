@@ -7,22 +7,22 @@
 					<button class="btn btn-outline-dark active position-relative" data-filter="all">
 						<i class="fa-solid fa-list"></i>
 						<span class="filter-indicator bg-secondary"></span>
-						All
+						<span data-i18n="filter-all"></span>
 					</button>
 					<button class="btn btn-outline-dark position-relative" data-filter="my_friends">
 						<i class="fa-solid fa-user-friends"></i>
 						<span class="filter-indicator bg-success"></span>
-						Friends
+						<span data-i18n="filter-friends"></span>
 					</button>
 					<button class="btn btn-outline-dark position-relative" data-filter="pending_requests">
 						<i class="fa-solid fa-clock"></i>
 						<span class="filter-indicator bg-warning"></span>
-						Pending
+						<span data-i18n="filter-pending"></span>
 					</button>
 					<button class="btn btn-outline-dark position-relative" data-filter="incoming_requests">
 						<i class="fa-solid fa-inbox"></i>
 						<span class="filter-indicator bg-info"></span>
-						Incoming
+						<span data-i18n="filter-incoming"></span>
 					</button>
 				</div>
 				<div class="search-form-container form-group mb-0">
@@ -30,7 +30,7 @@
 						<div class="input-group">
 							<div class="form-floating">
 								<input id="friends_search_input" name="username" placeholder="Search..." class="form-control">
-								<label for="friends_search_input">Search...</label>
+								<label for="friends_search_input" data-i18n="search-friend"></label>
 							</div>
 							<button id="search_friends_submit" type="submit" class="btn btn-primary send-button">
 								<i class="fa-solid fa-magnifying-glass"></i>

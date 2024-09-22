@@ -46,10 +46,10 @@ class Router {
 
 	async navigateToOnBootup() {
 		if (window.location.pathname === "/" || window.location.pathname === "/login") {
-			navigateTo(await this.checkAuthentication() ? '/play' : '/login');
+			navigateTo(await this.checkAuthentication(window.location.pathname) ? '/play' : '/login');
 		}
 		else if (window.location.pathname === "/signup") {
-			navigateTo(await this.checkAuthentication() ? '/play' : '/signup')
+			navigateTo(await this.checkAuthentication(window.location.pathname) ? '/play' : '/signup')
 		}
 		else {
 			this.router();
@@ -75,8 +75,8 @@ class Router {
 		const isProtectedRoute = matchedRoute && matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
 
 		if (isProtectedRoute) {
-			const isAuthenticated = await this.checkAuthentication();
-			if (!isAuthenticated) {
+			const isAuthenticated = await this.checkAuthentication(matchedRoute);
+			if (!isAuthenticated) {				
 				this.navigateTo("/login");
 				return;
 			}
@@ -105,7 +105,7 @@ class Router {
 		this.previousPath = path;
 	}
 
-	async checkAuthentication() {
+	async checkAuthentication(path) {
 		try {
 			const response = await fetch('/api/check_auth', {
 				method: 'GET',
@@ -123,8 +123,9 @@ class Router {
 
 			return is_auth;
 
-		} catch (error) {
-			console.error("Error checking authentication:", error);
+		} catch (error) {			
+			if (path !== "/login" && path !== "/signup" && path !== "/auth")
+				console.error("Error checking authentication:", error);
 			return false;
 		}
 	}

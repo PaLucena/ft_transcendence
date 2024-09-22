@@ -21,36 +21,12 @@ export class Profile extends Component {
     }
 
 	init() {
-		this.setLanguage();
 		this.displayUserInfo(this.params.username);
 		this.saveInfoBtn(this.params.username);
 		if (typeof this.params.username === "undefined")
 			Navbar.focus();
 		this.enable2fa();
 		this.disable2fa();
-	}
-
-	setLanguage() {
-		fetch('/api/get_user_language', {
-			method: 'GET',
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			console.log("IDIOMA:", data.language);
-
-			// TODO: switch tocho
-		})
-		.catch(error => {
-			console.log('Error(setLanguage):', error.message);
-		});
 	}
 
 	async displayUserInfo(username) {
@@ -269,24 +245,18 @@ export class Profile extends Component {
 
 	saveInfoBtn(username) {
 		const editForm = document.getElementById("editForm");
-
+	
 		this.addEventListener(editForm, "submit", async (event) => {
 			event.preventDefault();
-
+	
 			const formData = new FormData(event.target);
-			const jsonData = {};
-
-			formData.forEach((value, key) => {
-				jsonData[key] = value;
-			});
-			jsonData['language'] = document.getElementById('language_selector').value;
-
+			formData.append('language', document.getElementById('language_selector').value);
+	
+			console.log('Form Data:', Array.from(formData.entries()));
+	
 			fetch("/api/update_user_info/", {
 				method: "POST",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(jsonData),
+				body: formData,
 				credentials: 'include'
 			})
 			.then(response => {
@@ -302,13 +272,13 @@ export class Profile extends Component {
 				document.getElementById("userInfo").style.display = "block";
 				document.getElementById("userEdit").style.display = "none";
 				this.displayUserInfo(username);
-				this.setLanguage();
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
-			})
-		})
+			});
+		});
 	}
+
 
 	logout() {
 		let	logoutBtn = document.getElementById("logoutBtn");
@@ -376,7 +346,7 @@ export class Profile extends Component {
 	}
 
 	hideModal() {
-		const response = fetch("/api/2fa/confirmDevice/", {
+		fetch("/api/2fa/confirmDevice/", {
 			method: 'POST',
 			credentials: 'include',
 			headers: {
@@ -400,7 +370,7 @@ export class Profile extends Component {
 		let twofaBtn = document.getElementById("Enable2faBtn");
 
 		this.addEventListener(twofaBtn, "click", (event) => {
-			const response = fetch("/api/2fa/enable2fa/", {
+			fetch("/api/2fa/enable2fa/", {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
@@ -443,7 +413,7 @@ export class Profile extends Component {
 		});
 	}
 
-	disable2fa() {
+	async disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
 		this.addEventListener(TwofaBtn, "click", async (event) => {
 			

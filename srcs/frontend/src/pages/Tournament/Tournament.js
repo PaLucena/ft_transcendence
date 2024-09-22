@@ -1,5 +1,6 @@
 import { Component } from "../../scripts/Component.js";
 import { navigateTo } from '../../scripts/Router.js';
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 
@@ -16,7 +17,7 @@ export class Tournament extends Component {
 	}
 
 	init() {
-		//this.getTournamentCode(this.params.tournamentId);
+		this.getTournamentCode(this.params.tournamentId);
 		this.checkCreator(this.params.tournamentId);
 		this.displayInfo(this.params.tournamentId);
 	}
@@ -38,11 +39,10 @@ export class Tournament extends Component {
 			return response.json();
 		})
 		.then(data => {
-			if (data.code !== null)
-				document.getElementById('invitationCode').innerHTML = `Code: ${data.code}`;
-		})
-		.catch((error) => {
-			console.log(error);
+			if (data.code !== null) {
+				document.getElementById('invitationCode').innerHTML = `<span data-i18n='invitation-code'></span>: ${data.code}`;
+				languageSelector.updateLanguage();
+			}
 		})
 	}
 
@@ -95,6 +95,7 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
+				//tournamentSocket.closeWebSocket();
 				customAlert('success', 'Tournament closed', '3000');
 			})
 			.catch((error) => {
@@ -124,6 +125,8 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
+				console.log("BLA BLA");
+				
 				tournamentSocket.closeWebSocket();
 				navigateTo('/play');
 			})
@@ -220,7 +223,7 @@ export class Tournament extends Component {
 				bottomHalf.insertAdjacentHTML('beforeend', matchContainerHtml);
 			}
 		} else {
-			console.warn('topHalf или bottomHalf не найдены.');
+			console.warn('topHalf or bottomHalf not found.');
 		}
 
 		function createPlayerHtml(player, index) {
@@ -243,24 +246,27 @@ export class Tournament extends Component {
 
 
 	createHtml(tournament_name) {
-        const html = `
-            <div class="tournament-name col-12 d-flex justify-content-center">
+		const html = `
+			<div class="tournament-name col-12 d-flex justify-content-center">
 				<div>
-					<p id="tournamentName">${tournament_name}</p>
+					<p id="tournamentName" class="d-flex justify-content-center display-6">${tournament_name}</p>
 					<div class="d-flex justify-content-center">
 						<p id="invitationCode"></p>
 					</div>
 				</div>
 			</div>
 
-            <div class="top-half d-flex h-40 w-100 m-0"></div>
-            <div class="bottom-half d-flex h-60 w-100 m-0 mt-2"></div>
+			<div class="top-half d-flex h-40 w-100 m-0"></div>
+			<div class="bottom-half d-flex h-60 w-100 m-0 mt-2"></div>
 
-            <div class="close-exit-btn col-12 d-flex justify-content-center">
-                <button id="closeBtn" class="btn btn-primary hide">CLOSE TOURNAMENT</button>
-                <button id="exitBtn" class="btn btn-danger hide">EXIT TOURNAMENT</button>
+            <div class="close-exit-btn-container col-12 d-flex justify-content-center">
+				<div class="close-exit-btn col-4 col-md-2 col-xl-1 gap-2 d-flex justify-content-center">
+                	<button id="closeBtn" data-i18n='close-tournament-button' class="btn btn-primary hide"></button>
+                	<button id="exitBtn" data-i18n='exit-tournament-button' class="btn btn-danger hide"></button>
+				</div>
             </div>
         `;
+		setTimeout(() => languageSelector.updateLanguage(), 0);
         return html;
     }
 }

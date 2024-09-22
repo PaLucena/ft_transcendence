@@ -14,17 +14,15 @@ export class Get2faCode extends Component {
 	init() { }
 
 	clearModal(inputs) {
-		if (inputs.length > 0) {
+		if (inputs.length > 0)
 			inputs.forEach(input => input.value = '');
-			inputs[0].focus();
-		}
+		setTimeout(() => inputs[0].focus(), 400);
 	}
 
 	showModal(overlayElement, inputs, TwoFactorModal) {
 		TwoFactorModal.show();
-		this.clearModal(inputs);
+		setTimeout(() => this.clearModal(inputs), 0);
 	}
-
 
 	hideModal(overlayElement, inputs, TwoFactorModal) {
 		this.clearModal(inputs);
@@ -39,7 +37,7 @@ export class Get2faCode extends Component {
 
 		return new Promise(resolve => {
 			this.showModal(overlayElement, inputs, TwoFactorModal);
-			TwoFactorModalElement.addEventListener('hidden.bs.modal', this.hideModal(overlayElement, inputs, TwoFactorModal));
+			TwoFactorModalElement.addEventListener('hidden.bs.modal', () => this.hideModal(overlayElement, inputs, TwoFactorModal));
 			inputs.forEach((input, index) => {
 				input.addEventListener('input', (event) => {
 					const value = event.target.value;
@@ -110,7 +108,7 @@ export class Get2faCode extends Component {
 					})
 				})
 				.catch(error => {
-					customAlert('danger', `Errorr: ${error.message}`, '');
+					customAlert('danger', `Error: ${error.message}`, '');
 					console.log(error)
 				});
 			}
