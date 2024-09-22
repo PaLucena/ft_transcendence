@@ -29,20 +29,15 @@ async def start_all_matches(tournament, matches):
 		match_id = result['match_id']
 		print(f"Match {match_id} finished with result: {result}")
 		results.append(result)
-		print("HERE 3")
 
 		next_matches = await sync_to_async(assign_next_match, thread_sensitive=False)(tournament, match_id, result)
-		print("HERE 4 ", next_matches)
 
 		while next_matches:
-			print("HERE 7")
 			formatted_next_matches = [format_match(m) for m in next_matches]
 			new_results = await start_all_matches(tournament, formatted_next_matches)
 			results.extend(new_results)
-			print("HERE 8")
 			next_matches = []
 			for new_result in new_results:
-				print("HERE 9", new_result['match_id'])
 				next_matches.extend(await sync_to_async(assign_next_match, thread_sensitive=False)(tournament, new_result['match_id'], result))
 
 	return results
@@ -50,7 +45,6 @@ async def start_all_matches(tournament, matches):
 
 # checks if the next match can be assigned based on the outcome of the current match.
 def assign_next_match(tournament, match_id, finished_match_data):
-	print("HERE 6.4")
 	next_possible_matches = next_match_dependencies.get(match_id, [])
 	next_matches = []
 
@@ -63,7 +57,6 @@ def assign_next_match(tournament, match_id, finished_match_data):
 		if finished_match.player1 == 0 and finished_match.player2 == 0:
 			pass
 		else:
-			print("HERE 12345")
 			record_match(format_match_for_bc(finished_match_data))
 
 	for next_match_id in next_possible_matches:
@@ -73,12 +66,9 @@ def assign_next_match(tournament, match_id, finished_match_data):
 				match_id=next_match_id
 			)
 			if auto_advance_match(tournament, match):
-				print("HERE 6.4")
 				next_matches.append(assign_match_players(tournament, match))
 			else:
-				print("HERE 6.5")
 				assign_match_players(tournament, match)
-				print("HERE 6.6")
 				next_matches.append(format_match(match))
 
 	if match_id == 14:
@@ -164,7 +154,6 @@ def can_assign_match(tournament, match):
 
 def assign_match_players(tournament, match):
 	assignment = assignments[match.match_id]
-	print("HERE 1 : ", assignment)
 	player1_role = list(assignment['player1'].keys())[0]
 	player1_match_id = assignment['player1'][player1_role]
 	player1_match = Match.objects.get(tournament=tournament, match_id=player1_match_id)
@@ -179,7 +168,7 @@ def assign_match_players(tournament, match):
 		match.controls_mode = 'AI'
 	else:
 		match.controls_mode = 'remote'
-	print("HERE 2 : ", assignment)
+
 	match.save()
 	return match
 
