@@ -268,7 +268,15 @@ export class ChatRenderer {
 
 	onConnect1x1Init(data) {
         try {
-            this.renderInviteModal(data.players, data.current_user)
+            const container = document.getElementById('match_waiting_modal_container');
+
+			if (container) {
+				this.renderModalLayout1x1();
+				this.initNonStatick1x1(data.players, data.current_user)
+				this.chatModal.uiSetup.setup1x1Buttons();
+			} else {
+				console.warn('match_waiting_modal_container not found.');
+			}
 
 			const invite = document.getElementById('match_waiting_modal');
             if (invite) {
@@ -295,15 +303,22 @@ export class ChatRenderer {
         }
     }
 
-	renderInviteModal(players, current_user) {
+	initNonStatick1x1(players, current_user) {
 		const container = document.getElementById('match_waiting_modal_container');
 
 		if (container) {
-			this.renderModalLayout1x1()
-			this.renderUsers1x1(players, current_user)
-			this.renderButtons1x1(players, current_user)
-			this.chatModal.uiSetup.setup1x1Buttons()
-        } else {
+			const hasRejected = players.some(player => player.status === -1);
+
+			const modalContent = container.querySelector('.modal-content');
+			if (modalContent) {
+				if (hasRejected) {
+					modalContent.classList.add('canceled');
+				}
+			}
+
+			this.renderUsers1x1(players, current_user);
+			this.renderButtons1x1(players, current_user, hasRejected);
+		} else {
 			console.warn('match_waiting_modal_container not found.');
 		}
 	}
@@ -362,35 +377,33 @@ export class ChatRenderer {
 			const player2 = players[0].username !== current_user ? players[0] : players[1];
 
 			playerSection.innerHTML = `
-				<div class="player-container ${this.getStatusClass(player1.status)}">
+				<div class="player-container ${getStatusClass(player1.status)}">
 					<div class="img" style="background-image: url(${player1.avatar || '/assets/images/default_avatar.jpg'});"></div>
 					<span>${player1.username}</span>
 				</div>
 				<div class="vs">
 					<i class="fa-solid fa-v"></i> / <i class="fa-solid fa-s"></i>
 				</div>
-				<div class="player-container ${this.getStatusClass(player2.status)}">
+				<div class="player-container ${getStatusClass(player2.status)}">
 					<div class="img" style="background-image: url(${player2.avatar || '/assets/images/default_avatar.jpg'});"></div>
 					<span>${player2.username}</span>
 				</div>
 			`;
 		}
+
+		function getStatusClass(status) {
+			return status === 0 ? 'waiting'
+				: status === 1 ? 'accepted'
+				: status === -1 ? 'canceled'
+				: '';
+		}
 	}
 
-
-	getStatusClass(status) {
-		return status === 0 ? 'waiting'
-			 : status === 1 ? 'accepted'
-			 : status === -1 ? 'canceled'
-			 : '';
-	}
-
-	renderButtons1x1(players, current_user) {
+	renderButtons1x1(players, current_user, hasRejected=false) {
 		const buttonsContainer = document.getElementById('match_waiting_buttons_container');
 
 		if (buttonsContainer) {
 			const currentUserData = players.find(player => player.username === current_user);
-			const hasRejected = players.some(player => player.status === -1);
 			const isCurrentUserAccepted = currentUserData && currentUserData.status === 1;
 
 			buttonsContainer.innerHTML = `
@@ -399,7 +412,6 @@ export class ChatRenderer {
 			`;
 		}
 	}
-
 
 
 	removeBlockStatusMessage() {

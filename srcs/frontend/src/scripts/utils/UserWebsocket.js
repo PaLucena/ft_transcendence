@@ -78,7 +78,7 @@ class UserWebsocket {
                     chatModalInstance.uiSetup.setupTimer(5, () => { console.log("END!");})
                     break ;
                 case 'accept':
-                    chatModalInstance.chatRenderer.renderUsers1x1(data.players, data.current_user)
+                    chatModalInstance.chatRenderer.initNonStatick1x1(data.players, data.current_user)
                     break ;
             }
         } else {
