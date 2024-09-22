@@ -191,14 +191,6 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             if len(invite_users) != 2:
                 raise ValueError("Invite requires exactly 2 users.")
 
-            current_user = self.scope["user"]
-
-            if (
-                invite_users[0].user != current_user
-                and invite_users[1].user == current_user
-            ):
-                invite_users[0], invite_users[1] = invite_users[1], invite_users[0]
-
             players = [
                 {
                     "username": invite_users[0].user.username,

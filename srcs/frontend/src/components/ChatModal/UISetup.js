@@ -219,11 +219,11 @@ export class UISetup {
     }
 
     setUpTimer(timeLeft, onTimeUp) {
-        const modal = document.getElementById('match_waiting_modal')
+        const modal = document.getElementById('match_waiting_modal');
         if (modal) {
-            const timerElement = modal.querySelector('.timer');
+            const timerElement = modal.querySelector('#match_waiting_timer');
 
-            const intervalId = setInterval(() => {
+            const updateTimer = () => {
                 const minutes = Math.floor(timeLeft / 60);
                 const seconds = timeLeft % 60;
                 const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
@@ -233,8 +233,16 @@ export class UISetup {
                 }
 
                 console.log(formattedTime);
+            };
 
+            updateTimer();
+
+            const intervalId = setInterval(() => {
                 timeLeft--;
+
+                if (timeLeft >= 0) {
+                    updateTimer();
+                }
 
                 if (timeLeft < 0) {
                     clearInterval(intervalId);
