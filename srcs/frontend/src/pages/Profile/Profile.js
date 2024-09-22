@@ -448,7 +448,7 @@ export class Profile extends Component {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
 		this.addEventListener(TwofaBtn, "click", (event) => {
 			const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
-			if TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
+			if (TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData) === true){}
 			const response = fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',
