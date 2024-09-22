@@ -1,6 +1,7 @@
 import { Component } from "../../scripts/Component.js";
 import { InputController } from "./InputController.js";
 import { navigateTo } from "../../scripts/Router.js";
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 
 export class Pong extends Component {
 
@@ -27,6 +28,7 @@ export class Pong extends Component {
 
 	init() {
 		this.initPong();
+		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
 	initPong() {
@@ -76,9 +78,8 @@ export class Pong extends Component {
 	safeDefaultValues() {
 		this.message_line_super.innerHTML = '';
 		this.message_line_main.innerHTML = '';
+		this.message_line_main.innerHTML = '<span data-i18n="press-to-start"></span>'
 		this.message_line_sub_2.innerHTML = '';
-		this.controls_1.innerHTML = '';
-		this.controls_2.innerHTML = '';
 		this.button_return.style.display = 'none';
 	}
 
@@ -189,7 +190,7 @@ export class Pong extends Component {
 			} else {
 				this.message_line_sub_2.style.color = this.p_1_color;
 			}
-			this.message_line_sub_2.innerHTML = 'AI is ready';
+			this.message_line_sub_2.innerHTML = '<span data-i18n="ai-is-ready"></span>';
 		}
 	}
 
@@ -217,31 +218,32 @@ export class Pong extends Component {
 			this.controls_1.innerHTML = '';
 			this.controls_2.innerHTML = '';
 		} else if (gameState.state === 'waiting') {
-			this.message_line_super.innerHTML = `timeout: ${gameState["countdown"]}`;
-			this.message_line_main.innerHTML = 'Press to start';
+			this.message_line_super.innerHTML = `${gameState["countdown"]}`;
+		//	this.message_line_main.innerHTML = '<span data-i18n="press-to-start"></span>';
 		} else if (gameState.state === 'player_ready' && this.message_line_sub_2.innerHTML === '') {
 			if (gameState.player === 1) {
 				this.message_line_sub_2.style.color = this.p_1_color;
-				this.message_line_sub_2.innerHTML = `${this.player_1_name} is ready`;
+				this.message_line_sub_2.innerHTML = `${this.player_1_name} <span data-i18n="is-ready"></span>`;
 			} else {
 				this.message_line_sub_2.style.color = this.p_2_color;
-				this.message_line_sub_2.innerHTML = `${this.player_2_name} is ready`;
+				this.message_line_sub_2.innerHTML = `${this.player_2_name} <span data-i18n="is-ready"></span>`;
 			}
 		} else if (gameState.state === 'countdown') {
 			this.message_line_super.innerHTML = '';
-			this.message_line_main.innerHTML = `Ready in ${gameState["countdown"]}...`;
+			this.message_line_main.innerHTML = `${gameState["countdown"]}...`;
 			this.message_line_sub_2.innerHTML = '';
 			this.controls_1.innerHTML = '';
 			this.controls_2.innerHTML = '';
 		} else if (gameState.state === 'game_over') {
 			this.message_line_super.innerHTML = '';
-			this.message_line_main.innerHTML = 'Game Over';
+			this.message_line_main.innerHTML = '<span data-i18n="game-over"></span>';
 			this.message_line_sub_2.innerHTML = "";
 			this.controls_1.innerHTML = '';
 			this.controls_2.innerHTML = '';
 			this.playing = false;
 			this.button_return.style.display = 'block';
 		}
+		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
 	getCSSVar(name) {

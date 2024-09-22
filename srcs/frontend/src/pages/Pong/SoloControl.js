@@ -4,12 +4,12 @@ export default class SoloControl {
         this.execCommands = execCommands;
         this.keysPressed = {};
         this.paddleInterval = null;
-        this.buttons_to_hyde = null;
+        this.buttons_to_hide = null;
 
         if (this.player === 1) {
-            this.buttons_to_hyde = 2;
+            this.buttons_to_hide = 2;
         } else {
-            this.buttons_to_hyde = 1;
+            this.buttons_to_hide = 1;
         }
 
         this.touchIntervals = {};
@@ -18,9 +18,9 @@ export default class SoloControl {
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         if (isTouchDevice) {
             document.body.classList.add('touch-enabled');
-            document.getElementById(`p${this.buttons_to_hyde}-up`).style.display = 'none';
-            document.getElementById(`p${this.buttons_to_hyde}-down`).style.display = 'none';
-            document.getElementById(`p${this.buttons_to_hyde}-ready`).style.display = 'none';
+            document.getElementById(`p${this.buttons_to_hide}-up`).style.display = 'none';
+            document.getElementById(`p${this.buttons_to_hide}-down`).style.display = 'none';
+            document.getElementById(`p${this.buttons_to_hide}-ready`).style.display = 'none';
         } else {
             document.body.classList.remove('touch-enabled');
         }

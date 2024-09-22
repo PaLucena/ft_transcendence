@@ -114,12 +114,6 @@ export class Play extends Component {
 			this.playAi();
 		});
 
-		// online
-		// const	remoteBtn = document.getElementById("remoteBtn");
-		// this.addEventListener(remoteBtn, "click", () => {
-		// 	this.playRemote();
-		// });
-
 		const	tournamentModalElement = document.getElementById("tournamentModal");
 		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
 		this.addEventListener(tournamentModalElement, 'shown.bs.modal', () => {

@@ -1,5 +1,6 @@
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleBlockUnblock } from "../../scripts/utils/rtchatUtils.js";
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 
 export class UISetup {
     constructor(chatModal) {
@@ -12,6 +13,7 @@ export class UISetup {
         if (chatModalElement) {
             this.chatModal.addEventListener(chatModalElement, 'shown.bs.modal', async () => {
                 await this.chatModal.chatLoader.loadChats();
+                setTimeout(() => languageSelector.updateLanguage(), 0);
             });
 
             this.chatModal.addEventListener(chatModalElement, 'click', async (e) => {
