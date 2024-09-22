@@ -266,6 +266,44 @@ export class ChatRenderer {
 		}
 	}
 
+	onConnect1x1Init(data) {
+        try {
+            this.renderInviteModal(data.players, data.current_user)
+
+			const invite = document.getElementById('match_waiting_modal');
+            if (invite) {
+				this.chatModal.uiSetup.setup1x1Buttons();
+
+                const inviteInstance = new bootstrap.Modal(invite);
+                inviteInstance.show();
+
+                const messages = document.getElementById('messages_modal');
+                if (messages) {
+                    const chatInstance = bootstrap.Modal.getInstance(messages);
+                    if (chatInstance) {
+                        chatInstance.hide();
+                    }
+                } else {
+                    console.warn('messages_modal not found.');
+                }
+
+                const chats = document.getElementById('chats_modal');
+                if (chats) {
+                    const chatInstance = bootstrap.Modal.getInstance(chats);
+                    if (chatInstance) {
+                        chatInstance.hide();
+                    }
+                } else {
+                    console.warn('chats_modal not found.');
+                }
+            } else {
+                console.warn('match_waiting_modal not found.');
+            }
+        } catch (error) {
+                console.error('Failed to invite to match:', error);
+        }
+    }
+
 	renderInviteModal(players, current_user) {
 		console.log("POP:", players, current_user);
 
@@ -337,7 +375,7 @@ export class ChatRenderer {
 							</div>
 							<div class="modal-footer">
 								<div class="timer" id="match_waiting_timer"></div>
-								<div class="button-container d-flex align-items-center justify-content-center">
+								<div id="match_waiting_buttons_container" class="button-container d-flex align-items-center justify-content-center">
 									<button type="button" class="btn action-btn accept">Accept</button>
 									<button type="button" class="btn action-btn cancel">Cancel</button>
 								</div>

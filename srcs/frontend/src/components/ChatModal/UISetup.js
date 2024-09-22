@@ -220,7 +220,7 @@ export class UISetup {
         })
     }
 
-    setUpTimer(timeLeft, onTimeUp) {
+    setupTimer(timeLeft, onTimeUp) {
         const modal = document.getElementById('match_waiting_modal');
         if (modal) {
             const timerElement = modal.querySelector('#match_waiting_timer');
@@ -254,6 +254,28 @@ export class UISetup {
                     }
                 }
             }, 1000);
+        }
+    }
+
+    setup1x1Buttons() {
+        const modal = document.getElementById('match_waiting_buttons_container')
+
+        if (modal) {
+            this.chatModal.addEventListener(modal, 'click', (event) => {
+                const target = event.target;
+                const acceptButton = document.querySelector('.action-btn.accept');
+                const cancelButton = document.querySelector('.action-btn.cancel');
+
+                if (target.classList.contains('accept')) {
+                    console.log('accepted');
+                    acceptButton.disabled = true;
+                    cancelButton.disabled = false;
+                } else if (target.classList.contains('cancel')) {
+                    console.log('rejected');
+                    cancelButton.disabled = true;
+                    acceptButton.disabled = true;
+                }
+            });
         }
     }
 }

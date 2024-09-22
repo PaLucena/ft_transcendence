@@ -74,8 +74,8 @@ class UserWebsocket {
         if (chatModalInstance) {
             switch (data.type) {
                 case 'connect':
-                    this.onConnect1x1Render(chatModalInstance, data)
-                    chatModalInstance.uiSetup.setUpTimer(5, () => { console.log("END!");})
+                    chatModalInstance.chatRenderer.onConnect1x1Init(data)
+                    chatModalInstance.uiSetup.setupTimer(5, () => { console.log("END!");})
                     break ;
             }
         } else {
@@ -106,42 +106,6 @@ class UserWebsocket {
                     console.error('Failed to send notification:', error);
                 }
                 break ;
-        }
-    }
-
-    onConnect1x1Render(chatModalInstance, data) {
-        try {
-            chatModalInstance.chatRenderer.renderInviteModal(data.players, data.current_user)
-            const invite = document.getElementById('match_waiting_modal');
-
-            if (invite) {
-                const inviteInstance = new bootstrap.Modal(invite);
-                inviteInstance.show();
-
-                const messages = document.getElementById('messages_modal');
-                if (messages) {
-                    const chatInstance = bootstrap.Modal.getInstance(messages);
-                    if (chatInstance) {
-                        chatInstance.hide();
-                    }
-                } else {
-                    console.warn('messages_modal not found.');
-                }
-
-                const chats = document.getElementById('chats_modal');
-                if (chats) {
-                    const chatInstance = bootstrap.Modal.getInstance(chats);
-                    if (chatInstance) {
-                        chatInstance.hide();
-                    }
-                } else {
-                    console.warn('chats_modal not found.');
-                }
-            } else {
-                console.warn('match_waiting_modal not found.');
-            }
-        } catch (error) {
-                console.error('Failed to invite to match:', error);
         }
     }
 
