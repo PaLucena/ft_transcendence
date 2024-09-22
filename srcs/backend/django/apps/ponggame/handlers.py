@@ -1,4 +1,5 @@
 import json
+import time
 
 
 async def handle_player_ready(consumer, player):
@@ -27,7 +28,7 @@ async def handle_move(consumer, player_id, direction):
 
 
 async def handle_resize(consumer):
-    await consumer.send_positions(
+    await send_positions(
         consumer.channel_layer,
         consumer.room_name,
         consumer.game_logic
@@ -64,6 +65,7 @@ async def send_positions(channel_layer, room_group_name, game_logic):
             'pad_1_y': game_logic.pad_1_y - game_logic.PADDLE_HEIGHT / 2,
             'pad_2_x': game_logic.pad_2_x,
             'pad_2_y': game_logic.pad_2_y - game_logic.PADDLE_HEIGHT / 2,
+            'timestamp': time.time(),
         }
         await channel_layer.group_send(
             room_group_name,

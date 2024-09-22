@@ -246,24 +246,18 @@ export class Profile extends Component {
 
 	saveInfoBtn(username) {
 		const editForm = document.getElementById("editForm");
-
+	
 		this.addEventListener(editForm, "submit", async (event) => {
 			event.preventDefault();
-
+	
 			const formData = new FormData(event.target);
-			const jsonData = {};
-
-			formData.forEach((value, key) => {
-				jsonData[key] = value;
-			});
-			jsonData['language'] = document.getElementById('language_selector').value;
-
+			formData.append('language', document.getElementById('language_selector').value);
+	
+			console.log('Form Data:', Array.from(formData.entries()));
+	
 			fetch("/api/update_user_info/", {
 				method: "POST",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(jsonData),
+				body: formData,
 				credentials: 'include'
 			})
 			.then(response => {
@@ -282,9 +276,10 @@ export class Profile extends Component {
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
-			})
-		})
+			});
+		});
 	}
+
 
 	logout() {
 		let	logoutBtn = document.getElementById("logoutBtn");

@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.crypto import get_random_string
 
 class AppUser(AbstractUser):
-    nickname = models.CharField(max_length=100, null=True, blank=True, unique=True)
+    nickname = models.CharField(max_length=15, null=True, blank=True, unique=True)
     avatar = models.FileField(upload_to="avatars/", default="default/default.jpg", null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
     is_online = models.BooleanField(default=False)
@@ -13,7 +13,7 @@ class AppUser(AbstractUser):
     created = models.DateTimeField(auto_now_add=True, auto_now=False)
     api42auth = models.BooleanField(default=False)
     language = models.CharField(
-            max_length=2,
+            max_length=20,
             choices=[('EN', 'English'), ('ES', 'Spanish'), ('LV', 'Latvian')],
             default='EN'
         )

@@ -95,6 +95,7 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
+				//tournamentSocket.closeWebSocket();
 				customAlert('success', 'Tournament closed', '3000');
 			})
 			.catch((error) => {
@@ -124,6 +125,8 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
+				console.log("BLA BLA");
+				
 				tournamentSocket.closeWebSocket();
 				navigateTo('/play');
 			})
@@ -243,8 +246,8 @@ export class Tournament extends Component {
 
 
 	createHtml(tournament_name) {
-        const html = `
-            <div class="tournament-name col-12 d-flex justify-content-center">
+		const html = `
+			<div class="tournament-name col-12 d-flex justify-content-center">
 				<div>
 					<p id="tournamentName" class="d-flex justify-content-center display-6">${tournament_name}</p>
 					<div class="d-flex justify-content-center">
@@ -253,8 +256,8 @@ export class Tournament extends Component {
 				</div>
 			</div>
 
-            <div class="top-half d-flex h-40 w-100 m-0"></div>
-            <div class="bottom-half d-flex h-60 w-100 m-0 mt-2"></div>
+			<div class="top-half d-flex h-40 w-100 m-0"></div>
+			<div class="bottom-half d-flex h-60 w-100 m-0 mt-2"></div>
 
             <div class="close-exit-btn-container col-12 d-flex justify-content-center">
 				<div class="close-exit-btn col-4 col-md-2 col-xl-1 gap-2 d-flex justify-content-center">

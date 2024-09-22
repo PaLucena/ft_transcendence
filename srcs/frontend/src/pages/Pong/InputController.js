@@ -9,7 +9,7 @@ export class InputController {
 
         console.log("control: " + this.controls_mode);
 
-        this.socket = socket;
+        this.gameSocket = socket;
         this.controlModule = null;
         this.configureControls();
     }
@@ -40,28 +40,28 @@ export class InputController {
     execCommands(command) {
         switch (command) {
             case 'player_1_ready':
-                this.socket.send(JSON.stringify({ type: 'player_ready', player: 1 }));
+                this.gameSocket.send(JSON.stringify({ type: 'player_ready', player: 1 }));
                 break;
             case 'player_2_ready':
-                this.socket.send(JSON.stringify({ type: 'player_ready', player: 2 }));
+                this.gameSocket.send(JSON.stringify({ type: 'player_ready', player: 2 }));
                 break;
             case 'quit_p1':
-                this.socket.send(JSON.stringify({ type: 'quit', player: 1 }));
+                this.gameSocket.send(JSON.stringify({ type: 'quit', player: 1 }));
                 break;
             case 'quit_p2':
-                this.socket.send(JSON.stringify({ type: 'quit', player: 2 }));
+                this.gameSocket.send(JSON.stringify({ type: 'quit', player: 2 }));
                 break;
             case 'player_1_up':
-                this.socket.send(JSON.stringify({ type: 'move', player: 1, direction: -1 }));
+                this.gameSocket.send(JSON.stringify({ type: 'move', player: 1, direction: -1 }));
                 break;
             case 'player_1_down':
-                this.socket.send(JSON.stringify({ type: 'move', player: 1, direction: 1 }));
+                this.gameSocket.send(JSON.stringify({ type: 'move', player: 1, direction: 1 }));
                 break;
             case 'player_2_up':
-                this.socket.send(JSON.stringify({ type: 'move', player: 2, direction: -1 }));
+                this.gameSocket.send(JSON.stringify({ type: 'move', player: 2, direction: -1 }));
                 break;
             case 'player_2_down':
-                this.socket.send(JSON.stringify({ type: 'move', player: 2, direction: 1 }));
+                this.gameSocket.send(JSON.stringify({ type: 'move', player: 2, direction: 1 }));
                 break;
             default:
                 break;

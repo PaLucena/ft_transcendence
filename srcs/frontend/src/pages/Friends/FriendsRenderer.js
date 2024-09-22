@@ -39,6 +39,8 @@ export class FriendsRenderer {
 					style="top:90%; left:85%;">
 				</div>`;
 
+			console.log("user:", user.username, "friend avatar: ", user.other_user_avatar_url);
+				
 			const commonHtml = `
 				<div class="friends-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
 					<div class="img-nick">

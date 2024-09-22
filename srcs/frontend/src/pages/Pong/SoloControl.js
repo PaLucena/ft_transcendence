@@ -4,6 +4,13 @@ export default class SoloControl {
         this.execCommands = execCommands;
         this.keysPressed = {};
         this.paddleInterval = null;
+        this.buttons_to_hyde = null;
+
+        if (this.player === 1) {
+            this.buttons_to_hyde = 2;
+        } else {
+            this.buttons_to_hyde = 1;
+        }
 
         this.touchIntervals = {};
         this.touchControls = Array.from(document.querySelectorAll('[data-controls]'));
@@ -11,6 +18,9 @@ export default class SoloControl {
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         if (isTouchDevice) {
             document.body.classList.add('touch-enabled');
+            document.getElementById(`p${this.buttons_to_hyde}-up`).style.display = 'none';
+            document.getElementById(`p${this.buttons_to_hyde}-down`).style.display = 'none';
+            document.getElementById(`p${this.buttons_to_hyde}-ready`).style.display = 'none';
         } else {
             document.body.classList.remove('touch-enabled');
         }
@@ -89,30 +99,36 @@ export default class SoloControl {
 
     handleTouchStart(control) {
         switch(control) {
-            case 'p1_up':
-                if (!this.touchIntervals['p1_up']) {
-                    this.touchIntervals['p1_up'] = setInterval(() => {
+            case 'p1-ready':
+                this.execCommands(`player_${this.player}_ready`);
+                break;
+            case 'p1-up':
+                if (!this.touchIntervals['p1-up']) {
+                    this.touchIntervals['p1-up'] = setInterval(() => {
                         this.execCommands(`player_${this.player}_up`);
                     }, 10);
                 }
                 break;
-            case 'p1_down':
-                if (!this.touchIntervals['p1_down']) {
-                    this.touchIntervals['p1_down'] = setInterval(() => {
+            case 'p1-down':
+                if (!this.touchIntervals['p1-down']) {
+                    this.touchIntervals['p1-down'] = setInterval(() => {
                         this.execCommands(`player_${this.player}_down`);
                     }, 10);
                 }
                 break;
-            case 'p2_up':
-                if (!this.touchIntervals['p2_up']) {
-                    this.touchIntervals['p2_up'] = setInterval(() => {
+            case 'p2-ready':
+                this.execCommands(`player_${this.player}_ready`);
+                break;
+            case 'p2-up':
+                if (!this.touchIntervals['p2-up']) {
+                    this.touchIntervals['p2-up'] = setInterval(() => {
                         this.execCommands(`player_${this.player}_up`);
                     }, 10);
                 }
                 break;
-            case 'p2_down':
-                if (!this.touchIntervals['p2_down']) {
-                    this.touchIntervals['p2_down'] = setInterval(() => {
+            case 'p2-down':
+                if (!this.touchIntervals['p2-down']) {
+                    this.touchIntervals['p2-down'] = setInterval(() => {
                         this.execCommands(`player_${this.player}_down`);
                     }, 10);
                 }
