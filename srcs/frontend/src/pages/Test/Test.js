@@ -79,9 +79,22 @@ export class Test extends Component {
 		const connect1x1 = document.getElementById('connect_1x1');
 		this.addEventListener(connect1x1, 'click', async () => {
 			try {
-				const message = JSON.stringify({
+				userSocket.socket.send(JSON.stringify({
 					action: 'invitation_1x1',
 					type: 'connect',
+					group_name: 'invite_1x1_Bart_to_admin'
+				}));
+			} catch (error) {
+				console.error('Failed to send notification:', error);
+			}
+		});
+
+		const accept1x1 = document.getElementById('accept_1x1');
+		this.addEventListener(accept1x1, 'click', async () => {
+			try {
+				const message = JSON.stringify({
+					action: 'invitation_1x1',
+					type: 'accept',
 					group_name: 'invite_1x1_Bart_to_admin'
 				});
 				userSocket.socket.send(message);

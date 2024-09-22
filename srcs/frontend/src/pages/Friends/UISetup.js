@@ -181,12 +181,11 @@ export class UISetup {
             await handleResponse(response, async () => {
                 if (username && notification_type) {
                     try {
-                        const message = JSON.stringify({
+                        userSocket.socket.send(JSON.stringify({
                             action: 'notification',
                             type: notification_type,
                             to_user: username
-                        });
-                        userSocket.socket.send(message);
+                        }));
                     } catch (error) {
                         console.error('Failed to send notification:', error);
                     }

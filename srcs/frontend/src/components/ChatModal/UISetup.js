@@ -1,6 +1,7 @@
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleBlockUnblock } from "../../scripts/utils/rtchatUtils.js";
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
+import { userSocket } from "../../scripts/utils/UserWebsocket.js";
 
 export class UISetup {
     constructor(chatModal) {
@@ -267,9 +268,19 @@ export class UISetup {
                 const cancelButton = document.querySelector('.action-btn.cancel');
 
                 if (target.classList.contains('accept')) {
-                    console.log('accepted');
-                    acceptButton.disabled = true;
-                    cancelButton.disabled = false;
+                    try {
+                        userSocket.socket.send(JSON.stringify({
+                            action: 'invitation_1x1',
+                            type: 'accept',
+                            group_name: 'invite_1x1_Bart_to_admin'
+                        }));
+
+                        console.log('accepted');
+                        acceptButton.disabled = true;
+                        cancelButton.disabled = false;
+                    } catch (error) {
+                        console.error('Failed to send notification:', error);
+                    }
                 } else if (target.classList.contains('cancel')) {
                     console.log('rejected');
                     cancelButton.disabled = true;

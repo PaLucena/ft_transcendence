@@ -77,6 +77,9 @@ class UserWebsocket {
                     chatModalInstance.chatRenderer.onConnect1x1Init(data)
                     chatModalInstance.uiSetup.setupTimer(5, () => { console.log("END!");})
                     break ;
+                case 'accept':
+                    console.log("HERE!");
+                    break ;
             }
         } else {
             console.error("ChatModal instance is not initialized");
@@ -96,12 +99,11 @@ class UserWebsocket {
                 break ;
             case '1x1_invite':
                 try {
-                    const message = JSON.stringify({
+                    this.socket.send(JSON.stringify({
                         action: 'invitation_1x1',
                         type: 'connect',
                         group_name: notification.message
-                    });
-                    this.socket.send(message);
+                    }));
                 } catch (error) {
                     console.error('Failed to send notification:', error);
                 }

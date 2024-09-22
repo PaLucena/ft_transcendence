@@ -103,7 +103,37 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_error(500, f"Unexpected error: {str(e)}")
 
         elif invitation_1x1_type == "accept":
-            pass
+            try:
+                invite_data = await self.get_1x1_data(group_name)
+
+                if not invite_data:
+                    await self.send_error(404, "Invite requires exactly 2 users.")
+                    return
+
+                current_user = self.scope["user"]
+
+                for player in invite_data:
+                    if player["username"] == current_user.username:
+                        if player["status"] == 1:
+                            await self.send_error(
+                                400, "You have already accepted the invitation."
+                            )
+                            return
+
+                        await self.update_invite_status(group_name, current_user, 1)
+                        break
+                else:
+                    await self.send_error(404, "User not found in the invite.")
+                    return
+
+                updated_invite_data = await self.get_1x1_data(group_name)
+
+                await self.send_1x1_update(
+                    group_name, "accept", updated_invite_data, self.user
+                )
+            except Exception as e:
+                await self.send_error(500, f"Failed to accept invitation: {str(e)}")
+
         elif invitation_1x1_type == "reject":
             pass
         else:
@@ -151,6 +181,22 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                 404, f"Notification type '{notification_type}' not found."
             )
 
+    async def send_1x1_update(
+        self, group_name, invitation_1x1_type, updated_invite_data, current_user
+    ):
+        try:
+            event = {
+                "type": "invitation_1x1_update",
+                "invitation_1x1": {
+                    "type": invitation_1x1_type,
+                    "players": updated_invite_data,
+                    "current_user": current_user.username,
+                },
+            }
+            await self.channel_layer.group_send(group_name, event)
+        except Exception as e:
+            await self.send_error(500, f"Failed to send 1x1 update: {str(e)}")
+
     async def send_notification(self, notification_type, username, message):
         try:
             group_name = f"notification-{username}"
@@ -173,6 +219,14 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
         elif notification_type == "friend_cancel":
             return f"{self.user.username} has canceled the friend request!"
         return None
+
+    @database_sync_to_async
+    def update_invite_status(self, group_name, user, status):
+        invite_user = InviteUser.objects.get(
+            invite_room__group_name=group_name, user=user
+        )
+        invite_user.status = status
+        invite_user.save()
 
     @database_sync_to_async
     def user_exists(self, username):
@@ -233,6 +287,18 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             await self.send_error(
                 500, f"Failed to send notification users list: {str(e)}"
             )
+
+    async def invitation_1x1_update(self, event):
+        try:
+            invitation_1x1 = event.get("invitation_1x1")
+            if not invitation_1x1:
+                await self.send_error(400, "Missing invitation_1x1 data.")
+                return
+
+            await self.send_json({"invitation_1x1": invitation_1x1})
+
+        except Exception as e:
+            await self.send_error(500, f"Failed to send 1x1 update: {str(e)}")
 
     async def send_online_users_list(self):
         try:
