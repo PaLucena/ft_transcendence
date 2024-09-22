@@ -162,7 +162,7 @@ def assign_match_players(tournament, match):
 	player2_match = Match.objects.get(tournament=tournament, match_id=player2_match_id)
 	match.player2 = getattr(player2_match, player2_role)
 
-	if (match.player1 == 0 and match.player2 == 0):
+	if match.player1 == 0 and match.player2 == 0:
 		match.controls_mode = 'AI'
 	else:
 		match.controls_mode = 'remote'
@@ -232,6 +232,13 @@ def format_match(match):
 	}
 
 def format_match_for_bc(result):
+	if result['forfeit']:
+		winner = result['player_2_id'] if result['forfeit'] == 1 else result['player_1_id']
+	else:
+		if result['player_1_goals'] > result['player_2_goals']:
+			winner = result['player_1_id']
+		else:
+			winner = result['player_2_id']
 	return {
 		'tournament_id': result['tournament_id'],
 		'match_id': result['match_id'],
@@ -243,7 +250,7 @@ def format_match_for_bc(result):
 		'player_2_max_hits': result['player_2_max_hits'],
 		'match_total_time': result['match_total_time'],
 		'forfeit': result['forfeit'],
-		'winner_id': result['player_1_id'] if result['player_1_goals'] > result['player_2_goals'] else result['player_2_id'],
+		'winner_id': winner,
 	}
 
 def generate_ai_result(match):

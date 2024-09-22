@@ -32,6 +32,8 @@ class GameManager:
 		self.player_to_room = {}
 		self.channel_layer = get_channel_layer()
 
+		self.frame_count = 0
+
 	async def start_match(self, tournament_id, match_id, player_1_id, player_2_id, controls_mode):
 		"""
 		Start a match between two players
@@ -96,23 +98,26 @@ class GameManager:
 			return None
 
 	async def run_game_loop(self, game_room, game_logic, ai_player):
+		frame_count = 0
 		try:
 			while game_logic.game_state != "game_over":
 				loop_time = time.time()
 				if game_logic.ai_side:
 					ai_player.ai_turn(game_logic.new_direction)
 				await game_logic.game_loop()
-				await send_positions(self.channel_layer, game_room.game_room_id, game_logic)
 				await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
+				await send_positions(self.channel_layer, game_room.game_room_id, game_logic)
 				if game_logic.game_state == "scored":
 					await send_score(self.channel_layer, game_room.game_room_id, game_logic)
 				elapsed_time = time.time() - loop_time
 				if game_logic.FRAME_TIME - elapsed_time < 0:
 					print("**** ALERT: Game loop is running too slow ****")
-				await asyncio.sleep(max(0.0, game_logic.FRAME_TIME - elapsed_time))
-			game_logic.match_total_time = round(time.time() - game_logic.start_time, 2)
+				sleep_time = max(0.0, game_logic.FRAME_TIME - elapsed_time)
+				await asyncio.sleep(sleep_time)
+				frame_count += 1
 			if game_logic.game_state == "game_over":
 				await send_score(self.channel_layer, game_room.game_room_id, game_logic)
+				game_logic.end_game_adjustments()
 			await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
 		except Exception as e:
 			print(f"Error running game loop: {e}")
