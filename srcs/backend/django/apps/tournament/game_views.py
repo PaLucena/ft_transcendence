@@ -29,7 +29,6 @@ class BaseMatch(APIView):
 				tournament=tournament,
 				match_id=match_id,
 			)
-			# run in the background
 			asyncio.create_task(self.handle_match_and_record(user_id, player_2_id, match_id))
 
 			return Response({'message': 'Match started!'}, status=status.HTTP_200_OK)
@@ -92,7 +91,6 @@ class RemoteMatch(BaseMatch):
 		return 'remote'
 
 	def get_player2_id(self, request):
-		# player_2_id has to be passed in the request data for remote matches
 		player_2_username = request.data.get('player_2_username', 0)
 		
 		if not player_2_username:

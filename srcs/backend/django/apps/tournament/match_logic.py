@@ -19,7 +19,6 @@ async def start_all_matches(tournament, matches):
 			match['player_2_id'],
 			match['controls_mode']
 		)
-		#notify players here
 		for match in matches
 	]
 
@@ -43,12 +42,9 @@ async def start_all_matches(tournament, matches):
 	return results
 
 
-# checks if the next match can be assigned based on the outcome of the current match.
 def assign_next_match(tournament, match_id, finished_match_data):
 	next_possible_matches = next_match_dependencies.get(match_id, [])
 	next_matches = []
-
-	# check if its match between 2 ai players i want to advance (or put this in pong)
 
 	finished_match = Match.objects.get(match_id=match_id, tournament=tournament)
 

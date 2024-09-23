@@ -157,7 +157,6 @@ def login(request):
 		response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
 		response.set_cookie("access_token", str(access), httponly=True, secure=True)
 
-		#load_test_data(request)
 		return response
 	else:
 		return Response({"error": "Incorrect password"}, status=status.HTTP_404_NOT_FOUND)
@@ -182,8 +181,6 @@ def loginWith2fa(request):
 	print("Refresh Token for 2FA Expiry:", twofactor_refresh["exp"])
 	return response
 
-
-# ...
 @api_view(["GET"])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -270,19 +267,6 @@ def update_user_info(request):
 			user.language = language
 
 		user.save()
-		#user.refresh_from_db()
-		#request.session.flush()
-		#auth_logout(request)
-		# authenticated_user = authenticate(
-		#     username=new_username, password=new_password
-		# )
-		# if authenticated_user is not None:
-		#     user = AppUser.objects.get(username=new_username)
-		#     user.save()
-
-		#auth_login(request, user)
-		#update_session_auth_hash(request, user)
-		#user_logged_in.send(sender=user.__class__, request=request, user=user)
 
 		response = Response(
 			{"message": "User info updated successfully."}, status=status.HTTP_201_CREATED

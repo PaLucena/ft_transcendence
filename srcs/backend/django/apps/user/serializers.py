@@ -22,12 +22,6 @@ class UserSerializerClass(ModelSerializer):
 			raise serializers.ValidationError("This email is already in use.")
 		return value
 
-	#nickname will be set before tournament
-	# def validate_nickname(self, value):
-	# 	if AppUser.objects.filter(nickname__iexact=value).exists():
-	# 		raise serializers.ValidationError({"error": "This nickname is already in use."})
-	# 	return value
-
 	def validate_avatar(self, value):
 		if value:
 			if not value.content_type.startswith('image'):

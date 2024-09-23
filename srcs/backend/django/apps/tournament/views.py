@@ -13,7 +13,6 @@ from ponggame.game_manager import game_manager
 from asgiref.sync import sync_to_async
 import asyncio
 
-# when private tournamnt is craeted, the creator gets the invitation code
 @api_view (["GET"])
 @default_authentication_required
 def get_code(request, tournament_id):
@@ -63,7 +62,6 @@ def create_tournament(request):
 		)
 
 		tournament.participants.add(creator)
-		#start countdown 10 min
 
 		return Response({"message": "Created successfully"}, status=status.HTTP_200_OK)
 
@@ -71,7 +69,6 @@ def create_tournament(request):
 		return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-#return list of first available matches
 @api_view (["POST"])
 @default_authentication_required
 def close_tournament(request, tournament_id):
@@ -228,7 +225,6 @@ def tournament_bracket(request, tournament_id):
         return Response({"error": "Tournament not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
-#to show tournament bracket
 def get_tournament_bracket(tournament):
 	bracket_data = []
 	matches = Match.objects.filter(tournament=tournament).order_by('match_id')

@@ -38,7 +38,6 @@ class DefaultAuthentication:
 		if not AppUser.objects.filter(pk=user.pk).exists():
 			raise exceptions.AuthenticationFailed('User does not exist')
 
-		print("USER SIMPLE CHECK DONE", user)
 		if Has2faEnabled(user.username):
 			twofactor_access_token = request.COOKIES.get('twofactor_access_token')
 			twofactor_refresh_token = request.COOKIES.get('twofactor_refresh_token')
@@ -64,7 +63,6 @@ class DefaultAuthentication:
 
 
 		request.user = user
-		print("USER IS DECORATOR: ", user)
 		return user, request.COOKIES.get('access_token')
 
 

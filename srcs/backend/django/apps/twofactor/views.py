@@ -16,7 +16,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 def check2fa(request):
 	return Response({"has2faEnabled": Has2faEnabled(request.user.username)}, status=status.HTTP_200_OK)
 
-# Create your views here.
 @api_view(["POST"])
 @default_authentication_required
 def	enable2fa(request):

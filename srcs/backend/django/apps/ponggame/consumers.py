@@ -79,13 +79,11 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         if self.game_logic:
-            # Disconnect from room
             if self.player_id == 1:
                 self.game_logic.player_1_channel = None
             elif self.player_id == 2:
                 self.game_logic.player_2_channel = None
 
-            # Leave room group
             await self.channel_layer.group_discard(
                 self.room_name,
                 self.channel_name

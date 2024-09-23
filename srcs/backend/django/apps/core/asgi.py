@@ -1,5 +1,3 @@
-# project_name/asgi.py
-
 import os
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
@@ -13,7 +11,6 @@ from ponggame import routing as PonggameAppRouting
 from notifications import routing as NotificationsAppRouting
 from tournament import routing as TournamentAppRouting
 from user.middleware import JWTAuthMiddleware
-# from YourAppHere import consumers
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
 
@@ -25,7 +22,6 @@ websocket_urlpatterns = (
 	TournamentAppRouting.websocket_urlpatterns
 )
 
-# ProtocolTypeRouter for routing different protocols
 application = ProtocolTypeRouter(
     {
         "http": get_asgi_application(),

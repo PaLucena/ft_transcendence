@@ -20,8 +20,6 @@ class Tournament(models.Model):
 	invitation_code = models.CharField(max_length=5, null=True, blank=True)
 	is_active = models.BooleanField(default=False)
 	player_ids = models.JSONField(default=list)
-	#invitation_time_out =  models.DateTimeField(default=lambda: timezone.now() + timedelta(minutes=10))
-	#pending_invitations = models.ManyToManyField(AppUser, related_name='pending', default=list)
 
 
 class Match(models.Model):
