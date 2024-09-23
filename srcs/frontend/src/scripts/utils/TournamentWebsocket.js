@@ -1,5 +1,5 @@
 import { Tournament } from "../../pages/Tournament/Tournament.js";
-import {navigateTo} from "../Router";
+import {navigateTo} from "../Router.js";
 
 class TournamentWebsocket {
     constructor() {
