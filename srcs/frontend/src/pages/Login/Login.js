@@ -2,7 +2,7 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-//import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
 
 
@@ -66,8 +66,7 @@ export class Login extends Component {
 						await TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
 					}
 
-					onlineSocket.initWebSocket(jsonData["username"]);
-					notificationsSocket.initWebSocket();
+					userSocket.initWebSocket();
 					customAlert('success', 'Login successful', 3000);
 					navigateTo("/play");
 
