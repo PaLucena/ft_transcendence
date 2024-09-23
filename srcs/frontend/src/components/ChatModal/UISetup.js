@@ -258,7 +258,7 @@ export class UISetup {
         }
     }
 
-    setup1x1Buttons(group_name) {
+    setupButtons1x1(group_name) {
         const modal = document.getElementById('match_waiting_buttons_container')
 
         if (modal) {

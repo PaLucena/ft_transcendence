@@ -39,10 +39,26 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             await self.send_error(500, f"Failed to connect: {str(e)}")
             await self.close()
 
-    async def disconnect(self, close_code):
+    @database_sync_to_async
+    def find_invite_room_for_user(self, user):
+        try:
+            invite_users = InviteUser.objects.filter(user=user)
+            rooms = invite_users.values_list(
+                "invite_room__group_name", flat=True
+            ).distinct()
+            return list(rooms)
+        except Exception as e:
+            raise Exception(f"Failed to find invite rooms for user: {str(e)}")
 
+    async def disconnect(self, close_code):
         if self.user is not None and self.user.is_authenticated:
             await self.remove_user_from_online_list(self.user)
+            rooms = await self.find_invite_room_for_user(self.user)
+            if rooms:
+                print("Invite rooms for user:", ", ".join(rooms))
+                for room in rooms:
+                    await self.handle_invite_response_1x1("reject", room)
+                    await self.channel_layer.group_discard(room, self.channel_name)
 
         await self.channel_layer.group_discard(
             self.online_status_group_name, self.channel_name
@@ -99,7 +115,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                         "type": invitation_1x1_type,
                         "players": invite_data,
                         "current_user": current_user.username,
-                        "group_name": group_name
+                        "group_name": group_name,
                     }
                 }
             )

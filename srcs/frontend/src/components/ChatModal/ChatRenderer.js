@@ -276,7 +276,7 @@ export class ChatRenderer {
 				this.renderButtons1x1();
 				this.updateStatusClasses1x1(data.players, data.current_user, data.group_name)
 
-				this.chatModal.uiSetup.setup1x1Buttons(data.group_name);
+				this.chatModal.uiSetup.setupButtons1x1(data.group_name);
 			} else {
 				console.warn('match_waiting_modal_container not found.');
 			}
