@@ -6,6 +6,7 @@ import { userSocket } from "../../scripts/utils/UserWebsocket.js";
 export class UISetup {
     constructor(chatModal) {
         this.chatModal = chatModal;
+        this.intervalId = null;
     }
 
     setupChatModal() {
@@ -238,9 +239,14 @@ export class UISetup {
                 console.log(formattedTime);
             };
 
+            if (this.intervalId) {
+                clearInterval(this.intervalId);
+                this.intervalId = null;
+            }
+
             updateTimer();
 
-            const intervalId = setInterval(() => {
+            this.intervalId = setInterval(() => {
                 timeLeft--;
 
                 if (timeLeft >= 0) {
@@ -248,13 +254,21 @@ export class UISetup {
                 }
 
                 if (timeLeft < 0) {
-                    clearInterval(intervalId);
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
 
                     if (typeof onTimeUp === 'function') {
                         onTimeUp();
                     }
                 }
             }, 1000);
+        }
+    }
+
+    stopTimer() {
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
         }
     }
 

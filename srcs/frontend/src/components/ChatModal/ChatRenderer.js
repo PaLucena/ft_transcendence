@@ -1,6 +1,7 @@
 export class ChatRenderer {
     constructor(chatModal) {
         this.chatModal = chatModal;
+		this.invitModalInstance = null;
     }
 
 	renderChatElements(chats) {
@@ -336,10 +337,28 @@ export class ChatRenderer {
 			`;
 
 			const inviteModalElement = document.getElementById('match_waiting_modal');
-			const inviteInstance = new bootstrap.Modal(inviteModalElement);
-			inviteInstance.show();
+			if (!this.invitModalInstance) {
+				this.invitModalInstance = new bootstrap.Modal(inviteModalElement);
+			}
+			this.invitModalInstance.show();
 		} else {
 			console.warn('match_waiting_modal_container not found.');
+		}
+	}
+
+	hideInviteModal() {
+		if (this.invitModalInstance) {
+			this.invitModalInstance.hide()
+
+			const container = document.getElementById('match_waiting_modal_container');
+			const modal = container.querySelector('#match_waiting_modal');
+
+			if (container && modal) {
+				this.chatModal.addEventListener(modal, 'hidden.bs.modal', () => {
+					this.invitModalInstance = null;
+					container.innerHTML = '';
+				})
+			}
 		}
 	}
 

@@ -74,15 +74,26 @@ class UserWebsocket {
         if (chatModalInstance) {
             switch (data.type) {
                 case 'connect':
-                    chatModalInstance.chatRenderer.onConnect1x1InitRender(data)
-                    chatModalInstance.uiSetup.setupTimer(5, () => { console.log("END!");})
-                    break ;
+                    chatModalInstance.chatRenderer.onConnect1x1InitRender(data);
+                    chatModalInstance.uiSetup.stopTimer();
+
+                    chatModalInstance.uiSetup.setupTimer(15, () => {
+                        console.log("Closing the modal...");
+                        chatModalInstance.chatRenderer.hideInviteModal();
+                    });
+                    break;
                 case 'accept':
-                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players, data.current_user)
+                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players, data.current_user);
                     break ;
                 case 'reject':
-                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players, data.current_user)
-                    break ;
+                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players, data.current_user);
+                    chatModalInstance.uiSetup.stopTimer();
+
+                    chatModalInstance.uiSetup.setupTimer(1, () => {
+                        console.log("Closing the modal...");
+                        chatModalInstance.chatRenderer.hideInviteModal();
+                    });
+                    break;
             }
         } else {
             console.error("ChatModal instance is not initialized");
