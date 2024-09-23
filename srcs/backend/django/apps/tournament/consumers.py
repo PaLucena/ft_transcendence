@@ -8,11 +8,15 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.tournament_name = self.scope["url_route"]["kwargs"]["tournament_name"]
         self.tournamentroom_name = f"tournament_{self.tournament_name}"
+        self.userroom_name = f"channel_{self.scope.get('user')}"
 
         try:
             await self.accept()
             await self.channel_layer.group_add(
                 self.tournamentroom_name, self.channel_name
+            )
+            await self.channel_layer.group_add(
+                self.user, self.channel_name
             )
             await self.send_tournament_users_list(self.tournament_name)
 
@@ -80,5 +84,21 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
                 "error": True,
                 "errorCode": code,
                 "errorMessage": message,
+            }
+        )
+
+    async def send_goto_game(self, userId1_room, userId2_room):
+        event = {
+            "type": "goto_game",
+            "goto_game": True,
+        }
+        await self.channel_layer.group_send(userId1_room, event)
+        await self.channel_layer.group_send(userId2_room, event)
+
+
+    async def goto_game(self):
+        await self.send_json(
+            {
+                "goto_game": True,
             }
         )
