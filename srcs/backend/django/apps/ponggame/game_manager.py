@@ -32,6 +32,9 @@ class GameManager:
 		self.player_to_room = {}
 		self.channel_layer = get_channel_layer()
 
+	def is_player_in_game(self, player_id):
+		return player_id in self.player_to_room
+
 	async def start_match(self, tournament_id, match_id, player_1_id, player_2_id, controls_mode):
 		"""
 		Start a match between two players
