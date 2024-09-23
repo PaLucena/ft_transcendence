@@ -7,11 +7,11 @@ export class Navbar extends Component {
 	}
 
 	init() {
-		this.initNavbarAvatar();
+		Navbar.initNavbarAvatar();
 		Navbar.focus();
 	}
 
-	initNavbarAvatar() {
+	static initNavbarAvatar() {
 		fetch("/api/get_user_data/", {
 			method: "GET",
 			headers: {

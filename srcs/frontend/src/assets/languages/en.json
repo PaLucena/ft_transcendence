@@ -33,6 +33,7 @@
 	"username": "username",
 	"avatar": "avatar",
 	"change-password": "Change password",
+	"current-password": "current password",
 	"new-password": "new password",
 	"confirm-new-password": "confirm new password",
 	"select-language": "Select language",

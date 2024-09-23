@@ -34,6 +34,7 @@
 	"username": "usuario",
 	"avatar": "avatar",
 	"change-password": "Cambiar contraseña",
+	"current-password": "contraseña actual",
 	"new-password": "nueva contraseña",
 	"confirm-new-password": "confirmar nueva contraseña",
 	"select-language": "Seleccionar idioma",
