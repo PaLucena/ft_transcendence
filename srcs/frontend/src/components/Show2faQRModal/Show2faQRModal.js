@@ -6,7 +6,6 @@ export function showQRmodal(qrpath){
 	const overlayElement = document.getElementById('customOverlay');
 	var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
 	const csrftoken = getCSRFToken('csrftoken');
-	console.log(qrpath)
 	fetch("/api/media/" + qrpath, {
 		method: "GET",
 		credentials: 'include',

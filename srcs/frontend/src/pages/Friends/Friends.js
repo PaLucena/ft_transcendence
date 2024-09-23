@@ -8,7 +8,6 @@ import { UISetup } from './UISetup.js';
 
 export class Friends extends Component {
 	constructor(params = {}) {
-		console.log('Friends Constructor');
 		super('/pages/Friends/friends.html', params)
 
 		this.filter = this.params.filter || 'all';
@@ -19,7 +18,6 @@ export class Friends extends Component {
 	}
 
 	destroy() {
-		console.log('Friends Custom destroy');
 
 		this.removeAllEventListeners();
 		this.uiSetup.removeOnlineUpdateListeners();

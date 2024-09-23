@@ -69,7 +69,6 @@ export class ChatLoader {
             });
 
             await handleResponse(response, data => {
-                console.log(data);
 
                 try {
                     this.chatModal.chatRenderer.renderInviteModal();

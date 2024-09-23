@@ -6,7 +6,6 @@ import { UISetup } from './UISetup.js';
 
 export class ChatModal extends Component {
     constructor() {
-        console.log('ChatModal Constructor');
         super('/components/ChatModal/chatmodal.html');
         this.chatSocket = null;
 
@@ -17,7 +16,6 @@ export class ChatModal extends Component {
     }
 
     destroy() {
-        console.log('Chat Custom destroy');
 
         this.webSocketHandler.closeWebSocket();
         this.removeAllEventListeners();

@@ -6,8 +6,6 @@ export class InputController {
         this.controls_mode = controls_mode;
         this.controls_side = controls_side;
 
-        console.log("control: " + this.controls_mode);
-
         this.gameSocket = socket;
         this.controlModule = null;
         this.configureControls();
@@ -16,15 +14,12 @@ export class InputController {
     configureControls() {
         switch (this.controls_mode) {
             case 'local':
-                console.log("Controls for 2 players in same keyboard");
                 this.controlModule = new DualControl(this.execCommands.bind(this));
                 break;
             case 'remote':
-                console.log("Controls for 1 players in remote mode");
                 this.controlModule = new SoloControl(this.execCommands.bind(this), this.controls_side);
                 break;
             case 'AI':
-                console.log("Controls for 1 player with AI opponent");
                 this.controlModule = new SoloControl(this.execCommands.bind(this), this.controls_side);
                 break;
             default:

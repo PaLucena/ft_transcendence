@@ -6,12 +6,10 @@ import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 
 export class Signup extends Component {
 	constructor() {
-		console.log('Signup Constructor');
 		super('/pages/Signup/signup.html');
 	}
 
 	destroy() {
-		console.log("Signup Custom destroy");
 		this.removeAllEventListeners();
     }
 
@@ -21,6 +19,8 @@ export class Signup extends Component {
 
 	initSubmitForm() {
 		const signup_form = document.getElementById('signup_form')
+
+		signup_form.querySelector('input').focus();
 
 		this.addEventListener(signup_form, 'submit', (event) => {
 			let password = $('#password').val();

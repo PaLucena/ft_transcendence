@@ -6,13 +6,10 @@ import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 
 export class Tournament extends Component {
 	constructor(params = {}) {
-		console.log("Tournament Constructor");
-		console.log("Tournament params:", params);
 		super('/pages/Tournament/tournament.html', params);
 	}
 
 	destroy() {
-		console.log("Tournament Custom destroy");
 		this.removeAllEventListeners();
 	}
 
@@ -40,7 +37,7 @@ export class Tournament extends Component {
 		})
 		.then(data => {
 			if (data.code !== null) {
-				document.getElementById('invitationCode').innerHTML = `<span data-i18n='invitation-code'></span>: ${data.code}`;
+				document.getElementById('invitationCode').innerHTML = `<span data-i18n='code'></span>: ${data.code}`;
 				languageSelector.updateLanguage();
 			}
 		})
@@ -71,7 +68,7 @@ export class Tournament extends Component {
 			this.exitTournament(tournamentId);
 		})
 		.catch((error) => {
-			console.log(error);
+			console.log("Error(checkCreator):", error.message);
 		})
 	}
 
@@ -99,7 +96,7 @@ export class Tournament extends Component {
 				customAlert('success', 'Tournament closed', '3000');
 			})
 			.catch((error) => {
-				console.log(error);
+				console.log("Error(closeTournament):", error.message);
 				customAlert('danger', `Error: ` + error.message, '');
 			})
 		});
@@ -125,13 +122,12 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
-				console.log("BLA BLA");
 				
 				tournamentSocket.closeWebSocket();
 				navigateTo('/play');
 			})
 			.catch((error) => {
-				console.log(error);
+				console.log("Error(exitTournament):", error.message);
 				customAlert('danger', `Error: ` + error.message, '');
 			})
 		});
@@ -174,13 +170,11 @@ export class Tournament extends Component {
             }
         })
         .catch((error) => {
-            console.log("Error: ", error);
+            console.log("Error(displayInfo):", error.message);
         });
     }
 
 	static renderPlayers(players) {
-
-		console.log("PLayers: ", players);
 
 		const topHalf = document.querySelector('.top-half');
 		const bottomHalf = document.querySelector('.bottom-half');
@@ -260,7 +254,7 @@ export class Tournament extends Component {
 			<div class="bottom-half d-flex h-60 w-100 m-0 mt-2"></div>
 
             <div class="close-exit-btn-container col-12 d-flex justify-content-center">
-				<div class="close-exit-btn col-4 col-md-2 col-xl-1 gap-2 d-flex justify-content-center">
+				<div class="close-exit-btn col-3 col-sm-2 col-lg-1 gap-2 d-flex justify-content-center">
                 	<button id="closeBtn" data-i18n='close-tournament-button' class="btn btn-primary hide"></button>
                 	<button id="exitBtn" data-i18n='exit-tournament-button' class="btn btn-danger hide"></button>
 				</div>

@@ -7,7 +7,6 @@ import { Component } from "../../scripts/Component.js";
 
 export class Get2faCode extends Component {
 	constructor() {
-		console.log('Get2faCode Constructor');
 		super('/components/Get2faModal/Get2faModal.html')
 	}
 
@@ -68,7 +67,6 @@ export class Get2faCode extends Component {
 				const otpCode = Array.from(inputs).map(input => input.value).join('');
 				const csrftoken = getCSRFToken('csrftoken');
 
-				console.log("Submiting 2fa form to user", username)
 				fetch("/api/2fa/verify-2fa/", {
 					method: "POST",
 					credentials: 'include',

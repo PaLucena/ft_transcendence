@@ -2,7 +2,7 @@
 	<div class="container-user">
 		<div id="userInfo" class="user-info rounded-5 bg-white shadow">
 			<div class="photo row col-10 mx-auto">
-				<div class="profile-photo-container col-4 m-0 d-flex justify-content-center">
+				<div class="profile-photo-container col-4 m-0 d-flex justify-content-bottom">
 					<img id="photoContainer" class="profile-photo rounded-circle h-100 square shadow"/>
 				</div>
 			</div>
@@ -13,8 +13,10 @@
 			<div class="d-flex col-8 mx-auto align-items-center justify-content-center">
 				<p><span id="friendsNbPlaceholder">0</span> <span data-i18n="number-of-friends" id="friendsText"></span></p>
 			</div>
-			<div id="editPlaceholder" class="row col-4 mx-auto d-flex mt-3 justify-content-center"> </div>
-			<div id="profile_bottom_btns" class="profile-bottom-btns row col-12 mx-auto d-flex justify-content-center"> </div>
+			<div id="profile_bottom_btns" class="profile-bottom-btns row col-12 mx-auto d-flex justify-content-center">
+				<div id="editPlaceholder" class="row col-8 col-sm-6 mx-auto d-flex mt-3 justify-content-center"> </div>
+				<div id="logoutPlaceholder" class="row col-8 col-sm-6 mx-auto d-flex mt-3 justify-content-center"> </div>
+			</div>
 		</div>
 		<div id="userEdit" class="user-edit bg-light align-items-center rounded-5 shadow">
 			<form id="editForm" class="edit-form d-flex mt-0 mt-md-5 justify-content-center align-items-center">
@@ -61,20 +63,20 @@
 	<div class="container-stats">
 		<div class="stats row rounded-5 bg-white shadow">
 			<div class="h-10 d-flex justify-content-center align-items-end">
-				<div id="statsSelector" class="btn-group col-6 gap-2">
+				<div id="statsSelector" class="btn-group col-6">
 					<button id="ownStatsBtn" class="btn btn-outline-dark active position-relative" data-i18n="my-stats"></button>
 				</div>
 			</div>
-			<div id="statsPlaceholder" class="both-stats h-90">
+			<div id="statsPlaceholder" class="both-stats h-90 w-100 p-0 d-flex justify-content-center">
 				<div id="ownStatsDisplay" class="h-100 w-100">
-					<div class="stats-own h-100 w-100 gap-4 d-flex justify-content-center align-items-center">
+					<div class="stats-own h-100 w-100 d-flex justify-content-center align-items-center">
 						<div class="col-10">
 							<span data-i18n="win-rate"></span>
 							<div class="progress" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
-								<div id="winRateBar" class="progress-bar" style="width: 25%">25%</div>
+								<div id="winRateBar" class="progress-bar bg-primary" style="width: 25%">25%</div>
 							</div>
 						</div>
-						<ul id="ownStatsList" class="stats-list list-group mt-5 col-8 h-60">
+						<ul id="ownStatsList" class="stats-list list-group col-11 col-md-8 h-60">
 							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 								<div class="col-6 d-flex justify-content-start" data-i18n="total-matches"></div>
 								<div class="col-6 d-flex justify-content-end" id="total_matches"></div>
@@ -103,43 +105,43 @@
 					</div>
 				</div>
 				<div id="friendshipStatsDisplay" class="h-100 w-100 hide">
-					<div class="stats-shared h-100 w-100 gap-4 m-0 d-flex justify-content-center align-items-center">
+					<div class="stats-shared h-100 w-100 d-flex justify-content-center align-items-center">
 						<div class="col-10">
 							<span data-i18n="win-rate"></span>
 							<div class="progress" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
-								<div id="friendshipWinRateBar" class="progress-bar" style="width: 25%">25%</div>
+								<div id="friendshipWinRateBar" class="progress-bar bg-primary" style="width: 25%">25%</div>
 							</div>
 							<div class="d-flex justify-content-center">
 								<div class="col-5 d-flex justify-content-start" data-i18n="you"></div>
 								<div id="friendName" class="col-5 d-flex justify-content-end"></div>
 							</div>
 						</div>
-						<ul id="friendshipStatsList" class="stats-list list-group mt-5 col-8 h-60">
-							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+						<ul id="friendshipStatsList" class="stats-list list-group mt-5 col-11 col-md-8 h-60">
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 								<div class="col-6 d-flex justify-content-start" data-i18n="total-matches"></div>
 								<div class="col-6 d-flex justify-content-end" id="total_matches"></div>
 							</li>
-							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 								<div class="col-6 d-flex justify-content-start" data-i18n="your-wins"></div>
 								<div class="col-6 d-flex justify-content-end" id="player1_wins"></div>
 							</li>
-							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 								<div class="col-6 d-flex justify-content-start" data-i18n="their-wins"></div>
 								<div class="col-6 d-flex justify-content-end" id="player2_wins"></div>
 							</li>
-							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 								<div class="col-6 d-flex justify-content-start" data-i18n="your-total-points"></div>
 								<div class="col-6 d-flex justify-content-end" id="player1_total_goals"></div>
 							</li>
-							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 								<div class="col-6 d-flex justify-content-start" data-i18n="their-total-points"></div>
 								<div class="col-6 d-flex justify-content-end" id="player2_total_goals"></div>
 							</li>
-							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 								<div class="col-6 d-flex justify-content-start" data-i18n="your-average-score"></div>
 								<div class="col-6 d-flex justify-content-end" id="player1_average_goals_per_match"></div>
 							</li>
-							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
 								<div class="col-6 d-flex justify-content-start" data-i18n="their-total-points"></div>
 								<div class="col-6 d-flex justify-content-end" id="player2_average_goals_per_match"></div>
 							</li>

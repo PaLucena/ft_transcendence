@@ -12,12 +12,10 @@ import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRe
 
 export class Profile extends Component {
 	constructor(params = {}) {
-		console.log('Profile Constructor');
 		super('/pages/Profile/profile.html', params);
 	}
 
 	destroy() {
-		console.log("Profile Custom destroy");
 		this.removeAllEventListeners(this.params);
     }
 
@@ -54,8 +52,8 @@ export class Profile extends Component {
 			this.displayUserStats(data["username"]);
 
 			if (myUsername === data["username"]) {
-				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-green text-white" data-i18n='edit-profile'></button>`;
-				document.getElementById("profile_bottom_btns").innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-6" data-i18n='logout'></button>`;
+				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-green text-white col-12" data-i18n='edit-profile'></button>`;
+				document.getElementById("logoutPlaceholder").innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-12" data-i18n='logout'></button>`;
 				setTimeout(() => languageSelector.updateLanguage(), 0);
 				this.editUserBtn(data);
 				this.logout();
@@ -118,6 +116,9 @@ export class Profile extends Component {
 			winRateBar.innerHTML = `${winRate}%`;
 			winRateBar.style.width = `${winRate}%`;
 
+			if (data["match_total_time"] == -1)
+				data["match_total_time"] = 0;
+
 			const liStats = document.querySelectorAll('#ownStatsList li');
 
 			liStats.forEach(liStat => {
@@ -156,7 +157,7 @@ export class Profile extends Component {
 			});
 		})
 		.catch(error => {
-			console.log("Error(displayUserStats):", error);
+			console.log("Error(displayFriendshipStats):", error);
 		})
 	}
 
@@ -264,6 +265,7 @@ export class Profile extends Component {
 				document.getElementById("userInfo").style.display = "block";
 				document.getElementById("userEdit").style.display = "none";
 				this.displayUserInfo(username);
+				editForm.reset();
 				setTimeout(() => languageSelector.updateLanguage(), 0);
 			})
 			.catch((error) => {

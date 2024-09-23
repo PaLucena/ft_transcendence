@@ -7,7 +7,6 @@ async function main() {
     const Pong = await ethers.getContractFactory("PongTournament");
     const pong = await Pong.deploy();
     const address = await pong.getAddress();
-    console.log("Contract deployed to address:", address);
 
     const contractName = 'PongTournament';
     const artifactsPath = path.join('artifacts', 'contracts', `${contractName}.sol`, `${contractName}.json`);

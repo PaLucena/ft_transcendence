@@ -8,11 +8,9 @@ import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 export class Play extends Component {
 	constructor() {
 		super('/pages/Play/play.html');
-		console.log('Play Constructor');
 	}
 
 	destroy() {
-		console.log("Play Custom destroy");
 		tournamentSocket.closeWebSocket();
 		this.removeAllEventListeners();
 	}
@@ -26,34 +24,6 @@ export class Play extends Component {
 		Navbar.focus();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
-
-	// createTournamentWebSocket(tournament_name) {
-	// 	console.log("tournament_name: ", tournament_name);
-
-	// 	try {
-	// 		this.t_socket = new WebSocket(`ws/tournament/${tournament_name}/`)
-	// 	} catch (error) {
-	// 		this.handleError(null, 'Failed to create WebSocket');
-	// 		customAlert('danger', 'Failed to connect', 5000);
-	// 		return;
-	// 	}
-
-	// 	this.t_socket.onopen = () => {
-	// 		console.log("Connection established");
-	// 	};
-
-	// 	this.t_socket.onclose = (event) => {
-	// 		if (event.wasClean) {
-	// 			console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-	// 		} else {
-	// 			console.log('Connection died');
-	// 		}
-	// 	}
-
-	// 	this.t_socket.onerror = (error) => {
-	// 		console.log(`Error: ${error.message}`);
-	// 	}
-	// }
 
 	setupEventListeners() {
 		const	oneVSoneBtn = document.getElementById("oneVSoneBtn");

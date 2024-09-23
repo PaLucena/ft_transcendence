@@ -6,7 +6,6 @@ import { userSocket } from "../../scripts/utils/UserWebsocket.js";
 
 export class Auth extends Component {
 	constructor() {
-		console.log('Auth Constructor');
 		super("/pages/Auth/auth.html")
 	}
 
@@ -17,8 +16,6 @@ export class Auth extends Component {
 	getApiToken() {
 		const urlParams = new URLSearchParams(window.location.search);
 		const code = urlParams.get('code');
-
-		console.log("code: ", code)
 
 		fetch("/api/42api-login/", {
 			method: 'POST',
@@ -38,7 +35,6 @@ export class Auth extends Component {
 			return response.json()
 		})
 		.then(data => {
-			console.log("Initializing websocket for user", data["username"]);
 			userSocket.initWebSocket(data["username"]);
 			navigateTo("/play");
 		})

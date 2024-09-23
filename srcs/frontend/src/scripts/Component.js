@@ -61,7 +61,6 @@ export class Component {
 	}
 
     destroy() {
-        console.log(`Destroying ${this.constructor.name}`);
         this.removeAllEventListeners();
     }
   }
