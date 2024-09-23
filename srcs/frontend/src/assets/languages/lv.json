@@ -33,6 +33,7 @@
 	"username": "lietotājvārds",
 	"avatar": "avatārs",
 	"change-password": "Mainīt paroli",
+	"current-password": "pašreizējā parole",
 	"new-password": "jauna parole",
 	"confirm-new-password": "apstiprināt jauno paroli",
 	"select-language": "Izvēlēties valodu",
