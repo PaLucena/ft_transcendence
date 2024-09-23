@@ -78,19 +78,26 @@ class UserWebsocket {
                     chatModalInstance.uiSetup.stopTimer();
 
                     chatModalInstance.uiSetup.setupTimer(15, () => {
-                        console.log("Closing the modal...");
                         chatModalInstance.chatRenderer.hideInviteModal();
                     });
                     break;
                 case 'accept':
-                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players, data.current_user);
+                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players);
+
+                    const playerStatuses = data.players.map(player => player.status);
+                    if (playerStatuses.every(status => status === 1)) {
+                        chatModalInstance.uiSetup.setupTimer(1, () => {
+                            chatModalInstance.chatRenderer.hideInviteModal();
+                            console.log("йцуйцу");
+                        });
+                    }
                     break ;
                 case 'reject':
-                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players, data.current_user);
+                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players);
                     chatModalInstance.uiSetup.stopTimer();
 
                     chatModalInstance.uiSetup.setupTimer(1, () => {
-                        console.log("Closing the modal...");
+
                         chatModalInstance.chatRenderer.hideInviteModal();
                     });
                     break;

@@ -272,10 +272,11 @@ export class ChatRenderer {
             const container = document.getElementById('match_waiting_modal_container');
 
 			if (container) {
-				this.renderModalLayout1x1();
+				this.renderModalLayout1x1(data.current_user);
 				this.renderUsers1x1(data.players, data.current_user);
 				this.renderButtons1x1();
-				this.updateStatusClasses1x1(data.players, data.current_user, data.group_name)
+
+				this.updateStatusClasses1x1(data.players)
 
 				this.chatModal.uiSetup.setupButtons1x1(data.group_name);
 			} else {
@@ -307,12 +308,12 @@ export class ChatRenderer {
         }
     }
 
-	renderModalLayout1x1() {
+	renderModalLayout1x1(current_user) {
 		const container = document.getElementById('match_waiting_modal_container');
 
 		if (container) {
 			container.innerHTML = `
-				<div id="match_waiting_modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+				<div id="match_waiting_modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true" data-current-user-1x1="${current_user}">
 					<div class="modal-bg">
 						<div class="modal-dialog modal-dialog-centered">
 							<div class="modal-content">
@@ -405,7 +406,7 @@ export class ChatRenderer {
 	}
 
 
-	renderButtons1x1() {
+	renderButtons1x1(current_user) {
 		const buttonsContainer = document.getElementById('match_waiting_buttons_container');
 
 		if (buttonsContainer) {
@@ -416,9 +417,11 @@ export class ChatRenderer {
 		}
 	}
 
-	updateStatusClasses1x1(players, current_user) {
+	updateStatusClasses1x1(players) {
 		const modalContainer = document.getElementById('match_waiting_modal');
 		if (!modalContainer) return;
+
+		const current_user = modalContainer.getAttribute('data-current-user-1x1');
 
 		const playerContainers = modalContainer.querySelectorAll('.player-container');
 		const modalContent = modalContainer.querySelector('.modal-content');
@@ -448,7 +451,6 @@ export class ChatRenderer {
 			}
 		});
 	}
-
 
 
 	removeBlockStatusMessage() {
