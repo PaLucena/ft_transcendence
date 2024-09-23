@@ -228,7 +228,7 @@ def block_or_unblock_user_view(request):
 @default_authentication_required
 def create_invite(request, username):
     try:
-        invitation_lifetime = 15
+        invitation_lifetime = 20
 
         if request.user.username == username:
             return Response(
@@ -285,7 +285,7 @@ def create_invite(request, username):
         )
 
 
-def delete_invite_room_after_delay(room_id, delay=15):
+def delete_invite_room_after_delay(room_id, delay=20):
     def delete_invite_room():
         try:
             invite_room = InviteRoom.objects.get(id=room_id)
