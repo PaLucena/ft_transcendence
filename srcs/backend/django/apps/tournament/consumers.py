@@ -16,7 +16,7 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
                 self.tournamentroom_name, self.channel_name
             )
             await self.channel_layer.group_add(
-                self.user, self.channel_name
+                self.userroom_name, self.channel_name
             )
             await self.send_tournament_users_list(self.tournament_name)
 
@@ -87,7 +87,8 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    async def send_goto_game(self, userId1_room, userId2_room):
+    @staticmethod
+    async def send_goto_game(userId1_room, userId2_room):
         event = {
             "type": "goto_game",
             "goto_game": True,

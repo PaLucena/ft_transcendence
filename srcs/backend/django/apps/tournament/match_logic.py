@@ -5,6 +5,7 @@ from ponggame.game_manager import game_manager
 import asyncio
 from asgiref.sync import sync_to_async
 from .consumers import TournamentConsumer
+from channels.layers import get_channel_layer
 
 
 async def start_all_matches(tournament, matches):
@@ -21,11 +22,18 @@ async def start_all_matches(tournament, matches):
 		for match in matches
 	]
 
+	channel_layer = get_channel_layer()
+
 	for match in matches:
 		userId1_room = f"channel_{match['player_1_id']}"
 		userId2_room = f"channel_{match['player_2_id']}"
-		await TournamentConsumer.send_goto_game(userId1_room, userId2_room)
-
+		event = {
+			"type": "game_notification",
+			"action": "goto_game",
+			"goto_game": True,
+		}
+		await channel_layer.group_send(userId1_room, event)
+		await channel_layer.group_send(userId2_room, event)
 
 	print("HERE 2")
 	for task in asyncio.as_completed(match_tasks):
