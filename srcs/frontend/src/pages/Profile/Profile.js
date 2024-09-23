@@ -264,6 +264,7 @@ export class Profile extends Component {
 				document.getElementById("userInfo").style.display = "block";
 				document.getElementById("userEdit").style.display = "none";
 				this.displayUserInfo(username);
+				setTimeout(() => languageSelector.updateLanguage(), 0);
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');

@@ -7,19 +7,31 @@ export class languageSelector extends Component {
 	}
 
 	init() {
-		languageSelector.updateLanguage()
+		this.currentLanguage = "en";
+		languageSelector.updateLanguage();
+		languageSelector.checkLanguage();
 	}
 
 	static async updateLanguage() {
-		const response = await fetch('/api/get_user_language', {
-			method: 'GET',
-			credentials: 'include'
-		})
+		try {
+			const response = await fetch('/api/get_user_language', {
+				method: 'GET',
+				credentials: 'include'
+			})
+			const data = await response.json();
+			
+			this.currentLanguage = data.language.toLowerCase();
+			languageSelector.checkLanguage();
+		}
+		catch(error) {
+			console.log("Error(updateLanguage):", error.message);
+		}
+	}
 
-		const data = await response.json();
-
-		document.documentElement.lang = data.language.toLowerCase();
-		const langData = await this.fetchLanguageData(data.language.toLowerCase())
+	static async checkLanguage() {
+		console.log("Current language:", this.currentLanguage);
+		document.documentElement.lang = this.currentLanguage;
+		const langData = await this.fetchLanguageData(this.currentLanguage)
 		this.updateContent(langData);
 	}
 
