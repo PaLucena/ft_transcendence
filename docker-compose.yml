@@ -132,3 +132,7 @@ networks:
   transcendence_net:
     name: transcendence_net
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16
+          gateway: 172.23.0.1
