@@ -244,37 +244,25 @@ def create_invite(request, username):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        existing_invite = (
-            InviteRoom.objects.filter(
-                invite_users__user__in=[request.user, other_user],
-                invite_users__status=0,
-            )
-            .distinct()
-            .first()
-        )
-
         current_time = timezone.now()
 
-        if existing_invite:
-            time_remaining = (existing_invite.expires_at - current_time).total_seconds()
+        active_invites = InviteRoom.objects.filter(
+            invite_users__user__in=[request.user, other_user],
+        ).distinct()
+
+        for invite in active_invites:
+            time_remaining = (invite.expires_at - current_time).total_seconds()
 
             if time_remaining <= 0:
-                existing_invite.delete()
-                return Response(
-                    {"detail": "The invitation has expired. Try again."},
-                    status=status.HTTP_410_GONE,
-                )
+                invite.delete()
 
-            if time_remaining > 0:
-                return Response(
-                    {
-                        "detail": f"You need to wait {int(time_remaining)} seconds to send this user another request."
-                    },
-                    status=status.HTTP_409_CONFLICT,
-                )
+        if active_invites.exists():
+            return Response(
+                {"detail": "One of the users is already in an active invitation."},
+                status=status.HTTP_409_CONFLICT,
+            )
 
         expires_at = current_time + timezone.timedelta(seconds=invitation_lifetime)
-
         invite_room = InviteRoom.objects.create(
             group_name=f"invite_1x1_{request.user.username}_to_{other_user.username}",
             expires_at=expires_at,
