@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
-import hashlib
 from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,10 +29,7 @@ AUTH_USER_MODEL = "user.AppUser"
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
-# def generate_secret_key():
-#     return hashlib.sha256(os.urandom(64)).hexdigest()
 
-# SECRET_KEY = generate_secret_key()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -79,7 +75,6 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # 	'user.middleware.UpdateLastSeenMiddleware',
     "django_otp.middleware.OTPMiddleware",
 ]
 ROOT_URLCONF = "core.urls"
@@ -120,10 +115,6 @@ CACHES = {
         },
     }
 }
-
-# AUTHENTICATION_BACKENDS = [
-#     'django.contrib.auth.backends.ModelBackend',  # Default backend
-# ]
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -219,9 +210,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
     "https://localhost:8080",
 ]
-
-# CORS_ALLOW_CREDENTIALS = True
-# CORS_ORIGIN_ALLOW_ALL = True
 
 
 CSRF_TRUSTED_ORIGINS = [

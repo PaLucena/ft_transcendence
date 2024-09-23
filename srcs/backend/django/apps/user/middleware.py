@@ -20,7 +20,6 @@ class JWTAuthMiddleware:
 			cookies = headers[b'cookie'].decode('utf-8')
 			cookies = dict(item.split("=") for item in cookies.split("; "))
 			session_id = cookies.get('sessionid')
-			print(f"Session ID: {session_id}")
 			if session_id:
 				try:
 					session = await sync_to_async(Session.objects.get, thread_sensitive=True)(session_key=session_id)
@@ -50,7 +49,6 @@ class UpdateLastSeenMiddleware:
 	def __call__(self, request) -> Any:
 		response = self.get_response(request)
 		if request.user.is_authenticated:
-			print("5 USER IN MIDDLEWARE: ")
 			User = get_user_model()
 			user = User.objects.get(username=request.user)
 			user.last_seen = timezone.now()

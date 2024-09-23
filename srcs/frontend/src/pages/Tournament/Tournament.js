@@ -125,8 +125,6 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
-				console.log("BLA BLA");
-				
 				tournamentSocket.closeWebSocket();
 				navigateTo('/play');
 			})

@@ -36,7 +36,6 @@ from friends.models import Friend
 @default_authentication_required
 def check_auth(request):
 	user = request.user
-	print("USER: ", user)
 	return Response({"authenticated": user.is_authenticated}, status=status.HTTP_200_OK)
 
 
@@ -265,29 +264,15 @@ def update_user_info(request):
 			user.save()
 			request.session.flush()
 			auth_logout(request)
+			auth_login(request, user)
 
 		if language and user.language != language:
 			user.language = language
 
 		user.save()
-		#user.refresh_from_db()
-		#request.session.flush()
-		#auth_logout(request)
-		# authenticated_user = authenticate(
-		#     username=new_username, password=new_password
-		# )
-		# if authenticated_user is not None:
-		#     user = AppUser.objects.get(username=new_username)
-		#     user.save()
-
-		#auth_login(request, user)
-		#update_session_auth_hash(request, user)
-		#user_logged_in.send(sender=user.__class__, request=request, user=user)
-
 		response = Response(
 			{"message": "User info updated successfully."}, status=status.HTTP_201_CREATED
 		)
-
 		return response
 	except Exception as e:
 		return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)

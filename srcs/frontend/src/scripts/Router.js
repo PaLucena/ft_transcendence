@@ -38,11 +38,8 @@ class Router {
 	}
 
 	async navigateTo(url) {
-		console.log(123123);
 		
-		if (this.previousPath !== url) {
-			console.log("qwewqe");
-			
+		if (this.previousPath !== url) {			
 			window.history.pushState({}, "", url);
 			this.router();
 		}
@@ -80,7 +77,6 @@ class Router {
 
 		if (isProtectedRoute) {
 			const isAuthenticated = await this.checkAuthentication(matchedRoute);
-			console.log("HERE:", isAuthenticated);
 			await fetch("/api/2fa/check2fa/", {
 					method: "GET",
 					credentials: 'include',
@@ -94,7 +90,6 @@ class Router {
 					return response.json();
 				})
 				.then(data => {
-					console.log("data es", data)
 					if (data["has2faEnabled"] == false) {
 						if (!isAuthenticated) {
 							this.navigateTo("/login");
