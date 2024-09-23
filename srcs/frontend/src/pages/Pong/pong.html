@@ -1,18 +1,18 @@
 <div class="container containerPong">
 	<div class="score-bar">
 		<div class="player-container player-1-container">
-			<div class="player-name player-1-name"><h1>name</h1></div>
+			<div class="player-name player-1-name"></div>
 			<img class="player-avatar player-1-avatar" src="../../assets/images/default_avatar.jpg" alt="avatar 1">
 			<h1 class="player-score player-1-score">0</h1>
 		</div>
 		<div class="central-container">
-			<div><h1>Score</h1></div>
+			<div><h1 data-i18n="score"></h1></div>
 			<div class="win-info">6 (dif.2)</div>
 		</div>
 		<div class="player-container player-2-container">
 			<h1 class="player-score player-2-score">0</h1>
 			<img class="player-avatar player-2-avatar" src="../../assets/images/default_avatar.jpg" alt="avatar 2">
-			<div class="player-name player-2-name"><h1>name</h1></div>
+			<div class="player-name player-2-name"></div>
 		</div>
 	</div>
 	<div class="board">
@@ -24,18 +24,20 @@
 		<div class="board-info">
 			<div class="board-message">
 				<div class="message-line-super"></div>
-				<div class="message-line-main">Press to Start</div>
+				<div class="message-line-main"></div>
 				<div class="message-line-center"></div>
 				<div class="message-line-sub-1"></div>
 				<div class="message-line-sub-2"></div>
 			</div>
 			<div class="controls-info">
-				<div class="controls-1">W(up)<br>S(down)<br><br>press "space"</div>
-				<div class="controls-2">Arrow Up<br>Arrow Down<br><br>press "enter"</div>
+				<div class="controls-1">
+					W(<span data-i18n="up"></span>)<br>S(<span data-i18n="down"></span>)<br><br><span data-i18n="press-space"></span>
+				</div>
+				<div class="controls-2"><span data-i18n="arrow-up"></span><br><span data-i18n="arrow-down"></span><br><br><span data-i18n="press-enter"></span></div>
 			</div>
 		</div>
 		<div class="game-over">
-			<div class="button-return" id="button-return">back</div>
+			<div class="button-return" id="button-return" data-i18n="back"></div>
 		</div>
 		<div class="quit">
 			<img id="button-quit" class="button-quit" src="../../assets/images/quit.png" alt="exit">
@@ -44,16 +46,15 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title text-light">Quitting match</h5>
+						<h5 class="modal-title text-light" data-i18n="quitting-match"></h5>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
-					<div class="modal-body d-flex justify-content-center text-light">
-						Are you sure?
-						<br>
-						You will lose this match
+					<div class="modal-body text-light">
+						<div class="d-flex justify-content-center align-items-center h-50" data-i18n="are-you-sure"></div>
+						<div class="d-flex justify-content-center align-items-center h-50" data-i18n="you-will-lose"></div>
 					</div>
 					<div class="modal-footer d-flex justify-content-center">
-						<button id="button-confirm-quit" class="btn btn-danger text-light">Quit</button>
+						<button id="button-confirm-quit" class="btn btn-danger text-light" data-i18n="quit"></button>
 					</div>
 				</div>
 			</div>

@@ -11,50 +11,50 @@
 				<div id="chatBtnPlaceholder"></div>
 			</div>
 			<div class="d-flex col-8 mx-auto align-items-center justify-content-center">
-				<p><span id="friendsNbPlaceholder">0</span> <span id="friendsText">friends</span></p>
+				<p><span id="friendsNbPlaceholder">0</span> <span data-i18n="number-of-friends" id="friendsText"></span></p>
 			</div>
 			<div id="editPlaceholder" class="row col-4 mx-auto d-flex mt-3 justify-content-center"> </div>
-			<div id="profile_bottom_btns"  class="profile-bottom-btns row col-12 mx-auto d-flex justify-content-center"> </div>
+			<div id="profile_bottom_btns" class="profile-bottom-btns row col-12 mx-auto d-flex justify-content-center"> </div>
 		</div>
 		<div id="userEdit" class="user-edit bg-light align-items-center rounded-5 shadow">
 			<form id="editForm" class="edit-form d-flex mt-0 mt-md-5 justify-content-center align-items-center">
 				<div class="col-9 form-floating mt-3">
 					<input type="text" class="form-control" id="new_username" name="new_username" placeholder="" autocomplete="username">
-					<label for="new_username">username</label>
+					<label for="new_username" data-i18n="username"></label>
 				</div>
 				<div class="col-9 form-floating mt-3">
 					<input type="file" class="form-control" id="avatar" name="avatar" placeholder="avatar">
-					<label for="avatar">avatar</label>
+					<label for="avatar" data-i18n="avatar"></label>
 				</div>
 				<div class="col-9 form-floating mt-3">
 					<input type="password" class="form-control" id="old_password" name="old_password" placeholder="" autocomplete="current-password" data-bs-toggle="collapse" data-bs-target="#collapse">
-					<label for="old_password" id="oldPasswordLabel">Change password</label>
+					<label for="old_password" id="oldPasswordLabel" data-i18n="change-password"></label>
 				</div>
 				<div class="collapse col-9" id="collapse">
 					<div class="form-floating mt-3">
 						<input type="password" class="form-control" id="new_password" name="new_password" placeholder="" autocomplete="new-password">
-						<label for="new_password">new password</label>
+						<label for="new_password" data-i18n="new-password"></label>
 					</div>
 					<div class="form-floating mt-3">
 						<input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="" autocomplete="new-password">
-						<label for="confirm_password">confirm new password</label>
+						<label for="confirm_password" data-i18n="confirm-new-password"></label>
 					</div>
 				</div>
 				<div class="col-9 mt-3">
 					<select id="language_selector" class="form-select col-8" aria-label="Default select example">
-						<option selected>Select language</option>
+						<option data-i18n="select-language" selected></option>
 						<option value="EN">English</option>
-						<option value="ES">Spanish</option>
-						<option value="LV">Latvian</option>
+						<option value="ES">Español</option>
+						<option value="LV">Latviski</option>
 					</select>
 				</div>
 			</form>
 			<div id="2faButtonPlaceholder" class="row col-8 mx-auto d-flex mt-4 justify-content-center">
-				<button class="btn btn-dark hide" id="Enable2faBtn">ENABLE 2FA</button>
-				<button class="btn btn-danger hide" id="Disable2faBtn">DISABLE 2FA</button>
+				<button class="btn btn-dark hide" id="Enable2faBtn" data-i18n="enable-twofactor"></button>
+				<button class="btn btn-danger hide" id="Disable2faBtn" data-i18n="enable-twofactor"></button>
 			</div>
 			<div id="saveInfo" class="d-flex col mt-4 mb-3 justify-content-center">
-				<button type="submit" form="editForm" class="btn btn-primary col-10">SAVE</button>
+				<button type="submit" form="editForm" class="btn btn-primary col-10" data-i18n="save-data"></button>
 			</div>
 		</div>
 	</div>
@@ -62,36 +62,42 @@
 		<div class="stats row rounded-5 bg-white shadow">
 			<div class="h-10 d-flex justify-content-center align-items-end">
 				<div id="statsSelector" class="btn-group col-6 gap-2">
-					<button id="ownStatsBtn" class="btn btn-outline-dark active position-relative">
-						My stats
-					</button>
+					<button id="ownStatsBtn" class="btn btn-outline-dark active position-relative" data-i18n="my-stats"></button>
 				</div>
 			</div>
 			<div id="statsPlaceholder" class="both-stats h-90">
 				<div id="ownStatsDisplay" class="h-100 w-100">
 					<div class="stats-own h-100 w-100 gap-4 d-flex justify-content-center align-items-center">
 						<div class="col-10">
-							Win Rate
+							<span data-i18n="win-rate"></span>
 							<div class="progress" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
 								<div id="winRateBar" class="progress-bar" style="width: 25%">25%</div>
 							</div>
 						</div>
 						<ul id="ownStatsList" class="stats-list list-group mt-5 col-8 h-60">
 							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Total matches</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="total-matches"></div>
 								<div class="col-6 d-flex justify-content-end" id="total_matches"></div>
 							</li>
 							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Total points</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="total-points"></div>
 								<div class="col-6 d-flex justify-content-end" id="total_goals"></div>
 							</li>
 							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Average score</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="average-score"></div>
 								<div class="col-6 d-flex justify-content-end" id="average_score"></div>
 							</li>
 							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Highest score</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="highest-score"></div>
 								<div class="col-6 d-flex justify-content-end" id="highest_score"></div>
+							</li>
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start" data-i18n="max-hits"></div>
+								<div class="col-6 d-flex justify-content-end" id="max_hits"></div>
+							</li>
+							<li class="list-group-item d-flex h-25 justify-content-center align-items-center">
+								<div class="col-6 d-flex justify-content-start" data-i18n="match-total-time"></div>
+								<div class="col-6 d-flex justify-content-end" id="match_total_time"></div>
 							</li>
 						</ul>
 					</div>
@@ -99,42 +105,42 @@
 				<div id="friendshipStatsDisplay" class="h-100 w-100 hide">
 					<div class="stats-shared h-100 w-100 gap-4 m-0 d-flex justify-content-center align-items-center">
 						<div class="col-10">
-							Win Rate
+							<span data-i18n="win-rate"></span>
 							<div class="progress" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
 								<div id="friendshipWinRateBar" class="progress-bar" style="width: 25%">25%</div>
 							</div>
 							<div class="d-flex justify-content-center">
-								<div class="col-5 d-flex justify-content-start">You</div>
+								<div class="col-5 d-flex justify-content-start" data-i18n="you"></div>
 								<div id="friendName" class="col-5 d-flex justify-content-end"></div>
 							</div>
 						</div>
 						<ul id="friendshipStatsList" class="stats-list list-group mt-5 col-8 h-60">
 							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Total matches</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="total-matches"></div>
 								<div class="col-6 d-flex justify-content-end" id="total_matches"></div>
 							</li>
 							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Your wins</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="your-wins"></div>
 								<div class="col-6 d-flex justify-content-end" id="player1_wins"></div>
 							</li>
 							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Their wins</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="their-wins"></div>
 								<div class="col-6 d-flex justify-content-end" id="player2_wins"></div>
 							</li>
 							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Your total points</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="your-total-points"></div>
 								<div class="col-6 d-flex justify-content-end" id="player1_total_goals"></div>
 							</li>
 							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Their total points</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="their-total-points"></div>
 								<div class="col-6 d-flex justify-content-end" id="player2_total_goals"></div>
 							</li>
 							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Your average score</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="your-average-score"></div>
 								<div class="col-6 d-flex justify-content-end" id="player1_average_goals_per_match"></div>
 							</li>
 							<li class="list-group-item d-flex h-15 justify-content-center align-items-center">
-								<div class="col-6 d-flex justify-content-start">Their average score</div>
+								<div class="col-6 d-flex justify-content-start" data-i18n="their-total-points"></div>
 								<div class="col-6 d-flex justify-content-end" id="player2_average_goals_per_match"></div>
 							</li>
 						</ul>
@@ -149,7 +155,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="imageModalLabel">2FA CODE</h5>
+				<h5 class="modal-title" id="imageModalLabel" data-i18n="twofactor-code"></h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">

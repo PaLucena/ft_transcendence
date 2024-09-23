@@ -63,8 +63,7 @@ def calculate_player_statistics(matches, player_id):
 		'average_score': 0,
 		'highest_score': 0,
 		'total_goals': 0,
-		'player_1_max_hits': 0,
-		'player_2_max_hits': 0,
+		'max_hits': 0,
 		'match_total_time': -1
 	}
 
@@ -85,9 +84,11 @@ def calculate_player_statistics(matches, player_id):
 		if player_1_id == player_id:
 			player_goals = player_1_goals
 			opponent_goals = player_2_goals
+			stats['max_hits'] = player_1_hits
 		elif player_2_id == player_id:
 			player_goals = player_2_goals
 			opponent_goals = player_1_goals
+			stats['max_hits'] = player_2_hits
 		else:
 			continue
 
@@ -104,13 +105,6 @@ def calculate_player_statistics(matches, player_id):
 
 		if player_goals > stats['highest_score']:
 			stats['highest_score'] = player_goals
-
-		if player_1_hits > stats['player_1_max_hits']:
-			stats['player_1_max_hits'] = player_1_hits
-
-		if player_2_hits > stats['player_2_max_hits']:
-			stats['player_2_max_hits'] = player_2_hits
-
 
 	if stats['total_matches'] > 0:
 		stats['average_score'] = total_goals / stats['total_matches']

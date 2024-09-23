@@ -68,6 +68,8 @@ class GameLogic:
         self.player_1_channel = None
         self.player_2_channel = None
 
+        self.pad_vertical = False
+
 
     def move_ball(self):
         try:
@@ -98,26 +100,37 @@ class GameLogic:
     def check_collision(self):
         try:
             # Check collision with walls
-            if self.ball_y - self.BALL_RADIUS <= 0 or self.ball_y + self.BALL_RADIUS >= self.TABLE_HEIGHT:
-                self.ball_dir_y *= -1
+            if self.ball_y - self.BALL_RADIUS < 0:
+                self.ball_dir_y = abs(self.ball_dir_y)
+            elif self.ball_y + self.BALL_RADIUS >= self.TABLE_HEIGHT:
+                self.ball_dir_y = -abs(self.ball_dir_y)
 
             # Check collision with pads
-            if (self.pad_1_x >= self.ball_x - self.BALL_RADIUS >= self.pad_1_x - self.PADDLE_WIDTH and
-                    self.pad_1_y - self.PADDLE_HEIGHT / 2 <= self.ball_y <= self.pad_1_y + self.PADDLE_HEIGHT / 2 and
-                    self.ball_dir_x < 0):
-                self.new_angle(1)
-                self.ball_vel_y += self.BALL_SPEED_INC
-                self.ball_vel_x += self.BALL_SPEED_INC
-                self.player_1_hits += 1
-                self.new_direction = True
-            elif (self.pad_2_x <= self.ball_x + self.BALL_RADIUS <= self.pad_2_x + self.PADDLE_WIDTH and
-                  self.pad_2_y - self.PADDLE_HEIGHT / 2 <= self.ball_y <= self.pad_2_y + self.PADDLE_HEIGHT / 2 and
-                  self.ball_dir_x > 0):
-                self.new_angle(2)
-                self.ball_vel_y += self.BALL_SPEED_INC
-                self.ball_vel_x += self.BALL_SPEED_INC
-                self.player_2_hits += 1
-                self.new_direction = True
+            if self.pad_1_x >= self.ball_x - self.BALL_RADIUS:
+                if (self.pad_1_y - self.PADDLE_MID_HEIGHT <= self.ball_y + self.BALL_RADIUS and
+                        self.pad_1_y + self.PADDLE_MID_HEIGHT >= self.ball_y - self.BALL_RADIUS):
+                    if self.ball_x - self.BALL_RADIUS >= self.pad_1_x - self.ball_vel_x:
+                        self.new_angle(1)
+                        self.ball_vel_y += self.BALL_SPEED_INC
+                        self.ball_vel_x += self.BALL_SPEED_INC
+                        self.player_1_hits += 1
+                        self.new_direction = True
+                    elif self.ball_x - self.BALL_RADIUS <= self.pad_1_x + self.PADDLE_WIDTH and not self.pad_vertical:
+                        self.ball_dir_y *= -1
+                        self.pad_vertical = True
+            elif self.pad_2_x <= self.ball_x + self.BALL_RADIUS:
+                if (self.pad_2_y - self.PADDLE_MID_HEIGHT <= self.ball_y + self.BALL_RADIUS and
+                        self.pad_2_y + self.PADDLE_MID_HEIGHT >= self.ball_y - self.BALL_RADIUS):
+                    if self.ball_x + self.BALL_RADIUS <= self.pad_2_x + self.PADDLE_WIDTH + self.ball_vel_x:
+                        self.new_angle(2)
+                        self.ball_vel_y += self.BALL_SPEED_INC
+                        self.ball_vel_x += self.BALL_SPEED_INC
+                        self.player_2_hits += 1
+                        self.new_direction = True
+                    elif self.ball_x + self.BALL_RADIUS >= self.pad_2_x and not self.pad_vertical:
+                        self.ball_dir_y *= -1
+                        self.pad_vertical = True
+
         except Exception as e:
             print(f"Error checking collision: {e}")
 
@@ -159,6 +172,7 @@ class GameLogic:
         self.ball_dir_x = -1 if random.uniform(0, 1) <= 0.5 else 1
         self.ball_dir_y = -1 if random.uniform(0, 1) <= 0.5 else 1
         self.new_direction = True
+        self.pad_vertical = False
 
     def end_game(self):
         if (self.player_1_goals >= self.GOALS_TO_WIN and

@@ -166,18 +166,21 @@ def login(request):
 
 @api_view(["POST"])
 def loginWith2fa(request):
-    user = request.data.get("username")
-    print("username is", user["username"])
-    user = AppUser.objects.get(username=user["username"])
-    auth_login(request, user)
-    twofactor_refresh = RefreshToken.for_user(user)
-    twofactor_access = twofactor_refresh.access_token
-    response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-    response.set_cookie("twofactor_refresh_token", str(twofactor_refresh), httponly=True, secure=True)
-    response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
-    print("Access Token for 2FA Expiry:", twofactor_access["exp"])
-    print("Refresh Token for 2FA Expiry:", twofactor_refresh["exp"])
-    return response
+	username = request.data.get("username")
+	password = request.data.get("password")
+	authenticated_user = authenticate(username=username, password=password)
+	if authenticated_user is not None:
+		user = AppUser.objects.get(username=username)
+		auth_login(request, user)
+		user.save()
+		twofactor_refresh = RefreshToken.for_user(user)
+	twofactor_access = twofactor_refresh.access_token
+	response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+	response.set_cookie("twofactor_refresh_token", str(twofactor_refresh), httponly=True, secure=True)
+	response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
+	print("Access Token for 2FA Expiry:", twofactor_access["exp"])
+	print("Refresh Token for 2FA Expiry:", twofactor_refresh["exp"])
+	return response
 
 
 # ...

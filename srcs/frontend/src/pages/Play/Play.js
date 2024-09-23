@@ -1,6 +1,7 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 
@@ -19,10 +20,11 @@ export class Play extends Component {
 	async init() {
 		this.checkRunningTournaments()
 		.then(tournamentId => {
-			document.getElementById("tournamentBtn").innerHTML = tournamentId ? "<h1>Back to tournament</h1>" : "<h1>Tournament</h1>";
+			document.getElementById("tournamentBtn").innerHTML = tournamentId ? "<h1 data-i18n='back-to-tournament-button'></h1>" : "<h1 data-i18n='tournament-button'></h1>";
 		})
 		this.setupEventListeners();
 		Navbar.focus();
+		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
 	// createTournamentWebSocket(tournament_name) {
@@ -111,12 +113,6 @@ export class Play extends Component {
 		this.addEventListener(aiBtn, "click", () => {
 			this.playAi();
 		});
-
-		// online
-		// const	remoteBtn = document.getElementById("remoteBtn");
-		// this.addEventListener(remoteBtn, "click", () => {
-		// 	this.playRemote();
-		// });
 
 		const	tournamentModalElement = document.getElementById("tournamentModal");
 		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
@@ -207,7 +203,6 @@ export class Play extends Component {
 		})
 	}
 
-	// remote logic
 	playRemote() {
 		fetch("/api/start_remote_match/", {
 			method: "POST",
@@ -215,7 +210,7 @@ export class Play extends Component {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				player_2_username: player2Username, // the username of the invited player
+				player_2_username: player2Username,
 			}),
 			credentials: 'include'
 		})
@@ -270,7 +265,6 @@ export class Play extends Component {
 			.then(data => {
 				customAlert('success', data.message, '3000');
 				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
-				//this.createTournamentWebSocket(jsonData["name"]);
 				tournamentSocket.initWebSocket(jsonData["name"]);
 			})
 			.catch((error) => {
@@ -388,8 +382,6 @@ export class Play extends Component {
 					return response.json();
 				})
 				.then(data => {
-					// TODO: Añadir modal para insertar nickname
-					//this.createTournamentWebSocket(tournamentName);
 					tournamentSocket.initWebSocket(tournamentName);
 					navigateTo("/tournament/" + tournamentData.id);
 				})
@@ -401,9 +393,11 @@ export class Play extends Component {
 	}
 
 	displayJoinModal(type) {
-		if (type === 'private')
+		if (type === 'private') {
 			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
-																<label for="code">Invitation code</label>`;
+																<label data-i18n="invitation-code" for="code"></label>`;
+			setTimeout(() => languageSelector.updateLanguage(), 0);
+		}
 		else
 			document.querySelector('#codeInput').innerHTML = ``;
 

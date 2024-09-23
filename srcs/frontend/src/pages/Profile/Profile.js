@@ -1,6 +1,7 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
@@ -21,37 +22,13 @@ export class Profile extends Component {
     }
 
 	init() {
-		this.setLanguage();
 		this.displayUserInfo(this.params.username);
 		this.saveInfoBtn(this.params.username);
 		if (typeof this.params.username === "undefined")
 			Navbar.focus();
 		this.enable2fa();
 		this.disable2fa();
-		// this.sendServerMessage();
-	}
-
-	setLanguage() {
-		fetch('/api/get_user_language', {
-			method: 'GET',
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			console.log("IDIOMA:", data.language);
-
-			// TODO: switch tocho
-		})
-		.catch(error => {
-			console.log('Error(setLanguage):', error.message);
-		});
+		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
 	async displayUserInfo(username) {
@@ -77,23 +54,23 @@ export class Profile extends Component {
 			this.displayUserStats(data["username"]);
 
 			if (myUsername === data["username"]) {
-				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-green text-white">EDIT PROFILE</button>`;
-				document.getElementById("profile_bottom_btns").innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-6">LOGOUT</button>`;
+				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-green text-white" data-i18n='edit-profile'></button>`;
+				document.getElementById("profile_bottom_btns").innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-6" data-i18n='logout'></button>`;
+				setTimeout(() => languageSelector.updateLanguage(), 0);
 				this.editUserBtn(data);
 				this.logout();
 
 			}
 			else {
-				document.getElementById("profile_bottom_btns").innerHTML = `<button id="blockBtn" class="btn btn-danger col-6">BLOCK</button>`;
 				this.renderChatBtn(data["username"]);
-				document.getElementById("ownStatsBtn").innerHTML = `${data['username']} stats`;
+				document.getElementById("ownStatsBtn").innerHTML = `${data['username']} <span data-i18n='stats'></span>`;
 
 				if (!data['friendship']) {
-					document.getElementById('statsPlaceholder').innerHTML = `<div class="h-100 w-100 d-flex justify-content-center align-items-center"><h1>Friendn't</h1></div>`;
+					document.getElementById('statsPlaceholder').innerHTML = `<div class="h-100 w-100 d-flex justify-content-center align-items-center"><h1><span data-i18n='friend'></span>n't</h1></div>`;
 				}
 
 				if (data['friendship'] && data['matches_in_common']) {
-					document.getElementById('statsSelector').innerHTML += `<button id="friendshipStatsBtn" class="btn btn-outline-dark position-relative">Our stats</button>`;
+					document.getElementById('statsSelector').innerHTML += `<button id="friendshipStatsBtn" class="btn btn-outline-dark position-relative" data-i18n="our-stats"></button>`;
 					document.getElementById('friendName').innerHTML = data['username'];
 					this.displayFriendshipStats(data['username']);
 					this.selectStats();
@@ -104,7 +81,8 @@ export class Profile extends Component {
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
 			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
 			if (data["number_of_friends"] == 1)
-				document.getElementById("friendsText").innerHTML = 'friend';
+				document.getElementById("friendsText").setAttribute("data-i18n", "friend");
+			setTimeout(() => languageSelector.updateLanguage(), 0);
 		})
 		.catch(error => {
 			customAlert('danger', `Error: ` + error.message, '');
@@ -112,7 +90,8 @@ export class Profile extends Component {
 			if (error.message === "AppUser matching query does not exist.")
 			document.getElementById("rootProfile").style.justifyContent = 'center';
 			document.getElementById("rootProfile").style.alignItems = 'center';
-			document.getElementById("rootProfile").innerHTML = '<p class="display-1">User not found<p>';
+			document.getElementById("rootProfile").innerHTML = '<p class="display-1" data-i18n="user-not-found"><p>';
+			setTimeout(() => languageSelector.updateLanguage(), 0);
 		})
 	}
 
@@ -131,9 +110,6 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
-
-			console.log("User stats:", data)
-
 			let winRate = (data['wins'] * 100 / data['total_matches']) || 0;
 			winRate = winRate < 6 ? Math.round(winRate) : Math.round(winRate * 10) / 10;
 			data['average_score'] = Math.round(data['average_score'] * 100) / 100;
@@ -169,8 +145,6 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
-			console.log("Friendship stats:", data);
-
 			document.getElementById('friendshipWinRateBar').innerHTML = data['player1_win_percentage'];
 			document.getElementById('friendshipWinRateBar').style.width = `${data['player1_win_percentage']}%`;
 
@@ -245,14 +219,9 @@ export class Profile extends Component {
 			document.getElementById("userInfo").style.display = "none";
 			document.getElementById("userEdit").style.display = "block";
 
-			this.checkLanguage();
 			this.startPasswordEL();
 			this.show2faButton();
 		});
-	}
-
-	checkLanguage() {
-		// fetch a la view
 	}
 
 	startPasswordEL() {
@@ -277,8 +246,6 @@ export class Profile extends Component {
 			const formData = new FormData(event.target);
 			formData.append('language', document.getElementById('language_selector').value);
 	
-			console.log('Form Data:', Array.from(formData.entries()));
-	
 			fetch("/api/update_user_info/", {
 				method: "POST",
 				body: formData,
@@ -297,7 +264,6 @@ export class Profile extends Component {
 				document.getElementById("userInfo").style.display = "block";
 				document.getElementById("userEdit").style.display = "none";
 				this.displayUserInfo(username);
-				this.setLanguage();
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, '');
@@ -372,7 +338,7 @@ export class Profile extends Component {
 	}
 
 	hideModal() {
-		const response = fetch("/api/2fa/confirmDevice/", {
+		fetch("/api/2fa/confirmDevice/", {
 			method: 'POST',
 			credentials: 'include',
 			headers: {
@@ -396,7 +362,7 @@ export class Profile extends Component {
 		let twofaBtn = document.getElementById("Enable2faBtn");
 
 		this.addEventListener(twofaBtn, "click", (event) => {
-			const response = fetch("/api/2fa/enable2fa/", {
+			fetch("/api/2fa/enable2fa/", {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
@@ -439,10 +405,14 @@ export class Profile extends Component {
 		});
 	}
 
-	disable2fa() {
+	async disable2fa() {
 		let TwofaBtn = document.getElementById("Disable2faBtn");
-		this.addEventListener(TwofaBtn, "click", (event) => {
-			const response = fetch("/api/2fa/disable2fa/", {
+		const username = await this.getOwnName()
+		console.log("Hi! im",username)
+		this.addEventListener(TwofaBtn, "click", async (event) => {
+			const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
+			await TwoFactorCodeModalInstance.initTwoFactorAuth({"username": username});
+			fetch("/api/2fa/disable2fa/", {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
@@ -454,13 +424,4 @@ export class Profile extends Component {
 			})
 		})
 	}
-
-	/* sendServerMessage() {
-		let testBtn = document.getElementById('testBtn');
-		if (testBtn) {
-			testBtn.addEventListener("click", (event) => {
-				onlineSocket.sendMessage("test", "ealgar-c")
-			})
-		}
-	} */
 }

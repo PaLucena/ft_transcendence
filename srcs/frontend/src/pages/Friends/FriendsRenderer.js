@@ -1,3 +1,5 @@
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
+
 export class FriendsRenderer {
 	constructor(friends) {
 		this.friends = friends;
@@ -14,6 +16,7 @@ export class FriendsRenderer {
 
 				if (userElement) {
 					container.appendChild(userElement);
+					setTimeout(() => languageSelector.updateLanguage(), 0); 
 				}
 			});
 		} else {
@@ -52,6 +55,7 @@ export class FriendsRenderer {
 					</div>
 					${this.getActionButtons(user, filterType)}
 				</div>`;
+				setTimeout(() => languageSelector.updateLanguage(), 0);
 
 
 			const template = document.createElement('template');
@@ -99,28 +103,32 @@ export class FriendsRenderer {
 			case 'my_friends':
 				return `<button class="btn btn-outline-dark"
 							data-action="remove"
-							data-username="${user.username}">
-						Remove
-					</button>`;
+							data-username="${user.username}"
+							data-i18n='remove-friend'>
+							‎
+						</button>`;
 			case 'pending_requests':
 				return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
 							<button class="btn btn-outline-dark"
 								data-action="remove"
-								data-username="${user.username}">
-								Cancel
+								data-username="${user.username}"
+								data-i18n='cancel-friend'>
+								‎
 							</button>
 						</div>`;
 			case 'incoming_requests':
 				return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
 							<button class="btn btn-green text-white"
 								data-action="accept"
-								data-username="${user.username}">
-								Accept
+								data-username="${user.username}"
+								data-i18n='accept-friend'>
+								‎
 							</button>
 							<button class="btn btn-outline-dark"
 								data-action="cancel"
-								data-username="${user.username}">
-								Cancel
+								data-username="${user.username}"
+								data-i18n='cancel-friend'>
+								‎
 							</button>
 						</div>`;
 			default:
@@ -133,37 +141,41 @@ export class FriendsRenderer {
 			case 'accepted':
 				return `<button class="btn btn-outline-dark"
 							data-action="remove"
-							data-username="${user.username}">
-						Remove
-					</button>`;
+							data-username="${user.username}"
+							data-i18n='remove-friend'>
+							‎
+						</button>`;
 			case 'pending':
 				return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
 							<button class="btn btn-outline-dark"
 								data-action="remove"
-								data-username="${user.username}">
-								Cancel
+								data-username="${user.username}"
+								data-i18n='cancel-friend'>
+								‎
 							</button>
 						</div>`;
 			case 'incoming':
 				return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
 							<button class="btn btn-green text-light"
 								data-action="accept"
-								data-username="${user.username}">
-								Accept
+								data-username="${user.username}"
+								data-i18n='accept-friend'>
 							</button>
 							<button class="btn btn-outline-dark"
 								data-action="cancel"
-								data-username="${user.username}">
-								Cancel
+								data-username="${user.username}"
+								data-i18n='cancel-friend'>
 							</button>
+							‎
 						</div>`;
 			case 'no_relation':
 			default:
 				return `<button class="btn btn-green text-white"
 							data-action="invite"
-							data-username="${user.username}">
-						Invite
-					</button>`;
+							data-username="${user.username}"
+							data-i18n='invite-friend'>
+							‎
+						</button>`;
 		}
 	}
 }

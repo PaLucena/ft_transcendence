@@ -2,32 +2,38 @@ import { Component } from '../Component.js';
 import { Navbar } from "../../components/Navbar/Navbar.js";
 import { ChatModal } from '../../components/ChatModal/ChatModal.js';
 import { Get2faCode } from '../../components/Get2faModal/Get2faModal.js';
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import routerInstance from '../Router.js'
 
 class StaticComponentsRenderer {
-    constructor() {
-        this.componentsToRender = [
-            {
-                instance: null,
-                getInstance: () => new Navbar(),
-                containerId: 'navbar',
-                routesToExclude: ["/login", "/signup", "/auth", "/404", "/pong"]
-            },
-            {
-                instance: null,
-                getInstance: () => new ChatModal(),
-                containerId: 'chat_modal',
-                routesToExclude: ["/login", "/signup", "/auth", "/404"]
-            },
+	constructor() {
+		this.componentsToRender = [
+			{
+				instance: null,
+				getInstance: () => new Navbar(),
+				containerId: 'navbar',
+				routesToExclude: ["/login", "/signup", "/auth", "/404", "/pong"]
+			},
+			{
+				instance: null,
+				getInstance: () => new ChatModal(),
+				containerId: 'chat_modal',
+				routesToExclude: ["/login", "/signup", "/auth", "/404"]
+			},
 			{
 				instance: null,
 				getInstance: () => new Get2faCode (),
 				containerId: 'get2faCode_modal',
-                routesToExclude: []
-
+				routesToExclude: []
+			},
+			{
+				instance: null,
+				getInstance: () => new languageSelector (),
+				containerId: 'languageSelector',
+				routesToExclude: ["/login", "/signup", "/auth", "/404"]
 			}
-        ];
-    }
+		];
+	}
 
 	async render() {
 		const currentPath = window.location.pathname.replace(/\/+$/, '');
