@@ -11,6 +11,7 @@ from rtchat.models import ChatGroup, Block, InviteRoom, InviteUser
 from user.models import AppUser
 from rtchat.serializers import GroupMessageSerializer, UserSerializer
 from user.decorators import default_authentication_required
+from ponggame.game_manager import game_manager
 
 
 @api_view(["GET"])
@@ -296,3 +297,62 @@ def delete_invite_room_after_delay(room_id, delay=20):
 
     timer = threading.Timer(delay, delete_invite_room)
     timer.start()
+
+
+@api_view(["POST"])
+@default_authentication_required
+def check_users_in_match(request):
+    try:
+        current_username = request.data.get("current_user")
+        invite_username = request.data.get("invite_user")
+
+        try:
+            current_user = AppUser.objects.get(username=current_username)
+        except AppUser.DoesNotExist:
+            return Response(
+                {
+                    "detail": f"User with username '{current_username}' does not exist",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            invite_user = AppUser.objects.get(username=invite_username)
+        except AppUser.DoesNotExist:
+            return Response(
+                {
+                    "detail": f"User with username '{invite_username}' does not exist",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if game_manager.is_player_in_game(current_user.id):
+            return Response(
+                {
+                    "detail": f"{current_user.username} is already in a game",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if game_manager.is_player_in_game(invite_user.id):
+            return Response(
+                {
+                    "detail": f"{invite_user.username} is already in a game",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {"detail": "Both users are free to play", "status": 1},
+            status=status.HTTP_200_OK,
+        )
+
+    except Exception as e:
+        return Response(
+            {"detail": f"An error occurred: {str(e)}", "status": 0},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

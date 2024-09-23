@@ -35,6 +35,8 @@ class GameManager:
 		self.frame_count = 0
 	def is_player_in_game(self, player_id):
 		return player_id in self.player_to_room
+
+
 	async def start_match(self, tournament_id, match_id, player_1_id, player_2_id, controls_mode):
 		print ("TEST 1")
 		"""

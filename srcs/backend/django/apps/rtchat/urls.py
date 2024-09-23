@@ -7,4 +7,7 @@ urlpatterns = [
     path("chatroom/<str:chatroom_name>/", views.chat_view, name="chatroom"),
     path("user/<str:username>/", views.get_or_create_chatroom, name="start_chat"),
     path("invite/<str:username>/", views.create_invite, name="create_invite"),
+    path(
+        "check_users_in_match/", views.check_users_in_match, name="check_users_in_match"
+    ),
 ]

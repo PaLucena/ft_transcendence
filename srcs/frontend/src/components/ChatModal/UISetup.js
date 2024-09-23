@@ -1,6 +1,7 @@
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleBlockUnblock } from "../../scripts/utils/rtchatUtils.js";
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
+import { handleBlockUnblock, handleResponse } from "../../scripts/utils/rtchatUtils.js";
 import { userSocket } from "../../scripts/utils/UserWebsocket.js";
 
 export class UISetup {
@@ -210,14 +211,33 @@ export class UISetup {
         }
     }
 
-    setupInviteToPlayButton() {
+    setupInviteToPlayButton(current_user, invite_user) {
         const inviteToPlayBtn = document.getElementById('invite_to_play_btn');
 
         this.chatModal.addEventListener(inviteToPlayBtn, 'click', async (e) => {
             const inviteBtn = e.target.closest('[data-invite-to-play-username]');
             if (inviteBtn) {
                 const usernameForInvite = inviteBtn.getAttribute('data-invite-to-play-username');
-                await this.chatModal.chatLoader.loadInvitation(usernameForInvite);
+
+                try {
+                    const response = await fetch(`/api/chat/check_users_in_match/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ current_user, invite_user}),
+                    });
+
+                    await handleResponse(response, (data) => {
+                        if (data.status === 1) {
+                            this.chatModal.chatLoader.loadInvitation(usernameForInvite);
+                        }
+                    });
+
+                } catch(error) {
+                    this.handleError(error.errorCode, error.errorMessage);
+                }
             }
         })
     }
@@ -305,6 +325,22 @@ export class UISetup {
                     }
                 }
             });
+        }
+    }
+
+    handleError(errorCode, errorMessage) {
+        switch (errorCode) {
+            case 400:
+                customAlert('danger', `${errorMessage}`, 5000);
+                break;
+            case 404:
+                customAlert('danger', `${errorMessage}`, 5000);
+                break;
+            case 500:
+                console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
+                break;
+            default:
+                console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
         }
     }
 }

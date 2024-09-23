@@ -49,7 +49,7 @@ export class ChatLoader {
                 this.chatModal.chatRenderer.renderChatMessages(data.chat_messages, currentUser, isPublicChat);
                 if (!isPublicChat) {
                     this.chatModal.chatRenderer.renderMessageInputContainer(data.block_status, data.other_user.username);
-                    this.chatModal.uiSetup.setupInviteToPlayButton();
+                    this.chatModal.uiSetup.setupInviteToPlayButton(data.current_user, data.other_user.username);
                 }
                 this.chatModal.webSocketHandler.initWebSocket(chatroomName, currentUser);
             });
