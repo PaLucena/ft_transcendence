@@ -53,6 +53,7 @@ class InviteRoom(models.Model):
     expires_at = models.DateTimeField()
     is_accepted = models.BooleanField(default=False)
     is_cancelled = models.BooleanField(default=False)
+    author = models.ForeignKey(AppUser, on_delete=models.CASCADE)
 
     def has_expired(self):
         return timezone.now() > self.expires_at

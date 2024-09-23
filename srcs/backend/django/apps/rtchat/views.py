@@ -266,6 +266,7 @@ def create_invite(request, username):
         expires_at = current_time + timezone.timedelta(seconds=invitation_lifetime)
         invite_room = InviteRoom.objects.create(
             group_name=f"invite_1x1_{request.user.username}_to_{other_user.username}",
+            author=request.user,
             expires_at=expires_at,
         )
 
@@ -331,7 +332,7 @@ def check_users_in_match(request):
         if game_manager.is_player_in_game(current_user.id):
             return Response(
                 {
-                    "detail": f"{current_user.username} is already in a game",
+                    "detail": f"You are already in a game",
                     "status": 0,
                 },
                 status=status.HTTP_400_BAD_REQUEST,
