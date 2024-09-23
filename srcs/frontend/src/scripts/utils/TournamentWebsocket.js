@@ -1,4 +1,5 @@
 import { Tournament } from "../../pages/Tournament/Tournament.js";
+import {navigateTo} from "../Router";
 
 class TournamentWebsocket {
     constructor() {
@@ -32,6 +33,9 @@ class TournamentWebsocket {
             }
             if (data.tournament_users) {
                 Tournament.renderPlayers(data.tournament_users);
+            }
+            if (data.goto_game) {
+                navigateTo("/pong");
             }
         } catch (error) {
             this.handleError(null, error, false);
