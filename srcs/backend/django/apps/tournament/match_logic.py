@@ -6,42 +6,6 @@ import asyncio
 from asgiref.sync import sync_to_async
 
 
-async def start_all_matches(tournament, matches):
-	results = []
-	match_tasks = [
-		game_manager.start_match(
-			match['tournament_id'],
-			match['match_id'],
-			match['player_1_id'],
-			match['player_2_id'],
-			match['controls_mode']
-		)
-		#notify players here
-		for match in matches
-	]
-
-	print("HERE 2")
-	for task in asyncio.as_completed(match_tasks):
-		result = await task
-		print("RESULT: ", result)
-		match_id = result['match_id']
-		print(f"Match {match_id} finished with result: {result}")
-		results.append(result)
-
-		next_matches = await sync_to_async(assign_next_match, thread_sensitive=False)(tournament, match_id, result)
-
-		while next_matches:
-			formatted_next_matches = [format_match(m) for m in next_matches]
-			new_results = await start_all_matches(tournament, formatted_next_matches)
-			print("NEW RESULTS: ", new_results)
-			results.extend(new_results)
-			next_matches = []
-			for new_result in new_results:
-				next_matches.extend(await sync_to_async(assign_next_match, thread_sensitive=False)(tournament, new_result['match_id'], result))
-
-	return results
-
-
 # checks if the next match can be assigned based on the outcome of the current match.
 def assign_next_match(tournament, match_id, finished_match_data):
 	next_possible_matches = next_match_dependencies.get(match_id, [])

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from user.decorators import default_authentication_required
 import random
 from blockchain.views import create_tournament as bc_create_tournament
-from .match_logic import create_initial_matches, format_match, assign_next_match, start_all_matches
+from .match_logic import create_initial_matches
 from user.utils import set_nickname
 from ponggame.game_manager import game_manager
 from asgiref.sync import sync_to_async
@@ -72,6 +72,8 @@ def create_tournament(request):
 
 
 #return list of first available matches
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 @api_view (["POST"])
 @default_authentication_required
 def close_tournament(request, tournament_id):
@@ -102,10 +104,20 @@ def close_tournament(request, tournament_id):
 				tournament.is_active = True
 				tournament.save()
 				available_matches = create_initial_matches(tournament)
+				
 				print("BEFORE")
-				results = asyncio.run(start_all_matches(tournament, available_matches))
+				async_to_sync(get_channel_layer().group_send)(
+					f"tournament_{tournament.name}",
+					{
+						"type": "start_matches",
+						"tournament_id": tournament_id,
+						"matches": available_matches
+					}
+				)
+	
+				#results = asyncio.run(start_all_matches(tournament, available_matches))
 				print("AFTER")
-				return Response(results,
+				return Response({"message": "Tournament starting."},
 					status=status.HTTP_200_OK)
 
 			else:

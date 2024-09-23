@@ -24,8 +24,6 @@ class BaseMatch(APIView):
 			player_2_id = self.get_player2_id(request)
 			tournament = await sync_to_async(get_user_tournament)(user)
 			tournament_id = tournament.id
-			if tournament_id != 0:
-				return Response({'message': 'Match started in tournament already!'}, status=status.HTTP_200_OK)
 			match_id = await sync_to_async(generate_unique_match_id)(tournament)
 
 			await sync_to_async(Match.objects.create)(
