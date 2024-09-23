@@ -1,7 +1,8 @@
 import { eventEmitter } from './EventEmitter.js';
-import { updateOnlineStatus } from './rtchatUtils.js'
+import { handleResponse, updateOnlineStatus } from './rtchatUtils.js'
 import customAlert from './customAlert.js';
 import { staticComponentsRenderer } from '../utils/StaticComponentsRenderer.js';
+import { navigateTo } from '../Router.js';
 
 class UserWebsocket {
     constructor() {
@@ -86,9 +87,40 @@ class UserWebsocket {
 
                     const playerStatuses = data.players.map(player => player.status);
                     if (playerStatuses.every(status => status === 1)) {
-                        chatModalInstance.uiSetup.setupTimer(1, () => {
+
+                        chatModalInstance.uiSetup.setupTimer(1, async () => {
                             chatModalInstance.chatRenderer.hideInviteModal();
-                            console.log("йцуйцу");
+
+                            const modalContainer = document.getElementById('match_waiting_modal');
+                            const currentUser = modalContainer.getAttribute('data-current-user-1x1');
+                            const authorPlayer = data.players.find(player => player.is_author === 1 && player.username === currentUser);
+
+                            if (authorPlayer) {
+                                const oppositePlayer = data.players.find(player => player.username !== currentUser);
+                                if (oppositePlayer) {
+                                    try {
+                                        const response = await fetch(`/api/start_remote_match/`, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            credentials: 'include',
+                                            body: JSON.stringify({ player_2_id: oppositePlayer.id })
+                                        });
+
+                                        await handleResponse(response, data => {
+                                            navigateTo('/pong');
+                                        });
+
+                                    } catch(error) {
+                                        console.log(error);
+                                    }
+                                }
+                            } else {
+                                setTimeout(() => {
+                                    navigateTo('/pong');
+                                }, 0);
+                            }
                         });
                     }
                     break ;

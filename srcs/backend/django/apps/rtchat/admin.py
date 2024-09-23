@@ -14,6 +14,7 @@ class InviteRoomAdmin(admin.ModelAdmin):
         "expires_at",
         "is_accepted",
         "is_cancelled",
+        "author",
     )
     search_fields = ("group_name",)
     inlines = [InviteUserInline]

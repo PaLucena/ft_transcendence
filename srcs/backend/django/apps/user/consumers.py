@@ -157,7 +157,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             updated_invite_data = await self.get_1x1_data(group_name)
 
             await self.send_1x1_update(
-                group_name, invitation_1x1_type, updated_invite_data, self.user
+                group_name, invitation_1x1_type, updated_invite_data
             )
 
             if invitation_1x1_type == "reject":
@@ -211,7 +211,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             )
 
     async def send_1x1_update(
-        self, group_name, invitation_1x1_type, updated_invite_data, current_user
+        self, group_name, invitation_1x1_type, updated_invite_data
     ):
         try:
             event = {
@@ -219,7 +219,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                 "invitation_1x1": {
                     "type": invitation_1x1_type,
                     "players": updated_invite_data,
-                    "current_user": current_user.username,
+                    "invitation_author": "",
                 },
             }
             await self.channel_layer.group_send(group_name, event)
@@ -286,6 +286,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
 
             players = [
                 {
+                    "id": invite_users[0].user.id,
                     "username": invite_users[0].user.username,
                     "avatar": (
                         invite_users[0].user.avatar.url
@@ -293,8 +294,14 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                         else None
                     ),
                     "status": invite_users[0].status,
+                    "is_author": (
+                        1
+                        if invite_room.author.username == invite_users[0].user.username
+                        else 0
+                    ),
                 },
                 {
+                    "id": invite_users[1].user.id,
                     "username": invite_users[1].user.username,
                     "avatar": (
                         invite_users[1].user.avatar.url
@@ -302,6 +309,11 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                         else None
                     ),
                     "status": invite_users[1].status,
+                    "is_author": (
+                        1
+                        if invite_room.author.username == invite_users[1].user.username
+                        else 0
+                    ),
                 },
             ]
 

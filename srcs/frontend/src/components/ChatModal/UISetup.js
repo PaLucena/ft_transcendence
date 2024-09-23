@@ -1,5 +1,4 @@
 import customAlert from "../../scripts/utils/customAlert.js";
-import { handleBlockUnblock } from "../../scripts/utils/rtchatUtils.js";
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import { handleBlockUnblock, handleResponse } from "../../scripts/utils/rtchatUtils.js";
 import { userSocket } from "../../scripts/utils/UserWebsocket.js";
