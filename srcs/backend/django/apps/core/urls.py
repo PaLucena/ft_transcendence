@@ -40,6 +40,7 @@ urlpatterns = [
     path("api/", include("user_stats.urls")),
     path("api/", include("tournament.urls")),
     path("api/chat/", include("rtchat.urls")),
+    path("api/game/", include("ponggame.urls")),
     path("api/friends/", include("friends.urls")),
     path("api/blockchain/", include("blockchain.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),

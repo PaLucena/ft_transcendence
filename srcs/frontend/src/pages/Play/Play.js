@@ -78,6 +78,12 @@ export class Play extends Component {
 			.catch((error) => {
 				customAlert('danger', `Error(checkRunningTournaments): ` + error.message, '');
 			})
+
+			this.checkUserInGame()
+			.then(UserHasGame => {
+				if (UserHasGame === true)
+					console.log("has a game");
+			})
 		});
 
 		const	backOne = document.getElementById("backOne");
@@ -142,6 +148,24 @@ export class Play extends Component {
 				);
 			}
 			return (joinedTournament ? joinedTournament.id : null);
+		}
+		catch (error) {
+			console.log("ERROR", error)
+			throw error;
+		}
+	}
+	
+	async checkUserInGame() {
+		try {
+			const response = await fetch('/api/game/userInGame', {
+				method: "GET",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include'
+			});
+			const data = await response.json();
+			return (data["userInGame"]);
 		}
 		catch (error) {
 			console.log("ERROR", error)

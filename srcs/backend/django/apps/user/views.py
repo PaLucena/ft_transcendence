@@ -36,7 +36,6 @@ from friends.models import Friend
 @default_authentication_required
 def check_auth(request):
 	user = request.user
-	print("USER: ", user)
 	return Response({"authenticated": user.is_authenticated}, status=status.HTTP_200_OK)
 
 
