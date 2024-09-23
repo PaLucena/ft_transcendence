@@ -22,15 +22,18 @@ class BaseMatch(APIView):
 			user = request.user
 			user_id = user.pk
 			player_2_id = self.get_player2_id(request)
-			tournament = await sync_to_async(ensure_private_tournament_exists)()
+			tournament = await sync_to_async(get_user_tournament)(user)
+			tournament_id = tournament.id
+			if tournament_id != 0:
+				return Response({'message': 'Match started in tournament already!'}, status=status.HTTP_200_OK)
 			match_id = await sync_to_async(generate_unique_match_id)(tournament)
-	
+
 			await sync_to_async(Match.objects.create)(
 				tournament=tournament,
 				match_id=match_id,
 			)
 			# run in the background
-			asyncio.create_task(self.handle_match_and_record(user_id, player_2_id, match_id))
+			asyncio.create_task(self.handle_match_and_record(user_id, player_2_id, match_id, tournament_id))
 
 			return Response({'message': 'Match started!'}, status=status.HTTP_200_OK)
 		except ValueError as ve:
@@ -38,10 +41,10 @@ class BaseMatch(APIView):
 		except Exception as e:
 			return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-	async def handle_match_and_record(self, user_id, player_2_id, match_id):
+	async def handle_match_and_record(self, user_id, player_2_id, match_id, tournament_id):
 		try:
 			result = await game_manager.start_match(
-				tournament_id=0,
+				tournament_id=tournament_id,
 				match_id=match_id,
 				player_1_id=user_id,
 				player_2_id=player_2_id,
@@ -50,6 +53,13 @@ class BaseMatch(APIView):
 			await sync_to_async(record_match)(format_match_for_bc(result))
 		except Exception as e:
 			print(f"Error handling match result: {e}")
+
+
+def get_user_tournament(user):
+	tournaments = Tournament.objects.filter(player_ids__contains=[user.pk], id__gt=0)
+	if tournaments.exists():
+		return tournaments.first()
+	return ensure_private_tournament_exists()
 
 
 def generate_unique_match_id(tournament):

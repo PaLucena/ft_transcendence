@@ -1,9 +1,6 @@
-from rest_framework.decorators import api_view
 from .models import Match
 from .tournament_config import next_match_dependencies, required_matches, assignments
-from user.decorators import default_authentication_required
 from blockchain.views import record_match
-import random
 from ponggame.game_manager import game_manager
 import asyncio
 from asgiref.sync import sync_to_async
@@ -26,6 +23,7 @@ async def start_all_matches(tournament, matches):
 	print("HERE 2")
 	for task in asyncio.as_completed(match_tasks):
 		result = await task
+		print("RESULT: ", result)
 		match_id = result['match_id']
 		print(f"Match {match_id} finished with result: {result}")
 		results.append(result)
@@ -35,6 +33,7 @@ async def start_all_matches(tournament, matches):
 		while next_matches:
 			formatted_next_matches = [format_match(m) for m in next_matches]
 			new_results = await start_all_matches(tournament, formatted_next_matches)
+			print("NEW RESULTS: ", new_results)
 			results.extend(new_results)
 			next_matches = []
 			for new_result in new_results:

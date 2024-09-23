@@ -243,7 +243,6 @@ export class Pong extends Component {
 			this.playing = false;
 			this.button_return.style.display = 'block';
 		}
-		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
 	getCSSVar(name) {
