@@ -15,9 +15,9 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.75); /* Dark overlay with opacity */
-    z-index: 1040; /* Make sure it sits behind the modal */
-    display: none; /* Initially hidden */
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 1040;
+    display: none;
 }
 
 .otp-input {

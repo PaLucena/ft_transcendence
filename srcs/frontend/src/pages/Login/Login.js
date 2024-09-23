@@ -2,7 +2,6 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-//import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
 import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
 
 
@@ -32,7 +31,6 @@ export class Login extends Component {
 			event.preventDefault();
 			let formIsValid = true;
 
-			// Validate the form
 			if (!this.checkValidity()) {
 				formIsValid = false;
 			}

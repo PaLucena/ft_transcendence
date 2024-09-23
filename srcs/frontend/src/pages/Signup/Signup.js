@@ -76,8 +76,6 @@ export class Signup extends Component {
 					customAlert('danger', `Error: ${error.message}`, '');
 				});
 			}
-
-			//this.classList.add('was-validated');
 		});
 
 		$('#confirm_password, #password').on('input', function() {

@@ -2,13 +2,10 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { Navbar } from '../../components/Navbar/Navbar.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
-import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
-
-// import { showQRmodal } from '../../components/Show2faQRModal'
 
 export class Profile extends Component {
 	constructor(params = {}) {

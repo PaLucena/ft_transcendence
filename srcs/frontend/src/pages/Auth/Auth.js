@@ -18,8 +18,6 @@ export class Auth extends Component {
 		const urlParams = new URLSearchParams(window.location.search);
 		const code = urlParams.get('code');
 
-		console.log("code: ", code)
-
 		fetch("/api/42api-login/", {
 			method: 'POST',
 			headers: {

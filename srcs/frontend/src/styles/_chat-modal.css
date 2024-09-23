@@ -94,8 +94,6 @@
 	background-color: #6b7280;
 }
 
-/*  First Chat modal  */
-
 .circle-container {
     width: 100px;
     height: 100px;
@@ -107,9 +105,6 @@
 	max-height: 100%;
 	object-fit: cover;
 }
-
-/* Second Chat modal */
-
 
 .unblock-btn {
 	color: gray;
