@@ -159,6 +159,10 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             await self.send_1x1_update(
                 group_name, invitation_1x1_type, updated_invite_data, self.user
             )
+
+            if invitation_1x1_type == "reject":
+                await self.delete_invite_room(group_name)
+
         except Exception as e:
             await self.send_error(
                 500, f"Failed to {invitation_1x1_type} invitation: {str(e)}"
@@ -244,6 +248,16 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
         elif notification_type == "friend_cancel":
             return f"{self.user.username} has canceled the friend request!"
         return None
+
+    @database_sync_to_async
+    def delete_invite_room(self, group_name):
+        try:
+            room = InviteRoom.objects.get(group_name=group_name)
+            room.delete()
+        except InviteRoom.DoesNotExist:
+            raise InviteRoom.DoesNotExist(f"Room '{group_name}' does not exist.")
+        except Exception as e:
+            raise Exception(f"Failed to delete room: {str(e)}")
 
     @database_sync_to_async
     def update_invite_status(self, group_name, user, status):
