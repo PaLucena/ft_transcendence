@@ -7,10 +7,11 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
 from django.http import Http404
-from rtchat.models import ChatGroup, Block, Invite
+from rtchat.models import ChatGroup, Block, InviteRoom, InviteUser
 from user.models import AppUser
 from rtchat.serializers import GroupMessageSerializer, UserSerializer
 from user.decorators import default_authentication_required
+from ponggame.game_manager import game_manager
 
 
 @api_view(["GET"])
@@ -228,7 +229,7 @@ def block_or_unblock_user_view(request):
 @default_authentication_required
 def create_invite(request, username):
     try:
-        invitation_lifetime = 60
+        invitation_lifetime = 20
 
         if request.user.username == username:
             return Response(
@@ -244,39 +245,38 @@ def create_invite(request, username):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        existing_invite = (
-            Invite.objects.select_related("sender", "receiver")
-            .filter(
-                Q(sender=request.user, receiver=other_user)
-                | Q(sender=other_user, receiver=request.user),
-            )
-            .first()
-        )
-
         current_time = timezone.now()
 
-        if existing_invite:
-            time_remaining = (existing_invite.expires_at - current_time).total_seconds()
-            if time_remaining > 0:
-                return Response(
-                    {
-                        "detail": f"You need to wait {int(time_remaining)} seconds to send this user another request."
-                    },
-                    status=status.HTTP_409_CONFLICT,
-                )
+        active_invites = InviteRoom.objects.filter(
+            invite_users__user__in=[request.user, other_user],
+        ).distinct()
+
+        for invite in active_invites:
+            time_remaining = (invite.expires_at - current_time).total_seconds()
+
+            if time_remaining <= 0:
+                invite.delete()
+
+        if active_invites.exists():
+            return Response(
+                {"detail": "One of the users is already in an active invitation."},
+                status=status.HTTP_409_CONFLICT,
+            )
 
         expires_at = current_time + timezone.timedelta(seconds=invitation_lifetime)
-
-        invite = Invite.objects.create(
-            sender=request.user,
-            receiver=other_user,
+        invite_room = InviteRoom.objects.create(
+            group_name=f"invite_1x1_{request.user.username}_to_{other_user.username}",
+            author=request.user,
             expires_at=expires_at,
         )
 
-        delete_invite_after_delay(invite.id, invitation_lifetime)
+        InviteUser.objects.create(invite_room=invite_room, user=request.user, status=0)
+        InviteUser.objects.create(invite_room=invite_room, user=other_user, status=0)
+
+        delete_invite_room_after_delay(invite_room.id, invitation_lifetime)
 
         return Response(
-            {"invite_id": invite.id, "group_name": invite.group_name},
+            {"group_name": invite_room.group_name},
             status=status.HTTP_201_CREATED,
         )
 
@@ -287,14 +287,73 @@ def create_invite(request, username):
         )
 
 
-def delete_invite_after_delay(invite_id, delay=90):
-    def delete_invite():
+def delete_invite_room_after_delay(room_id, delay=20):
+    def delete_invite_room():
         try:
-            invite = Invite.objects.get(id=invite_id)
-            invite.delete()
-            print(f"Invite {invite_id} deleted after {delay} seconds")
-        except Invite.DoesNotExist:
-            print(f"Invite {invite_id} already deleted")
+            invite_room = InviteRoom.objects.get(id=room_id)
+            invite_room.delete()
+            print(f"InviteRoom {room_id} deleted after {delay} seconds")
+        except InviteRoom.DoesNotExist:
+            print(f"InviteRoom {room_id} already deleted")
 
-    timer = threading.Timer(delay, delete_invite)
+    timer = threading.Timer(delay, delete_invite_room)
     timer.start()
+
+
+@api_view(["POST"])
+@default_authentication_required
+def check_users_in_match(request):
+    try:
+        current_username = request.data.get("current_user")
+        invite_username = request.data.get("invite_user")
+
+        try:
+            current_user = AppUser.objects.get(username=current_username)
+        except AppUser.DoesNotExist:
+            return Response(
+                {
+                    "detail": f"User with username '{current_username}' does not exist",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            invite_user = AppUser.objects.get(username=invite_username)
+        except AppUser.DoesNotExist:
+            return Response(
+                {
+                    "detail": f"User with username '{invite_username}' does not exist",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if game_manager.is_player_in_game(current_user.id):
+            return Response(
+                {
+                    "detail": f"You are already in a game",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if game_manager.is_player_in_game(invite_user.id):
+            return Response(
+                {
+                    "detail": f"{invite_user.username} is already in a game",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            {"detail": "Both users are free to play", "status": 1},
+            status=status.HTTP_200_OK,
+        )
+
+    except Exception as e:
+        return Response(
+            {"detail": f"An error occurred: {str(e)}", "status": 0},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

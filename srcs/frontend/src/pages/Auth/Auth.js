@@ -38,8 +38,7 @@ export class Auth extends Component {
 			return response.json()
 		})
 		.then(data => {
-			console.log("Initializing websocket for user", data["username"]);
-			userSocket.initWebSocket(data["username"]);
+			userSocket.initWebSocket();
 			navigateTo("/play");
 		})
 		.catch(error => {

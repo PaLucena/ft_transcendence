@@ -152,18 +152,18 @@ export class UISetup {
             switch (action) {
                 case 'invite':
                     endpoint = 'invite_friend';
-                    notification_type = 'invite';
+                    notification_type = 'friend_invite';
                     break;
                 case 'cancel':
                     endpoint = 'remove_friend';
-                    notification_type = 'cancel';
+                    notification_type = 'friend_cancel';
                     break;
                 case 'remove':
                     endpoint = 'remove_friend';
                     break;
                 case 'accept':
                     endpoint = 'accept_invitation';
-                    notification_type = 'accept';
+                    notification_type = 'friend_accept';
                     break;
                 default:
                     throw { errorCode: 400, errorMessage: 'Invalid action type' };
@@ -181,12 +181,11 @@ export class UISetup {
             await handleResponse(response, async () => {
                 if (username && notification_type) {
                     try {
-                        const message = JSON.stringify({
+                        userSocket.socket.send(JSON.stringify({
                             action: 'notification',
-                            notification_type,
+                            type: notification_type,
                             to_user: username
-                        });
-                        userSocket.socket.send(message);
+                        }));
                     } catch (error) {
                         console.error('Failed to send notification:', error);
                     }

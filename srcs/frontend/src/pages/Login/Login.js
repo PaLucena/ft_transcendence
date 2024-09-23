@@ -2,7 +2,7 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-//import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
 
 
@@ -12,7 +12,7 @@ export class Login extends Component {
 		super('/pages/Login/login.html');
 		this.TwoFactorCodeModalInstance = null;
 	}
-	
+
 	async init() {
 		this.initLoginForm();
 		this.intraLogin();
@@ -21,14 +21,14 @@ export class Login extends Component {
 	destroy() {
 		console.log("Login Custom destroy");
 		this.removeAllEventListeners();
-		if (this.TwoFactorCodeModalInstance) 
+		if (this.TwoFactorCodeModalInstance)
 			this.TwoFactorCodeModalInstance = null;
 	}
 
 	async initLoginForm() {
 		const loginForm = document.getElementById('login_form');
 		this.addEventListener(loginForm, 'submit', async function (event) {
-			
+
 			event.preventDefault();
 			let formIsValid = true;
 
@@ -71,7 +71,7 @@ export class Login extends Component {
 						throw new Error(errData.error || `Response status: ${response.status}`);
 					}
 					const data = await response.json();
-					
+
 					if (data.has_2fa === true) {
 						if (!this.TwoFactorCodeModalInstance) {
 							this.TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
@@ -81,13 +81,13 @@ export class Login extends Component {
 
 							btn.addEventListener('click', (e) => {
 								this.TwoFactorCodeModalInstance.destroy();
-								this.TwoFactorCodeModalInstance = null; 
+								this.TwoFactorCodeModalInstance = null;
 							});
 							await this.TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
 							this.TwoFactorCodeModalInstance.destroy();
-							this.TwoFactorCodeModalInstance = null; 
+							this.TwoFactorCodeModalInstance = null;
 						}
-						
+
 						await fetch("/api/2fa-login/", {
 							method: "POST",
 							credentials: 'include',
@@ -103,6 +103,7 @@ export class Login extends Component {
 						})
 					}
 
+					userSocket.initWebSocket();
 					customAlert('success', 'Login successful', 3000);
 					navigateTo("/play");
 
