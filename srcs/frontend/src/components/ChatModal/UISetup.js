@@ -1,10 +1,12 @@
 import customAlert from "../../scripts/utils/customAlert.js";
-import { handleBlockUnblock } from "../../scripts/utils/rtchatUtils.js";
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
+import { handleBlockUnblock, handleResponse } from "../../scripts/utils/rtchatUtils.js";
+import { userSocket } from "../../scripts/utils/UserWebsocket.js";
 
 export class UISetup {
     constructor(chatModal) {
         this.chatModal = chatModal;
+        this.intervalId = null;
     }
 
     setupChatModal() {
@@ -208,15 +210,136 @@ export class UISetup {
         }
     }
 
-    setupInviteToPlayButton() {
+    setupInviteToPlayButton(current_user, invite_user) {
         const inviteToPlayBtn = document.getElementById('invite_to_play_btn');
 
         this.chatModal.addEventListener(inviteToPlayBtn, 'click', async (e) => {
             const inviteBtn = e.target.closest('[data-invite-to-play-username]');
             if (inviteBtn) {
                 const usernameForInvite = inviteBtn.getAttribute('data-invite-to-play-username');
-                await this.chatModal.chatLoader.loadInvitation(usernameForInvite);
+
+                try {
+                    const response = await fetch(`/api/chat/check_users_in_match/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ current_user, invite_user}),
+                    });
+
+                    await handleResponse(response, (data) => {
+                        if (data.status === 1) {
+                            this.chatModal.chatLoader.loadInvitation(usernameForInvite);
+                        }
+                    });
+
+                } catch(error) {
+                    this.handleError(error.errorCode, error.errorMessage);
+                }
             }
         })
+    }
+
+    setupTimer(timeLeft, onTimeUp) {
+        const modal = document.getElementById('match_waiting_modal');
+        if (modal) {
+            const timerElement = modal.querySelector('#match_waiting_timer');
+
+            const updateTimer = () => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                if (timerElement) {
+                    timerElement.textContent = formattedTime;
+                }
+
+                console.log(formattedTime);
+            };
+
+            if (this.intervalId) {
+                clearInterval(this.intervalId);
+                this.intervalId = null;
+            }
+
+            updateTimer();
+
+            this.intervalId = setInterval(() => {
+                timeLeft--;
+
+                if (timeLeft >= 0) {
+                    updateTimer();
+                }
+
+                if (timeLeft < 0) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
+
+                    if (typeof onTimeUp === 'function') {
+                        onTimeUp();
+                    }
+                }
+            }, 1000);
+        }
+    }
+
+    stopTimer() {
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
+    }
+
+    setupButtons1x1(group_name) {
+        const modal = document.getElementById('match_waiting_buttons_container')
+
+        if (modal) {
+            this.chatModal.addEventListener(modal, 'click', (event) => {
+                const target = event.target;
+
+                if (target.classList.contains('accept')) {
+                    try {
+                        userSocket.socket.send(JSON.stringify({
+                            action: 'invitation_1x1',
+                            type: 'accept',
+                            group_name
+                        }));
+
+                        console.log('accepted');
+                    } catch (error) {
+                        console.error('Failed to send notification:', error);
+                    }
+                } else if (target.classList.contains('cancel')) {
+                    try {
+                        userSocket.socket.send(JSON.stringify({
+                            action: 'invitation_1x1',
+                            type: 'reject',
+                            group_name
+                        }));
+
+                        console.log('rejected');
+                    } catch (error) {
+                        console.error('Failed to send notification:', error);
+                    }
+                }
+            });
+        }
+    }
+
+    handleError(errorCode, errorMessage) {
+        switch (errorCode) {
+            case 400:
+                customAlert('danger', `${errorMessage}`, 5000);
+                break;
+            case 404:
+                customAlert('danger', `${errorMessage}`, 5000);
+                break;
+            case 500:
+                console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
+                break;
+            default:
+                console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
+        }
     }
 }

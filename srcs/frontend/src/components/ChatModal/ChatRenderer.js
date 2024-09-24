@@ -1,6 +1,7 @@
 export class ChatRenderer {
     constructor(chatModal) {
         this.chatModal = chatModal;
+		this.invitModalInstance = null;
     }
 
 	renderChatElements(chats) {
@@ -266,60 +267,191 @@ export class ChatRenderer {
 		}
 	}
 
-	renderInviteModal() {
+	onConnect1x1InitRender(data) {
+        try {
+            const container = document.getElementById('match_waiting_modal_container');
+
+			if (container) {
+				this.renderModalLayout1x1(data.current_user);
+				this.renderUsers1x1(data.players, data.current_user);
+				this.renderButtons1x1();
+
+				this.updateStatusClasses1x1(data.players)
+
+				this.chatModal.uiSetup.setupButtons1x1(data.group_name);
+			} else {
+				console.warn('match_waiting_modal_container not found.');
+			}
+
+			const invite = document.getElementById('match_waiting_modal');
+            if (invite) {
+                const messages = document.getElementById('messages_modal');
+                if (messages) {
+                    const chatInstance = bootstrap.Modal.getInstance(messages);
+                    if (chatInstance) {
+                        chatInstance.hide();
+                    }
+                }
+
+                const chats = document.getElementById('chats_modal');
+                if (chats) {
+                    const chatInstance = bootstrap.Modal.getInstance(chats);
+                    if (chatInstance) {
+                        chatInstance.hide();
+                    }
+                }
+            } else {
+                console.warn('match_waiting_modal not found.');
+            }
+        } catch (error) {
+                console.error('Failed to invite to match:', error);
+        }
+    }
+
+	renderModalLayout1x1(current_user) {
 		const container = document.getElementById('match_waiting_modal_container');
 
 		if (container) {
-			container.innerHTML = '';
-            const inviteModalHtml = this.createInviteModal();
-
-			if (inviteModalHtml) {
-				const template = document.createElement('template');
-				template.innerHTML = inviteModalHtml.trim();
-				const inviteModalElement = template.content.firstChild;
-
-				container.appendChild(inviteModalElement);
-			}
-        } else {
-			console.warn('match_waiting_modal_container not found.');
-		}
-	}
-
-	createInviteModal() {
-		return `
-			<div id="match_waiting_modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-				<div class="modal-bg">
-					<div class="modal-dialog modal-dialog-centered">
-						<div class="modal-content">
-							<div class="modal-header justify-content-center">
-								<h1 class="modal-title fs-5">Waiting for players!</h1>
-							</div>
-							<div class="modal-body">
-								<div class="container d-flex align-items-center text-center justify-content-center gap-4">
-									<div class="accepted player-container">
-										<div class="img" style="background-image: url(/assets/images/Bart.jpeg);">
-										</div>
-										<span>Bart</span>
-									</div>
-									<div class="vs">
-										<i class="fa-solid fa-v"></i> / <i class="fa-solid fa-s"></i>
-									</div>
-									<div class="canceled player-container">
-										<div class="img" style="background-image: url(/assets/images/back_hole.webp);"></div>
-										<span>Black Hole</span>
+			container.innerHTML = `
+				<div id="match_waiting_modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true" data-current-user-1x1="${current_user}">
+					<div class="modal-bg">
+						<div class="modal-dialog modal-dialog-centered">
+							<div class="modal-content">
+								<div class="modal-header justify-content-center">
+									<h1 class="modal-title fs-5">Waiting for players!</h1>
+								</div>
+								<div class="modal-body">
+									<div id="player_section" class="container d-flex align-items-center text-center justify-content-center gap-4">
+										<!-- Users will be rendered here -->
 									</div>
 								</div>
-							</div>
-							<div class="modal-footer">
-								<div class="timer">0:30</div>
-								<div class="btn action-btn accept">Accept</button>
+								<div class="modal-footer">
+									<div class="timer" id="match_waiting_timer"></div>
+									<div id="match_waiting_buttons_container" class="button-container d-flex align-items-center justify-content-center">
+										<!-- Buttons will be rendered here -->
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		`;
+			`;
+
+			const inviteModalElement = document.getElementById('match_waiting_modal');
+			if (!this.invitModalInstance) {
+				this.invitModalInstance = new bootstrap.Modal(inviteModalElement);
+			}
+			this.invitModalInstance.show();
+		} else {
+			console.warn('match_waiting_modal_container not found.');
+		}
 	}
+
+	hideInviteModal() {
+		if (this.invitModalInstance) {
+			this.invitModalInstance.hide()
+
+			const container = document.getElementById('match_waiting_modal_container');
+			const modal = container.querySelector('#match_waiting_modal');
+
+			if (container && modal) {
+				this.chatModal.addEventListener(modal, 'hidden.bs.modal', () => {
+					this.invitModalInstance = null;
+					container.innerHTML = '';
+				})
+			}
+		}
+	}
+
+	renderUsers1x1(players, current_user) {
+		const playerSection = document.getElementById('player_section');
+
+		if (playerSection) {
+			const player1 = players[0].username === current_user ? {
+				username: "You",
+				realUsername: players[0].username,
+				avatar: players[0].avatar,
+				status: players[0].status,
+			} : {
+				username: "You",
+				realUsername: players[1].username,
+				avatar: players[1].avatar,
+				status: players[1].status,
+			};
+
+
+			const player2 = players[0].username !== current_user ? players[0] : players[1];
+
+			playerSection.innerHTML = `
+				<div class="player-container ${this.getStatusClass(player1.status)}" data-username-1x1="${player1.realUsername}">
+					<div class="img" style="background-image: url(${player1.avatar || '/assets/images/default_avatar.jpg'});"></div>
+					<span>${player1.username}</span>
+				</div>
+				<div class="vs">
+					<i class="fa-solid fa-v"></i> / <i class="fa-solid fa-s"></i>
+				</div>
+				<div class="player-container ${this.getStatusClass(player2.status)}" data-username-1x1="${player2.username}">
+					<div class="img" style="background-image: url(${player2.avatar || '/assets/images/default_avatar.jpg'});"></div>
+					<span>${player2.username}</span>
+				</div>
+			`;
+		}
+	}
+
+	getStatusClass(status) {
+		return status === 0 ? 'waiting'
+			: status === 1 ? 'accepted'
+			: status === -1 ? 'canceled'
+			: '';
+	}
+
+
+	renderButtons1x1(current_user) {
+		const buttonsContainer = document.getElementById('match_waiting_buttons_container');
+
+		if (buttonsContainer) {
+			buttonsContainer.innerHTML = `
+				<button type="button" class="btn action-btn accept">Accept</button>
+				<button type="button" class="btn action-btn cancel">Cancel</button>
+			`;
+		}
+	}
+
+	updateStatusClasses1x1(players) {
+		const modalContainer = document.getElementById('match_waiting_modal');
+		if (!modalContainer) return;
+
+		const current_user = modalContainer.getAttribute('data-current-user-1x1');
+
+		const playerContainers = modalContainer.querySelectorAll('.player-container');
+		const modalContent = modalContainer.querySelector('.modal-content');
+		const actionButtons = modalContainer.querySelectorAll('.action-btn');
+
+		let isCanceled = false;
+		let currentUserStatus = null;
+
+		players.forEach(player => {
+			playerContainers.forEach(container => {
+				if (container.getAttribute('data-username-1x1') === player.username) {
+					container.className = `player-container ${this.getStatusClass(player.status)}`;
+					if (player.status === -1) isCanceled = true;
+					if (player.username === current_user) currentUserStatus = player.status;
+				}
+			});
+		});
+
+		if (modalContent) {
+			modalContent.classList.toggle('canceled', isCanceled);
+		}
+
+		actionButtons.forEach(button => {
+			button.disabled = isCanceled || (button.classList.contains('accept') && currentUserStatus === 1);
+			if (!isCanceled && !button.classList.contains('accept')) {
+				button.disabled = false;
+			}
+		});
+	}
+
 
 	removeBlockStatusMessage() {
 		const messageInputContainer = document.getElementById('message_input_container');

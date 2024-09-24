@@ -1,5 +1,6 @@
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from "../../scripts/utils/rtchatUtils.js";
+import { userSocket } from "../../scripts/utils/UserWebsocket.js";
 
 export class ChatLoader {
     constructor(chatModal) {
@@ -48,7 +49,7 @@ export class ChatLoader {
                 this.chatModal.chatRenderer.renderChatMessages(data.chat_messages, currentUser, isPublicChat);
                 if (!isPublicChat) {
                     this.chatModal.chatRenderer.renderMessageInputContainer(data.block_status, data.other_user.username);
-                    this.chatModal.uiSetup.setupInviteToPlayButton();
+                    this.chatModal.uiSetup.setupInviteToPlayButton(data.current_user, data.other_user.username);
                 }
                 this.chatModal.webSocketHandler.initWebSocket(chatroomName, currentUser);
             });
@@ -70,30 +71,25 @@ export class ChatLoader {
 
             await handleResponse(response, data => {
                 console.log(data);
+                try {;
+                    userSocket.socket.send(JSON.stringify({
+                        action: 'notification',
+                        type: "1x1_invite",
+                        to_user: username,
+                        group_name: data.group_name
+                    }));
+                } catch (error) {
+                    console.error('Failed to send notification:', error);
+                }
 
                 try {
-                    this.chatModal.chatRenderer.renderInviteModal();
-                    const invite = document.getElementById('match_waiting_modal');
-
-                    if (invite) {
-                        const inviteInstance = new bootstrap.Modal(invite);
-                        inviteInstance.show();
-
-                        const chat = document.getElementById('messages_modal');
-
-                        if (chat) {
-                            const chatInstance = bootstrap.Modal.getInstance(chat);
-                            chatInstance.hide();
-                        } else {
-                            console.warn('messages_modal not found.');
-                        }
-                    } else {
-                        console.warn('match_waiting_modal not found.');
-                    }
-                }
-                catch (error) {
-                    console.error('Failed to invite to match:', error);
-                    customAlert('danger', 'Failed to invite to match', 5000);
+                    userSocket.socket.send(JSON.stringify({
+                        action: 'invitation_1x1',
+                        type: 'connect',
+                        group_name: data.group_name
+                    }));
+                } catch (error) {
+                    console.error('Failed to send notification:', error);
                 }
             });
 

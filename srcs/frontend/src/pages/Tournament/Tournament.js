@@ -95,6 +95,7 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
+				
 				customAlert('success', 'Tournament closed', '3000');
 			})
 			.catch((error) => {

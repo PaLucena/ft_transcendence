@@ -1,4 +1,4 @@
-@keyframes shadowPulse {
+@keyframes shadowPulseGreen {
     0% {
         box-shadow:
             0px 0px 15px 5px rgba(0,0,0,0.5),
@@ -13,6 +13,24 @@
         box-shadow:
             0px 0px 15px 5px rgba(0,0,0,0.5),
             0px 0px 255px -30px rgba(118, 227, 118, 0.6);
+    }
+}
+
+@keyframes shadowPulseRed {
+    0% {
+        box-shadow:
+            0px 0px 15px 5px rgba(0,0,0,0.5),
+            0px 0px 255px -30px rgba(220, 53, 69, 0.6);
+    }
+    50% {
+        box-shadow:
+            0px 0px 25px 10px rgba(0,0,0,0.2),
+            0px 0px 200px 60px rgba(220, 53, 69, 1);
+    }
+    100% {
+        box-shadow:
+            0px 0px 15px 5px rgba(0,0,0,0.5),
+            0px 0px 255px -30px rgba(220, 53, 69, 0.6);
     }
 }
 
@@ -45,14 +63,18 @@
 
 #match_waiting_modal .modal-content {
     border-radius: 0;
-    border: 4px solid #32cd32;
     color: #fff;
     background: linear-gradient(145deg, #4d4d4d, #1c1c1c);
-    animation: shadowPulse 12s ease-in-out infinite;
     backdrop-filter: blur(12px);
+	border: 4px solid #32cd32;
+	animation: shadowPulseGreen 12s ease-in-out infinite;
+	transition: border 0.5s ease, box-shadow 0.5s ease;
 }
 
-
+#match_waiting_modal .modal-content.canceled {
+	border: 4px solid #dc3545;
+	animation: shadowPulseRed 12s ease-in-out infinite;
+}
 
 
 #match_waiting_modal .modal-content .modal-title {
@@ -81,23 +103,25 @@
     background-repeat: no-repeat;
     border-radius: 50%;
 	margin-bottom: 10px;
+	transition: all 0.3s;
 }
 
 #match_waiting_modal .modal-content .modal-body .player-container.accepted .img {
 	opacity: 1;
-	box-shadow: 0 0px 2px 2px #76e376,
-				0 -15px 20px 0 #76e376 inset;
+	box-shadow: 0 0 2px 2px rgba(118, 227, 118, 1),
+				0 -15px 20px 0 rgba(118, 227, 118, 1) inset;
 }
 
 #match_waiting_modal .modal-content .modal-body .player-container.canceled .img {
 	opacity: 1;
-	box-shadow: 0 0px 2px 2px #dc3545,
-				0 -15px 20px 0 #dc3545 inset;
+	box-shadow: 0 0 2px 2px rgba(220, 53, 69, 1),
+				0 -15px 20px 0 rgba(220, 53, 69, 1) inset;
 }
 
 #match_waiting_modal .modal-content .modal-body .player-container.waiting .img {
 	opacity: 0.4;
-	box-shadow: 0 0 10px 5px rgba(0,0,0,0.65) inset;
+	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.65),
+				0 0 10px 5px rgba(0,0,0, 0.65) inset;
 }
 
 #match_waiting_modal .modal-content .modal-footer {
@@ -112,8 +136,12 @@
 }
 
 
+#match_waiting_modal .modal-content .modal-footer .button-container {
+	width: 100%;
+}
+
 #match_waiting_modal .modal-content .modal-footer .action-btn {
-	width: 250px;
+	width: clamp(45%, 45%, 45%);
 	height: 70px;
 	font-size: 40px;
 	font-weight: bolder;
@@ -122,6 +150,7 @@
 	transition: all 0.5s;
 	border: none;
 }
+
 
 #match_waiting_modal .modal-content .modal-footer .action-btn.accept {
 	color: #2f5b2f;
@@ -154,3 +183,20 @@
 	border-bottom: none;
 	border-top: none;
 }
+
+@media (max-width: 576px) {
+	#match_waiting_modal .modal-content .modal-footer .action-btn {
+		height: 60px;
+		font-size: 30px;
+	}
+}
+
+@media (max-width: 376px) {
+	#match_waiting_modal .modal-content .modal-footer .button-container {
+		flex-direction: column;
+	}
+	#match_waiting_modal .modal-content .modal-footer .action-btn {
+		width: 75%;
+	}
+}
+

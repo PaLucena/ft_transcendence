@@ -35,8 +35,11 @@ class GameManager:
 		self.frame_count = 0
 	def is_player_in_game(self, player_id):
 		return player_id in self.player_to_room
+
+
 	async def start_match(self, tournament_id, match_id, player_1_id, player_2_id, controls_mode):
-		print ("TEST 1")
+		print ("player 1 ID: ", player_1_id)
+		print ("player 2 ID: ", player_2_id)
 		"""
 		Start a match between two players
 
@@ -52,6 +55,7 @@ class GameManager:
 		"""
 
 		# Generate random scores for AI vs AI match
+
 		if player_1_id == 0 and player_2_id == 0:
 			return random_ai_game(tournament_id, match_id, player_1_id, player_2_id)
 

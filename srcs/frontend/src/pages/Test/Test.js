@@ -39,7 +39,7 @@ export class Test extends Component {
 			try {
 				const message = JSON.stringify({
 					action: 'notification',
-					notification_type: 'invite',
+					type: 'friend_invite',
 					to_user: 'admin'
 				});
 				userSocket.socket.send(message);
@@ -53,7 +53,7 @@ export class Test extends Component {
 			try {
 				const message = JSON.stringify({
 					action: 'notification',
-					notification_type: 'accept',
+					type: 'friend_accept',
 					to_user: 'admin'
 				});
 				userSocket.socket.send(message);
@@ -67,8 +67,35 @@ export class Test extends Component {
 			try {
 				const message = JSON.stringify({
 					action: 'notification',
-					notification_type: 'cancel',
+					type: 'friend_cancel',
 					to_user: 'admin'
+				});
+				userSocket.socket.send(message);
+			} catch (error) {
+				console.error('Failed to send notification:', error);
+			}
+		});
+
+		const connect1x1 = document.getElementById('connect_1x1');
+		this.addEventListener(connect1x1, 'click', async () => {
+			try {
+				userSocket.socket.send(JSON.stringify({
+					action: 'invitation_1x1',
+					type: 'connect',
+					group_name: 'invite_1x1_Bart_to_admin'
+				}));
+			} catch (error) {
+				console.error('Failed to send notification:', error);
+			}
+		});
+
+		const accept1x1 = document.getElementById('accept_1x1');
+		this.addEventListener(accept1x1, 'click', async () => {
+			try {
+				const message = JSON.stringify({
+					action: 'invitation_1x1',
+					type: 'accept',
+					group_name: 'invite_1x1_Bart_to_admin'
 				});
 				userSocket.socket.send(message);
 			} catch (error) {
