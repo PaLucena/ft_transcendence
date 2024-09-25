@@ -39,7 +39,7 @@ export class Auth extends Component {
 			navigateTo("/play");
 		})
 		.catch(error => {
-			customAlert('danger', `Error: ${error.message}`, '');
+			customAlert('danger', `Error: ${error.message}`, 5000);
 			navigateTo("/login")
 		});
 	}

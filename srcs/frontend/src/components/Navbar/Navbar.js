@@ -30,11 +30,11 @@ export class Navbar extends Component {
 			document.getElementById("navItem-profile").src = `${data["avatar"]}`;
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
-	
+
 	static focus() {
 		let page = window.location.pathname.slice(1);
 		const	border = page.indexOf("/");

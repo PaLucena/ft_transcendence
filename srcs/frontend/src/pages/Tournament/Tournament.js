@@ -92,12 +92,12 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
-				
-				customAlert('success', 'Tournament closed', '3000');
+
+				customAlert('success', 'Tournament closed', 3000);
 			})
 			.catch((error) => {
 				console.log("Error(closeTournament):", error.message);
-				customAlert('danger', `Error: ` + error.message, '');
+				customAlert('danger', `Error: ` + error.message, 5000);
 			})
 		});
 	}
@@ -127,7 +127,7 @@ export class Tournament extends Component {
 			})
 			.catch((error) => {
 				console.log("Error(exitTournament):", error.message);
-				customAlert('danger', `Error: ` + error.message, '');
+				customAlert('danger', `Error: ` + error.message, 5000);
 			})
 		});
 	}

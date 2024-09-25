@@ -46,7 +46,7 @@ export class Play extends Component {
 				}
 			})
 			.catch((error) => {
-				customAlert('danger', `Error(checkRunningTournaments): ` + error.message, '');
+				customAlert('danger', `Error(checkRunningTournaments): ` + error.message, 5000);
 			})
 		});
 
@@ -137,12 +137,12 @@ export class Play extends Component {
 			return response.json();
 		})
 		.then(data => {
-			customAlert('success', data.message, '3000');
+			customAlert('success', data.message, 3000);
 			navigateTo("/pong");
 
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
@@ -164,12 +164,12 @@ export class Play extends Component {
 			return response.json();
 		})
 		.then(data => {
-			customAlert('success', data.message, '3000');
+			customAlert('success', data.message, 3000);
 			navigateTo("/pong");
 
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
@@ -193,12 +193,12 @@ export class Play extends Component {
 			return response.json();
 		})
 		.then(data => {
-			customAlert('success', data.message, '3000');
+			customAlert('success', data.message, 3000);
 			navigateTo("/pong");
 
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
@@ -233,12 +233,12 @@ export class Play extends Component {
 				return response.json();
 			})
 			.then(data => {
-				customAlert('success', data.message, '3000');
+				customAlert('success', data.message, 3000);
 				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
 				tournamentSocket.initWebSocket(jsonData["name"]);
 			})
 			.catch((error) => {
-				customAlert('danger', `Error: ` + error.message, '');
+				customAlert('danger', `Error: ` + error.message, 5000);
 			})
 		})
 	}
@@ -270,7 +270,7 @@ export class Play extends Component {
 			}
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
@@ -318,7 +318,7 @@ export class Play extends Component {
 			}
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
@@ -356,7 +356,7 @@ export class Play extends Component {
 					navigateTo("/tournament/" + tournamentData.id);
 				})
 				.catch((error) => {
-					customAlert('danger', `Error: ` + error.message, '');
+					customAlert('danger', `Error: ` + error.message, 5000);
 				})
 			});
 		});
