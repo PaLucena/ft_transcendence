@@ -2,13 +2,14 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-//import { onlineSocket } from '../../scripts/utils/OnlineWebsocket.js';
+import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
 
 
 export class Login extends Component {
 	constructor() {
 		super('/pages/Login/login.html');
+		this.TwoFactorCodeModalInstance = null;
 	}
 
 	async init() {
@@ -18,6 +19,8 @@ export class Login extends Component {
 
 	destroy() {
 		this.removeAllEventListeners();
+		if (this.TwoFactorCodeModalInstance)
+			this.TwoFactorCodeModalInstance = null;
 	}
 
 	async initLoginForm() {
@@ -26,6 +29,7 @@ export class Login extends Component {
 		loginForm.querySelector('input').focus();
 
 		this.addEventListener(loginForm, 'submit', async function (event) {
+
 			event.preventDefault();
 			let formIsValid = true;
 
@@ -67,12 +71,25 @@ export class Login extends Component {
 						const errData = await response.json();
 						throw new Error(errData.error || `Response status: ${response.status}`);
 					}
-
 					const data = await response.json();
+
 					if (data.has_2fa === true) {
-						const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
-						await TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
-						fetch("/api/2fa-login/", {
+						if (!this.TwoFactorCodeModalInstance) {
+							this.TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
+
+							const modal = document.getElementById('get2faCode_modal')
+							let btn = modal.querySelector('.btn-close')
+
+							btn.addEventListener('click', (e) => {
+								this.TwoFactorCodeModalInstance.destroy();
+								this.TwoFactorCodeModalInstance = null;
+							});
+							await this.TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
+							this.TwoFactorCodeModalInstance.destroy();
+							this.TwoFactorCodeModalInstance = null;
+						}
+
+						await fetch("/api/2fa-login/", {
 							method: "POST",
 							credentials: 'include',
 							headers: {
@@ -80,11 +97,14 @@ export class Login extends Component {
 							},
 							body: JSON.stringify(jsonData)
 						}).then(response => {
-							return response.json();
+							if (!response.ok){
+								const errData = response.json();
+								throw new Error(errData.error || `Response status: ${response.status}`);
+							}
 						})
-						.then(() => {})
 					}
 
+					userSocket.initWebSocket();
 					customAlert('success', 'Login successful', 3000);
 					navigateTo("/play");
 

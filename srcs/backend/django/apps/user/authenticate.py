@@ -61,7 +61,6 @@ class DefaultAuthentication:
 
 
 		request.user = user
-
 		return user, request.COOKIES.get('access_token')
 
 

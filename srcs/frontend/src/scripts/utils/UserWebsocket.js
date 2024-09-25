@@ -1,6 +1,8 @@
 import { eventEmitter } from './EventEmitter.js';
-import { updateOnlineStatus } from './rtchatUtils.js'
+import { handleResponse, updateOnlineStatus } from './rtchatUtils.js'
 import customAlert from './customAlert.js';
+import { staticComponentsRenderer } from '../utils/StaticComponentsRenderer.js';
+import { navigateTo } from '../Router.js';
 
 class UserWebsocket {
     constructor() {
@@ -55,7 +57,10 @@ class UserWebsocket {
                 eventEmitter.emit('onlineUsersUpdated', data.online_users);
             } else if (data.notification) {
                 this.handleNotification(data.notification);
-            } else {
+            } else if (data.invitation_1x1) {
+                this.handleInvitation1x1(data.invitation_1x1)
+            }
+            else {
                 this.handleError(null, 'Invalid data format received.', false);
             }
         } catch (error) {
@@ -63,16 +68,98 @@ class UserWebsocket {
         }
     }
 
+
+    handleInvitation1x1 (data) {
+        const chatModalInstance = staticComponentsRenderer.getComponentInstance('ChatModal');
+
+        if (chatModalInstance) {
+            switch (data.type) {
+                case 'connect':
+                    chatModalInstance.chatRenderer.onConnect1x1InitRender(data);
+                    chatModalInstance.uiSetup.stopTimer();
+
+                    chatModalInstance.uiSetup.setupTimer(15, () => {
+                        chatModalInstance.chatRenderer.hideInviteModal();
+                    });
+                    break;
+                case 'accept':
+                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players);
+
+                    const playerStatuses = data.players.map(player => player.status);
+                    if (playerStatuses.every(status => status === 1)) {
+
+                        chatModalInstance.uiSetup.setupTimer(1, async () => {
+                            chatModalInstance.chatRenderer.hideInviteModal();
+
+                            const modalContainer = document.getElementById('match_waiting_modal');
+                            const currentUser = modalContainer.getAttribute('data-current-user-1x1');
+                            const authorPlayer = data.players.find(player => player.is_author === 1 && player.username === currentUser);
+
+                            if (authorPlayer) {
+                                const oppositePlayer = data.players.find(player => player.username !== currentUser);
+                                if (oppositePlayer) {
+                                    try {
+                                        const response = await fetch(`/api/start_remote_match/`, {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            credentials: 'include',
+                                            body: JSON.stringify({ player_2_id: oppositePlayer.id })
+                                        });
+
+                                        await handleResponse(response, data => {
+                                            navigateTo('/pong');
+                                        });
+
+                                    } catch(error) {
+                                        console.log(error);
+                                    }
+                                }
+                            } else {
+                                setTimeout(() => {
+                                    navigateTo('/pong');
+                                }, 0);
+                            }
+                        });
+                    }
+                    break ;
+                case 'reject':
+                    chatModalInstance.chatRenderer.updateStatusClasses1x1(data.players);
+                    chatModalInstance.uiSetup.stopTimer();
+
+                    chatModalInstance.uiSetup.setupTimer(1, () => {
+
+                        chatModalInstance.chatRenderer.hideInviteModal();
+                    });
+                    break;
+            }
+        } else {
+            console.error("ChatModal instance is not initialized");
+        }
+    }
+
     handleNotification(notification) {
         switch (notification.type) {
-            case 'invite':
+            case 'friend_invite':
                 customAlert('info', notification.message, 3000, 'New Friend Request');
                 break ;
-            case 'accept':
+            case 'friend_accept':
                 customAlert('success', notification.message, 3000, 'Friendship Confirmed');
                 break ;
-            case 'cancel':
+            case 'friend_cancel':
                 customAlert('danger', notification.message, 3000, 'Friendship Canceled');
+                break ;
+            case '1x1_invite':
+                try {
+                    this.socket.send(JSON.stringify({
+                        action: 'invitation_1x1',
+                        type: 'connect',
+                        group_name: notification.message
+                    }));
+                } catch (error) {
+                    console.error('Failed to send notification:', error);
+                }
                 break ;
         }
     }

@@ -6,6 +6,7 @@ from asgiref.sync import sync_to_async
 from django.contrib.sessions.models import Session
 from channels.db import database_sync_to_async
 from django.db import connection
+from django.http import JsonResponse
 
 
 class JWTAuthMiddleware:
@@ -20,7 +21,6 @@ class JWTAuthMiddleware:
 			cookies = headers[b'cookie'].decode('utf-8')
 			cookies = dict(item.split("=") for item in cookies.split("; "))
 			session_id = cookies.get('sessionid')
-			print(f"Session ID: {session_id}")
 			if session_id:
 				try:
 					session = await sync_to_async(Session.objects.get, thread_sensitive=True)(session_key=session_id)
@@ -50,9 +50,26 @@ class UpdateLastSeenMiddleware:
 	def __call__(self, request) -> Any:
 		response = self.get_response(request)
 		if request.user.is_authenticated:
-			print("5 USER IN MIDDLEWARE: ")
 			User = get_user_model()
 			user = User.objects.get(username=request.user)
 			user.last_seen = timezone.now()
 			user.save()
 		return response
+
+from django.conf import settings
+
+class EnforceProxyMiddleware:
+	def __init__(self, get_response):
+		self.get_response = get_response
+		self.nginx_ip = '172.23.0.1'
+
+	def __call__(self, request):
+		path_info = request.META.get("PATH_INFO")
+		if path_info == "/health/":
+			return self.get_response(request)
+		if 'HTTP_X_REAL_IP' not in request.META or 'HTTP_X_FORWARDED_FOR' not in request.META:
+			return JsonResponse({'error': 'Request must come through a proxy'}, status=403)
+		real_ip = request.META['HTTP_X_REAL_IP']
+		if real_ip != self.nginx_ip:
+			return JsonResponse({'error': 'Request must come through the NGINX proxy'}, status=403)
+		return self.get_response(request)

@@ -36,7 +36,6 @@ from friends.models import Friend
 @default_authentication_required
 def check_auth(request):
 	user = request.user
-	print("USER: ", user)
 	return Response({"authenticated": user.is_authenticated}, status=status.HTTP_200_OK)
 
 
@@ -157,9 +156,7 @@ def login(request):
 		response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
 		response.set_cookie("access_token", str(access), httponly=True, secure=True)
 
-		print("Access Token Expiry:", access["exp"])
-		print("Refresh Token Expiry:", refresh["exp"])
-		load_test_data(request)
+		#load_test_data(request)
 		return response
 	else:
 		return Response({"error": "Incorrect password"}, status=status.HTTP_404_NOT_FOUND)
@@ -168,18 +165,21 @@ def login(request):
 
 @api_view(["POST"])
 def loginWith2fa(request):
-    user = request.data.get("username")
-    print("username is", user["username"])
-    user = AppUser.objects.get(username=user["username"])
-    auth_login(request, user)
-    twofactor_refresh = RefreshToken.for_user(user)
-    twofactor_access = twofactor_refresh.access_token
-    response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
-    response.set_cookie("twofactor_refresh_token", str(twofactor_refresh), httponly=True, secure=True)
-    response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
-    print("Access Token for 2FA Expiry:", twofactor_access["exp"])
-    print("Refresh Token for 2FA Expiry:", twofactor_refresh["exp"])
-    return response
+	username = request.data.get("username")
+	password = request.data.get("password")
+	authenticated_user = authenticate(username=username, password=password)
+	if authenticated_user is not None:
+		user = AppUser.objects.get(username=username)
+		auth_login(request, user)
+		user.save()
+		twofactor_refresh = RefreshToken.for_user(user)
+	twofactor_access = twofactor_refresh.access_token
+	response = Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+	response.set_cookie("twofactor_refresh_token", str(twofactor_refresh), httponly=True, secure=True)
+	response.set_cookie("twofactor_access_token", str(twofactor_access), httponly=True, secure=True)
+	print("Access Token for 2FA Expiry:", twofactor_access["exp"])
+	print("Refresh Token for 2FA Expiry:", twofactor_refresh["exp"])
+	return response
 
 
 # ...
@@ -250,12 +250,6 @@ def update_user_info(request):
 				return Response(avatar_error, status=status.HTTP_400_BAD_REQUEST)
 
 		if old_password and new_password and confirm_password:
-			print(
-				"user.password old_password new_password :",
-				user.password,
-				old_password,
-				new_password,
-			)
 			if not check_password(old_password, user.password):
 				return Response(
 					{"error": "Incorrect old password."},
@@ -270,29 +264,15 @@ def update_user_info(request):
 			user.save()
 			request.session.flush()
 			auth_logout(request)
+			auth_login(request, user)
 
 		if language and user.language != language:
 			user.language = language
 
 		user.save()
-		#user.refresh_from_db()
-		#request.session.flush()
-		#auth_logout(request)
-		# authenticated_user = authenticate(
-		#     username=new_username, password=new_password
-		# )
-		# if authenticated_user is not None:
-		#     user = AppUser.objects.get(username=new_username)
-		#     user.save()
-
-		#auth_login(request, user)
-		#update_session_auth_hash(request, user)
-		#user_logged_in.send(sender=user.__class__, request=request, user=user)
-
 		response = Response(
 			{"message": "User info updated successfully."}, status=status.HTTP_201_CREATED
 		)
-
 		return response
 	except Exception as e:
 		return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)

@@ -2,6 +2,10 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.exceptions import ObjectDoesNotExist
 from tournament.models import Tournament
 from channels.db import database_sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
+from .match_logic import format_match, assign_next_match
+import asyncio
+from ponggame.game_manager import game_manager
 
 
 class TournamentConsumer(AsyncJsonWebsocketConsumer):
@@ -82,3 +86,55 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
                 "errorMessage": message,
             }
         )
+
+
+    #a method to start all matches when triggered
+    async def start_matches(self, event):
+        print("AAAAAAAAAAAAAAAAAAWEFAWEFAWFAWFA")
+        tournament_id = event["tournament_id"]
+        matches = event["matches"]
+        print("4 FIRST MATCHES RECEIVED: ", matches, flush=True)
+        tournament = await sync_to_async(Tournament.objects.get)(pk=tournament_id)
+        results = await self.start_all_matches(tournament, matches)
+        
+        await self.send_json({
+            "message": f"All matches for tournament {tournament_id} finished",
+            "results": results
+        })
+
+    async def start_all_matches(self, tournament, matches):
+        results = []
+        match_tasks = [
+            game_manager.start_match(
+                match['tournament_id'],
+                match['match_id'],
+                match['player_1_id'],
+                match['player_2_id'],
+                match['controls_mode']
+            )
+            for match in matches
+        ]
+
+        for task in asyncio.as_completed(match_tasks):
+            result = await task
+            match_id = result['match_id']
+            results.append(result)
+
+            next_matches = await sync_to_async(assign_next_match, thread_sensitive=False)(
+                tournament, match_id, result
+            )
+
+            while next_matches:
+                formatted_next_matches = [format_match(m) for m in next_matches]
+                new_results = await self.start_all_matches(tournament, formatted_next_matches)
+                results.extend(new_results)
+                next_matches = []
+                for new_result in new_results:
+                    next_matches.extend(
+                        await sync_to_async(assign_next_match, thread_sensitive=False)(
+                            tournament, new_result['match_id'], result
+                        )
+                    )
+
+        return results
+    
