@@ -83,7 +83,7 @@ export class Profile extends Component {
 			setTimeout(() => languageSelector.updateLanguage(), 0);
 		})
 		.catch(error => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 			console.log('Error(displayUserInfo):', error);
 			if (error.message === "AppUser matching query does not exist.")
 			document.getElementById("rootProfile").style.justifyContent = 'center';
@@ -240,13 +240,13 @@ export class Profile extends Component {
 
 	saveInfoBtn(username) {
 		const editForm = document.getElementById("editForm");
-	
+
 		this.addEventListener(editForm, "submit", async (event) => {
 			event.preventDefault();
-	
+
 			const formData = new FormData(event.target);
 			formData.append('language', document.getElementById('language_selector').value);
-	
+
 			fetch("/api/update_user_info/", {
 				method: "POST",
 				body: formData,
@@ -261,7 +261,7 @@ export class Profile extends Component {
 				return response.json();
 			})
 			.then(data => {
-				customAlert('success', data.message, '3000');
+				customAlert('success', data.message, 3000);
 				document.getElementById("userInfo").style.display = "block";
 				document.getElementById("userEdit").style.display = "none";
 				this.displayUserInfo(username);
@@ -269,7 +269,7 @@ export class Profile extends Component {
 				setTimeout(() => languageSelector.updateLanguage(), 0);
 			})
 			.catch((error) => {
-				customAlert('danger', `Error: ` + error.message, '');
+				customAlert('danger', `Error: ` + error.message, 5000);
 			});
 		});
 	}
@@ -296,7 +296,7 @@ export class Profile extends Component {
 	show2faButton() {
 		let EnableButtonPlaceholder = document.getElementById("Enable2faBtn");
 		let DisableButtonPlaceholder = document.getElementById("Disable2faBtn");
-		
+
 		fetch("/api/user_from_intra", {
 			method: "GET",
 			credentials: 'include',
@@ -336,7 +336,7 @@ export class Profile extends Component {
 			}
 		})
 		.catch(error => {
-			customAlert('danger', `Error: ${error.message}`, '');
+			customAlert('danger', `Error: ${error.message}`, 5000);
 		});
 	}
 
@@ -357,7 +357,7 @@ export class Profile extends Component {
 			this.show2faButton();
 		})
 		.catch(error => {
-			customAlert('danger', `Error: ${error.message}`, '');
+			customAlert('danger', `Error: ${error.message}`, 5000);
 		});
 	}
 

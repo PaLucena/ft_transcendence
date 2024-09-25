@@ -26,6 +26,6 @@ export function showQRmodal(qrpath){
 		qrmodal.show()
 	})
 	.catch(error => {
-		customAlert('danger', `Error: ${error.message}`, '');
+		customAlert('danger', `Error: ${error.message}`, 5000);
 	});
 }

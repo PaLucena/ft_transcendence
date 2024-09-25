@@ -25,7 +25,7 @@ export class Login extends Component {
 
 	async initLoginForm() {
 		const loginForm = document.getElementById('login_form');
-		
+
 		loginForm.querySelector('input').focus();
 
 		this.addEventListener(loginForm, 'submit', async function (event) {
@@ -109,7 +109,7 @@ export class Login extends Component {
 					navigateTo("/play");
 
 				} catch (error) {
-					customAlert('danger', `Error: ${error.message}`, '');
+					customAlert('danger', `Error: ${error.message}`, 5000);
 					console.log(error);
 				}
 			}
