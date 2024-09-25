@@ -55,6 +55,14 @@ text-light {
 	color: white; 
 }
 
+.btn-primary {
+	background-color: #2c5784;
+}
+
+.btn-primary:hover, .btn-primary:active {
+	background-color: #9d8df1;
+}
+
 .btn-green, .bg-green {
 	background-color: #3a595c;
 }

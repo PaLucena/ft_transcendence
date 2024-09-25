@@ -8,12 +8,10 @@ import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 export class Play extends Component {
 	constructor() {
 		super('/pages/Play/play.html');
-		console.log('Play Constructor');
 	}
 
 	destroy() {
-		console.log("Play Custom destroy");
-		//tournamentSocket.closeWebSocket();
+		tournamentSocket.closeWebSocket();
 		this.removeAllEventListeners();
 	}
 

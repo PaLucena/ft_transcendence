@@ -7,15 +7,11 @@ import { Component } from "../../scripts/Component.js";
 
 export class Get2faCode extends Component {
 	constructor() {
-		console.log('Get2faCode Constructor');
 		super('/components/Get2faModal/Get2faModal.html')
 		this.promise = null;
 	}
 	
-	init() {
-		console.log("INIT 2FA");
-		
-	}
+	init() {}
 	
 	clearModal(inputs) {
 		if (inputs.length > 0)
@@ -71,9 +67,7 @@ export class Get2faCode extends Component {
 			const submit2FAForm = (username, overlayElement, inputs, TwoFactorModal) => {
 				const otpCode = Array.from(inputs).map(input => input.value).join('');
 				const csrftoken = getCSRFToken('csrftoken');
-				
-				console.log(jsonData)
-				console.log("Submiting 2fa form to user", username)
+
 				fetch("/api/2fa/verify-2fa/", {
 					method: "POST",
 					credentials: 'include',

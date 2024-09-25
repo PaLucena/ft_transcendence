@@ -28,8 +28,14 @@
 	
 	.container-user .user-info {
 		max-height: 100%;
-		overflow-y: auto;
 	}
+
+	.user-info .photo .profile-photo-container {
+		margin-top: 5%;
+		height: 135%;
+	}
+
+	/* container user responsive */
 }
 
 @media only screen and (min-width: 800px) {
@@ -55,6 +61,10 @@
 	.container-user .user-info, .container-stats .stats {
 		margin-left: 5%;
 	}
+
+	.user-info .photo .profile-photo-container {
+		height: 120%;
+	}
 }
 
 .container-user .user-info {
@@ -74,7 +84,6 @@
 
 .user-info .photo .profile-photo-container {
 	position: absolute;
-	height: 120%;
 	bottom: 0;
 }
 
@@ -85,6 +94,7 @@
 }
 
 .user-info .profile-bottom-btns {
+	flex-direction: column;
 	position: absolute;
 	bottom: 0;
 	margin-bottom: 5%;
@@ -92,6 +102,7 @@
 
 .container-stats {
 	z-index: 2;
+	overflow: auto;
 }
 
 .container-stats .stats {
@@ -99,16 +110,15 @@
 	width: 90%;
 	max-height: 100%;
 	overflow-y: auto;
-	overflow-x: hidden;
-
 }
 
 .container-stats .stats .stats-list {
-	margin-bottom: 5%;
+	margin-top: 5%;
 }
 
 .both-stats {
 	position: relative;
+	overflow-x: hidden;
 }
 
 .both-stats .stats-own {

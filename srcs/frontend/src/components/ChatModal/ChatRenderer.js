@@ -1,3 +1,5 @@
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
+
 export class ChatRenderer {
     constructor(chatModal) {
         this.chatModal = chatModal;
@@ -188,7 +190,7 @@ export class ChatRenderer {
 		const blockStatus = data.block_status;
 		const isBlocker = blockStatus === "blocker";
 		const action = isBlocker ? 'unblock' : 'block';
-		const buttonText = isBlocker ? '<span data-i18n="unlock"></span>' : '<span data-i18n="unblock"></span>';
+		const buttonText = isBlocker ? '<span data-i18n="unblock"></span>' : '<span data-i18n="block"></span>';
 
 		return `
 		<div class="d-flex align-items-center">

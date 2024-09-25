@@ -8,7 +8,6 @@ import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRe
 
 export class Login extends Component {
 	constructor() {
-		console.log('Login Constructor');
 		super('/pages/Login/login.html');
 		this.TwoFactorCodeModalInstance = null;
 	}
@@ -19,7 +18,6 @@ export class Login extends Component {
 	}
 
 	destroy() {
-		console.log("Login Custom destroy");
 		this.removeAllEventListeners();
 		if (this.TwoFactorCodeModalInstance)
 			this.TwoFactorCodeModalInstance = null;
@@ -27,6 +25,9 @@ export class Login extends Component {
 
 	async initLoginForm() {
 		const loginForm = document.getElementById('login_form');
+		
+		loginForm.querySelector('input').focus();
+
 		this.addEventListener(loginForm, 'submit', async function (event) {
 
 			event.preventDefault();
