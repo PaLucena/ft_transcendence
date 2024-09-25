@@ -75,6 +75,8 @@ export class Tournament extends Component {
 	closeTournament(tournamentId) {
 		const	closeBtn = document.getElementById('closeBtn');
 
+		console.log("close tournament is being called");
+
 		this.addEventListener(closeBtn, 'click', () => {
 			fetch(`/api/close_tournament/${tournamentId}/`, {
 				method: "POST",
