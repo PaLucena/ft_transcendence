@@ -11,10 +11,7 @@ export class Get2faCode extends Component {
 		this.promise = null;
 	}
 	
-	init() {
-		console.log("INIT 2FA");
-		
-	}
+	init() {}
 	
 	clearModal(inputs) {
 		if (inputs.length > 0)
