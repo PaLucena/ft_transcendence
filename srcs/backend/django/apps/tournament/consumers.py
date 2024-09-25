@@ -1,9 +1,11 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from channels.layers import get_channel_layer
 from django.core.exceptions import ObjectDoesNotExist
 from tournament.models import Tournament
 from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async, async_to_sync
 from .match_logic import format_match, assign_next_match
+from user.models import AppUser as UserModel
 import asyncio
 from ponggame.game_manager import game_manager
 
@@ -91,31 +93,35 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    @staticmethod
-    async def send_goto_game(userId1_room, userId2_room):
-        event = {
-            "type": "goto_game",
-            "goto_game": True,
-        }
-        await self.channel_layer.group_send(userId1_room, event)
-        await self.channel_layer.group_send(userId2_room, event)
+    async def goto_game(self, event):
+        player1_id = event["player1_id"]
+        player2_id = event["player2_id"]
+        user_id = self.scope["user"].id
 
-
-    async def goto_game(self):
-        await self.send_json(
-            {
-                "goto_game": True,
-            }
-        )
+        if user_id == player1_id or user_id == player2_id:
+            await self.send_json(
+                {
+                    "goto_game": True,
+                    "player_number": 1 if user_id == player1_id else 2,
+                }
+            )
+        else:
+            pass
 
 
     #a method to start all matches when triggered
     async def start_matches(self, event):
-        print("AAAAAAAAAAAAAAAAAAWEFAWEFAWFAWFA")
         tournament_id = event["tournament_id"]
         matches = event["matches"]
-        print("4 FIRST MATCHES RECEIVED: ", matches, flush=True)
+
         tournament = await sync_to_async(Tournament.objects.get)(pk=tournament_id)
+        creator_id = await database_sync_to_async(lambda: tournament.creator.id)()
+
+        if self.scope["user"].id != creator_id:
+            print("User", self.scope["user"].id, "is not the creator of the tournament")
+            return
+
+        print("User", self.scope["user"].id, "is starting the tournament")
         results = await self.start_all_matches(tournament, matches)
 
         await self.send_json({
@@ -140,7 +146,6 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             result = await task
             match_id = result['match_id']
             results.append(result)
-
             next_matches = await sync_to_async(assign_next_match, thread_sensitive=False)(
                 tournament, match_id, result
             )
@@ -158,3 +163,16 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
                     )
 
         return results
+
+
+    async def notify_players_to_start_game(self, tournament_name, player1_id, player2_id):
+        channel_layer = get_channel_layer()
+        message = {
+            "type": "goto_game",
+            "player1_id": player1_id,
+            "player2_id": player2_id,
+        }
+
+        await channel_layer.group_send(
+            f"tournament_{tournament_name}", message
+        )

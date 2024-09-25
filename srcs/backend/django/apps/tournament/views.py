@@ -9,6 +9,7 @@ import random
 from blockchain.views import create_tournament as bc_create_tournament
 from .match_logic import create_initial_matches
 from user.utils import set_nickname
+
 from ponggame.game_manager import game_manager
 from asgiref.sync import sync_to_async
 import asyncio
@@ -106,6 +107,8 @@ def close_tournament(request, tournament_id):
 				available_matches = create_initial_matches(tournament)
 				
 				print("BEFORE")
+				print("Tournament creator: ", tournament.creator)
+
 				async_to_sync(get_channel_layer().group_send)(
 					f"tournament_{tournament.name}",
 					{
@@ -114,8 +117,7 @@ def close_tournament(request, tournament_id):
 						"matches": available_matches
 					}
 				)
-	
-				#results = asyncio.run(start_all_matches(tournament, available_matches))
+
 				print("AFTER")
 				return Response({"message": "Tournament starting."},
 					status=status.HTTP_200_OK)

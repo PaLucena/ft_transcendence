@@ -181,7 +181,8 @@ def create_initial_matches(tournament):
 			)
 			match_id += 1
 			matches.append(match)
-		available_matches = [format_match(match) for match in matches]
+
+	available_matches = [format_match(match) for match in matches]
 
 	return available_matches
 

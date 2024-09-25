@@ -11,7 +11,7 @@ from .AI_player import AiPlayer
 def random_ai_game(tournament_id, match_id, player_1_id, player_2_id):
 	player_1_goals = 6
 	player_2_goals = random.randint(0, 4)
-	print(f"AI vs AI result: {player_1_goals} - {player_2_goals}")
+	print(f"Match {match_id} AI vs AI result: {player_1_goals} - {player_2_goals}")
 
 	return {
 		'tournament_id': tournament_id,
@@ -38,8 +38,7 @@ class GameManager:
 
 
 	async def start_match(self, tournament_id, match_id, player_1_id, player_2_id, controls_mode):
-		print ("player 1 ID: ", player_1_id)
-		print ("player 2 ID: ", player_2_id)
+		print ("Call to start_match with match", match_id, "between", player_1_id, "and", player_2_id)
 		"""
 		Start a match between two players
 
@@ -60,14 +59,13 @@ class GameManager:
 			return random_ai_game(tournament_id, match_id, player_1_id, player_2_id)
 
 		if player_1_id != 0 and self.player_to_room.get(player_1_id):
+			print(f"ERROR: Player {player_1_id} is already in a game.")
 			return None
 		if player_2_id != 0 and self.player_to_room.get(player_2_id):
+			print(f"ERROR: Player {player_2_id} is already in a game.")
 			return None
 
-		print(f"Starting match between (ID {player_1_id}) and (ID {player_2_id})") # DEBUG
-
 		try:
-			print ("TEST 3")
 			# Create game room and game logic
 			game_room_id = self.create_game_room(player_1_id, player_2_id)
 			game_room = self.get_game_room_by_id(game_room_id)
@@ -90,15 +88,14 @@ class GameManager:
 					game_logic.player_2_ready = True
 			ai_player = AiPlayer(game_logic)
 
-			print ("TEST 4")
 			await self.run_game_loop(game_room, game_logic, ai_player)
-			print ("TEST 5")
 			# Get the game results
 			result = game_room.get_result(tournament_id, match_id)
 
 			# Remove the room
-			print ("TEST game_room_id: ", game_room_id)
 			self.remove_game_room(game_room_id)
+
+			print(f"{player_1_id} VS {player_2_id} finished.")
 
 			return result
 		except Exception as e:
