@@ -1,12 +1,14 @@
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from sqlite3 import IntegrityError
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from django.contrib.auth.models import AbstractUser
 from rest_framework.response import Response
-from .serializers import UserSerializerClass
 from .models import AppUser, Match
 from friends.models import Friend
 from rest_framework import status
+import re
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, logout
 from rest_framework.decorators import authentication_classes, permission_classes
@@ -97,50 +99,87 @@ def get_other_user_data(request, username):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+def validate_custom_password(password):
+    if len(password) < 8:
+        raise ValidationError("The password must contain at least 8 characters.")
+    if not re.search(r"[A-Z]", password):
+        raise ValidationError(
+            "The password must contain at least one uppercase letter."
+        )
+    if not re.search(r"[0-9]", password):
+        raise ValidationError("The password must contain at least one digit.")
+
+
 @api_view(["POST"])
 def signup(request):
-    serializer = UserSerializerClass(data=request.data)
-    if serializer.is_valid():
-        try:
-            serializer.save()
-            user = AppUser.objects.get(username=request.data["username"])
-            serializer = UserSerializerClass(user)
-            auth_login(request, user)
-            refresh = RefreshToken.for_user(user)
-            access = refresh.access_token
-            response = Response(
-                {"message": "Signup successful"}, status=status.HTTP_201_CREATED
-            )
-            response.set_cookie(
-                "refresh_token", str(refresh), httponly=True, secure=True
-            )
-            response.set_cookie("access_token", str(access), httponly=True, secure=True)
+    data = request.data
+    username = data.get("username")
+    email = data.get("email")
+    password = data.get("password")
+    confirm_password = data.get("confirm_password")
 
-            return response
-        except IntegrityError as e:
-            return Response(
-                {"error": {"code": 1001, "message": str(e)}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+    if not all([username, email, password, confirm_password]):
+        return Response(
+            {"error": {"code": 1000, "message": "All fields are required"}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
-    error_field, error_message = next(iter(serializer.errors.items()))
-    if (
-        isinstance(error_message, list)
-        and isinstance(error_message[0], dict)
-        and "code" in error_message[0]
-    ):
-        return Response(error_message[0], status=status.HTTP_400_BAD_REQUEST)
+    if AppUser.objects.filter(username__iexact=username).exists():
+        return Response(
+            {"error": {"code": 2001, "message": "This username is already in use."}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
-    error_codes = {
-        "username": 2001,
-        "email": 2002,
-    }
+    if AppUser.objects.filter(email__iexact=email).exists():
+        return Response(
+            {"error": {"code": 2002, "message": "This email is already in use."}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
-    error_code = error_codes.get(error_field, 9999)
-    return Response(
-        {"error": {"code": error_code, "message": error_message[0]}},
-        status=status.HTTP_400_BAD_REQUEST,
-    )
+    try:
+        validate_email(email)
+    except ValidationError:
+        return Response(
+            {"error": {"code": 2003, "message": "Invalid email address."}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if password != confirm_password:
+        return Response(
+            {"error": {"code": 2006, "message": "Passwords don't match."}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        validate_custom_password(password)
+    except ValidationError as e:
+        return Response(
+            {"error": {"code": 2007, "message": e.message}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        new_user = AppUser.objects.create_user(
+            username=username, email=email, password=password
+        )
+
+        auth_login(request, new_user)
+
+        refresh = RefreshToken.for_user(new_user)
+        access = refresh.access_token
+
+        response = Response(
+            {"message": "Signup successful"}, status=status.HTTP_201_CREATED
+        )
+        response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
+        response.set_cookie("access_token", str(access), httponly=True, secure=True)
+
+        return response
+    except IntegrityError as e:
+        return Response(
+            {"error": {"code": 1001, "message": str(e)}},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 @api_view(["POST"])
@@ -176,7 +215,6 @@ def login(request):
         response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
         response.set_cookie("access_token", str(access), httponly=True, secure=True)
 
-        # load_test_data(request)
         return response
     else:
         return Response(
