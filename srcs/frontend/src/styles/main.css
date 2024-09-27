@@ -45,14 +45,15 @@ nav {
 }
 
 ::-webkit-scrollbar {
-    background: #e6ecf8;
-    width: 6px;
+    background: transparent;
+    width: 7px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #61b2ff, #ff50ef);
+    background: #e6e6e6;
+    border-radius: 10px;
+    border: 1px solid #b9b9b9;
 }
-
 .user-profile-picture {
 	border-radius: 50%;
 	background-repeat: no-repeat;
