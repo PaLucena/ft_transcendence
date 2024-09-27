@@ -1,53 +1,90 @@
 import { Component } from "../../scripts/Component.js";
+import { handleResponse } from '../../scripts/utils/rtchatUtils.js'
+import { userSocket } from '../../scripts/utils/UserWebsocket.js'
+import { navigateTo } from "../../scripts/Router.js";
+
 
 export class Navbar extends Component {
 	constructor() {
-		super('/components/Navbar/navbar.html')
+		super('/components/Navbar/navbar.html');
+		this.currentPathname = window.location.pathname;
 	}
 
 	init() {
-		Navbar.initNavbarAvatar();
-		Navbar.focus();
+		this.setupHistoryListeners();
+		this.setupOnLogoutBtn();
+		this.changeMenuButtonsActivity();
 	}
 
-	static initNavbarAvatar() {
-		fetch("/api/get_user_data/", {
-			method: "GET",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			document.getElementById("navItem-profile").src = `${data["avatar"]}`;
-		})
-		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, 5000);
-		})
+	setupOnLogoutBtn () {
+		const logoutBtn = document.getElementById('navbar_logout');
+
+		if (logoutBtn) {
+			this.addEventListener(logoutBtn, "click", async () => {
+				try {
+					const response = await fetch('/api/logout/', {
+						method: "GET",
+						credentials: 'include'
+					})
+
+					handleResponse(response, () => {
+						userSocket.closeWebSocket();
+						navigateTo("/login");
+					});
+
+				} catch(error) {
+					console.log("Logout error: ", error);
+				}
+			});
+		}
 	}
 
+	changeMenuButtonsActivity() {
+		const currentPath = window.location.pathname.split('/')[1];
 
-	static focus() {
-		let page = window.location.pathname.slice(1);
-		const	border = page.indexOf("/");
-		if (border > 0)
-			page = page.substring(0, page.indexOf("/"));
+		const navBar = document.getElementById('navbar');
 
-		let navItems = document.querySelectorAll('[id^="navItem"]');
-		navItems.forEach(navItem => {
-			navItem.style.border = "";
+		if (navBar) {
+			const menuItems = navBar.querySelectorAll('.icon');
+
+			menuItems.forEach(item => {
+				const route = item.getAttribute('data-route');
+
+				if (route === currentPath) {
+					item.classList.add('active');
+				} else {
+					item.classList.remove('active');
+				}
+			});
+		} else {
+			console.warn('navbar is not found.');
+
+		}
+	}
+
+	setupHistoryListeners() {
+		const originalPushState = history.pushState;
+		const originalReplaceState = history.replaceState;
+
+		history.pushState = (...args) => {
+			originalPushState.apply(history, args);
+			this.handlePathChange();
+		};
+
+		history.replaceState = (...args) => {
+			originalReplaceState.apply(history, args);
+			this.handlePathChange();
+		};
+
+		window.addEventListener('popstate', () => {
+			this.handlePathChange();
 		});
+	}
 
-		if (page === 'tournament')
-			return ;
-		document.getElementById('navItem-' + page).style.border = "2px solid #edeef0";
+	handlePathChange() {
+		if (this.currentPathname !== window.location.pathname) {
+			this.currentPathname = window.location.pathname;
+			this.changeMenuButtonsActivity();
+		}
 	}
 }

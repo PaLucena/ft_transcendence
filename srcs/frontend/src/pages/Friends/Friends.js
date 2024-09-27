@@ -1,5 +1,4 @@
 import { Component } from '../../scripts/Component.js';
-import { Navbar } from '../../components/Navbar/Navbar.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import { FriendsLoader } from './FriendsLoader.js';
 import { FriendsRenderer } from './FriendsRenderer.js';
@@ -25,7 +24,6 @@ export class Friends extends Component {
 	}
 
 	async init() {
-		await Navbar.focus();
 		await this.friendsLoader.loadFriendsData();
 		this.uiSetup.setupSearchInputEvent();
 		this.uiSetup.setupSearchForm();

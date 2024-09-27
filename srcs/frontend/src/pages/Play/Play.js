@@ -1,6 +1,5 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
-import { Navbar } from '../../components/Navbar/Navbar.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
@@ -21,7 +20,6 @@ export class Play extends Component {
 			document.getElementById("tournamentBtn").innerHTML = tournamentId ? "<h1 data-i18n='back-to-tournament-button'></h1>" : "<h1 data-i18n='tournament-button'></h1>";
 		})
 		this.setupEventListeners();
-		Navbar.focus();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 

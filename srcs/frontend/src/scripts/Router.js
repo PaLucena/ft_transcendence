@@ -40,9 +40,18 @@ class Router {
 	async navigateTo(url) {
 		if (this.previousPath !== url) {
 			window.history.pushState({}, "", url);
+
+			const routeChangeEvent = new CustomEvent('routeChange', {
+				detail: {
+					path: url
+				}
+			});
+			window.dispatchEvent(routeChangeEvent);
+
 			this.router();
 		}
 	}
+
 
 	async router() {
 		const path = window.location.pathname;
