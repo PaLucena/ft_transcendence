@@ -35,7 +35,8 @@ urlpatterns = [
     # The route for checking the health of the django container
     path("health/", health_check),
     # Admin and API routes
-    path("api/admin/", admin.site.urls),
+    # path("api/admin/", admin.site.urls),
+    path("admin/", admin.site.urls),
     path("api/", include("user.urls")),
     path("api/", include("user_stats.urls")),
     path("api/", include("tournament.urls")),
@@ -45,6 +46,6 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path(
         "api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
-    ),  # frontend asks a new access token here
+    ),
     path("api/2fa/", include("twofactor.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
