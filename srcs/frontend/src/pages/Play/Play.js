@@ -203,7 +203,9 @@ export class Play extends Component {
 	createTournament(tournamentType) {
 		const tournamentForm = document.getElementById("tournamentForm");
 
-		this.addEventListener(tournamentForm, "submit", (event) => {
+		tournamentForm.removeEventListener('submit', this.handleTournamentSubmit);
+
+		this.handleTournamentSubmit = (event) => {
 			event.preventDefault();
 
 			const formData = new FormData(event.target);
@@ -237,9 +239,12 @@ export class Play extends Component {
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, 5000);
-			})
-		})
+			});
+		};
+		
+		this.addEventListener(tournamentForm, "submit", this.handleTournamentSubmit);
 	}
+
 
 	joinTournamentAsCreator(name, tournamentType) {
 		fetch("/api/display_tournaments/", {
