@@ -25,7 +25,6 @@ export class Friends extends Component {
 
 	async init() {
 		await this.friendsLoader.loadFriendsData();
-		this.uiSetup.setupSearchInputEvent();
 		this.uiSetup.setupSearchForm();
 		this.uiSetup.setupFilterButtons();
 		this.uiSetup.setupFriendButtons();
