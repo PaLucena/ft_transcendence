@@ -8,6 +8,9 @@ export class Navbar extends Component {
 	constructor() {
 		super('/components/Navbar/navbar.html');
 		this.currentPathname = window.location.pathname;
+
+		this.originalPushState = history.pushState;
+		this.originalReplaceState = history.replaceState;
 	}
 
 	init() {
@@ -63,28 +66,29 @@ export class Navbar extends Component {
 	}
 
 	setupHistoryListeners() {
-		const originalPushState = history.pushState;
-		const originalReplaceState = history.replaceState;
-
 		history.pushState = (...args) => {
-			originalPushState.apply(history, args);
+			this.originalPushState.apply(history, args);
 			this.handlePathChange();
 		};
 
 		history.replaceState = (...args) => {
-			originalReplaceState.apply(history, args);
+			this.originalReplaceState.apply(history, args);
 			this.handlePathChange();
 		};
-
-		window.addEventListener('popstate', () => {
-			this.handlePathChange();
-		});
 	}
 
 	handlePathChange() {
 		if (this.currentPathname !== window.location.pathname) {
 			this.currentPathname = window.location.pathname;
+
 			this.changeMenuButtonsActivity();
 		}
 	}
+
+    destroy() {
+		history.pushState = this.originalPushState;
+		history.replaceState = this.originalReplaceState;
+
+		this.removeAllEventListeners();
+    }
 }
