@@ -3,11 +3,17 @@ import { navigateTo } from '../../scripts/Router.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
+import { pongTournamentSocket } from '../../scripts/utils/PongTournamentSocket.js';
+
+
 
 export class Play extends Component {
 	constructor() {
 		super('/pages/Play/play.html');
+		this.public_tournaments = [];
+		this.private_tournaments = [];
 	}
+
 
 	destroy() {
 		tournamentSocket.closeWebSocket();
@@ -20,6 +26,7 @@ export class Play extends Component {
 			document.getElementById("tournamentBtn").innerHTML = tournamentId ? "<h1 data-i18n='back-to-tournament-button'></h1>" : "<h1 data-i18n='tournament-button'></h1>";
 		})
 		this.setupEventListeners();
+		pongTournamentSocket.initWebSocket();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
@@ -49,25 +56,21 @@ export class Play extends Component {
 		});
 
 
-
 		// DEBUG  ---------------------------------------------------------------------------
 		const testBtn = document.getElementById("testBtn");
 		testBtn.innerHTML = "Test Button";
 		this.addEventListener(testBtn, "click", async () => {
-			await fetch("/api/tournament/", {
-				method: "POST",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				credentials: 'include'
-			})
-				.then(response => response.json())
-				.then(data => {
-					alert("Tournament created");
-				})
-				.catch((error) => {
-					alert("Error creating tournament: " + error);
-				})
+			pongTournamentSocket.t_socket.send(JSON.stringify({
+				'type': 'create_tournament',
+				'name': 'testTournament',
+				'is_private': false,
+				'password': null,
+			}));
+			pongTournamentSocket.t_socket.send(JSON.stringify({
+				'type': 'join_tournament',
+				'name': 'testTournament',
+				'password': null,
+			}));
 		});
 		// ----------------------------------------------------------------------------------
 
@@ -111,7 +114,7 @@ export class Play extends Component {
 		const	tournamentModalElement = document.getElementById("tournamentModal");
 		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
 		this.addEventListener(tournamentModalElement, 'shown.bs.modal', () => {
-			document.getElementById('name-input').focus();
+			document.getElementById('tournament-name').focus();
 		});
 	}
 
@@ -227,9 +230,14 @@ export class Play extends Component {
 	}
 
 	createTournament(tournamentType) {
+		const closeModal = document.getElementsByClassName("btn-close")[0];
+		const tittleModal = document.getElementsByClassName("modal-title")[0];
 		const tournamentForm = document.getElementById("tournamentForm");
+		const tournamentName = document.getElementById("tournament-name");
 
 		tournamentForm.removeEventListener('submit', this.handleTournamentSubmit);
+		tittleModal.innerHTML = `Create ${tournamentType} tournament`;
+		tournamentName.value = "";
 
 		this.handleTournamentSubmit = (event) => {
 			event.preventDefault();
@@ -237,35 +245,18 @@ export class Play extends Component {
 			const formData = new FormData(event.target);
 			const jsonData = {};
 
-			formData.forEach((value, key) => {
-				jsonData[key] = value;
-			});
-			jsonData["type"] = tournamentType;
+			jsonData["type"] = "create_tournament";
+			jsonData["name"] = tournamentName.value;
+			if (tournamentType === 'private') {
+				jsonData["is_private"] = true;
+				jsonData["password"] = formData.get("password");
+			} else {
+				jsonData["is_private"] = false;
+				jsonData["password"] = null;
+			}
+			pongTournamentSocket.t_socket.send(JSON.stringify(jsonData));
 
-			fetch("/api/create_tournament/", {
-				method: "POST",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(jsonData),
-				credentials: 'include'
-			})
-			.then(response => {
-				if (!response.ok) {
-					return response.json().then(errData => {
-						throw new Error(errData.error || `Response status: ${response.status}`);
-					});
-				}
-				return response.json();
-			})
-			.then(data => {
-				customAlert('success', data.message, 3000);
-				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
-				tournamentSocket.initWebSocket(jsonData["name"]);
-			})
-			.catch((error) => {
-				customAlert('danger', `Error: ` + error.message, 5000);
-			});
+			closeModal.click();
 		};
 		
 		this.addEventListener(tournamentForm, "submit", this.handleTournamentSubmit);
@@ -303,53 +294,34 @@ export class Play extends Component {
 		})
 	}
 
+
 	displayTournaments() {
-		fetch("/api/display_tournaments/", {
-			method: "GET",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			const	displayPublic = data.public_tournaments;
-			const	displayPrivate = data.private_tournaments;
+		console.log("Public tournaments:", this.public_tournaments);
+        console.log("Private tournaments:", this.private_tournaments);
+		if (this.public_tournaments.length === 0)
+			document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
+		else {
+			let	publicContainer = document.getElementById("publicTournamentDisplay");
+			publicContainer.innerHTML = '';
 
-			if (displayPublic.length === 0)
-				document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
-			else {
-				let	publicContainer = document.getElementById("publicTournamentDisplay");
-				publicContainer.innerHTML = '';
-
-				for (let i = 0; displayPublic[i]; i++) {
-					publicContainer.innerHTML += `<button class="display-tournament-item btn border-start-0 border-end-0 col-10 my-1 rounded" style="background-color: #ff6d3f;"><span class="tName">${displayPublic[i].name}</span> [${displayPublic[i].players.length}]</div>`;
-				}
-				this.joinTournament(displayPublic, 'public');
+			for (let i = 0; this.public_tournaments[i]; i++) {
+				publicContainer.innerHTML += `<button class="display-tournament-item btn border-start-0 border-end-0 col-10 my-1 rounded" style="background-color: #ff6d3f;"><span class="tName">${this.public_tournaments[i].name}</span> [${this.public_tournaments[i].participants.length}]</div>`;
 			}
-			if (displayPrivate.length === 0)
-				document.getElementById("privateTournamentDisplay").innerHTML = "No active tournaments";
-			else {
-				let	privateContainer = document.getElementById("privateTournamentDisplay");
-				privateContainer.innerHTML = '';
+			this.joinTournament(this.public_tournaments, 'public');
+		}
+		if (this.private_tournaments.length === 0)
+			document.getElementById("privateTournamentDisplay").innerHTML = "No active tournaments";
+		else {
+			let	privateContainer = document.getElementById("privateTournamentDisplay");
+			privateContainer.innerHTML = '';
 
-				for (let i = 0; displayPrivate[i]; i++) {
-					privateContainer.innerHTML += `<button class="display-tournament-item btn btn-success border-start-0 border-end-0 col-10 my-1 rounded"><span class="tName">${displayPrivate[i].name}</span> [${displayPrivate[i].players.length}]</div>`;
-				}
-				this.joinTournament(displayPrivate, 'private');
+			for (let i = 0; this.private_tournaments[i]; i++) {
+				privateContainer.innerHTML += `<button class="display-tournament-item btn btn-success border-start-0 border-end-0 col-10 my-1 rounded"><span class="tName">${this.private_tournaments[i].name}</span> [${this.private_tournaments[i].participants.length}]</div>`;
 			}
-		})
-		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, 5000);
-		})
+			this.joinTournament(this.private_tournaments, 'private');
+		}
 	}
+
 
 	joinTournament(allTournaments, type) {
 		const	joinBtns = document.querySelectorAll('.display-tournament-item');

@@ -1,4 +1,5 @@
 from .tournament_manager import TournamentManager
+from .views import tournament
 
 
 async def send_main_room(channel_layer):
@@ -17,8 +18,9 @@ async def send_main_room(channel_layer):
 
 async def send_tournament_room(channel_layer, tournament_room):
     manager = TournamentManager()
-    state = manager.get_tournament_state(tournament_room)
-    participants = manager.get_tournament_data(tournament_room)
+    tournament_data = manager.get_tournament_data(tournament_room)
+    state = tournament_data['state']
+    participants = tournament_data['participants']
     await channel_layer.group_send(
         tournament_room,
         {
@@ -42,14 +44,16 @@ async def handle_create_tournament(consumer, message):
     manager = TournamentManager()
 
     try:
-        creator = message['creator']
+        creator = consumer.user_id
         name = message['name']
         is_private = message['is_private']
         password = message['password']
 
         new = manager.create_tournament(creator, name, is_private, password)
+        print("llega hasta aqui")
         if new is not None:
-            await consumer.add_to_tournament_group(f"tournament_{new.id}")
+            await consumer.add_to_tournament_group(f"{new.id}")
+            print("entrando al torneo")
             await send_main_room(consumer.channel_layer)
         else:
             await consumer.channel_layer.send_error("User already has an active tournament.")
@@ -61,7 +65,7 @@ async def handle_create_tournament(consumer, message):
 async def handle_join_tournament(consumer, message):
     manager = TournamentManager()
     tournament_id = message['tournament_id']
-    tournament_room = f"tournament_{tournament_id}"
+    tournament_room = f"{tournament_id}"
     password = message['password']
 
     try:

@@ -7,12 +7,12 @@ class TournamentState:
     CANCELLED = "cancelled"
 
 class Tournament:
-    def __init__(self, creator, name, is_private=False, password=None):
-        self.id = generate_unique_id(creator.id)
+    def __init__(self, creator_id, name, is_private=False, password=None):
+        self.id = generate_unique_id(creator_id)
         self.name = name
-        self.creator = creator
-        self.participants = [creator.id]
-        self.players = [creator.id]
+        self.creator_id = creator_id
+        self.participants = [creator_id]
+        self.players = [creator_id]
         self.finished_matches = []
         self.is_private = is_private
         self.password = password
@@ -44,7 +44,7 @@ class Tournament:
             raise Exception("The user is not a participant of the tournament.")
 
         if self.state == TournamentState.WAITING:
-            if user_id == self.creator.id:
+            if user_id == self.creator_id:
                 self.state = TournamentState.CANCELLED
             else:
                 self.participants.remove(user_id)
@@ -55,7 +55,7 @@ class Tournament:
         return {
             "id": self.id,
             "name": self.name,
-            "creator": self.creator.username,
+            "creator": self.creator_id,
             "participants": [p for p in self.participants],
             "is_private": self.is_private,
             "state": self.state,
