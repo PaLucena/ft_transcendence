@@ -12,10 +12,10 @@ class TournamentManager:
         return cls._instance
 
 
-    def create_tournament(self, creator, name, is_private=False, password=None):
-        if self.get_player_active_tournament(creator.id) is None:
+    def create_tournament(self, creator_id, name, is_private=False, password=None):
+        if self.get_player_active_tournament(creator_id) is None:
             print("Free user, ready to create a tournament") # DEBUG
-            new_tournament = Tournament(creator, name, is_private, password)
+            new_tournament = Tournament(creator_id, name, is_private, password)
             self.tournaments[new_tournament.id] = new_tournament
             return new_tournament
         return None
