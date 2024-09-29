@@ -74,33 +74,19 @@ export class Signup extends Component {
 					}
 				}
 
-				const password = signupForm.querySelector('#password');
-				const confirmPassword = signupForm.querySelector('#confirm_password');
-				if (password.value !== confirmPassword.value) {
-					errorContainer.innerHTML = `
-						<div class="flash alert alert-danger m-0">
-							Passwords don't match.
-						</div>`;
-					password.value = '';
-					confirmPassword.value = '';
-					password.focus();
-					return;
-				}
-
 				const jsonData = {
 					username: signupForm.querySelector('#username').value,
 					email: signupForm.querySelector('#email').value,
-					password: password.value,
-					confirm_password: confirmPassword.value,
+					password: signupForm.querySelector('#password').value,
+					confirm_password: signupForm.querySelector('#confirm_password').value,
 				};
 
 				try {
 					await this.handleFormSubmit(jsonData);
 				} catch (error) {
+					console.log(error);
 					this.handleError(error.errorCode, error.errorMessage);
 				}
-
-				signupForm.classList.add('was-validated');
 			});
 		} else {
 			console.warn('signup_form is not found.');
@@ -111,38 +97,55 @@ export class Signup extends Component {
         switch (errorCode) {
             case 400:
 				const signupForm = document.getElementById('signup_form');
-				const errorContainer = signupForm.querySelector('#js_flash_container');
 
-				if (errorContainer) {
-					if (errorMessage.code === 2001) {
-						errorContainer.innerHTML = `
-							<div class="flash alert alert-danger m-0 text-start">
-								${errorMessage.message || 'Server data validation on signup error.'}
-							</div>`;
-						signupForm.querySelector('#username').value = '';
-						signupForm.querySelector('#email').value = '';
-						signupForm.querySelector('#password').value = '';
-						signupForm.querySelector('#confirm_password').value = '';
-						signupForm.querySelector('#username').focus();
-					} else if (errorMessage.code === 2002) {
-						errorContainer.innerHTML = `
-							<div class="flash alert alert-danger m-0 text-start">
-								${errorMessage.message || 'Server data validation on signup error.'}
-							</div>`;
-						signupForm.querySelector('#email').focus();
+				if (signupForm) {
+					const errorContainer = signupForm.querySelector('#js_flash_container');
+
+					if (errorContainer) {
+						if (errorMessage.code === 1000) {
+							const inputs = signupForm.querySelectorAll('input');
+
+							for (let input of inputs) {
+								if (!input.value) {
+									errorContainer.innerHTML = `
+										<div class="flash alert alert-danger m-0 text-start">
+											${errorMessage.message || 'Server data validation on signup error.'}
+										</div>`;
+									input.focus();
+									break ;
+								}
+							}
+						}
+						else if (errorMessage.code === 2001) {
+							errorContainer.innerHTML = `
+								<div class="flash alert alert-danger m-0 text-start">
+									${errorMessage.message || 'Server data validation on signup error.'}
+								</div>`;
+							signupForm.querySelector('#username').focus();
+						} else if (errorMessage.code === 2002 || errorMessage.code === 2003) {
+							errorContainer.innerHTML = `
+								<div class="flash alert alert-danger m-0 text-start">
+									${errorMessage.message || 'Server data validation on signup error.'}
+								</div>`;
+							signupForm.querySelector('#email').focus();
+						} else if (errorMessage.code === 2006 || errorMessage.code === 2007) {
+							errorContainer.innerHTML = `
+								<div class="flash alert alert-danger m-0 text-start">
+									${errorMessage.message || 'Server data validation on signup error.'}
+								</div>`;
+							signupForm.querySelector('#password').value = '';
+							signupForm.querySelector('#confirm_password').value = '';
+							signupForm.querySelector('#password').focus();
+						} else {
+							errorContainer.innerHTML = `
+								<div class="flash alert alert-danger m-0 text-start">
+									Server data validation on signup error.
+								</div>`;
+						}
 					} else {
-						errorContainer.innerHTML = `
-							<div class="flash alert alert-danger m-0 text-start">
-								${errorMessage.message || 'Server data validation on signup error.'}
-							</div>`;
-						signupForm.querySelector('#password').value = '';
-						signupForm.querySelector('#confirm_password').value = '';
-						signupForm.querySelector('#password').focus();
+						customAlert('danger', `${errorMessage.message || 'Server data validation on signup error.'}`, 5000);
 					}
-				} else {
-					customAlert('danger', `${errorMessage.message || 'Server data validation on signup error.'}`, 5000);
 				}
-
 				break ;
             default:
                 console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);

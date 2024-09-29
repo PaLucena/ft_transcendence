@@ -1,14 +1,11 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
-import { Navbar } from '../../components/Navbar/Navbar.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
-
-// import { showQRmodal } from '../../components/Show2faQRModal'
 
 export class Profile extends Component {
 	constructor(params = {}) {
@@ -22,8 +19,6 @@ export class Profile extends Component {
 	init() {
 		this.displayUserInfo(this.params.username);
 		this.saveInfoBtn(this.params.username);
-		if (typeof this.params.username === "undefined")
-			Navbar.focus();
 		this.enable2fa();
 		this.disable2fa();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
@@ -75,7 +70,14 @@ export class Profile extends Component {
 				}
 			}
 
-			document.getElementById("photoContainer").src = `${data["avatar"]}`;
+			const profileContainer =document.getElementById('rootProfile');
+			if (profileContainer) {
+				const profilePhoto = profileContainer.querySelector('#profile_photo');
+				if (profilePhoto && data.avatar) {
+					profilePhoto.style.backgroundImage = `url(${data.avatar || '/assets/images/default_avatar.jpg'})`;
+				}
+				//document.getElementById("photoContainer").src = `${data["avatar"]}`;
+			}
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
 			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
 			if (data["number_of_friends"] == 1)
@@ -162,7 +164,7 @@ export class Profile extends Component {
 	}
 
 	renderChatBtn(username) {
-		document.getElementById('chatBtnPlaceholder').innerHTML = '<button id="chatBtn" class="btn btn-green d-flex justify-content-center align-items-center ml-3 rounded-circle square"><img src="../../assets/icons/chat.svg" alt="Play icon" class="h-75"></button>';
+		document.getElementById('chatBtnPlaceholder').innerHTML = '<button id="chatBtn" class="btn btn-green profile-chat-btn d-flex justify-content-center align-items-center ml-3 rounded-circle square"><i class="fa-regular fa-comment-dots"></i></button>';
 		const chatBtn = document.getElementById("chatBtn");
 
 		this.addEventListener(chatBtn, "click", async () => {
