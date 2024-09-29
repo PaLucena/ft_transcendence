@@ -64,6 +64,8 @@ class GameLogic:
         self.new_direction = False
         self.match_total_time = 0
         self.forfeit = 0
+        self.winner = 0
+        self.loser = 0
 
         self.player_1_channel = None
         self.player_2_channel = None
@@ -235,9 +237,28 @@ class GameLogic:
 
     def end_game_adjustments(self):
         self.match_total_time = round(time.time() - self.start_time, 2)
-        if not self.player_1_ready:
-            self.player_1_goals = -1
-            self.match_total_time = 0
-        if not self.player_2_ready:
-            self.player_2_goals = -1
-            self.match_total_time = 0
+        if self.forfeit:
+            if self.forfeit == 1:
+                self.winner = 2
+            else:
+                self.winner = 1
+            self.loser = 0
+        else:
+            if not self.player_1_ready and not self.player_2_ready:
+                self.winner = 0
+                self.loser = 0
+                self.match_total_time = 0
+            elif not self.player_1_ready:
+                self.winner = 2
+                self.loser = 0
+                self.match_total_time = 0
+            elif not self.player_2_ready:
+                self.winner = 1
+                self.loser = 0
+                self.match_total_time = 0
+            elif self.player_1_goals > self.player_2_goals:
+                self.winner = 1
+                self.loser = 2
+            else:
+                self.winner = 2
+                self.loser = 1
