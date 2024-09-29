@@ -207,7 +207,7 @@ contract PongTournament {
             }
         }
 
-        // Loosers bracket - First round - 4 players
+        // Losers bracket - First round - 4 players
         for (uint256 i = 0; i < 2; i++) {
             local = losersBracket[i * 2];
             visitor = losersBracket[i * 2 + 1];
@@ -237,7 +237,7 @@ contract PongTournament {
             }
         }
 
-        // Loosers bracket - Second round - 4 players
+        // Losers bracket - Second round - 4 players
         for (uint256 i = 0; i < 2; i++) {
             local = losersBracket[i * 2];
             visitor = losersBracket[i * 2 + 1];
@@ -251,7 +251,7 @@ contract PongTournament {
             }
         }
 
-        // Loosers bracket - Third round - 2 players
+        // Losers bracket - Third round - 2 players
         local = losersBracket[0];
         visitor = losersBracket[1];
         rnd_match = randomMatch(local, visitor);
@@ -277,7 +277,7 @@ contract PongTournament {
             losersBracket[0] = local;
         }
 
-        // Loosers bracket - Fourth round - 2 players
+        // Losers bracket - Fourth round - 2 players
         local = losersBracket[0];
         visitor = losersBracket[1];
         rnd_match = randomMatch(local, visitor);

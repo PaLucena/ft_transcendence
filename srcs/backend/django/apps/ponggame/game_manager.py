@@ -31,8 +31,8 @@ class GameManager:
 		self.rooms = {}
 		self.player_to_room = {}
 		self.channel_layer = get_channel_layer()
-
 		self.frame_count = 0
+
 	def is_player_in_game(self, player_id):
 		return player_id in self.player_to_room
 
@@ -101,6 +101,31 @@ class GameManager:
 		except Exception as e:
 			print(f"Error starting match: {e}")
 			return None
+
+
+	async def start_match_test(self, tournament_id, match_id, player1_id, player2_id, controls_mode):
+
+		if player1_id == 0:
+			winner = 2
+			loser = 1
+		elif player2_id == 0:
+			winner = 1
+			loser = 2
+		else:
+			winner = random.choice([1, 2])
+			loser = 2 if winner == 1 else 1
+
+		match_result = {
+			"tournament_id": tournament_id,
+			"match_id": match_id,
+			f"player_1_id": player1_id,
+			f"player_2_id": player2_id,
+			"winner": winner,
+			"loser": loser
+		}
+
+		return match_result
+
 
 	async def run_game_loop(self, game_room, game_logic, ai_player):
 		frame_count = 0
@@ -190,6 +215,8 @@ class GameRoom:
 			'player_2_max_hits': self.game_logic.player_2_max_hits,
 			'match_total_time': self.game_logic.match_total_time,
 			'forfeit': self.game_logic.forfeit,
+			'winner': self.game_logic.winner,
+			'loser': self.game_logic.loser,
 		}
 
 # Create the game manager

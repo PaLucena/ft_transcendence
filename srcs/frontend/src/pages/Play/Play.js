@@ -48,6 +48,32 @@ export class Play extends Component {
 			})
 		});
 
+
+
+		// DEBUG  ---------------------------------------------------------------------------
+		const testBtn = document.getElementById("testBtn");
+		testBtn.innerHTML = "Test Button";
+		this.addEventListener(testBtn, "click", async () => {
+			await fetch("/api/tournament/", {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include'
+			})
+				.then(response => response.json())
+				.then(data => {
+					alert("Tournament created");
+				})
+				.catch((error) => {
+					alert("Error creating tournament: " + error);
+				})
+		});
+		// ----------------------------------------------------------------------------------
+
+
+
+
 		const	backOne = document.getElementById("backOne");
 		this.addEventListener(backOne, "click", () => {
 			document.getElementById("dropdownOneVsOne").style.display = "none";

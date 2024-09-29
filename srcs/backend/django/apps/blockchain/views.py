@@ -51,9 +51,9 @@ def record_match(data):
 def get_tournament(request, tournament_id):
     try:
         matches = bc_get_tournament(tournament_id)
-        return (matches)
+        return matches
     except Exception as e:
-        return ("error")
+        return "Error: " + str(e)
 
 
 def get_all_tournaments_ids(request):
@@ -75,25 +75,25 @@ def get_match(request, match_id):
 def get_player_tournaments(request, player_id):
     try:
         tournaments = bc_get_player_tournaments(player_id)
-        return (tournaments)
+        return tournaments
     except Exception as e:
-        return ("error")
+        return "Error: " + str(e)
 
 
 def get_player_matches(request, player_id):
     try:
         matches = bc_get_player_matches(player_id)
-        return (matches)
+        return matches
     except Exception as e:
-        return ("error")
+        return "Error: " + str(e)
 
 
 def get_face2face(request, player1_id, player2_id):
     try:
         matches = bc_get_face2face(player1_id, player2_id)
-        return (matches)
+        return matches
     except Exception as e:
-        return ("error")
+        return "Error: " + str(e)
 
 
 def load_test_data(request):

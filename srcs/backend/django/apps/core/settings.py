@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "blockchain",
     "rtchat",
     "ponggame",
+    "pongtournament",
     "django_otp",
     "django_otp.plugins.otp_totp",
     "twofactor",
