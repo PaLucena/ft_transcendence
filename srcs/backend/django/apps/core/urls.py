@@ -35,8 +35,7 @@ urlpatterns = [
     # The route for checking the health of the django container
     path("health/", health_check),
     # Admin and API routes
-    # path("api/admin/", admin.site.urls),
-    path("admin/", admin.site.urls),
+    path("api/admin/", admin.site.urls),
     path("api/", include("user.urls")),
     path("api/", include("user_stats.urls")),
     path("api/", include("tournament.urls")),
