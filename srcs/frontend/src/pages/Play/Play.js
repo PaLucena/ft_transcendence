@@ -1,6 +1,5 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
-import { Navbar } from '../../components/Navbar/Navbar.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
@@ -21,7 +20,6 @@ export class Play extends Component {
 			document.getElementById("tournamentBtn").innerHTML = tournamentId ? "<h1 data-i18n='back-to-tournament-button'></h1>" : "<h1 data-i18n='tournament-button'></h1>";
 		})
 		this.setupEventListeners();
-		Navbar.focus();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
@@ -46,7 +44,7 @@ export class Play extends Component {
 				}
 			})
 			.catch((error) => {
-				customAlert('danger', `Error(checkRunningTournaments): ` + error.message, '');
+				customAlert('danger', `Error(checkRunningTournaments): ` + error.message, 5000);
 			})
 		});
 
@@ -149,12 +147,12 @@ export class Play extends Component {
 			return response.json();
 		})
 		.then(data => {
-			customAlert('success', data.message, '3000');
+			customAlert('success', data.message, 3000);
 			navigateTo("/pong");
 
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
@@ -176,12 +174,12 @@ export class Play extends Component {
 			return response.json();
 		})
 		.then(data => {
-			customAlert('success', data.message, '3000');
+			customAlert('success', data.message, 3000);
 			navigateTo("/pong");
 
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
@@ -205,19 +203,21 @@ export class Play extends Component {
 			return response.json();
 		})
 		.then(data => {
-			customAlert('success', data.message, '3000');
+			customAlert('success', data.message, 3000);
 			navigateTo("/pong");
 
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
 	createTournament(tournamentType) {
 		const tournamentForm = document.getElementById("tournamentForm");
 
-		this.addEventListener(tournamentForm, "submit", (event) => {
+		tournamentForm.removeEventListener('submit', this.handleTournamentSubmit);
+
+		this.handleTournamentSubmit = (event) => {
 			event.preventDefault();
 
 			const formData = new FormData(event.target);
@@ -245,15 +245,18 @@ export class Play extends Component {
 				return response.json();
 			})
 			.then(data => {
-				customAlert('success', data.message, '3000');
+				customAlert('success', data.message, 3000);
 				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
 				tournamentSocket.initWebSocket(jsonData["name"]);
 			})
 			.catch((error) => {
-				customAlert('danger', `Error: ` + error.message, '');
-			})
-		})
+				customAlert('danger', `Error: ` + error.message, 5000);
+			});
+		};
+		
+		this.addEventListener(tournamentForm, "submit", this.handleTournamentSubmit);
 	}
+
 
 	joinTournamentAsCreator(name, tournamentType) {
 		fetch("/api/display_tournaments/", {
@@ -282,7 +285,7 @@ export class Play extends Component {
 			}
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
@@ -330,7 +333,7 @@ export class Play extends Component {
 			}
 		})
 		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, '');
+			customAlert('danger', `Error: ` + error.message, 5000);
 		})
 	}
 
@@ -368,7 +371,7 @@ export class Play extends Component {
 					navigateTo("/tournament/" + tournamentData.id);
 				})
 				.catch((error) => {
-					customAlert('danger', `Error: ` + error.message, '');
+					customAlert('danger', `Error: ` + error.message, 5000);
 				})
 			});
 		});

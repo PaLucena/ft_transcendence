@@ -1,7 +1,7 @@
-import routerInstance, { navigateTo, navigateToOnBootup } from './Router.js';
+import routerInstance, { navigateTo } from './Router.js';
 
 window.addEventListener("DOMContentLoaded", () => {
-	navigateToOnBootup();
+	routerInstance.router();
 });
 
 window.addEventListener("popstate", () => {

@@ -1,26 +1,23 @@
-<nav class="d-flex navbar navbar-expand col-12 col-md-6 col-xl-4">
-	<div class="container-fluid vh-10">
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<ul class="navbar-nav me-auto mb-2 mb-lg-0 w-100">
-				<li class="d-flex col-3 nav-item align-items-center">
-					<div class="navbar-brand w-100 m-0 text-center text-light"><h1 class="display-4 display-md-6">Pong</h1></div>
-				</li>
-				<li class="d-flex col-3 nav-item align-items-center justify-content-center">
-					<a id="navItem-play" class="nav-link align-items-center h-8vh rounded-circle" aria-current="page" href="/play">
-						<img src="/assets/icons/play.svg" alt="Play icon" class="h-100">
+<nav class="d-flex navbar navbar-expand">
+		<div class="collapse justify-content-center navbar-collapse px-5 py-3" id="navbarSupportedContent">
+			<ul class="icon-container">
+				<li class="icon icon-rotate" data-route="play">
+					<a class="navbar-link" href="/play">
+						<i class="fa-solid fa-gamepad"></i>
 					</a>
 				</li>
-				<li class="d-flex col-3 nav-item align-items-center justify-content-center">
-					<a id="navItem-friends" class="nav-link align-items-center h-8vh rounded-circle" aria-current="page" href="/friends/all">
-						<img src="/assets/icons/friends.svg" alt="Friends icon" class="h-100">
+				<li class="icon icon-expand" data-route="friends">
+					<a class="navbar-link" href="/friends/all">
+						<i class="fa-solid fa-user-group"></i>
 					</a>
 				</li>
-				<li class="d-flex col-3 nav-item align-items-center justify-content-center">
-					<div class="d-flex h-10vh justify-content-end">
-						<a id="navbarPhotoContainer" class="nav-link fs-5 w-100" aria-current="page" href="/profile">
-							<img id="navItem-profile" class="h-100 square rounded-circle shadow" alt="Avatar" />
-						</a>
-					</div>
+				<li class="icon icon-enter" data-route="profile">
+					<a class="navbar-link" href="/profile">
+						<i class="fa fa-user"></i>
+					</a>
+				</li>
+				<li class="icon icon-collapse" id="navbar_logout">
+					<i class="fa-solid fa-right-from-bracket"></i>
 				</li>
 			</ul>
 		</div>

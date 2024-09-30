@@ -38,24 +38,20 @@ class Router {
 	}
 
 	async navigateTo(url) {
-		
-		if (this.previousPath !== url) {			
+		if (this.previousPath !== url) {
 			window.history.pushState({}, "", url);
+
+			const routeChangeEvent = new CustomEvent('routeChange', {
+				detail: {
+					path: url
+				}
+			});
+			window.dispatchEvent(routeChangeEvent);
+
 			this.router();
 		}
 	}
 
-	async navigateToOnBootup() {
-		if (window.location.pathname === "/" || window.location.pathname === "/login") {
-			navigateTo(await this.checkAuthentication(window.location.pathname) ? '/play' : '/login');
-		}
-		else if (window.location.pathname === "/signup") {
-			navigateTo(await this.checkAuthentication(window.location.pathname) ? '/play' : '/signup')
-		}
-		else {
-			this.router();
-		}
-	}
 
 	async router() {
 		const path = window.location.pathname;
@@ -75,32 +71,50 @@ class Router {
 		const routeFactory = matchedRoute ? this.routes[matchedRoute] : this.routes['/404'];
 		const isProtectedRoute = matchedRoute && matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
 
-		if (isProtectedRoute) {
-			const isAuthenticated = await this.checkAuthentication(matchedRoute);
-			await fetch("/api/2fa/check2fa/", {
-					method: "GET",
-					credentials: 'include',
-				})
-				.then(response => {
-					if (!response.ok) {
-						return response.json().then(errData => {
-							throw new Error(errData.error || `Response status: ${response.status}`);
-						});
-					}
-					return response.json();
-				})
-				.then(data => {
-					if (data["has2faEnabled"] == false) {
-						if (!isAuthenticated) {
-							this.navigateTo("/login");
-							return;
-						}
-					}
-				})
+		const isAuthenticated = await this.checkAuthentication();
 
-			if (!userSocket.userSocket || userSocket.userSocket.readyState === WebSocket.CLOSED)
-				userSocket.initWebSocket();
+		if (isAuthenticated) {
+			// if (matchedRoute === "/login" || matchedRoute === "/signup" || matchedRoute === "/auth") {
+			// 	this.navigateTo("/play");
+			// 	return;
+			// }
+
+			if (matchedRoute === "/login" || matchedRoute === "/signup" || matchedRoute === "/") {
+					this.navigateTo("/play");
+					return;
+			}
+
+			if (isProtectedRoute) {
+				if (!userSocket.userSocket || userSocket.userSocket.readyState === WebSocket.CLOSED)
+					userSocket.initWebSocket();
+			}
+		} else {
+			if (isProtectedRoute) {
+				this.navigateTo("/login");
+				return;
+			}
 		}
+
+		// await fetch("/api/2fa/check2fa/", {
+		// 		method: "GET",
+		// 		credentials: 'include',
+		// 	})
+		// 	.then(response => {
+		// 		if (!response.ok) {
+		// 			return response.json().then(errData => {
+		// 				throw new Error(errData.error || `Response status: ${response.status}`);
+		// 			});
+		// 		}
+		// 		return response.json();
+		// 	})
+		// 	.then(data => {
+		// 		if (data["has2faEnabled"] == false) {
+		// 			if (!isAuthenticated) {
+		// 				this.navigateTo("/login");
+		// 				return;
+		// 			}
+		// 		}
+		// 	})
 
 		if (this.currentComponent && this.previousPath !== path) {
 			if (typeof this.currentComponent.destroy === 'function') {
@@ -121,7 +135,7 @@ class Router {
 		this.previousPath = path;
 	}
 
-	async checkAuthentication(path) {
+	async checkAuthentication() {
 		try {
 			const response = await fetch('/api/check_auth', {
 				method: 'GET',
@@ -139,9 +153,8 @@ class Router {
 
 			return is_auth;
 
-		} catch (error) {			
-			if (path !== "/login" && path !== "/signup" && path !== "/auth")
-				console.error("Error checking authentication:", error);
+		} catch (error) {
+			console.error("Error on checked authentication:", error);
 			return false;
 		}
 	}
@@ -179,4 +192,3 @@ class Router {
 const routerInstance = new Router();
 export default routerInstance;
 export const navigateTo = routerInstance.navigateTo.bind(routerInstance);
-export const navigateToOnBootup = routerInstance.navigateToOnBootup.bind(routerInstance);
