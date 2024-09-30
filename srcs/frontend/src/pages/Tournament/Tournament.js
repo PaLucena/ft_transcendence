@@ -95,8 +95,16 @@ export class Tournament extends Component {
 				return response.json();
 			})
 			.then(data => {
-				
 				customAlert('success', 'Tournament closed', '3000');
+
+				try {
+					const message = JSON.stringify({
+						action: 'players_ready',
+					});
+					tournamentSocket.t_socket.send(message);
+				} catch (error) {
+					console.error('Failed to send notification:', error);
+				}
 			})
 			.catch((error) => {
 				console.log(error);
