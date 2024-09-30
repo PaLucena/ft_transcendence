@@ -16,7 +16,7 @@ export class FriendsRenderer {
 
 				if (userElement) {
 					container.appendChild(userElement);
-					setTimeout(() => languageSelector.updateLanguage(), 0); 
+					setTimeout(() => languageSelector.updateLanguage(), 0);
 				}
 			});
 		} else {
@@ -38,12 +38,12 @@ export class FriendsRenderer {
 					data-online-username="${user.username}"
 					style="top:90%; left:85%;">
 				</div>`;
-				
+
 			const commonHtml = `
 				<div class="friends-element col-6 col-sm-4 col-md-4 col-lg-2 mb-4">
 					<div class="img-nick">
 						<a
-							class="user-profile-picture ${borderClass} border border-2 btn rounded-circle bg-light d-flex justify-content-center align-items-center position-relative" href="/profile/${user.username}"
+							class="user-profile-picture ${borderClass} border border-3 btn rounded-circle bg-light d-flex justify-content-center align-items-center position-relative" href="/profile/${user.username}"
 							style="
 									background-image: url(${user.other_user_avatar_url || '/assets/images/default_avatar.jpg'});"
 						>

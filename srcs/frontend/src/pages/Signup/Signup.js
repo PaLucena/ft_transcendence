@@ -1,96 +1,154 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
-import { getCSRFToken } from '../../scripts/utils/csrf.js'
+import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
 import { userSocket } from '../../scripts/utils/UserWebsocket.js';
+import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 
 export class Signup extends Component {
-	constructor() {
-		super('/pages/Signup/signup.html');
-	}
-
-	destroy() {
-		this.removeAllEventListeners();
+    constructor() {
+        super('/pages/Signup/signup.html');
     }
 
-	init() {
-		this.initSubmitForm()
-	}
+    destroy() {
+        this.removeAllEventListeners();
+    }
+
+    async init() {
+        this.initSubmitForm();
+    }
+
+    async submitSignupData(jsonData, csrftoken) {
+        const response = await fetch("/api/signup/", {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify(jsonData)
+        });
+
+        let returnData = null;
+        await handleResponse(response, (data) => {
+            returnData = data;
+        });
+
+        return returnData;
+    }
+
+    async handleFormSubmit(jsonData) {
+        const csrftoken = getCSRFToken('csrftoken');
+
+        const signupData = await this.submitSignupData(jsonData, csrftoken);
+
+        if (signupData) {
+            userSocket.initWebSocket();
+            customAlert('success', 'Account was created successfully', 3000);
+            navigateTo("/play");
+        }
+    }
+
 
 	initSubmitForm() {
-		const signup_form = document.getElementById('signup_form')
+		const signupForm = document.getElementById('signup_form');
 
-		signup_form.querySelector('input').focus();
+		if (signupForm) {
+			signupForm.querySelector('input').focus();
 
-		this.addEventListener(signup_form, 'submit', (event) => {
-			let password = $('#password').val();
-			let confirmPassword = $('#confirm_password').val();
-			let formIsValid = true;
-
-			if (password !== confirmPassword) {
+			this.addEventListener(signupForm, 'submit', async (event) => {
 				event.preventDefault();
-				$('#confirm_password').addClass('is-invalid').removeClass('is-valid');
-				$('#confirm_password')[0].setCustomValidity('Passwords do not match.');
-				formIsValid = false;
-			}
-			else {
-				$('#confirm_password').removeClass('is-invalid').addClass('is-valid');
-				$('#confirm_password')[0].setCustomValidity('');
-			}
+				const errorContainer = signupForm.querySelector('#js_flash_container');
 
-			if (formIsValid) {
-				event.preventDefault();
+				const inputs = signupForm.querySelectorAll('input');
 
-				const formData = new FormData(event.target);
-				let jsonData = {};
-
-				formData.forEach((value, key) => {
-					jsonData[key] = value;
-				});
-
-				const csrftoken = getCSRFToken('csrftoken');
-
-				fetch("/api/signup/", {
-					method: "POST",
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-CSRFToken': csrftoken
-					},
-					body: JSON.stringify(jsonData)
-				})
-				.then(response => {
-					if (!response.ok) {
-						return response.json().then(errData => {
-							throw new Error(errData.error || `Response status: ${response.status}`);
-						});
+				for (let input of inputs) {
+					if (!input.value) {
+						const fieldName = input.name.charAt(0).toUpperCase() + input.name.slice(1);
+						errorContainer.innerHTML = `
+							<div class="flash alert alert-danger m-0">
+								${fieldName} is required.
+							</div>`;
+						input.focus();
+						return;
 					}
-					return response.json();
-				})
-				.then(data => {
-					userSocket.initWebSocket();
-					customAlert('success', 'Account was created successfully', 3000);
-					navigateTo("/play");
-				})
-				.catch(error => {
-					customAlert('danger', `Error: ${error.message}`, 5000);
-				});
-			}
+				}
 
-			//this.classList.add('was-validated');
-		});
+				const jsonData = {
+					username: signupForm.querySelector('#username').value,
+					email: signupForm.querySelector('#email').value,
+					password: signupForm.querySelector('#password').value,
+					confirm_password: signupForm.querySelector('#confirm_password').value,
+				};
 
-		$('#confirm_password, #password').on('input', function() {
-			let password = $('#password').val();
-			let confirmPassword = $('#confirm_password').val();
-
-			if (password !== confirmPassword) {
-				$('#confirm_password').addClass('is-invalid').removeClass('is-valid');
-				$('#confirm_password')[0].setCustomValidity('Passwords do not match.');
-			} else {
-				$('#confirm_password').removeClass('is-invalid').addClass('is-valid');
-				$('#confirm_password')[0].setCustomValidity('');
-			}
-		});
+				try {
+					await this.handleFormSubmit(jsonData);
+				} catch (error) {
+					console.log(error);
+					this.handleError(error.errorCode, error.errorMessage);
+				}
+			});
+		} else {
+			console.warn('signup_form is not found.');
+		}
 	}
+
+    handleError(errorCode, errorMessage) {
+        switch (errorCode) {
+            case 400:
+				const signupForm = document.getElementById('signup_form');
+
+				if (signupForm) {
+					const errorContainer = signupForm.querySelector('#js_flash_container');
+
+					if (errorContainer) {
+						if (errorMessage.code === 1000) {
+							const inputs = signupForm.querySelectorAll('input');
+
+							for (let input of inputs) {
+								if (!input.value) {
+									errorContainer.innerHTML = `
+										<div class="flash alert alert-danger m-0 text-start">
+											${errorMessage.message || 'Server data validation on signup error.'}
+										</div>`;
+									input.focus();
+									break ;
+								}
+							}
+						}
+						else if (errorMessage.code === 2001) {
+							errorContainer.innerHTML = `
+								<div class="flash alert alert-danger m-0 text-start">
+									${errorMessage.message || 'Server data validation on signup error.'}
+								</div>`;
+							signupForm.querySelector('#username').focus();
+						} else if (errorMessage.code === 2002 || errorMessage.code === 2003) {
+							errorContainer.innerHTML = `
+								<div class="flash alert alert-danger m-0 text-start">
+									${errorMessage.message || 'Server data validation on signup error.'}
+								</div>`;
+							signupForm.querySelector('#email').focus();
+						} else if (errorMessage.code === 2006 || errorMessage.code === 2007) {
+							errorContainer.innerHTML = `
+								<div class="flash alert alert-danger m-0 text-start">
+									${errorMessage.message || 'Server data validation on signup error.'}
+								</div>`;
+							signupForm.querySelector('#password').value = '';
+							signupForm.querySelector('#confirm_password').value = '';
+							signupForm.querySelector('#password').focus();
+						} else {
+							errorContainer.innerHTML = `
+								<div class="flash alert alert-danger m-0 text-start">
+									Server data validation on signup error.
+								</div>`;
+						}
+					} else {
+						customAlert('danger', `${errorMessage.message || 'Server data validation on signup error.'}`, 5000);
+					}
+				}
+				break ;
+            default:
+                console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
+        }
+    }
 }
