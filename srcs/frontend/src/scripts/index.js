@@ -1,5 +1,6 @@
 import routerInstance, { navigateTo } from './Router.js';
 
+
 window.addEventListener("DOMContentLoaded", () => {
 	routerInstance.router();
 });

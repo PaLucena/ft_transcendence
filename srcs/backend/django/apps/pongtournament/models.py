@@ -11,8 +11,8 @@ class Tournament:
         self.id = generate_unique_id(creator_id)
         self.name = name
         self.creator_id = creator_id
-        self.participants = [creator_id]
-        self.players = [creator_id]
+        self.participants = []
+        self.players = []
         self.finished_matches = []
         self.is_private = is_private
         self.password = password
@@ -21,6 +21,7 @@ class Tournament:
         self.winner_bracket = []
         self.loser_bracket = []
         self.tournament_winner = None
+        self.players_data = []
 
 
     def can_join(self, user_id, password):
@@ -34,10 +35,14 @@ class Tournament:
         return False
 
 
-    def add_participant(self, user_id):
-        self.participants.append(user_id)
-        self.players.append(user_id)
-
+    def add_participant(self, user):
+        self.participants.append(user.id)
+        self.players.append(user.id)
+        self.players_data.append({
+            "user_id": user.id,
+            "user_name": user.username,
+            "avatar": user.avatar.url,
+        })
 
     def remove_participant(self, user_id):
         if user_id not in self.participants:
@@ -57,6 +62,7 @@ class Tournament:
             "name": self.name,
             "creator": self.creator_id,
             "participants": [p for p in self.participants],
+            "players_data": self.players_data,
             "is_private": self.is_private,
             "state": self.state,
             "winner": self.tournament_winner

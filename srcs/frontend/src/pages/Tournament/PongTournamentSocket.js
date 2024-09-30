@@ -1,5 +1,5 @@
-import { Play } from "../../pages/Play/Play.js";
-import {navigateTo} from "../Router.js";
+import {navigateTo} from "../../scripts/Router.js";
+import { Play } from "../Play/Play.js";
 
 
 class PongTournamentSocket {
@@ -8,13 +8,14 @@ class PongTournamentSocket {
         this.reconnectDelay = 5000;
         this.maxReconnectAttempts = 10;
         this.reconnectAttempts = 0;
-        this.playInstance = null;
+
+        this.public_tournaments = [];
+        this.private_tournaments = [];
     }
 
     initWebSocket() {
         try {
             this.t_socket = new WebSocket(`/ws/pongtournament/`);
-            console.log("New tournament WebSocket created");
         } catch (error) {
             this.handleError(null, 'Failed to create WebSocket', true);
             return;
@@ -30,17 +31,16 @@ class PongTournamentSocket {
         try {
             const data = JSON.parse(event.data);
 
-            if (!this.playInstance) {
-                this.playInstance = Play.getInstance();
-            }
+            console.log("ALL DATA:", data)
 
             if (data.type === 'error') {
                 this.handleError(data.errorCode, data.message);
             }
 
             if (data.type === 'main_room_update') {
-                console.log("Main room update:", data.public_tournaments, data.private_tournaments);
-                this.playInstance.updateTournaments(data.public_tournaments, data.private_tournaments);
+                console.log("Main room update: public ", data.public_tournaments.length, " private", data.private_tournaments.length);
+                Play.displayTournaments(data.public_tournaments, data.private_tournaments);
+                console.log("Data", data);
             }
 
             if (data.type === 'tournament_room_update') {
@@ -55,7 +55,6 @@ class PongTournamentSocket {
 
             if (data.type === 'tournament_ended') {
                 console.log("Tournament ended:", data.tournament_id, data.results);
-
             }
 
         } catch (error) {
@@ -70,6 +69,7 @@ class PongTournamentSocket {
 
         navigateTo(`/pong/`);
     }
+
 
     handleClose(event) {
         if (!event.wasClean) {
