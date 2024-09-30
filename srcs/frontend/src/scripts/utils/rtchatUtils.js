@@ -42,7 +42,7 @@ export async function handleResponse(response, onSuccess) {
         const errorData = await response.json();
         throw {
             errorCode: response.status,
-            errorMessage: errorData.detail || `Response status: ${response.status}`
+            errorMessage: errorData.detail || errorData.error || `Response status: ${response.status}`
         };
     }
 

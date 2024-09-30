@@ -1,5 +1,4 @@
 import { Component } from '../../scripts/Component.js';
-import { Navbar } from '../../components/Navbar/Navbar.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import { FriendsLoader } from './FriendsLoader.js';
 import { FriendsRenderer } from './FriendsRenderer.js';
@@ -8,7 +7,6 @@ import { UISetup } from './UISetup.js';
 
 export class Friends extends Component {
 	constructor(params = {}) {
-		console.log('Friends Constructor');
 		super('/pages/Friends/friends.html', params)
 
 		this.filter = this.params.filter || 'all';
@@ -19,7 +17,6 @@ export class Friends extends Component {
 	}
 
 	destroy() {
-		console.log('Friends Custom destroy');
 
 		this.removeAllEventListeners();
 		this.uiSetup.removeOnlineUpdateListeners();
@@ -27,9 +24,7 @@ export class Friends extends Component {
 	}
 
 	async init() {
-		await Navbar.focus();
 		await this.friendsLoader.loadFriendsData();
-		this.uiSetup.setupSearchInputEvent();
 		this.uiSetup.setupSearchForm();
 		this.uiSetup.setupFilterButtons();
 		this.uiSetup.setupFriendButtons();

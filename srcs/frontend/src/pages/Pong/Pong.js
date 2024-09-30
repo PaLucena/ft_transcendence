@@ -202,7 +202,6 @@ export class Pong extends Component {
 		this.frameCounter++;
 		if (Date.now() - this.init_time > 1000) {
 			this.init_time = Date.now();
-			console.log(`FPS: ${this.frameCounter}`);
 			this.frameCounter = 0;
 		}
 	}

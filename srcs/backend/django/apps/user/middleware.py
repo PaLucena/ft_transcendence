@@ -59,17 +59,21 @@ class UpdateLastSeenMiddleware:
 from django.conf import settings
 
 class EnforceProxyMiddleware:
-	def __init__(self, get_response):
-		self.get_response = get_response
-		self.nginx_ip = '172.23.0.1'
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.nginx_ip = '172.23.0.1'
 
-	def __call__(self, request):
-		path_info = request.META.get("PATH_INFO")
-		if path_info == "/health/":
-			return self.get_response(request)
-		if 'HTTP_X_REAL_IP' not in request.META or 'HTTP_X_FORWARDED_FOR' not in request.META:
-			return JsonResponse({'error': 'Request must come through a proxy'}, status=403)
-		real_ip = request.META['HTTP_X_REAL_IP']
-		if real_ip != self.nginx_ip:
-			return JsonResponse({'error': 'Request must come through the NGINX proxy'}, status=403)
-		return self.get_response(request)
+    def __call__(self, request):
+        path_info = request.META.get("PATH_INFO")
+
+        if path_info == "/health/":
+            return self.get_response(request)
+
+        if 'HTTP_X_FORWARDED_FOR' not in request.META:
+            return JsonResponse({'error': 'Request must come through a proxy'}, status=403)
+
+        forwarded_for = request.META['HTTP_X_FORWARDED_FOR'].split(",")[0]
+        if forwarded_for != self.nginx_ip:
+            return JsonResponse({'error': 'Request must come through the NGINX proxy'}, status=403)
+
+        return self.get_response(request)

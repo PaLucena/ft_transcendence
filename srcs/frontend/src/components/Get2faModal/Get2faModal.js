@@ -7,45 +7,41 @@ import { Component } from "../../scripts/Component.js";
 
 export class Get2faCode extends Component {
 	constructor() {
-		console.log('Get2faCode Constructor');
 		super('/components/Get2faModal/Get2faModal.html')
 		this.promise = null;
 	}
-	
-	init() {
-		console.log("INIT 2FA");
-		
-	}
-	
+
+	init() {}
+
 	clearModal(inputs) {
 		if (inputs.length > 0)
 			inputs.forEach(input => input.value = '');
 		setTimeout(() => inputs[0].focus(), 400);
 	}
-	
+
 	showModal(overlayElement, inputs, TwoFactorModal) {
 		TwoFactorModal.show();
 		setTimeout(() => this.clearModal(inputs), 0);
 	}
-	
+
 	hideModal(overlayElement, inputs, TwoFactorModal) {
 		this.clearModal(inputs);
 		TwoFactorModal.hide();
 	}
-	
+
 	async initTwoFactorAuth(jsonData) {
 		const overlayElement = document.getElementById('customOverlay');
 		const inputs = document.querySelectorAll('.otp-input');
 		const TwoFactorModalElement = document.getElementById('twoFactorModal');
 		let TwoFactorModal = new bootstrap.Modal(TwoFactorModalElement, { backdrop: false, keyboard: true })
-		
+
 		this.promise = new Promise(resolve => {
 			this.showModal(overlayElement, inputs, TwoFactorModal);
 			this.addEventListener(TwoFactorModalElement,'hidden.bs.modal', () => this.hideModal(overlayElement, inputs, TwoFactorModal));
 			inputs.forEach((input, index) => {
 				this.addEventListener(input, 'input', (event) => {
 					const value = event.target.value;
-					
+
 					if (!/^\d$/.test(value)) {
 						event.target.value = '';
 						return;
@@ -57,7 +53,7 @@ export class Get2faCode extends Component {
 						submit2FAForm(jsonData, overlayElement, inputs, TwoFactorModal);
 					}
 				});
-				
+
 				this.addEventListener(input, 'keydown', (event) => {
 					if (event.key === 'Backspace' && input.value === '') {
 						if (index > 0) {
@@ -66,14 +62,12 @@ export class Get2faCode extends Component {
 					}
 				});
 			});
-			
+
 			inputs[0].focus();
 			const submit2FAForm = (username, overlayElement, inputs, TwoFactorModal) => {
 				const otpCode = Array.from(inputs).map(input => input.value).join('');
 				const csrftoken = getCSRFToken('csrftoken');
-				
-				console.log(jsonData)
-				console.log("Submiting 2fa form to user", username)
+
 				fetch("/api/2fa/verify-2fa/", {
 					method: "POST",
 					credentials: 'include',
@@ -97,7 +91,7 @@ export class Get2faCode extends Component {
 					this.hideModal(overlayElement, inputs, TwoFactorModal);
 				})
 				.catch(error => {
-					customAlert('danger', `Error: ${error.message}`, '');
+					customAlert('danger', `Error: ${error.message}`, 5000);
 					console.log(error)
 				});
 			}

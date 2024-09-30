@@ -4,7 +4,6 @@ import { userSocket } from "../../scripts/utils/UserWebsocket.js";
 
 export class Test extends Component {
 	constructor() {
-		console.log('Test Constructor');
 		super('/pages/Test/test.html');
 	}
 

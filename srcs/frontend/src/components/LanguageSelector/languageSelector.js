@@ -2,12 +2,11 @@ import { Component } from "../../scripts/Component.js";
 
 export class languageSelector extends Component {
 	constructor() {
-		console.log('LanguageSelector Constructor');
 		super('/components/LanguageSelector/languageSelector.html')
 	}
 
 	init() {
-		this.currentLanguage = "en";
+		languageSelector.currentLanguage = "en";
 		languageSelector.updateLanguage();
 		languageSelector.checkLanguage();
 	}
@@ -29,7 +28,6 @@ export class languageSelector extends Component {
 	}
 
 	static async checkLanguage() {
-		console.log("Current language:", this.currentLanguage);
 		document.documentElement.lang = this.currentLanguage;
 		const langData = await this.fetchLanguageData(this.currentLanguage)
 		this.updateContent(langData);
