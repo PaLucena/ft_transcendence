@@ -1,4 +1,5 @@
 import { Tournament } from "../../pages/Tournament/Tournament.js";
+import { navigateTo } from "../Router.js";
 
 class TournamentWebsocket {
     constructor() {
@@ -9,11 +10,16 @@ class TournamentWebsocket {
     }
 
     initWebSocket(tournament_name) {
-        try {
-            this.t_socket = new WebSocket(`/ws/tournament/${tournament_name}/`);
-        } catch (error) {
-            this.handleError(null, 'Failed to create WebSocket', true);
-            return;
+        if (this.t_socket && this.t_socket.readyState === WebSocket.OPEN) {
+            console.log("WebSocket is already open, no need to create a new one.");
+        }
+        else {
+            try {
+                this.t_socket = new WebSocket(`/ws/tournament/${tournament_name}/`);
+            } catch (error) {
+                this.handleError(null, 'Failed to create WebSocket', true);
+                return;
+            }
         }
 
         this.t_socket.onmessage = (e) => this.handleMessage(e);
@@ -26,6 +32,8 @@ class TournamentWebsocket {
         try {
             const data = JSON.parse(event.data);
 
+            console.log("DATA: ", data);
+            
             if (data.error) {
                 this.handleError(data.errorCode, data.errorMessage);
                 return;
@@ -33,6 +41,10 @@ class TournamentWebsocket {
             if (data.tournament_users) {
                 Tournament.renderPlayers(data.tournament_users);
             }
+            if (data.action == "players_ready")
+                console.log("NAV!!!!!!!");
+                //navigateTo("/pong");
+
         } catch (error) {
             this.handleError(null, error, false);
         }

@@ -247,7 +247,7 @@ export class Play extends Component {
 			.then(data => {
 				customAlert('success', data.message, 3000);
 				this.joinTournamentAsCreator(jsonData["name"], tournamentType);
-				tournamentSocket.initWebSocket(jsonData["name"]);
+				//tournamentSocket.initWebSocket(jsonData["name"]);
 			})
 			.catch((error) => {
 				customAlert('danger', `Error: ` + error.message, 5000);
@@ -367,7 +367,7 @@ export class Play extends Component {
 					return response.json();
 				})
 				.then(data => {
-					tournamentSocket.initWebSocket(tournamentName);
+					//tournamentSocket.initWebSocket(tournamentName);
 					navigateTo("/tournament/" + tournamentData.id);
 				})
 				.catch((error) => {

@@ -12,8 +12,8 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.tournament_name = self.scope["url_route"]["kwargs"]["tournament_name"]
         self.tournamentroom_name = f"tournament_{self.tournament_name}"
-
         try:
+            print(f"Client connected: {self.channel_name}")
             await self.accept()
             await self.channel_layer.group_add(
                 self.tournamentroom_name, self.channel_name
@@ -36,6 +36,23 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
 
         except Exception as e:
             await self.send_error(500, f"Failed to discard from group: {str(e)}")
+
+    async def receive_json(self, data):
+        tournament_data = data.get("action")
+
+        if tournament_data == "players_ready":
+            print("!!!!!!!!in players ready")
+            await self.channel_layer.group_send(
+                self.tournamentroom_name,
+                {
+                    "type": "start_match_event",
+                }
+            )
+
+    async def start_match_event(self, event):
+        await self.send_json({
+            "action": "players_ready",
+        })
 
     async def send_tournament_users_list(self, tournament_name):
         try:
@@ -90,10 +107,14 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
 
     #a method to start all matches when triggered
     async def start_matches(self, event):
-        print("AAAAAAAAAAAAAAAAAAWEFAWEFAWFAWFA")
+        print("START CONSUMERS: start_matches")
+        creator_name = event["creator_name"]
         tournament_id = event["tournament_id"]
         matches = event["matches"]
         print("4 FIRST MATCHES RECEIVED: ", matches, flush=True)
+        if (creator_name != self.scope["user"].username):
+            return
+
         tournament = await sync_to_async(Tournament.objects.get)(pk=tournament_id)
         results = await self.start_all_matches(tournament, matches)
         
@@ -117,7 +138,8 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
 
         for task in asyncio.as_completed(match_tasks):
             result = await task
-            match_id = result['match_id']
+            print("FINISHED MATCH ID: ", result)
+            match_id = result['match_id'] # problem 
             results.append(result)
 
             next_matches = await sync_to_async(assign_next_match, thread_sensitive=False)(
