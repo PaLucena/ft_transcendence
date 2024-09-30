@@ -8,13 +8,15 @@ from .handlers import (
     handle_create_tournament,
     handle_join_tournament,
     handle_leave_tournament,
-    handle_start_tournament
+    handle_start_tournament,
+    handle_clean_tournaments
 )
 
 
 class TournamentConsumer(AsyncWebsocketConsumer):
     def __init__(self):
         super().__init__()
+        self.user = None
         self.user_name = None
         self.user_id = None
         self.main_room = 'main_room'
@@ -22,9 +24,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
     async def connect(self):
-        user = self.scope['user']
-        self.user_name = user.username
-        self.user_id = user.id
+        self.user = self.scope['user']
+        self.user_name = self.user.username
+        self.user_id = self.user.id
 
         await self.channel_layer.group_add(self.main_room, self.channel_name)
 
@@ -57,6 +59,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         elif message['type'] == 'start_tournament':
             await handle_start_tournament(self, message)
 
+        elif message['type'] == 'required_update':
+            await send_main_room(self.channel_layer)
+
+        elif message['type'] == 'clean_tournaments':
+            await handle_clean_tournaments(self.channel_layer)
+
 
     async def send_error(self, message):
         await self.send(text_data=json.dumps({
@@ -81,6 +89,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type': 'tournament_room_update',
             'participants': participants,
+            'players_data': event['players_data'],
             'state': state
         }))
 

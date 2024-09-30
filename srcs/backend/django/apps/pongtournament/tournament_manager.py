@@ -42,14 +42,15 @@ class TournamentManager:
         await channel_layer.group_send(f"tournament_{tournament.id}", message)
 
 
-    def join_tournament(self, tournament_id, user_id, password=None):
+    def join_tournament(self, consumer, tournament_id, password=None):
         tournament = self.tournaments.get(tournament_id)
 
         if not tournament:
             raise Exception("Error(join tournament): Tournament not found.")
-        if not tournament.can_join(user_id, password):
-            raise Exception(f"Error(join tournament): User '{user_id}' can't join the tournament.")
-        tournament.add_participant(user_id, password)
+        if not tournament.can_join(consumer.user_id, password):
+            raise Exception(f"Error(join tournament): User '{consumer.user_id}' can't join the tournament.")
+
+        tournament.add_participant(consumer.user)
         return True
 
 
@@ -113,5 +114,5 @@ class TournamentManager:
 
 
     def clean_tournaments(self):
-        for tournament in list(self.tournaments.keys()):
-            self.delete_tournament(tournament)
+        while self.tournaments:
+            self.delete_tournament(list(self.tournaments.keys())[0])

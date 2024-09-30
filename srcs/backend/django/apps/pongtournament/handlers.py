@@ -1,6 +1,4 @@
 from .tournament_manager import TournamentManager
-from .views import tournament
-
 
 async def send_main_room(channel_layer):
     manager = TournamentManager()
@@ -16,16 +14,20 @@ async def send_main_room(channel_layer):
     )
 
 
+
+
 async def send_tournament_room(channel_layer, tournament_room):
     manager = TournamentManager()
     tournament_data = manager.get_tournament_data(tournament_room)
     state = tournament_data['state']
     participants = tournament_data['participants']
+    players_data = tournament_data['players_data']
     await channel_layer.group_send(
         tournament_room,
         {
             'type': 'tournament_room_update',
             'participants': participants,
+            'players_data': players_data,
             'state': state
         }
     )
@@ -55,11 +57,12 @@ async def handle_create_tournament(consumer, message):
             await consumer.add_to_tournament_group(f"{new.id}")
             print("entrando al torneo")
             await send_main_room(consumer.channel_layer)
+
         else:
-            await consumer.channel_layer.send_error("User already has an active tournament.")
+            await consumer.send_error("User already has an active tournament.")
 
     except Exception as e:
-        await consumer.channel_layer.send_error(str(e))
+        await consumer.send_error(str(e))
 
 
 async def handle_join_tournament(consumer, message):
@@ -69,13 +72,13 @@ async def handle_join_tournament(consumer, message):
     password = message['password']
 
     try:
-        if manager.join_tournament(tournament_id, consumer.user_id, password):
-            await consumer.channel_layer.group_add(tournament_room, message['channel_name'])
-            await send_tournament_room(consumer.channel_layer, message['tournament_room'])
+        if manager.join_tournament(consumer, tournament_id, password):
+            await consumer.channel_layer.group_add(tournament_room, consumer.channel_name)
+            await send_tournament_room(consumer.channel_layer, tournament_room)
         else:
-            await consumer.channel_layer.send_error("Failed to join tournament.")
+            await consumer.send_error("Failed to join tournament.")
     except Exception as e:
-        await consumer.channel_layer.send_error(str(e))
+        await consumer.send_error(str(e))
 
 
 async def handle_leave_tournament(consumer, message):
@@ -88,7 +91,7 @@ async def handle_leave_tournament(consumer, message):
         else:
             raise Exception("Failed to leave tournament.")
     except Exception as e:
-        await consumer.channel_layer.send_error(str(e))
+        await consumer.send_error(str(e))
 
 
 async def handle_start_tournament(consumer, message):
@@ -100,7 +103,7 @@ async def handle_start_tournament(consumer, message):
         await manager.start_tournament(tournament_id, user)
         await send_tournament_room(consumer.channel_layer, message['tournament_room'])
     except Exception as e:
-        await consumer.channel_layer.send_error(str(e))
+        await consumer.send_error(str(e))
 
 
 async def handle_end_tournament(channel_layer, message):
@@ -119,6 +122,12 @@ async def handle_end_tournament(channel_layer, message):
                 'message': str(e)
             }
         )
+
+
+async def handle_clean_tournaments(channel_layer):
+    manager = TournamentManager()
+    manager.clean_tournaments()
+    await send_main_room(channel_layer)
 
 
 async def handle_notify_match_start(channel_layer, player_id, match_id, opponent_name):

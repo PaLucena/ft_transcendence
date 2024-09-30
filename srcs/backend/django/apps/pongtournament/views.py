@@ -12,11 +12,11 @@ from user.decorators import default_authentication_required
 def tournament(request):
     if request.method == "POST":
 
-        # clean_tournaments()
+        clean_tournaments()
         # auto_tournament(request)  #  players 1 to 8
 
-        new_tournament(request)
-        get_tournaments()
+        # new_tournament(request)
+        # get_tournaments()
 
         return JsonResponse({"process finished": "ok"}, status=200)
 
@@ -30,10 +30,10 @@ def clean_tournaments():
 
 
 def auto_tournament(request):
-    creator = request.user
+    creator_id = request.user.id
     manager = TournamentManager()
 
-    test_tournament = manager.create_tournament(creator)
+    test_tournament = manager.create_tournament(creator_id, "nombre", is_private=False)
     if not test_tournament:
         print("Error creating tournament.")  # DEBUG
         return JsonResponse({"error": "Error creating tournament."}, status=500)
@@ -46,7 +46,7 @@ def auto_tournament(request):
     manager.join_tournament(test_tournament.id, 8)
 
     print("Tournament participants: ", test_tournament.participants)  # DEBUG
-    asyncio.run(manager.start_tournament(test_tournament.id, creator))
+    asyncio.run(manager.start_tournament(test_tournament.id, creator_id))
 
 
 def new_tournament(request):
