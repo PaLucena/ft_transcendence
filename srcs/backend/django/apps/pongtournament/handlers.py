@@ -53,11 +53,10 @@ async def handle_create_tournament(consumer, message):
         is_private = message['is_private']
         password = message['password']
 
+        print("Password (handle_create_tournament): ", password)
         new = manager.create_tournament(consumer, creator, name, is_private, password)
-        print("llega hasta aqui")
         if new is not None:
             await consumer.add_to_tournament_group(f"{new.id}")
-            print("entrando al torneo")
             await send_main_room(consumer.channel_layer)
 
         else:
