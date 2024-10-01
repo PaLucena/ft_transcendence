@@ -249,28 +249,17 @@ export class Play extends Component {
 
 			try {
 				let is_private = tournamentType === 'private';
-				//Create
 				await pongTournamentSocket.t_socket.send(JSON.stringify({
 					type: 'create_tournament',
 					name: formData.get("name"),
 					is_private,
 					password: is_private ? formData.get('password') : null,
 				}));
-				//Join
-				await pongTournamentSocket.t_socket.send(JSON.stringify({
-					type: 'join_tournament',
-					tournament_id: tournamentId,
-					password: null,
-				}));
 			} catch (error) {
 				console.error('Failed to send notification:', error);
 			}
-
-
 			closeModal.click();
-			
 		};
-		
 		this.addEventListener(tournamentForm, "submit", this.handleTournamentSubmit);
 	}
 
@@ -307,23 +296,30 @@ export class Play extends Component {
 	}
 
 
-	static displayTournaments(public_tournaments, private_tournaments) {
+	static displayTournaments(public_tournaments, private_tournaments, player_id) {
 		if (public_tournaments.length === 0)
 			document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
 		else {
 			let	publicContainer = document.getElementById("publicTournamentDisplay");
 			publicContainer.innerHTML = '';
 
-			for (let i = 0; public_tournaments[i]; i++) {
+			for (let i = 0; i < public_tournaments.length; i++) {
+				let isPlayer = public_tournaments[i].players.includes(player_id);
+				let tournamentName = isPlayer
+					? `⭐ ${public_tournaments[i].name} ⭐`
+					: public_tournaments[i].name;
 				publicContainer.innerHTML +=
 					`<button 
 						class="display-tournament-item btn border-start-0
 							border-end-0 col-10 my-1 rounded" 
 						style="background-color: #ff6d3f;"
 						data-tournament-id="${public_tournaments[i].id}"
+						data-tournament-name="${public_tournaments[i].name}"
+						data-tournament-type="public"
+						data-tournament-creator="${public_tournaments[i].participants_data[0].user_name}"
 					>
 						<span class="tName">
-							${public_tournaments[i].name}
+							${tournamentName}
 						</span>
 						[${public_tournaments[i].participants.length}]
 					</button>`;
@@ -335,16 +331,24 @@ export class Play extends Component {
 			let	privateContainer = document.getElementById("privateTournamentDisplay");
 			privateContainer.innerHTML = '';
 
-			for (let i = 0; private_tournaments[i]; i++) {
+			for (let i = 0; i < private_tournaments.length; i++) {
+				let isPlayer = private_tournaments[i].players.includes(player_id);
+				let tournamentName = isPlayer
+					? `⭐ ${private_tournaments[i].name} ⭐`
+					: private_tournaments[i].name;
 				privateContainer.innerHTML +=
 					`<button 
 						class="display-tournament-item btn btn-success
 							border-start-0 border-end-0
 							col-10 my-1 rounded"
+						style="background-color: #ff6d3f;"
 						data-tournament-id="${private_tournaments[i].id}"
+						data-tournament-name="${private_tournaments[i].name}"
+						data-tournament-type="private"
+						data-tournament-creator="${private_tournaments[i].participants_data[0].user_name}"
 					>
 						<span class="tName">
-							${private_tournaments[i].name}
+							${tournamentName}
 						</span>
 						[${private_tournaments[i].participants.length}]
 					</button>`;
@@ -361,18 +365,12 @@ export class Play extends Component {
 
 				if (closestElement) {
 					let tournamentId = closestElement.getAttribute("data-tournament-id");
+					let tournamentName = closestElement.getAttribute("data-tournament-name");
+					let tournamentType = closestElement.getAttribute("data-tournament-type");
+					let tournamentCreator = closestElement.getAttribute("data-tournament-creator");
 
-					try {
-						const message = JSON.stringify({
-							type: 'join_tournament',
-							tournament_id: tournamentId,
-							password: null,
-						});
-						pongTournamentSocket.t_socket.send(message);
-					} catch (error) {
-						console.error('Failed to send notification:', error);
-					}
-					console.log("Closest tournament name:", tournamentId);
+					this.displayJoinModal(tournamentId, tournamentType, tournamentName, tournamentCreator);
+
 				} else {
 					console.log("No element with data-tournament-name found.");
 				}
@@ -382,42 +380,54 @@ export class Play extends Component {
 		}
 	}
 
-	joinTournament(allTournaments, type) {
+	// joinTournament(allTournaments, type) {
+	// 	navigateTo("/tournament/" + tournamentData.id);
+	// }
 
+	displayJoinModal(tournamentId, tournamentType, tournamentName, tournamentCreator) {
+		document.getElementById("join-tournament-name").innerHTML = `Name: ${tournamentName}<br>Creator: ${tournamentCreator}`;
 
-		navigateTo("/tournament/" + tournamentData.id);
-
-	}
-
-	displayJoinModal(type) {
-		if (type === 'private') {
-			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
-																<label data-i18n="invitation-code" for="code"></label>`;
-			setTimeout(() => languageSelector.updateLanguage(), 0);
+		if (tournamentType === 'private') {
+			document.querySelector('#codeInput').innerHTML = `
+            <input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
+            <label data-i18n="invitation-code" for="code"></label>`;
+        	setTimeout(() => languageSelector.updateLanguage(), 0);
 		}
 		else
-			document.querySelector('#codeInput').innerHTML = ``;
+			document.querySelector('#codeInput').innerHTML = '';
 
 		const	joinModalElement = document.getElementById('joinModal');
 		const	joinModal = new bootstrap.Modal(joinModalElement, {backdrop: false, keyboard: true});
-
 		joinModal.show();
 
-		return new Promise(resolve => {
-			const joinForm = document.querySelector("#joinForm");
+		const joinForm = document.querySelector("#joinForm");
 
-			this.addEventListener(joinForm, "submit", (event) => {
-				event.preventDefault();
+		this.addEventListener(joinForm, "submit", (event) => {
+			event.preventDefault();
 
-				const formData = new FormData(event.target);
-				const jsonData = {};
+			const formData = new FormData(event.target);
+			const jsonData = {};
 
-				formData.forEach((value, key) => {
-					jsonData[key] = value;
-				});
-				resolve(jsonData);
-				joinModal.hide();
+			formData.forEach((value, key) => {
+				jsonData[key] = value;
 			});
+
+			jsonData['tournament_id'] = tournamentId;
+        	jsonData['tournament_type'] = tournamentType;
+
+			const message = JSON.stringify({
+				type: 'join_tournament',
+				tournament_id: jsonData.tournament_id,
+				tournament_type: jsonData.tournament_type,
+				password: jsonData.code || null,
+        	});
+
+			try {
+            	pongTournamentSocket.t_socket.send(message);
+        	} catch (error) {
+            	console.error('Failed to send notification:', error);
+        	}
+			joinModal.hide();
 		});
 	}
 }

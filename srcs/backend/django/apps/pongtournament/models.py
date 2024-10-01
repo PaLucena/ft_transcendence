@@ -21,7 +21,7 @@ class Tournament:
         self.winner_bracket = []
         self.loser_bracket = []
         self.tournament_winner = None
-        self.players_data = []
+        self.participants_data = []
 
 
     def can_join(self, user_id, password):
@@ -38,7 +38,7 @@ class Tournament:
     def add_participant(self, user):
         self.participants.append(user.id)
         self.players.append(user.id)
-        self.players_data.append({
+        self.participants_data.append({
             "user_id": user.id,
             "user_name": user.username,
             "avatar": user.avatar.url,
@@ -54,6 +54,9 @@ class Tournament:
             else:
                 self.participants.remove(user_id)
                 self.players.remove(user_id)
+                for player in self.participants_data:
+                    if player["user_id"] == user_id:
+                        self.participants_data.remove(player)
 
 
     def tournament_data(self):
@@ -62,7 +65,8 @@ class Tournament:
             "name": self.name,
             "creator": self.creator_id,
             "participants": [p for p in self.participants],
-            "players_data": self.players_data,
+            "participants_data": self.participants_data,
+            "players": [p for p in self.players],
             "is_private": self.is_private,
             "state": self.state,
             "winner": self.tournament_winner

@@ -31,30 +31,36 @@ class PongTournamentSocket {
         try {
             const data = JSON.parse(event.data);
 
-            console.log("ALL DATA:", data)
-
             if (data.type === 'error') {
                 this.handleError(data.errorCode, data.message);
             }
 
-            if (data.type === 'main_room_update') {
+            else if (data.type === 'main_room_update') {
                 console.log("Main room update: public ", data.public_tournaments.length, " private", data.private_tournaments.length);
-                Play.displayTournaments(data.public_tournaments, data.private_tournaments);
+                Play.displayTournaments(data.public_tournaments, data.private_tournaments, data.player_id);
                 console.log("Data", data);
             }
 
-            if (data.type === 'tournament_room_update') {
+            else if (data.type === 'tournament_room_update') {
                 console.log("Tournament room update:", data.participants, data.state);
             }
 
-            if (data.type === 'match_start') {
+            else if (data.type === 'match_start') {
                 console.log("Match starting:", data.match_id, data.message);
 
                 this.notifyPlayerMatchStart(data.match_id, data.message);
             }
 
-            if (data.type === 'tournament_ended') {
+            else if (data.type === 'deleted_tournament') {
+                console.log("Deleted tournament:", data.tournament_id);
+            }
+
+            else if (data.type === 'tournament_ended') {
                 console.log("Tournament ended:", data.tournament_id, data.results);
+            }
+
+            else {
+                console.log("Unknown message type:", data.type);
             }
 
         } catch (error) {

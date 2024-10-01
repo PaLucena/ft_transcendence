@@ -79,7 +79,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type': 'main_room_update',
             'public_tournaments': public_tournaments,
-            'private_tournaments': private_tournaments
+            'private_tournaments': private_tournaments,
+            'player_id': self.user_id
         }))
 
 
@@ -89,7 +90,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'type': 'tournament_room_update',
             'participants': participants,
-            'players_data': event['players_data'],
+            'participants_data': event['participants_data'],
             'state': state
         }))
 
@@ -113,6 +114,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             'type': 'tournament_ended',
             'tournament_id': tournament_id,
             'results': results,
+        }))
+
+
+    async def notify_cancel_tournament(self, event):
+        tournament_id = event['tournament_id']
+        await self.send(text_data=json.dumps({
+            'type': 'tournament_cancelled',
+            'tournament_id': tournament_id
         }))
 
 

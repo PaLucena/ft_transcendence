@@ -1,5 +1,6 @@
 from .tournament_manager import TournamentManager
 
+
 async def send_main_room(channel_layer):
     manager = TournamentManager()
     public_tournaments = manager.get_tournaments_by_privacy(is_private=False)
@@ -14,30 +15,31 @@ async def send_main_room(channel_layer):
     )
 
 
-
-
 async def send_tournament_room(channel_layer, tournament_room):
     manager = TournamentManager()
     tournament_data = manager.get_tournament_data(tournament_room)
     state = tournament_data['state']
     participants = tournament_data['participants']
-    players_data = tournament_data['players_data']
+    participants_data = tournament_data['participants_data']
+    players = tournament_data['players']
     await channel_layer.group_send(
         tournament_room,
         {
             'type': 'tournament_room_update',
             'participants': participants,
-            'players_data': players_data,
+            'participants_data': participants_data,
+            'players': players,
             'state': state
         }
     )
 
 
-async def send_deleted_tournament(channel_layer):
+async def send_deleted_tournament(channel_layer, tournament_id):
     await channel_layer.group_send(
-        'main_room',
+        tournament_id,
         {
             'type': 'deleted_tournament',
+            'tournament_id': tournament_id
         }
     )
 
@@ -51,7 +53,7 @@ async def handle_create_tournament(consumer, message):
         is_private = message['is_private']
         password = message['password']
 
-        new = manager.create_tournament(creator, name, is_private, password)
+        new = manager.create_tournament(consumer, creator, name, is_private, password)
         print("llega hasta aqui")
         if new is not None:
             await consumer.add_to_tournament_group(f"{new.id}")
@@ -74,6 +76,7 @@ async def handle_join_tournament(consumer, message):
     try:
         if manager.join_tournament(consumer, tournament_id, password):
             await consumer.channel_layer.group_add(tournament_room, consumer.channel_name)
+            await send_main_room(consumer.channel_layer)
             await send_tournament_room(consumer.channel_layer, tournament_room)
         else:
             await consumer.send_error("Failed to join tournament.")
@@ -84,10 +87,17 @@ async def handle_join_tournament(consumer, message):
 async def handle_leave_tournament(consumer, message):
     manager = TournamentManager()
     tournament_id = message['tournament_id']
+    tournament = manager.get_tournament_data(tournament_id)
+    tournament_room = f"{tournament_id}"
 
     try:
-        if manager.leave_tournament(tournament_id, consumer.user_id):
+        if consumer.user_id == tournament['creator']:
+            await send_deleted_tournament(consumer.channel_layer, tournament_id)
+            manager.delete_tournament(tournament_id)
+        elif manager.leave_tournament(tournament_id, consumer.user_id):
             await consumer.remove_from_tournament_group()
+            await send_main_room(consumer.channel_layer)
+            await send_tournament_room(consumer.channel_layer, tournament_room)
         else:
             raise Exception("Failed to leave tournament.")
     except Exception as e:
