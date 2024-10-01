@@ -18,10 +18,6 @@ export class Play extends Component {
 	}
 
 	async init() {
-		this.checkRunningTournaments()
-		.then(tournamentId => {
-			document.getElementById("tournamentBtn").innerHTML = tournamentId ? "<h1 data-i18n='back-to-tournament-button'></h1>" : "<h1 data-i18n='tournament-button'></h1>";
-		})
 		this.setupEventListeners();
 		this.setupTournamentJoin();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
@@ -36,19 +32,8 @@ export class Play extends Component {
 
 		const	tournamentBtn = document.getElementById("tournamentBtn");
 		this.addEventListener(tournamentBtn, "click", () => {
-
-			this.checkRunningTournaments()
-			.then(tournamentId => {
-				if (tournamentId)
-					navigateTo(`/tournament/${tournamentId}`);
-				else {
-					document.getElementById("btns").style.display = "none";
-					document.getElementById("dropdownTournaments").style.display = "block";
-				}
-			})
-			.catch((error) => {
-				customAlert('danger', `Error(checkRunningTournaments): ` + error.message, 5000);
-			})
+			document.getElementById("btns").style.display = "none";
+			document.getElementById("dropdownTournaments").style.display = "block";
 		});
 
 
@@ -61,8 +46,6 @@ export class Play extends Component {
 			}));
 		});
 		// ----------------------------------------------------------------------------------
-
-
 
 
 		const	backOne = document.getElementById("backOne");
@@ -118,33 +101,6 @@ export class Play extends Component {
 		});
 	}
 
-	async checkRunningTournaments() {
-		try {
-			const response = await fetch('/api/display_tournaments/', {
-				method: "GET",
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				credentials: 'include'
-			});
-
-			const data = await response.json();
-
-			let	joinedTournament = data.public_tournaments.find(tournament =>
-				tournament.players.some(players => players.nickname === 'you')
-			);
-			if (!joinedTournament) { // Verificamos si es undefined o null
-				joinedTournament = data.private_tournaments.find(tournament =>
-					tournament.players.some(players => players.nickname === 'you')
-				);
-			}
-			return (joinedTournament ? joinedTournament.id : null);
-		}
-		catch (error) {
-			console.log("ERROR", error)
-			throw error;
-		}
-	}
 
 	// local match
 	playLocal() {
@@ -229,9 +185,6 @@ export class Play extends Component {
 		})
 	}
 
-	renderTournaments() {
-
-	}
 
 	createTournament(tournamentType) {
 		const closeModal = document.getElementsByClassName("btn-close")[0];
@@ -239,9 +192,20 @@ export class Play extends Component {
 		const tournamentForm = document.getElementById("tournamentForm");
 		const tournamentName = document.getElementById("tournament-name");
 
+		console.log("Tournament type:", tournamentType);
+
 		tournamentForm.removeEventListener('submit', this.handleTournamentSubmit);
-		tittleModal.innerHTML = `Create ${tournamentType} tournament`;
+		tittleModal.innerHTML = `New ${tournamentType} tournament`;
 		tournamentName.value = '';
+
+		if (tournamentType === 'private') {
+			document.querySelector('#passwordInput').innerHTML = `
+				<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
+				<label data-i18n="invitation-code" for="code"></label>`;
+        	setTimeout(() => languageSelector.updateLanguage(), 0);
+		}
+		else
+			document.querySelector('#passwordInput').innerHTML = '';
 
 		this.handleTournamentSubmit = async (event) => {
 			event.preventDefault();
@@ -253,7 +217,7 @@ export class Play extends Component {
 					type: 'create_tournament',
 					name: formData.get("name"),
 					is_private,
-					password: is_private ? formData.get('password') : null,
+					password: is_private ? formData.get('code') : null,
 				}));
 			} catch (error) {
 				console.error('Failed to send notification:', error);
@@ -261,38 +225,6 @@ export class Play extends Component {
 			closeModal.click();
 		};
 		this.addEventListener(tournamentForm, "submit", this.handleTournamentSubmit);
-	}
-
-
-	joinTournamentAsCreator(name, tournamentType) {
-		fetch("/api/display_tournaments/", {
-			method: "GET",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			if (tournamentType === 'private') {
-				const	tournamentData = data.private_tournaments.find(object => object.name === name);
-				navigateTo("/tournament/" + tournamentData.id)
-			}
-			else {
-				const	tournamentData = data.public_tournaments.find(object => object.name === name);
-				navigateTo("/tournament/" + tournamentData.id)
-			}
-		})
-		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, 5000);
-		})
 	}
 
 
@@ -380,17 +312,15 @@ export class Play extends Component {
 		}
 	}
 
-	// joinTournament(allTournaments, type) {
-	// 	navigateTo("/tournament/" + tournamentData.id);
-	// }
 
 	displayJoinModal(tournamentId, tournamentType, tournamentName, tournamentCreator) {
 		document.getElementById("join-tournament-name").innerHTML = `Name: ${tournamentName}<br>Creator: ${tournamentCreator}`;
 
+		console.log("Joining tournament", tournamentId, tournamentType);
 		if (tournamentType === 'private') {
 			document.querySelector('#codeInput').innerHTML = `
-            <input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
-            <label data-i18n="invitation-code" for="code"></label>`;
+				<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
+				<label data-i18n="invitation-code" for="code"></label>`;
         	setTimeout(() => languageSelector.updateLanguage(), 0);
 		}
 		else
@@ -430,4 +360,9 @@ export class Play extends Component {
 			joinModal.hide();
 		});
 	}
+
+	joinTournamentRoom(allTournaments, type) {
+		navigateTo("/tournament/" + tournamentData.id);
+	}
+
 }

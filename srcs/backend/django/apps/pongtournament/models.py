@@ -25,6 +25,7 @@ class Tournament:
 
 
     def can_join(self, user_id, password):
+        print("Tournament password: ", self.password, " User password: ", password)
         if (self.state == TournamentState.WAITING and
                 len(self.participants) < 8 and
                 user_id not in self.participants):

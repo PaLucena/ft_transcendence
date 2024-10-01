@@ -14,7 +14,6 @@ class TournamentManager:
 
     def create_tournament(self, consumer, creator_id, name, is_private=False, password=None):
         if self.get_player_active_tournament(creator_id) is None:
-            print("Free user, ready to create a tournament") # DEBUG
             new_tournament = Tournament(creator_id, name, is_private, password)
             self.tournaments[new_tournament.id] = new_tournament
             self.join_tournament(consumer, new_tournament.id, password)

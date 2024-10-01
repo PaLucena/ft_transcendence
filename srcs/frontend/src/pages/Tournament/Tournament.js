@@ -15,7 +15,6 @@ export class Tournament extends Component {
 
 	init() {
 		this.getTournamentCode(this.params.tournamentId);
-		this.checkCreator(this.params.tournamentId);
 		this.displayInfo(this.params.tournamentId);
 	}
 
@@ -43,34 +42,6 @@ export class Tournament extends Component {
 		})
 	}
 
-	checkCreator(tournamentId) {
-		fetch(`/api/get_tournament_creator/${tournamentId}`, {
-			method: "GET",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			if (data === true) {
-				document.getElementById('closeBtn').style.display = 'block';
-				this.closeTournament(tournamentId)
-			}
-			document.getElementById('exitBtn').style.display = 'block';
-			this.exitTournament(tournamentId);
-		})
-		.catch((error) => {
-			console.log("Error(checkCreator):", error.message);
-		})
-	}
 
 	closeTournament(tournamentId) {
 		const	closeBtn = document.getElementById('closeBtn');
