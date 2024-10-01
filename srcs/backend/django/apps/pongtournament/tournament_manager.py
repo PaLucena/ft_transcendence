@@ -12,11 +12,12 @@ class TournamentManager:
         return cls._instance
 
 
-    def create_tournament(self, creator_id, name, is_private=False, password=None):
+    def create_tournament(self, consumer, creator_id, name, is_private=False, password=None):
         if self.get_player_active_tournament(creator_id) is None:
             print("Free user, ready to create a tournament") # DEBUG
             new_tournament = Tournament(creator_id, name, is_private, password)
             self.tournaments[new_tournament.id] = new_tournament
+            self.join_tournament(consumer, new_tournament.id, password)
             return new_tournament
         return None
 
@@ -49,6 +50,10 @@ class TournamentManager:
             raise Exception("Error(join tournament): Tournament not found.")
         if not tournament.can_join(consumer.user_id, password):
             raise Exception(f"Error(join tournament): User '{consumer.user_id}' can't join the tournament.")
+
+        for current_tournament in self.tournaments.values():
+            if consumer.user_id in current_tournament.players:
+                raise Exception("Error(join tournament): User already has an active tournament.")
 
         tournament.add_participant(consumer.user)
         return True
