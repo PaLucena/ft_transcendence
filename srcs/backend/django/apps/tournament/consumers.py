@@ -12,11 +12,16 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.tournament_name = self.scope["url_route"]["kwargs"]["tournament_name"]
         self.tournamentroom_name = f"tournament_{self.tournament_name}"
+        self.user_room = f"user_{self.scope['user'].id}"
+
         try:
             print(f"Client connected: {self.channel_name}")
             await self.accept()
             await self.channel_layer.group_add(
                 self.tournamentroom_name, self.channel_name
+            )
+            await self.channel_layer.group_add(
+                self.user_room, self.channel_name
             )
             await self.send_tournament_users_list(self.tournament_name)
 
@@ -32,27 +37,51 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_discard(
                 self.tournamentroom_name, self.channel_name
             )
+            await self.channel_layer.group_discard(
+                self.user_room, self.channel_name
+            )
             await self.send_tournament_users_list(self.tournament_name)
 
         except Exception as e:
             await self.send_error(500, f"Failed to discard from group: {str(e)}")
 
-    async def receive_json(self, data):
-        tournament_data = data.get("action")
+    # async def receive_json(self, data):
+    #     try:
+    #         print("Received data:", data)
+    #         tournament_data = data.get("action")
+    #         if tournament_data == "players_ready":
+    #             print("In players ready block")
+    #             await self.channel_layer.group_send(
+    #                 self.tournamentroom_name,
+    #                 {
+    #                     "type": "start_match_event",
+    #                 }
+    #             )
+    #     except Exception as e:
+    #         print(f"Error in receive_json: {str(e)}")
+    #         await self.send_error(500, f"Error in receive_json: {str(e)}")
 
-        if tournament_data == "players_ready":
-            print("!!!!!!!!in players ready")
-            await self.channel_layer.group_send(
-                self.tournamentroom_name,
-                {
-                    "type": "start_match_event",
-                }
-            )
+    # async def start_match_event(self, event):
+    #     await self.send_json({
+    #         "action": "players_ready",
+    #     })
 
     async def start_match_event(self, event):
-        await self.send_json({
-            "action": "players_ready",
-        })
+        action = event.get("action")
+
+        if action == "players_ready":
+            await self.send_json({
+                "action": "players_ready",
+            })
+
+    async def done_match_event(self, event):
+        action = event.get("action")
+        user_id = event.get("id")
+        if action == "players_done":
+            await self.send_json({
+                "action": "players_done",
+                "id": user_id
+            })
 
     async def send_tournament_users_list(self, tournament_name):
         try:
@@ -117,7 +146,12 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
 
         tournament = await sync_to_async(Tournament.objects.get)(pk=tournament_id)
         results = await self.start_all_matches(tournament, matches)
-        
+        await self.channel_layer.group_send(
+            self.tournamentroom_name,
+            {
+                "type": "start_match_event",
+            }
+        )
         await self.send_json({
             "message": f"All matches for tournament {tournament_id} finished",
             "results": results
@@ -138,8 +172,27 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
 
         for task in asyncio.as_completed(match_tasks):
             result = await task
+
+            if result["player_1_id"] != 0:
+                await self.channel_layer.group_send(
+                    self.tournamentroom_name,
+                    {
+                        'type': 'done_match_event',
+                        'action': 'players_done',
+                        'id': result["player_1_id"]
+                    }
+                )
+            if result["player_2_id"] != 0:
+                await self.channel_layer.group_send(
+                    self.tournamentroom_name,
+                    {
+                        'type': 'done_match_event',
+                        'action': 'players_done',
+                        'id': result["player_2_id"]
+                    }
+                )
             print("FINISHED MATCH ID: ", result)
-            match_id = result['match_id'] # problem 
+            match_id = result['match_id'] 
             results.append(result)
 
             next_matches = await sync_to_async(assign_next_match, thread_sensitive=False)(
@@ -147,6 +200,7 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             )
 
             while next_matches:
+                #aqui
                 formatted_next_matches = [format_match(m) for m in next_matches]
                 new_results = await self.start_all_matches(tournament, formatted_next_matches)
                 results.extend(new_results)

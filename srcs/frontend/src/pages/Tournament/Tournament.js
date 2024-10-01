@@ -94,14 +94,20 @@ export class Tournament extends Component {
 			.then(data => {
 				customAlert('success', 'Tournament closed', '3000');
 
-				try {
-					const message = JSON.stringify({
-						action: 'players_ready',
-					});
-					tournamentSocket.t_socket.send(message);
-				} catch (error) {
-					console.error('Failed to send notification:', error);
-				}
+				// try {
+				// 	const message = JSON.stringify({
+				// 		action: 'players_ready',
+				// 	});
+					
+				// 	if (tournamentSocket.t_socket.readyState === WebSocket.OPEN) {
+				// 		tournamentSocket.t_socket.send(message);
+				// 		console.log("MESSAGE IS: ", message);
+				// 	} else {
+				// 		console.error("WebSocket is not open.");
+				// 	}
+				// } catch (error) {
+				// 	console.error('Failed to send notification:', error);
+				// }
 			})
 			.catch((error) => {
 				console.log("Error(closeTournament):", error.message);

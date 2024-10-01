@@ -10,7 +10,7 @@ export class Play extends Component {
 	}
 
 	destroy() {
-		tournamentSocket.closeWebSocket();
+		//tournamentSocket.closeWebSocket();
 		this.removeAllEventListeners();
 	}
 

@@ -67,7 +67,6 @@ class GameManager:
 		print(f"Starting match between (ID {player_1_id}) and (ID {player_2_id})") # DEBUG
 
 		try:
-			print ("TEST 3")
 			# Create game room and game logic
 			game_room_id = self.create_game_room(player_1_id, player_2_id)
 			game_room = self.get_game_room_by_id(game_room_id)
@@ -90,16 +89,14 @@ class GameManager:
 					game_logic.player_2_ready = True
 			ai_player = AiPlayer(game_logic)
 
-			print ("TEST 4")
 			await self.run_game_loop(game_room, game_logic, ai_player)
-			print ("TEST 5")
 			# Get the game results
 			result = game_room.get_result(tournament_id, match_id)
 
 			# Remove the room
 			print ("TEST game_room_id: ", game_room_id)
 			self.remove_game_room(game_room_id)
-
+			print ("TEST after remove_game_room: ", game_room_id)
 			return result
 		except Exception as e:
 			print(f"Error starting match: {e}")
@@ -158,8 +155,10 @@ class GameManager:
 	def remove_game_room(self, game_room_id):
 		if game_room_id in self.rooms:
 			room = self.rooms[game_room_id]
-			del self.player_to_room[room.player_1_id]
-			del self.player_to_room[room.player_2_id]
+			if room.player_1_id in self.player_to_room:
+				del self.player_to_room[room.player_1_id]
+			if room.player_2_id in self.player_to_room:
+				del self.player_to_room[room.player_2_id]
 			del self.rooms[game_room_id]
 
 

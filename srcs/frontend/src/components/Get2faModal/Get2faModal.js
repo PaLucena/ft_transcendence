@@ -68,7 +68,7 @@ export class Get2faCode extends Component {
 				const otpCode = Array.from(inputs).map(input => input.value).join('');
 				const csrftoken = getCSRFToken('csrftoken');
 
-				fetch("/api/2fa/verify-2fa/", {
+				("/api/2fa/verify-2fa/", {
 					method: "POST",
 					credentials: 'include',
 					headers: {

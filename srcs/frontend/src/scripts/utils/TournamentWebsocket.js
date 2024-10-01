@@ -32,7 +32,7 @@ class TournamentWebsocket {
         try {
             const data = JSON.parse(event.data);
 
-            console.log("DATA: ", data);
+            console.log("DATA in handle message: ", data);
             
             if (data.error) {
                 this.handleError(data.errorCode, data.errorMessage);
@@ -41,10 +41,34 @@ class TournamentWebsocket {
             if (data.tournament_users) {
                 Tournament.renderPlayers(data.tournament_users);
             }
-            if (data.action == "players_ready")
-                console.log("NAV!!!!!!!");
-                //navigateTo("/pong");
-
+            if (data.action == "players_ready") {
+                console.log("NAVIGATING TO PONG");
+                navigateTo("/pong");
+            }
+            if (data.action == "players_done") {
+                fetch("/api/check_user_id/", {
+					method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+					credentials: 'include',
+                    body: JSON.stringify({"id": data.id})
+				})
+				.then(response => {
+					if (!response.ok) {
+						return response.json().then(errData => {
+							throw new Error(errData.error || `Response status: ${response.status}`);
+						});
+					}
+					return response.json();
+				})
+				.then(data => {
+					if (data["result"] == true) {
+                        console.log("NAVIGATING TO PLAY");
+                        navigateTo("/play");
+					}
+				})
+            }
         } catch (error) {
             this.handleError(null, error, false);
         }

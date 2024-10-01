@@ -225,7 +225,7 @@ export class UISetup {
                             'Content-Type': 'application/json',
                         },
                         credentials: 'include',
-                        body: JSON.stringify({ current_user, invite_user}),
+                        body: JSON.stringify({current_user, invite_user}),
                     });
 
                     await handleResponse(response, (data) => {

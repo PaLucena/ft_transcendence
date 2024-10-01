@@ -105,7 +105,15 @@ def close_tournament(request, tournament_id):
 				tournament.save()
 				available_matches = create_initial_matches(tournament)
 				
-				#print("BEFORE available_matches", available_matches)
+				async_to_sync(get_channel_layer().group_send)(
+					f"tournament_{tournament.name}",
+					{
+						"type": "start_match_event",
+						"tournament_id": tournament_id,
+						"action": "players_ready",
+					}
+				)
+
 				async_to_sync(get_channel_layer().group_send)(
 					f"tournament_{tournament.name}",
 					{
@@ -115,7 +123,7 @@ def close_tournament(request, tournament_id):
 						"creator_name": request.user.username
 					}
 				)
-	
+
 				#results = asyncio.run(start_all_matches(tournament, available_matches))
 				return Response({"message": "Tournament starting."},
 					status=status.HTTP_200_OK)

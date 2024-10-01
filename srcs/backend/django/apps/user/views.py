@@ -41,6 +41,20 @@ def check_auth(request):
     return Response({"authenticated": user.is_authenticated}, status=status.HTTP_200_OK)
 
 
+@api_view(["POST"])
+@default_authentication_required
+def check_user_id(request):
+    try:
+        user = request.user
+        user_id = request.data.get("id")
+        print(f"::::{request.data}")
+        if user.id == user_id:
+            return Response({"result": True}, status=status.HTTP_200_OK)
+        return Response({"result": False}, status=status.HTTP_200_OK)   
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(["GET"])
 @default_authentication_required
 def get_user_data(request):
@@ -49,6 +63,9 @@ def get_user_data(request):
         user_data = {
             "username": user.username,
             "avatar": user.avatar.url,
+
+
+            
             "email": user.email,
             "number_of_friends": get_friend_count(user),
             "language": user.language,
