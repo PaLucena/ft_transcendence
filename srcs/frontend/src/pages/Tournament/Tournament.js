@@ -217,8 +217,6 @@ export class Tournament extends Component {
 				`;
 				bottomHalf.insertAdjacentHTML('beforeend', matchContainerHtml);
 			}
-		} else {
-			console.warn('topHalf or bottomHalf not found.');
 		}
 
 		function createPlayerHtml(player, index) {

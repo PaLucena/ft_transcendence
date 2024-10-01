@@ -76,7 +76,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # 'user.middleware.EnforceProxyMiddleware',
+    'user.middleware.EnforceProxyMiddleware',
     "django_otp.middleware.OTPMiddleware",
 ]
 ROOT_URLCONF = "core.urls"

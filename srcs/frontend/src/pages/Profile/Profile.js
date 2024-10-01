@@ -76,7 +76,6 @@ export class Profile extends Component {
 				if (profilePhoto && data.avatar) {
 					profilePhoto.style.backgroundImage = `url(${data.avatar || '/assets/images/default_avatar.jpg'})`;
 				}
-				//document.getElementById("photoContainer").src = `${data["avatar"]}`;
 			}
 			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
 			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
