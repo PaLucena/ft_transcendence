@@ -379,7 +379,7 @@ export class Play extends Component {
 
 	displayJoinModal(type) {
 		if (type === 'private') {
-			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
+			document.querySelector('#codeInput').innerHTML = `<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" maxlength="6" required>
 																<label data-i18n="invitation-code" for="code"></label>`;
 			setTimeout(() => languageSelector.updateLanguage(), 0);
 		}
