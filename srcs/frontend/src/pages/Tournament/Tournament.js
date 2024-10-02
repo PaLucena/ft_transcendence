@@ -1,9 +1,4 @@
 import { Component } from "../../scripts/Component.js";
-import { navigateTo } from '../../scripts/Router.js';
-import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
-import customAlert from '../../scripts/utils/customAlert.js';
-import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
-
 export class Tournament extends Component {
 	constructor() {
 		super('/pages/Tournament/tournament.html');
@@ -16,6 +11,7 @@ export class Tournament extends Component {
 	}
 
 	init() {
+
 	}
 
 
@@ -35,9 +31,14 @@ export class Tournament extends Component {
 
 			if (btnContainer) {
 				if (creatorId === currentId) {
-					btnContainer.innerHTML = `Close <br> Delete`
+					btnContainer.innerHTML = `
+						<button data-i18n='close-tournament-button' data-tournament-action="close" class="btn btn-primary">Start Tournament</button>
+						<button data-i18n='delete-tournament-button' data-tournament-action="exit" class="btn btn-danger">Delete Tournament</button>
+					`;
 				} else {
-					btnContainer.innerHTML = `Exit`
+					btnContainer.innerHTML = `
+						<button data-i18n='delete-tournament-button' data-tournament-action="exit" class="btn btn-danger">Leave</button>
+					`;
 				}
 			} else {
 				console.warn('root_tournament_btn_container is not found.');
@@ -100,7 +101,7 @@ export class Tournament extends Component {
 							</div>
 						</div>
 						<div class="nickname-placeholder col-12 m-0 d-flex justify-content-center row mt-1">
-							<span id="nickname-${index}" class="nickname bg-light rounded-2 text-center py-1">${player.user_name}</span>
+							<span id="nickname-${index}" class="nickname bg-light rounded-2 text-center py-1">${player.user_name || 'AI'}</span>
 						</div>
 					</div>
 				</div>

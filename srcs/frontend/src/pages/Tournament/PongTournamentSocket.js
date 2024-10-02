@@ -40,40 +40,21 @@ class PongTournamentSocket {
             }
 
             else if (data.type === 'successfully_joined') {
-                console.log("successfully_joined", data);
-                navigateTo('/tournament');
-                const observer = new MutationObserver((mutations, obs) => {
-                    if (document.querySelector('#root_tournament_container')) {
-                        setTimeout(() => {
-                            Tournament.renderButtons(data.creator_id, data.current_id);
-                        }, 0);
-                        obs.disconnect();
-                    }
-                });
-
-                observer.observe(document, {
-                    childList: true,
-                    subtree: true
-                });
+                if (window.location.pathname === '/play') {
+                    console.log("successfully_joined", data);
+                    navigateTo('/tournament');
+                    setTimeout(() => {
+                        Tournament.renderButtons(data.creator_id, data.current_id);
+                    }, 100);
+                }
             }
 
             else if (data.type === 'tournament_room_update') {
                 if (window.location.pathname === '/tournament') {
                     console.log("Tournament room update:", data);
-
-                    const observer = new MutationObserver((mutations, obs) => {
-                        if (document.querySelector('#root_tournament_container')) {
-                            setTimeout(() => {
-                                Tournament.renderPlayers(data.participants_data);
-                            }, 0);
-                            obs.disconnect();
-                        }
-                    });
-
-                    observer.observe(document, {
-                        childList: true,
-                        subtree: true
-                    });
+                    setTimeout(() => {
+                        Tournament.renderPlayers(data.participants_data);
+                    }, 100);
                 }
             }
 
