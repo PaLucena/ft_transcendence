@@ -8,6 +8,7 @@ html, body {
 
 body {
 	background-color: #7ba9a9;
+	overflow-y: hidden;
 }
 
 nav {
