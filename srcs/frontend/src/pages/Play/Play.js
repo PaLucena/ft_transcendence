@@ -217,6 +217,7 @@ export class Play extends Component {
 
 
 	static displayTournaments(public_tournaments, private_tournaments, player_id) {
+
 		if (public_tournaments.length === 0)
 			document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
 		else {
@@ -226,7 +227,7 @@ export class Play extends Component {
 			for (let i = 0; i < public_tournaments.length; i++) {
 				let isPlayer = public_tournaments[i].players.includes(player_id);
 				let tournamentName = isPlayer
-					? `⭐ ${public_tournaments[i].name} ⭐`
+					? `⭐ ${public_tournaments[i].name}`
 					: public_tournaments[i].name;
 				publicContainer.innerHTML +=
 					`<button
@@ -237,6 +238,7 @@ export class Play extends Component {
 						data-tournament-name="${public_tournaments[i].name}"
 						data-tournament-type="public"
 						data-tournament-creator="${public_tournaments[i].participants_data[0].user_name}"
+						data-tournament-is-member = "${isPlayer}"
 					>
 						<span class="tName">
 							${tournamentName}
@@ -254,7 +256,7 @@ export class Play extends Component {
 			for (let i = 0; i < private_tournaments.length; i++) {
 				let isPlayer = private_tournaments[i].players.includes(player_id);
 				let tournamentName = isPlayer
-					? `⭐ ${private_tournaments[i].name} ⭐`
+					? `⭐ ${private_tournaments[i].name}`
 					: private_tournaments[i].name;
 				privateContainer.innerHTML +=
 					`<button
@@ -266,6 +268,7 @@ export class Play extends Component {
 						data-tournament-name="${private_tournaments[i].name}"
 						data-tournament-type="private"
 						data-tournament-creator="${private_tournaments[i].participants_data[0].user_name}"
+						data-tournament-is-member = "${isPlayer}"
 					>
 						<span class="tName">
 							${tournamentName}
@@ -288,8 +291,13 @@ export class Play extends Component {
 					let tournamentName = closestElement.getAttribute("data-tournament-name");
 					let tournamentType = closestElement.getAttribute("data-tournament-type");
 					let tournamentCreator = closestElement.getAttribute("data-tournament-creator");
+					let tournamentMember = closestElement.getAttribute("data-tournament-is-member");
 
-					this.displayJoinModal(tournamentId, tournamentType, tournamentName, tournamentCreator);
+					if (tournamentMember === 'false') {
+						this.displayJoinModal(tournamentId, tournamentType, tournamentName, tournamentCreator);
+					} else {
+						this.joinTournamentRoom(tournamentId);
+					}
 				}
 			});
 		} else {
@@ -346,8 +354,16 @@ export class Play extends Component {
 		});
 	}
 
-	joinTournamentRoom(allTournaments, type) {
-		navigateTo("/tournament/" + tournamentData.id);
+	joinTournamentRoom(tournamentId) {
+		const message = JSON.stringify({
+				type: 'join_tournament_room',
+				tournament_id: tournamentId,
+        	});
+			try {
+            	pongTournamentSocket.t_socket.send(message);
+        	} catch (error) {
+            	console.error('Failed to send notification:', error);
+        	}
 	}
 
 }

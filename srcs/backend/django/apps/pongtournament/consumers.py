@@ -50,6 +50,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         elif message["type"] == "join_tournament":
             await handle_join_tournament(self, message)
 
+        elif message["type"] == "join_tournament_room":
+            await handle_join_tournament(self, message)
+
         elif message["type"] == "leave_tournament":
             await handle_leave_tournament(self, message)
 

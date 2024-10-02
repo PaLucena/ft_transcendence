@@ -70,18 +70,26 @@ async def handle_join_tournament(consumer, message):
     manager = TournamentManager()
     tournament_id = message['tournament_id']
     tournament_room = f"{tournament_id}"
-    password = message['password']
 
-    try:
-        if manager.join_tournament(consumer, tournament_id, password):
-            await consumer.channel_layer.group_add(tournament_room, consumer.channel_name)
-            await send_main_room(consumer.channel_layer)
+    if message['type'] == 'join_tournament_room':
+        try:
             await consumer.send_successfully_joined()
             await send_tournament_room(consumer.channel_layer, tournament_room)
-        else:
-            await consumer.send_error("Failed to join tournament.")
-    except Exception as e:
-        await consumer.send_error(str(e))
+        except Exception as e:
+            await consumer.send_error(str(e))
+    else:
+        password = message['password']
+
+        try:
+            if manager.join_tournament(consumer, tournament_id, password):
+                await consumer.channel_layer.group_add(tournament_room, consumer.channel_name)
+                await send_main_room(consumer.channel_layer)
+                await consumer.send_successfully_joined()
+                await send_tournament_room(consumer.channel_layer, tournament_room)
+            else:
+                await consumer.send_error("Failed to join tournament.")
+        except Exception as e:
+            await consumer.send_error(str(e))
 
 
 async def handle_leave_tournament(consumer, message):
