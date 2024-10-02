@@ -16,7 +16,6 @@ export class Tournament extends Component {
 	}
 
 	init() {
-		this.displayInfo();
 	}
 
 
@@ -28,23 +27,27 @@ export class Tournament extends Component {
 
 	}
 
-
-    displayInfo() {
-		const container = document.getElementById('rootTournament');
+	static renderButtons(creatorId, currentId) {
+		const container = document.getElementById('root_tournament_container');
 
 		if (container) {
-			container.innerHTML = this.createHtml();
+			const btnContainer = container.querySelector('#root_tournament_btn_container');
+
+			if (btnContainer) {
+				if (creatorId === currentId) {
+					btnContainer.innerHTML = `Close <br> Delete`
+				} else {
+					btnContainer.innerHTML = `Exit`
+				}
+			} else {
+				console.warn('root_tournament_btn_container is not found.');
+			}
 		} else {
-			console.warn('rootTournament is not found.');
+			console.warn('root_tournament_container is not found.');
 		}
-    }
+	}
 
 	static renderPlayers(players) {
-		console.log(123123123);
-		console.log(players);
-		
-
-
 		const topHalf = document.querySelector('.top-half');
 		const bottomHalf = document.querySelector('.bottom-half');
 
@@ -105,35 +108,4 @@ export class Tournament extends Component {
 		}
 	}
 
-
-	createHtml() {
-		const html = `
-			<div class="tournament-name col-12 d-flex justify-content-center">
-				<div>
-					<p id="tournamentName" class="d-flex justify-content-center display-6">
-
-					</p>
-					<div class="d-flex justify-content-center">
-						<p id="invitationCode"></p>
-					</div>
-				</div>
-			</div>
-
-			<div class="top-half d-flex h-40 w-100 m-0">
-					<!-- Tournament first half of players -->
-			</div>
-
-			<div class="bottom-half d-flex h-60 w-100 m-0 mt-2">
-					<!-- Tournament second half of players -->
-			</div>
-
-            <div class="close-exit-btn-container col-12 d-flex justify-content-center">
-				<div class="close-exit-btn col-3 col-sm-2 col-lg-1 gap-2 d-flex justify-content-center">
-					<!-- Tornament butons container -->
-				</div>
-            </div>
-        `;
-		setTimeout(() => languageSelector.updateLanguage(), 0);
-        return html;
-    }
 }

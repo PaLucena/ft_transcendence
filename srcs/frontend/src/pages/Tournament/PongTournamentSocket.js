@@ -33,19 +33,50 @@ class PongTournamentSocket {
             }
 
             else if (data.type === 'main_room_update') {
-                console.log("Main room update: public ", data.public_tournaments.length, " private", data.private_tournaments.length);
-                Play.displayTournaments(data.public_tournaments, data.private_tournaments, data.player_id);
-                console.log("Data", data);
+                if (window.location.pathname === '/play') {
+                    console.log("Main room update: public ", data);
+                    Play.displayTournaments(data.public_tournaments, data.private_tournaments, data.player_id);
+                }
             }
 
             else if (data.type === 'successfully_joined') {
-                navigateTo('/tournament')
+                console.log("successfully_joined", data);
+                navigateTo('/tournament');
+                const observer = new MutationObserver((mutations, obs) => {
+                    if (document.querySelector('#root_tournament_container')) {
+                        setTimeout(() => {
+                            Tournament.renderButtons(data.creator_id, data.current_id);
+                        }, 0);
+                        obs.disconnect();
+                    }
+                });
+
+                observer.observe(document, {
+                    childList: true,
+                    subtree: true
+                });
             }
 
             else if (data.type === 'tournament_room_update') {
-                console.log("Tournament room update:", data);
-                Tournament.renderPlayers(data.participants_data);
+                if (window.location.pathname === '/tournament') {
+                    console.log("Tournament room update:", data);
+
+                    const observer = new MutationObserver((mutations, obs) => {
+                        if (document.querySelector('#root_tournament_container')) {
+                            setTimeout(() => {
+                                Tournament.renderPlayers(data.participants_data);
+                            }, 0);
+                            obs.disconnect();
+                        }
+                    });
+
+                    observer.observe(document, {
+                        childList: true,
+                        subtree: true
+                    });
+                }
             }
+
 
             else if (data.type === 'match_start') {
                 console.log("Match starting:", data.match_id, data.message);
