@@ -76,6 +76,7 @@ async def handle_join_tournament(consumer, message):
         if manager.join_tournament(consumer, tournament_id, password):
             await consumer.channel_layer.group_add(tournament_room, consumer.channel_name)
             await send_main_room(consumer.channel_layer)
+            await consumer.send_successfully_joined()
             await send_tournament_room(consumer.channel_layer, tournament_room)
         else:
             await consumer.send_error("Failed to join tournament.")

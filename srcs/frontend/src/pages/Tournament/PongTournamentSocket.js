@@ -1,6 +1,6 @@
 import {navigateTo} from "../../scripts/Router.js";
 import { Play } from "../Play/Play.js";
-
+import { Tournament } from "./Tournament.js";
 
 class PongTournamentSocket {
     constructor() {
@@ -8,9 +8,6 @@ class PongTournamentSocket {
         this.reconnectDelay = 5000;
         this.maxReconnectAttempts = 10;
         this.reconnectAttempts = 0;
-
-        this.public_tournaments = [];
-        this.private_tournaments = [];
     }
 
     initWebSocket() {
@@ -41,13 +38,17 @@ class PongTournamentSocket {
                 console.log("Data", data);
             }
 
+            else if (data.type === 'successfully_joined') {
+                navigateTo('/tournament')
+            }
+
             else if (data.type === 'tournament_room_update') {
-                console.log("Tournament room update:", data.participants, data.state);
+                console.log("Tournament room update:", data);
+                Tournament.renderPlayers(data.participants_data);
             }
 
             else if (data.type === 'match_start') {
                 console.log("Match starting:", data.match_id, data.message);
-
                 this.notifyPlayerMatchStart(data.match_id, data.message);
             }
 

@@ -229,9 +229,9 @@ export class Play extends Component {
 					? `⭐ ${public_tournaments[i].name} ⭐`
 					: public_tournaments[i].name;
 				publicContainer.innerHTML +=
-					`<button 
-						class="display-tournament-item btn border-start-0
-							border-end-0 col-10 my-1 rounded" 
+					`<button
+						class="tournament-item-btn display-tournament-item btn border-start-0
+							border-end-0 col-10 my-1 rounded"
 						style="background-color: #ff6d3f;"
 						data-tournament-id="${public_tournaments[i].id}"
 						data-tournament-name="${public_tournaments[i].name}"
@@ -257,9 +257,9 @@ export class Play extends Component {
 					? `⭐ ${private_tournaments[i].name} ⭐`
 					: private_tournaments[i].name;
 				privateContainer.innerHTML +=
-					`<button 
-						class="display-tournament-item btn btn-success
-							border-start-0 border-end-0
+					`<button
+						class="tournament-item-btn display-tournament-item
+							btn btn-success border-start-0 border-end-0
 							col-10 my-1 rounded"
 						style="background-color: #ff6d3f;"
 						data-tournament-id="${private_tournaments[i].id}"
@@ -281,7 +281,7 @@ export class Play extends Component {
 
 		if (tournamentsContainer) {
 			this.addEventListener(tournamentsContainer, "click", (event) => {
-				let closestElement = event.target.closest("[data-tournament-id]");
+				let closestElement = event.target.closest(".tournament-item-btn");
 
 				if (closestElement) {
 					let tournamentId = closestElement.getAttribute("data-tournament-id");
@@ -290,9 +290,6 @@ export class Play extends Component {
 					let tournamentCreator = closestElement.getAttribute("data-tournament-creator");
 
 					this.displayJoinModal(tournamentId, tournamentType, tournamentName, tournamentCreator);
-
-				} else {
-					console.log("No element with data-tournament-name found.");
 				}
 			});
 		} else {
