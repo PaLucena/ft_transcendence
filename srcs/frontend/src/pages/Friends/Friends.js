@@ -17,14 +17,12 @@ export class Friends extends Component {
 	}
 
 	destroy() {
-
 		this.removeAllEventListeners();
-		this.uiSetup.removeOnlineUpdateListeners();
 		this.uiSetup.removeSearchFormEvents();
 	}
 
-	async init() {
-		await this.friendsLoader.loadFriendsData();
+	init() {
+		this.friendsLoader.loadFriendsData();
 		this.uiSetup.setupSearchForm();
 		this.uiSetup.setupFilterButtons();
 		this.uiSetup.setupFriendButtons();

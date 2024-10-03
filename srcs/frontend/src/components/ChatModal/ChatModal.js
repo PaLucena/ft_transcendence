@@ -22,7 +22,7 @@ export class ChatModal extends Component {
         this.uiSetup.removeMessageFormEvents();
     }
 
-    async init() {
+    init() {
         this.uiSetup.setupChatModal();
         this.uiSetup.setupMessagesModal();
         this.uiSetup.setupMessagesModalClose();

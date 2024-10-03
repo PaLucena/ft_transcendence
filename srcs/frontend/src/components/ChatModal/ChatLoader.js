@@ -70,7 +70,6 @@ export class ChatLoader {
             });
 
             await handleResponse(response, data => {
-                console.log(data);
                 try {;
                     userSocket.socket.send(JSON.stringify({
                         action: 'notification',

@@ -14,7 +14,7 @@ export class Signup extends Component {
         this.removeAllEventListeners();
     }
 
-    async init() {
+    init() {
         this.initSubmitForm();
     }
 

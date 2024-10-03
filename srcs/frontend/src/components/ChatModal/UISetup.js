@@ -303,7 +303,6 @@ export class UISetup {
                             group_name
                         }));
 
-                        console.log('accepted');
                     } catch (error) {
                         console.error('Failed to send notification:', error);
                     }
@@ -315,7 +314,6 @@ export class UISetup {
                             group_name
                         }));
 
-                        console.log('rejected');
                     } catch (error) {
                         console.error('Failed to send notification:', error);
                     }
