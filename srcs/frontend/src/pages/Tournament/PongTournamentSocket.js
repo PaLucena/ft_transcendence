@@ -11,6 +11,9 @@ class PongTournamentSocket {
     }
 
     initWebSocket() {
+        if (this.t_socket && this.t_socket.readyState !== WebSocket.CLOSED)
+            return;
+
         try {
             this.t_socket = new WebSocket(`/ws/pongtournament/`);
         } catch (error) {
@@ -82,35 +85,25 @@ class PongTournamentSocket {
     }
 
     notifyPlayerMatchStart(match_id, message) {
-
-
         alert(`${message}`);
-
         navigateTo(`/pong/`);
     }
-
 
     handleClose(event) {
         if (!event.wasClean) {
             console.error('Tournament socket closed unexpectedly:', event.reason || 'Unknown reason');
-
-            if (this.reconnectAttempts < this.maxReconnectAttempts) {
-                this.reconnectAttempts++;
-                console.log(`Reconnecting in ${this.reconnectDelay / 1000} seconds... (Attempt ${this.reconnectAttempts})`);
-
-                setTimeout(() => {
-                    //this.initWebSocket();
-                }, this.reconnectDelay);
-            } else {
-                console.error('Maximum reconnect attempts reached. Connection closed.');
-            }
-        } else {
-            console.log('WebSocket connection closed cleanly.');
         }
     }
 
     handleError(param, failedToCreateWebSocket, b) {
         console.log(param, failedToCreateWebSocket, b);
+    }
+
+    closeWebSocket() {
+        if (this.t_socket) {
+            this.t_socket.close();
+            this.t_socket = null;
+        }
     }
 }
 

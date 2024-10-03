@@ -2,8 +2,8 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
+import { initGlobalSockets } from '../../scripts/utils/globalSocketManager.js';
 
 export class Signup extends Component {
     constructor() {
@@ -43,7 +43,7 @@ export class Signup extends Component {
         const signupData = await this.submitSignupData(jsonData, csrftoken);
 
         if (signupData) {
-            userSocket.initWebSocket();
+            initGlobalSockets();
             customAlert('success', 'Account was created successfully', 3000);
             navigateTo("/play");
         }

@@ -10,9 +10,9 @@ import { Pong } from '../pages/Pong/Pong.js';
 import { Tournament } from '../pages/Tournament/Tournament.js';
 import { Match } from '../pages/Match/Match.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
-import { userSocket } from './utils/UserWebsocket.js';
 import { handleResponse } from './utils/rtchatUtils.js';
 import { Test } from '../pages/Test/Test.js';
+import { initGlobalSockets } from './utils/globalSocketManager.js';
 
 class Router {
 	constructor() {
@@ -83,10 +83,10 @@ class Router {
 					return;
 			}
 
-			if (isProtectedRoute) {
-				if (!userSocket.userSocket || userSocket.userSocket.readyState === WebSocket.CLOSED)
-					userSocket.initWebSocket();
-			}
+			if (isProtectedRoute)
+				initGlobalSockets();
+
+
 		} else {
 			if (isProtectedRoute) {
 				this.navigateTo("/login");

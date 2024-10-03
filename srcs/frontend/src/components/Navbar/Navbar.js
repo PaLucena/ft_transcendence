@@ -1,7 +1,7 @@
 import { Component } from "../../scripts/Component.js";
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js'
-import { userSocket } from '../../scripts/utils/UserWebsocket.js'
 import { navigateTo } from "../../scripts/Router.js";
+import { closeGlobalSockets } from "../../scripts/utils/globalSocketManager.js";
 
 
 export class Navbar extends Component {
@@ -31,7 +31,7 @@ export class Navbar extends Component {
 					})
 
 					handleResponse(response, () => {
-						userSocket.closeWebSocket();
+						closeGlobalSockets();
 						navigateTo("/login");
 					});
 
