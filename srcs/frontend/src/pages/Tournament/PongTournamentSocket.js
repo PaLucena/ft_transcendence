@@ -1,4 +1,5 @@
 import {navigateTo} from "../../scripts/Router.js";
+import customAlert from "../../scripts/utils/customAlert.js";
 import { Play } from "../Play/Play.js";
 import { Tournament } from "./Tournament.js";
 
@@ -32,7 +33,7 @@ class PongTournamentSocket {
             const data = JSON.parse(event.data);
 
             if (data.type === 'error') {
-                this.handleError(data.errorCode, data.message);
+                customAlert('danger', data.message, 5000);
             }
 
             else if (data.type === 'main_room_update') {
@@ -93,10 +94,6 @@ class PongTournamentSocket {
         if (!event.wasClean) {
             console.error('Tournament socket closed unexpectedly:', event.reason || 'Unknown reason');
         }
-    }
-
-    handleError(param, failedToCreateWebSocket, b) {
-        console.log(param, failedToCreateWebSocket, b);
     }
 
     closeWebSocket() {
