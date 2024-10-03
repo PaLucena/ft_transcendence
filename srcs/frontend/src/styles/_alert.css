@@ -1,4 +1,4 @@
-#alert-container {
+#alert_container {
 	position: absolute;
     top: 10px;
     right: 30px;
@@ -176,7 +176,7 @@
 }
 
 @media (max-width: 720px) {
-	#alert-container {
+	#alert_container {
 		right: 15px;
 	}
 

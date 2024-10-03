@@ -8,7 +8,7 @@
  */
 
 export default function customAlert(type, text, time, title = '') {
-    const alertContainer = document.getElementById('alert-container');
+    const alertContainer = document.getElementById('alert_container');
 
     if (alertContainer) {
         const customAlert = document.createElement('aside');
@@ -89,6 +89,6 @@ export default function customAlert(type, text, time, title = '') {
             console.warn('alert_close is not found.')
         }
     } else {
-        console.warn('alert-container is not found.')
+        console.warn('alert_container is not found.')
     }
 };

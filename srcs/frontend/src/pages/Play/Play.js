@@ -2,231 +2,379 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 import { pongTournamentSocket } from '../Tournament/PongTournamentSocket.js';
+import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
+
 
 export class Play extends Component {
 	constructor() {
 		super('/pages/Play/play.html');
-		pongTournamentSocket.initWebSocket();
+		this.joinModalInstance = null;
 	}
 
-
-	destroy() {
-		tournamentSocket.closeWebSocket();
-		this.removeAllEventListeners();
-	}
 
 	async init() {
+		await this.getActiveTournamentsOnPlayData();
+		this.renderModalLayoutJoinTournament();
 		this.setupEventListeners();
-		this.setupTournamentJoin();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
-	setupEventListeners() {
-		const	oneVSoneBtn = document.getElementById("oneVSoneBtn");
-		this.addEventListener(oneVSoneBtn, "click", () => {
-			document.getElementById("btns").style.display = "none";
-			document.getElementById("dropdownOneVsOne").style.display = "block";
+	destroy() {
+		this.removeAllEventListeners();
+		this.removeModalInstance();
+	}
+
+	async getActiveTournamentsOnPlayData() {
+		const response = await fetch("/api/pongtournament/get_active_tournaments/", {
+			method: 'GET',
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: 'include',
 		});
 
-		const	tournamentBtn = document.getElementById("tournamentBtn");
-		this.addEventListener(tournamentBtn, "click", () => {
-			document.getElementById("btns").style.display = "none";
-			document.getElementById("dropdownTournaments").style.display = "block";
-		});
+        await handleResponse(response, (data) => {
+			Play.displayTournaments(data.public_tournaments, data.private_tournaments, data.player_id);
+        });
+	}
 
+	renderModalLayoutJoinTournament() {
+		const modalsContainer = document.getElementById('modals_container');
 
-		// DEBUG  ---------------------------------------------------------------------------
-		const testBtn = document.getElementById("testBtn");
-		testBtn.innerHTML = "Test Button";
-		this.addEventListener(testBtn, "click", async () => {
-			pongTournamentSocket.t_socket.send(JSON.stringify({
-				'type': 'clean_tournaments',
-			}));
-		});
-		// ----------------------------------------------------------------------------------
+		if (modalsContainer) {
+			const modalHTML = `
+				<div id="tournament_modal" class="modal-join modal fade" tabindex="-1" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h1 class="modal-title fs-5">
+									<!-- Tournament Title -->
+								</h1>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body my-3">
+								<!-- on-create/join-with-password Tournament form -->
+							</div>
+							<div class="modal-footer d-flex justify-content-center">
+								<!-- submit/join btn -->
+							</div>
+						</div>
+					</div>
+				</div>`;
 
+			modalsContainer.insertAdjacentHTML('beforeend', modalHTML);
 
-		const	backOne = document.getElementById("backOne");
-		this.addEventListener(backOne, "click", () => {
-			document.getElementById("dropdownOneVsOne").style.display = "none";
-			document.getElementById("btns").style.display = "block";
-		});
-
-		const	backTwo = document.getElementById("backTwo");
-		this.addEventListener(backTwo, "click", () => {
-			document.getElementById("dropdownTournaments").style.display = "none";
-			document.getElementById("btns").style.display = "block";
-		});
-
-		const	plusPublicBtn = document.getElementById("plusPublicBtn");
-		this.addEventListener(plusPublicBtn, "click", () => {
-			this.createTournament('public');
-		});
-
-		const	plusPrivateBtn = document.getElementById("plusPrivateBtn");
-		this.addEventListener(plusPrivateBtn, "click", () => {
-			this.createTournament('private');
-		});
-
-		// local
-		const	localBtn = document.getElementById("localBtn");
-		this.addEventListener(localBtn, "click", () => {
-			this.playLocal();
-		});
-
-		// ai
-		const	aiBtn = document.getElementById("aiBtn");
-		this.addEventListener(aiBtn, "click", () => {
-			this.playAi();
-		});
-
-		const	tournamentModalElement = document.getElementById("tournamentModal");
-		new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
-		this.addEventListener(tournamentModalElement, 'shown.bs.modal', () => {
-			document.getElementById('tournament-name').focus();
-		});
-
-		// close tournament modal
-		const closeTournamentBtn = document.querySelector('#closeTournamentBtn');
-		this.addEventListener(closeTournamentBtn, 'click', () => {
-			document.getElementById("tournamentForm").reset();
-		});
-
-		// close join modal
-		const closeJoinBtn = document.querySelector('#closeJoinBtn');
-		this.addEventListener(closeJoinBtn, 'click', () => {
-			document.getElementById("joinForm").reset();
-		});
+			const jointTournamentModal = document.getElementById('tournament_modal');
+			if (!this.joinModalInstance) {
+				this.joinModalInstance = new bootstrap.Modal(jointTournamentModal);
+			}
+		} else {
+			console.warn('modals_container is not found.');
+		}
 	}
 
 
-	// local match
-	playLocal() {
-		fetch("/api/start_local_match/", {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
+	setupEventListeners() {
+		const container = document.getElementById('play_container');
+
+		if (container) {
+
+			const modal = document.getElementById('tournament_modal');
+			if (modal) {
+				this.addEventListener(modal, 'shown.bs.modal', () => {
+					const tournamentForm = document.getElementById('tournament_modal_form');
+
+					if (tournamentForm) {
+						const firstInput = tournamentForm.querySelector('input');
+						if (firstInput) {
+							firstInput.focus();
+						}
+					}
+				});
+
+				this.addEventListener(modal, 'hidden.bs.modal', () => {
+					const modalTitle = modal.querySelector('.modal-title');
+					const modalBody = modal.querySelector('.modal-body');
+					const modalFooter = modal.querySelector('.modal-footer');
+
+					if (modalTitle) {
+						modalTitle.innerHTML = '';
+					}
+					if (modalBody) {
+						modalBody.innerHTML = '';
+					}
+					if (modalFooter) {
+						modalFooter.innerHTML = '';
+					}
 				});
 			}
-			return response.json();
-		})
-		.then(data => {
-			customAlert('success', data.message, 3000);
-			navigateTo("/pong");
 
-		})
-		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, 5000);
-		})
+
+			const	oneVSoneBtn = document.getElementById("oneVSoneBtn");
+			this.addEventListener(oneVSoneBtn, "click", () => {
+				document.getElementById("btns").style.display = "none";
+				document.getElementById("dropdownOneVsOne").style.display = "block";
+			});
+
+			const	tournamentBtn = document.getElementById("tournamentBtn");
+			this.addEventListener(tournamentBtn, "click", () => {
+				document.getElementById("btns").style.display = "none";
+				document.getElementById("dropdownTournaments").style.display = "block";
+			});
+
+
+			// DEBUG  ---------------------------------------------------------------------------
+			const testBtn = document.getElementById("testBtn");
+			testBtn.innerHTML = "Clean Tournaments";
+			this.addEventListener(testBtn, "click", async () => {
+				pongTournamentSocket.t_socket.send(JSON.stringify({
+					'type': 'clean_tournaments',
+				}));
+			});
+			// ----------------------------------------------------------------------------------
+
+
+			const	backOne = document.getElementById("backOne");
+			this.addEventListener(backOne, "click", () => {
+				document.getElementById("dropdownOneVsOne").style.display = "none";
+				document.getElementById("btns").style.display = "block";
+			});
+
+			const	backTwo = document.getElementById("backTwo");
+			this.addEventListener(backTwo, "click", () => {
+				document.getElementById("dropdownTournaments").style.display = "none";
+				document.getElementById("btns").style.display = "block";
+			});
+
+			const tournamentsContainer = document.getElementById("dropdownTournaments");
+			if (tournamentsContainer) {
+				this.addEventListener(tournamentsContainer, "click", (event) => {
+					let closestElement = event.target.closest(".tournament-item-btn");
+
+					if (closestElement) {
+						let tournamentId = closestElement.getAttribute("data-tournament-id");
+						let tournamentName = closestElement.getAttribute("data-tournament-name");
+						let tournamentType = closestElement.getAttribute("data-tournament-type");
+						let tournamentCreator = closestElement.getAttribute("data-tournament-creator");
+						let tournamentMember = closestElement.getAttribute("data-tournament-is-member");
+
+						if (tournamentMember === 'false') {
+							if (tournamentType === 'public') {
+								this.setTournamentModalTitle(`Join ${tournamentName} tournament`);
+								this.setTournamentModalContent('join_public', tournamentName, tournamentCreator);
+							} else if (tournamentType === 'private') {
+								this.setTournamentModalTitle(`Join ${tournamentName} tournament`);
+								this.setTournamentModalContent('join_private', tournamentName, tournamentCreator);
+							} else {
+								console.error('Invalid type passed on Join tournament');
+							}
+							this.showTournamentModal();
+							this.joinTournament(tournamentId, tournamentType);
+						} else {
+							this.joinTournamentRoom(tournamentId);
+						}
+					}
+				});
+			}
+
+			const createTournamentButtons = container.querySelectorAll('.create-tournament-btn');
+			createTournamentButtons.forEach(button => {
+				this.addEventListener(button, 'click', () => {
+					const creationType = button.getAttribute('data-tournament-creation-type');
+
+					if (creationType) {
+						if (creationType === 'public') {
+							this.setTournamentModalTitle(`Create ${creationType} tournament`);
+							this.setTournamentModalContent('create_public');
+						} else if (creationType === 'private') {
+							this.setTournamentModalTitle(`Create ${creationType} tournament`);
+							this.setTournamentModalContent('create_private');
+						} else {
+							console.error('Invalid argument type passed on Create Tournament.');
+						}
+						this.showTournamentModal();
+						this.createTournament(creationType);
+					}
+				});
+			});
+
+			// local
+			const	localBtn = document.getElementById("localBtn");
+			this.addEventListener(localBtn, "click", () => {
+				console.log('localBtn clicked');
+				this.playLocal();
+				navigateTo('/pong');
+			});
+
+			// ai
+			const	aiBtn = document.getElementById("aiBtn");
+			this.addEventListener(aiBtn, "click", () => {
+				console.log('aiBtn clicked');
+				this.playAi();
+				navigateTo('/pong');
+			});
+
+			const	tournamentModalElement = document.getElementById("tournamentModal");
+			new bootstrap.Modal(tournamentModalElement, {backdrop: false, keyboard: true});
+			this.addEventListener(tournamentModalElement, 'shown.bs.modal', () => {
+				document.getElementById('tournament-name').focus();
+			});
+		} else {
+			console.warn('play_container is not found.');
+		}
+	}
+
+	setTournamentModalTitle(text) {
+		if (text) {
+			const modal = document.getElementById('tournament_modal');
+
+			if  (modal) {
+				const titleContainer = modal.querySelector('.modal-title');
+
+				if (titleContainer) {
+					titleContainer.innerHTML = text;
+				}
+			} else {
+				console.warn('tournament_modal is not found.');
+			}
+		}
+	}
+
+	setTournamentModalContent(type, name=null, creator=null) {
+		if (type) {
+			const modal = document.getElementById('tournament_modal');
+
+			if  (modal) {
+				const bodyContainer = modal.querySelector('.modal-body');
+				const footerContainer = modal.querySelector('.modal-footer');
+
+				if (bodyContainer || footerContainer) {
+					switch (type) {
+						case 'create_public':
+							bodyContainer.innerHTML = `
+								<form id="tournament_modal_form">
+									<div class="form-floating">
+										<input type="text" class="form-control" id="tournament_name" name="name" placeholder="Tournament name" required>
+										<label for="name">Tournament name</label>
+									</div>
+								</form>`;
+
+							footerContainer.innerHTML = `
+								<button type="submit" form="tournament_modal_form" class="btn btn-primary">Create</button>
+							`;
+							break;
+						case 'create_private':
+							bodyContainer.innerHTML = `
+								<form id="tournament_modal_form">
+									<div class="form-floating mb-1">
+										<input type="text" class="form-control" id="tournament_name" name="name" placeholder="Tournament name" required>
+										<label for="name">Tournament name</label>
+									</div>
+									<div class="form-floating">
+										<input type="text" class="form-control" id="tournament_password" name="code" placeholder="Tournament password" required>
+										<label for="code">Tournament password</label>
+									</div>
+								</form>`;
+							footerContainer.innerHTML = `
+								<button type="submit" form="tournament_modal_form" class="btn btn-primary">Create</button>
+							`;
+							break;
+						case 'join_public':
+							bodyContainer.innerHTML = `
+								<div>
+									<p>Name: ${name || 'Anonymous Tournament'}</p>
+									<p>Creator: ${creator || 'Anonymous Player'}</p>
+								</div>
+								<form id="tournament_modal_form"></form>
+							`;
+							footerContainer.innerHTML = `
+								<button type="submit" form="tournament_modal_form" class="btn btn-primary">Join</button>
+							`;
+							break;
+						case 'join_private':
+							bodyContainer.innerHTML = `
+								<div>
+									<p>Name: ${name || 'Anonymous Tournament'}</p>
+									<p>Creator: ${creator || 'Anonymous Player'}</p>
+								</div>
+								<form id="tournament_modal_form">
+									<div class="form-floating">
+										<input type="text" class="form-control" id="tournament_password" name="code" placeholder="Tournament password" required>
+										<label for="code">Tournament password</label>
+									</div>
+								</form>
+							`;
+							footerContainer.innerHTML = `
+								<button type="submit" form="tournament_modal_form" class="btn btn-primary">Join</button>
+							`;
+							break;
+						default:
+						 console.error('Play.js setTournamentModalBody invalid argument type passed.');
+					}
+				}
+			} else {
+				console.warn('tournament_modal is not found.');
+			}
+		}
+	}
+
+	// local match
+	playLocal() {
+		try {
+			console.log("sending local match request");
+			pongTournamentSocket.t_socket.send(JSON.stringify({
+				type: "start_single_match",
+				player_2_id: 0,
+				controls_mode: "local"
+			}));
+		}
+		catch (error) {
+			console.error('Failed on start local match:', error);
+		}
 	}
 
 	// ai logic
 	playAi() {
-		fetch("/api/start_ai_match/", {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			customAlert('success', data.message, 3000);
-			navigateTo("/pong");
-
-		})
-		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, 5000);
-		})
-	}
-
-	playRemote() {
-		fetch("/api/start_remote_match/", {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				player_2_username: player2Username,
-			}),
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			customAlert('success', data.message, 3000);
-			navigateTo("/pong");
-
-		})
-		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, 5000);
-		})
-	}
-
-
-	createTournament(tournamentType) {
-		const closeModal = document.getElementsByClassName("btn-close")[0];
-		const tittleModal = document.getElementsByClassName("modal-title")[0];
-		const tournamentForm = document.getElementById("tournamentForm");
-		const tournamentName = document.getElementById("tournament-name");
-
-		console.log("Tournament type:", tournamentType);
-
-		tournamentForm.removeEventListener('submit', this.handleTournamentSubmit);
-		tittleModal.innerHTML = `New ${tournamentType} tournament`;
-		tournamentName.value = '';
-
-		if (tournamentType === 'private') {
-			document.querySelector('#passwordInput').innerHTML = `
-				<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
-				<label data-i18n="invitation-code" for="code"></label>`;
-        	setTimeout(() => languageSelector.updateLanguage(), 0);
+		try {
+			console.log("sending ai match request");
+			pongTournamentSocket.t_socket.send(JSON.stringify({
+				type: "start_single_match",
+				player_2_id: 0,
+				controls_mode: "AI"
+			}));
 		}
-		else
-			document.querySelector('#passwordInput').innerHTML = '';
+		catch (error) {
+			console.error('Failed on start AI match:', error);
+		}
+	}
+
+	createTournament(type) {
+		const tournamentForm = document.getElementById("tournament_modal_form");
 
 		this.handleTournamentSubmit = async (event) => {
 			event.preventDefault();
+
 			const formData = new FormData(event.target);
 
 			try {
-				let is_private = tournamentType === 'private';
-				await pongTournamentSocket.t_socket.send(JSON.stringify({
+				let is_private = type === 'private';
+
+				pongTournamentSocket.t_socket.send(JSON.stringify({
 					type: 'create_tournament',
 					name: formData.get("name"),
 					is_private,
 					password: is_private ? formData.get('code') : null,
 				}));
-			} catch (error) {
-				console.error('Failed to send notification:', error);
-			}
-			closeModal.click();
-		};
-		this.addEventListener(tournamentForm, "submit", this.handleTournamentSubmit);
-	}
 
+				this.hideTournamentModal();
+			} catch (error) {
+				console.error('Failed on create tournament:', error);
+			}
+		};
+
+		tournamentForm.onsubmit = this.handleTournamentSubmit;
+	}
 
 	static displayTournaments(public_tournaments, private_tournaments, player_id) {
 
@@ -238,6 +386,13 @@ export class Play extends Component {
 
 			for (let i = 0; i < public_tournaments.length; i++) {
 				let isPlayer = public_tournaments[i].players.includes(player_id);
+				let is_open = public_tournaments[i].is_open;
+				let bracket;
+				if (is_open) {
+					bracket = public_tournaments[i].participants.length;
+				} else {
+					bracket = "closed";
+				}
 				let tournamentName = isPlayer
 					? `⭐ ${public_tournaments[i].name}`
 					: public_tournaments[i].name;
@@ -255,7 +410,7 @@ export class Play extends Component {
 						<span class="tName">
 							${tournamentName}
 						</span>
-						[${public_tournaments[i].participants.length}]
+						[${bracket}]
 					</button>`;
 			}
 		}
@@ -267,6 +422,13 @@ export class Play extends Component {
 
 			for (let i = 0; i < private_tournaments.length; i++) {
 				let isPlayer = private_tournaments[i].players.includes(player_id);
+				let is_open = private_tournaments[i].is_open;
+				let bracket;
+				if (is_open) {
+					bracket = private_tournaments[i].participants.length;
+				} else {
+					bracket = "closed";
+				}
 				let tournamentName = isPlayer
 					? `⭐ ${private_tournaments[i].name}`
 					: private_tournaments[i].name;
@@ -285,97 +447,77 @@ export class Play extends Component {
 						<span class="tName">
 							${tournamentName}
 						</span>
-						[${private_tournaments[i].participants.length}]
+						[${bracket}]
 					</button>`;
 			}
 		}
 	}
 
-	setupTournamentJoin() {
-		const tournamentsContainer = document.getElementById("dropdownTournaments");
+	joinTournament(id, type) {
+		const tournamentForm = document.getElementById("tournament_modal_form");
 
-		if (tournamentsContainer) {
-			this.addEventListener(tournamentsContainer, "click", (event) => {
-				let closestElement = event.target.closest(".tournament-item-btn");
-
-				if (closestElement) {
-					let tournamentId = closestElement.getAttribute("data-tournament-id");
-					let tournamentName = closestElement.getAttribute("data-tournament-name");
-					let tournamentType = closestElement.getAttribute("data-tournament-type");
-					let tournamentCreator = closestElement.getAttribute("data-tournament-creator");
-					let tournamentMember = closestElement.getAttribute("data-tournament-is-member");
-
-					if (tournamentMember === 'false') {
-						this.displayJoinModal(tournamentId, tournamentType, tournamentName, tournamentCreator);
-					} else {
-						this.joinTournamentRoom(tournamentId);
-					}
-				}
-			});
-		} else {
-			console.warn('dropdownTournaments not found.');
-		}
-	}
-
-
-	displayJoinModal(tournamentId, tournamentType, tournamentName, tournamentCreator) {
-		document.getElementById("join-tournament-name").innerHTML = `Name: ${tournamentName}<br>Creator: ${tournamentCreator}`;
-
-		console.log("Joining tournament", tournamentId, tournamentType);
-		if (tournamentType === 'private') {
-			document.querySelector('#codeInput').innerHTML = `
-				<input type="text" class="form-control" id="code" name="code" placeholder="Invitation code" required>
-				<label data-i18n="invitation-code" for="code"></label>`;
-        	setTimeout(() => languageSelector.updateLanguage(), 0);
-		}
-		else
-			document.querySelector('#codeInput').innerHTML = '';
-
-		const	joinModalElement = document.getElementById('joinModal');
-		const	joinModal = new bootstrap.Modal(joinModalElement, {backdrop: false, keyboard: true});
-		joinModal.show();
-
-		const joinForm = document.querySelector("#joinForm");
-
-		this.addEventListener(joinForm, "submit", (event) => {
+		this.handleTournamentSubmit = async (event) => {
 			event.preventDefault();
 
 			const formData = new FormData(event.target);
-			const jsonData = {};
-
-			formData.forEach((value, key) => {
-				jsonData[key] = value;
-			});
-
-			jsonData['tournament_id'] = tournamentId;
-        	jsonData['tournament_type'] = tournamentType;
-
-			const message = JSON.stringify({
-				type: 'join_tournament',
-				tournament_id: jsonData.tournament_id,
-				tournament_type: jsonData.tournament_type,
-				password: jsonData.code || null,
-        	});
 
 			try {
-            	pongTournamentSocket.t_socket.send(message);
-        	} catch (error) {
-            	console.error('Failed to send notification:', error);
-        	}
-			joinModal.hide();
-		});
+				pongTournamentSocket.t_socket.send(JSON.stringify({
+					type: 'join_tournament',
+					tournament_id: id,
+					tournament_type: type,
+					password: formData.get('code') || null,
+				}));
+
+				this.hideTournamentModal();
+			} catch (error) {
+				console.error('Failed on join tournament:', error);
+			}
+		};
+
+		tournamentForm.onsubmit = this.handleTournamentSubmit;
 	}
 
 	joinTournamentRoom(tournamentId) {
-		const message = JSON.stringify({
+		try {
+			pongTournamentSocket.t_socket.send(JSON.stringify({
 				type: 'join_tournament_room',
 				tournament_id: tournamentId,
-        	});
-			try {
-            	pongTournamentSocket.t_socket.send(message);
-        	} catch (error) {
-            	console.error('Failed to send notification:', error);
-        	}
+			}));
+		} catch (error) {
+			console.error('Failed on send join tournament room:', error);
+		}
 	}
 
+	showTournamentModal() {
+		const container = document.getElementById('tournament_modal');
+
+		if (container) {
+			const instance = bootstrap.Modal.getInstance(container);
+			if (instance) {
+				instance.show();
+			}
+		}
+	}
+
+	hideTournamentModal() {
+		const container = document.getElementById('tournament_modal');
+
+		if (container) {
+			const instance = bootstrap.Modal.getInstance(container);
+			if (instance) {
+				instance.hide();
+			}
+		}
+	}
+
+	removeModalInstance() {
+		const modalsContainer = document.getElementById('modals_container');
+		const jointTournamentModal = document.getElementById('tournament_modal');
+
+		if (modalsContainer && jointTournamentModal) {
+			modalsContainer.removeChild(jointTournamentModal);
+			this.joinModalInstance = null;
+		}
+	}
 }
