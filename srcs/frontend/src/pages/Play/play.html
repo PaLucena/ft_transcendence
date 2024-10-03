@@ -1,4 +1,4 @@
-<div class="row h-90 align-items-center justify-content-center">
+<div id="play_container" class="row h-90 align-items-center justify-content-center">
 	<div class="gifContainer container position-relative align-items-center max-width-container ">
 		<div class="pongGIF row w-100 justify-content-center">
 			<img src="/assets/images/pong.gif" alt="Pong">
@@ -32,7 +32,7 @@
 				<div class="row fs-4 h-25 mb-0 align-items-center">
 					<div data-i18n="public-tournament" class="col-8 text-end"></div>
 					<div class="col-4">
-						<button id="plusPublicBtn" class="btn btn-green w-50" data-bs-toggle="modal" data-bs-target="#tournamentModal">
+						<button class="create-tournament-btn btn btn-green w-50" data-tournament-creation-type="public">
 							<span class="fs-4">+</span>
 						</button>
 					</div>
@@ -43,7 +43,7 @@
 				<div class="row fs-4 h-25 mb-0 align-items-center">
 					<div data-i18n="private-tournament-button" class="col-8 text-end"></div>
 					<div class="col-4">
-						<button id="plusPrivateBtn" class="btn btn-green w-50" data-bs-toggle="modal" data-bs-target="#tournamentModal">
+						<button class="create-tournament-btn btn btn-green w-50" data-tournament-creation-type="private">
 							<span class="fs-4">+</span>
 						</button>
 					</div>
@@ -79,7 +79,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="modal-join modal fade" id="joinModal" tabindex="-1" aria-hidden="true">
+		<!-- <div class="modal-join modal fade" id="joinModal" tabindex="-1" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -100,6 +100,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 	</div>
 </div>
