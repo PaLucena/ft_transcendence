@@ -1,11 +1,10 @@
 import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
-import { getCSRFToken } from '../../scripts/utils/csrf.js';
-import { userSocket } from '../../scripts/utils/UserWebsocket.js';
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
+import { closeGlobalSockets } from '../../scripts/utils/globalSocketManager.js';
 
 export class Profile extends Component {
 	constructor(params = {}) {
@@ -285,7 +284,7 @@ export class Profile extends Component {
 				credentials: 'include'
 			})
 			.then(response => {
-				userSocket.closeWebSocket();
+				closeGlobalSockets();
 				navigateTo("/login");
 			})
 			.catch((error) => {

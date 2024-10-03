@@ -1,8 +1,7 @@
 import { Component } from "../../scripts/Component.js";
 import { navigateTo } from '../../scripts/Router.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-import { userSocket } from "../../scripts/utils/UserWebsocket.js";
-
+import { initGlobalSockets } from "../../scripts/utils/globalSocketManager.js";
 
 export class Auth extends Component {
 	constructor() {
@@ -35,7 +34,7 @@ export class Auth extends Component {
 			return response.json()
 		})
 		.then(data => {
-			userSocket.initWebSocket();
+			initGlobalSockets();
 			navigateTo("/play");
 		})
 		.catch(error => {

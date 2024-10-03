@@ -15,29 +15,13 @@ export class Play extends Component {
 	destroy() {
 		tournamentSocket.closeWebSocket();
 		this.removeAllEventListeners();
-
-
-		const modalsContainer = document.getElementById('modals_container');
-		const jointTournamentModal = document.getElementById('tournament_modal');
-
-		if (modalsContainer && jointTournamentModal) {
-			modalsContainer.removeChild(jointTournamentModal);
-			this.joinModalInstance = null;
-		} else if (!modalsContainer) {
-			console.warn('modals_container is not found.');
-		} else if (!jointTournamentModal) {
-			console.warn('tournament_modal is not found in the container.');
-		}
+		this.removeModalInstance();
 	}
 
-	async init() {
-		pongTournamentSocket.initWebSocket();
-
+	init() {
 		this.renderModalLayoutJoinTournament();
 		this.setupEventListeners();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
-
-
 	}
 
 	renderModalLayoutJoinTournament() {
@@ -188,7 +172,7 @@ export class Play extends Component {
 						if (creationType === 'public') {
 							this.setTournamentModalTitle(`Create ${creationType} tournament`);
 							this.setTournamentModalContent('create_public');
-						} else if (creationTypeg === 'private') {
+						} else if (creationType === 'private') {
 							this.setTournamentModalTitle(`Create ${creationType} tournament`);
 							this.setTournamentModalContent('create_private');
 						} else {
@@ -515,6 +499,16 @@ export class Play extends Component {
 			if (instance) {
 				instance.hide();
 			}
+		}
+	}
+
+	removeModalInstance() {
+		const modalsContainer = document.getElementById('modals_container');
+		const jointTournamentModal = document.getElementById('tournament_modal');
+
+		if (modalsContainer && jointTournamentModal) {
+			modalsContainer.removeChild(jointTournamentModal);
+			this.joinModalInstance = null;
 		}
 	}
 }

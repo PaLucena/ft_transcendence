@@ -251,11 +251,8 @@ export class UISetup {
                 const seconds = timeLeft % 60;
                 const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
-                if (timerElement) {
+                if (timerElement)
                     timerElement.textContent = formattedTime;
-                }
-
-                console.log(formattedTime);
             };
 
             if (this.intervalId) {
