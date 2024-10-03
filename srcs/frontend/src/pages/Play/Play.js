@@ -155,7 +155,7 @@ export class Play extends Component {
 								console.error('Invalid type passed on Join tournament');
 							}
 							this.showTournamentModal();
-							this.joinTournament(id, type);
+							this.joinTournament(tournamentId, tournamentType);
 						} else {
 							this.joinTournamentRoom(tournamentId);
 						}
