@@ -1,4 +1,3 @@
-import { eventEmitter } from './EventEmitter.js';
 import { handleResponse, updateOnlineStatus } from './rtchatUtils.js'
 import customAlert from './customAlert.js';
 import { staticComponentsRenderer } from '../utils/StaticComponentsRenderer.js';
@@ -7,7 +6,6 @@ import { navigateTo } from '../Router.js';
 class UserWebsocket {
     constructor() {
         this.socket = null;
-        this.onlineUsersUpdatedListener = null;
     }
 
     initWebSocket() {
@@ -24,16 +22,6 @@ class UserWebsocket {
         this.socket.onmessage = (e) => this.handleMessage(e);
         this.socket.onerror = (e) => {this.handleError(null, e, true);}
         this.socket.onclose = (e) => this.handleClose(e);
-
-        this.initOnlineStatusListener();
-    }
-
-    initOnlineStatusListener() {
-        this.onlineUsersUpdatedListener = (onlineUsers) => {
-            updateOnlineStatus(onlineUsers);
-        };
-
-        eventEmitter.on('onlineUsersUpdated', this.onlineUsersUpdatedListener);
     }
 
     handleMessage(event) {
@@ -45,11 +33,11 @@ class UserWebsocket {
                 return;
             }
             if (data.online_users) {
-                eventEmitter.emit('onlineUsersUpdated', data.online_users);
+                updateOnlineStatus(data.online_users);
             } else if (data.notification) {
                 this.handleNotification(data.notification);
             } else if (data.invitation_1x1) {
-                this.handleInvitation1x1(data.invitation_1x1)
+                this.handleInvitation1x1(data.invitation_1x1);
             }
             else {
                 this.handleError(null, 'Invalid data format received.', false);
@@ -158,7 +146,6 @@ class UserWebsocket {
     handleClose(event) {
         if (!event.wasClean)
             console.error('Online socket closed unexpectedly:', event.reason || 'Unknown reason');
-        this.removeOnlineUpdateListeners();
     }
 
     handleError(errorCode, errorMessage, close) {
@@ -172,15 +159,6 @@ class UserWebsocket {
         if (this.socket) {
             this.socket.close();
             this.socket = null;
-        }
-
-        this.removeOnlineUpdateListeners();
-    }
-
-    removeOnlineUpdateListeners() {
-        if (this.onlineUsersUpdatedListener) {
-            eventEmitter.off('onlineUsersUpdated', this.onlineUsersUpdatedListener);
-            this.onlineUsersUpdatedListener = null;
         }
     }
 }

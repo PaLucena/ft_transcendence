@@ -175,12 +175,6 @@ export class UISetup {
         this.friends.filter = data;
     }
 
-    removeOnlineUpdateListeners() {
-        if (this.friends.friendsRenderer.onlineUsersUpdatedListener) {
-            this.friends.friendsRenderer.eventEmitter.off('onlineUsersUpdated', this.friends.friendsRenderer.onlineUsersUpdatedListener);
-        }
-    }
-
     handleError(errorCode, errorMessage) {
         switch (errorCode) {
             case 401:
