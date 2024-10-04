@@ -1,10 +1,11 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 import asyncio
-
-
 from .tournament_manager import TournamentManager
 from user.decorators import default_authentication_required
+from rest_framework.response import Response
+from rest_framework import status
+from pongtournament.tournament_manager import TournamentManager
 
 
 @api_view(["POST"])
@@ -69,3 +70,59 @@ def get_tournaments():
     print("Private tournaments: ", private_tournaments)  # DEBUG
 
     return JsonResponse({"ok": "ok"}, status=200)
+
+
+@api_view(["GET"])
+@default_authentication_required
+def get_tournament_room_data(request, tournament_id):
+    try:
+        manager = TournamentManager()
+        tournament_data = manager.get_tournament_data(tournament_id)
+
+        participants_data = tournament_data["participants_data"]
+        creator_id = tournament_data["creator"]
+        current_id = request.user.id
+        participants = tournament_data["participants"]
+
+        if current_id not in participants:
+            return Response(
+                {"detail": "You are not a participant in this tournament."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        return Response(
+            {
+                "participants_data": participants_data,
+                "creator_id": creator_id,
+                "current_id": current_id,
+            },
+            status=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        return Response(
+            {"detail": f"An error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
+@api_view(["GET"])
+@default_authentication_required
+def get_active_tournaments(request):
+    try:
+        manager = TournamentManager()
+        public_tournaments = manager.get_tournaments_by_privacy(is_private=False)
+        private_tournaments = manager.get_tournaments_by_privacy(is_private=True)
+        player_id = request.user.id
+        return Response(
+            {
+                "public_tournaments": public_tournaments,
+                "private_tournaments": private_tournaments,
+                "player_id": player_id,
+            },
+            status=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        return Response(
+            {"detail": f"An error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

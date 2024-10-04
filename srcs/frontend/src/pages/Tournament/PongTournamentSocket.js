@@ -46,22 +46,16 @@ class PongTournamentSocket {
             else if (data.type === 'successfully_joined') {
                 if (window.location.pathname === '/play') {
                     console.log("successfully_joined", data);
-                    navigateTo('/tournament');
-                    setTimeout(() => {
-                        Tournament.renderButtons(data.creator_id, data.current_id);
-                    }, 100);
+                    navigateTo(`/tournament/${data.tournament_id}`);
                 }
             }
 
             else if (data.type === 'tournament_room_update') {
                 if (window.location.pathname === '/tournament') {
                     console.log("Tournament room update:", data);
-                    setTimeout(() => {
-                        Tournament.renderPlayers(data.participants_data);
-                    }, 100);
+                    Tournament.renderPlayers(data.participants_data);
                 }
             }
-
 
             else if (data.type === 'match_start') {
                 console.log("Match starting:", data.match_id, data.message);

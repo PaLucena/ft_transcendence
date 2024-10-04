@@ -68,11 +68,10 @@ async def handle_join_tournament(consumer, message):
     tournament_id = message["tournament_id"]
     tournament_room = f"{tournament_id}"
     tournament = manager.get_tournament_data(tournament_id)
-    creator_id = tournament["creator"]
 
     if message["type"] == "join_tournament_room":
         try:
-            await consumer.send_successfully_joined(creator_id)
+            await consumer.send_successfully_joined(tournament_id)
             await send_tournament_room(consumer.channel_layer, tournament_room)
         except Exception as e:
             await consumer.send_error(str(e))
@@ -85,7 +84,7 @@ async def handle_join_tournament(consumer, message):
                     tournament_room, consumer.channel_name
                 )
                 await send_main_room(consumer.channel_layer)
-                await consumer.send_successfully_joined(creator_id)
+                await consumer.send_successfully_joined(tournament_id)
                 await send_tournament_room(consumer.channel_layer, tournament_room)
             else:
                 await consumer.send_error("Failed to join tournament.")

@@ -41,11 +41,10 @@ urlpatterns = [
     path("api/", include("tournament.urls")),
     path("api/", include("pongtournament.urls")),
     path("api/chat/", include("rtchat.urls")),
+    path("api/pongtournament/", include("pongtournament.urls")),
     path("api/friends/", include("friends.urls")),
     path("api/blockchain/", include("blockchain.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path(
-        "api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
-    ),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/2fa/", include("twofactor.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

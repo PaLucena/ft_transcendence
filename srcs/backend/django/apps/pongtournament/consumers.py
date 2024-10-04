@@ -96,13 +96,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         )
 
-    async def send_successfully_joined(self, creator_id):
+    async def send_successfully_joined(self, tournament_id):
         await self.send(
             text_data=json.dumps(
                 {
                     "type": "successfully_joined",
-                    "creator_id": creator_id,
-                    "current_id": self.user.id,
+                    "tournament_id": tournament_id
                 }
             )
         )

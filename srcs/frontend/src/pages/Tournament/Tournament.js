@@ -1,7 +1,10 @@
 import { Component } from "../../scripts/Component.js";
+import customAlert from "../../scripts/utils/customAlert.js";
+import { handleResponse } from "../../scripts/utils/rtchatUtils.js";
+
 export class Tournament extends Component {
-	constructor() {
-		super('/pages/Tournament/tournament.html');
+	constructor(params = {}) {
+		super('/pages/Tournament/tournament.html', params);
 	}
 
 	destroy() {
@@ -10,10 +13,45 @@ export class Tournament extends Component {
 		this.removeAllEventListeners();
 	}
 
-	init() {
-
+	async init() {
+		if (this.params.tournamentId) {
+			await this.getTournamentRoomData(this.params.tournamentId);
+			console.log(this.params.tournamentId);
+		}
 	}
 
+	async getTournamentRoomData(tournamentId) {
+		try {
+			const response = await fetch(`/api/pongtournament/get_tournament_room_data/${tournamentId}`, {
+				method: 'GET',
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: 'include',
+			});
+
+			await handleResponse(response, (data) => {
+				console.log("DATA;:", data);
+				this.renderButtons(data.creator_id, data.current_id)
+				Tournament.renderPlayers(data.participants_data)
+			});
+		} catch(error) {
+            this.handleError(error.errorCode, error.errorMessage);
+        }
+	}
+
+	handleError(errorCode, errorMessage) {
+		switch (errorCode) {
+			case 403:
+				customAlert('danger', errorMessage, 5000);
+				break ;
+			case 500:
+				customAlert('danger', 'An internal server error occurred.', 5000);
+				break;
+			default:
+				console.error(errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
+		}
+	}
 
 	closeTournament() {
 
@@ -23,7 +61,7 @@ export class Tournament extends Component {
 
 	}
 
-	static renderButtons(creatorId, currentId) {
+	renderButtons(creatorId, currentId) {
 		const container = document.getElementById('root_tournament_container');
 
 		if (container) {

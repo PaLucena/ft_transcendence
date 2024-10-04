@@ -29,6 +29,7 @@ class Router {
 			'/auth': () => new Auth(),
 			'/pong': () => new Pong(),
 			'/tournament': () => new Tournament(),
+			'/tournament/:tournamentId': params => new Tournament(params),
 			'/match': () => new Match(),
 			'/test': () => new Test(),
 		};
