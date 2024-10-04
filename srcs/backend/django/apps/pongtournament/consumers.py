@@ -128,13 +128,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         )
 
-    async def notify_cancel_tournament(self, event):
-        tournament_id = event["tournament_id"]
+    async def deleted_tournament(self, event):
         await self.send(
             text_data=json.dumps(
-                {"type": "tournament_cancelled", "tournament_id": tournament_id}
+                {
+                    "type": "deleted_tournament",
+                    "tournament_id": event["tournament_id"],
+                    "tournament_name": event["tournament_name"],
+                }
             )
         )
+        self.tournament_room = None
 
     async def add_to_tournament_group(self, tournament_room):
         if not self.tournament_room:

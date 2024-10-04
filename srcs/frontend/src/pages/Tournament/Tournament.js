@@ -1,6 +1,8 @@
 import { Component } from "../../scripts/Component.js";
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from "../../scripts/utils/rtchatUtils.js";
+import { pongTournamentSocket } from './PongTournamentSocket.js';
+import {navigateTo} from "../../scripts/Router.js";
 
 export class Tournament extends Component {
 	constructor(params = {}) {
@@ -69,14 +71,33 @@ export class Tournament extends Component {
 			if (btnContainer) {
 				if (creatorId === currentId) {
 					btnContainer.innerHTML = `
-						<button data-i18n='close-tournament-button' data-tournament-action="close" class="btn btn-primary">Start Tournament</button>
-						<button data-i18n='delete-tournament-button' data-tournament-action="exit" class="btn btn-danger">Delete Tournament</button>
+						<button data-tournament-action="start" class="btn btn-primary">Start Tournament</button>
+						<button data-tournament-action="leave" class="btn btn-danger">Delete Tournament</button>
 					`;
 				} else {
 					btnContainer.innerHTML = `
-						<button data-i18n='delete-tournament-button' data-tournament-action="exit" class="btn btn-danger">Leave</button>
+						<button data-tournament-action="leave" class="btn btn-danger">Leave</button>
 					`;
 				}
+
+				this.addEventListener(btnContainer, 'click', (event) => {
+					const btn = event.target.closest('.btn');
+					if (btn) {
+						const action = btn.getAttribute('data-tournament-action');
+						if (action === 'start') {
+							console.log('Start tournament');
+							pongTournamentSocket.t_socket.send(JSON.stringify({
+								type: 'start_tournament'
+							}));
+						} else if (action === 'leave') {
+							console.log('Delete tournament');
+							pongTournamentSocket.t_socket.send(JSON.stringify({
+								type: 'leave_tournament',
+								tournament_id: this.params.tournamentId
+							}));
+						}
+					}
+				});
 			} else {
 				console.warn('root_tournament_btn_container is not found.');
 			}
