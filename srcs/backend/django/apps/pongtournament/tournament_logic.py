@@ -4,13 +4,10 @@ import random
 from ponggame.game_manager import game_manager
 
 
-
 class TournamentLogic:
 
     @staticmethod
     async def init_tournament_logic(tournament):
-        print("Tournament started (TournamentLogic)")  # DEBUG
-        tournament.state = "ongoing"
         tournament.initial_bracket = [player for player in tournament.players]
         random.shuffle(tournament.initial_bracket)
 
@@ -21,32 +18,43 @@ class TournamentLogic:
 
         print("Initial bracket (8): ", tournament.initial_bracket)  # DEBUG
 
-        # First round
+
+    @staticmethod
+    async def solve_first_round(tournament):
         print("Initial round")  # DEBUG
         results_i = await TournamentLogic.solve_matches(tournament, tournament.initial_bracket)
         TournamentLogic.move_players(tournament, results_i, "initial", "initial")
 
-        # Second round
+
+    @staticmethod
+    async def solve_second_round(tournament):
         print("Second round")  # DEBUG
         results_w = await TournamentLogic.solve_matches(tournament, tournament.winner_bracket)
         results_l = await TournamentLogic.solve_matches(tournament, tournament.loser_bracket)
         TournamentLogic.move_players(tournament, results_l, "second", "loser")
         TournamentLogic.move_players(tournament, results_w, "second", "winner")
 
-        # Third round
+
+    @staticmethod
+    async def solve_third_round(tournament):
         print("Third round")  # DEBUG
         results_l = await TournamentLogic.solve_matches(tournament, tournament.loser_bracket)
         TournamentLogic.move_players(tournament, results_l, "third", "loser")
 
-        # Fourth round
+
+    @staticmethod
+    async def solve_fourth_round(tournament):
         print("Fourth round")  # DEBUG
         results_w = await TournamentLogic.solve_matches(tournament, tournament.winner_bracket)
         TournamentLogic.move_players(tournament, results_w, "fourth", "winner")
 
-        # Final round
+
+    @staticmethod
+    async def solve_final_round(tournament):
         print("Final round")  # DEBUG
         results_w = await TournamentLogic.solve_matches(tournament, tournament.winner_bracket)
         TournamentLogic.move_players(tournament, results_w, "final", "winner")
+
 
     @staticmethod
     async def solve_matches(tournament, bracket):
@@ -64,11 +72,12 @@ class TournamentLogic:
 
             match_task = game_manager.start_match_test(  # DEBUG *******************************
                 tournament.id,
-                tournament.id + f"_match_{len(tournament.finished_matches) + 1}",
+                tournament.id + f"_match_{tournament.match_counter}",
                 player1_id,
                 player2_id,
                 controls_mode,
             )
+            tournament.match_counter += 1
             match_tasks.append(match_task)
 
         matches_results = await asyncio.gather(*match_tasks)
@@ -182,7 +191,6 @@ class TournamentLogic:
                         tournament.players.remove(match_result["player_1_id"])
                     if match_result["winner"] != 0:
                         tournament.players.remove(match_result["player_2_id"])
-                    tournament.state = "finished"
 
             print("Tournament finished. Winner: ", tournament.tournament_winner)
 

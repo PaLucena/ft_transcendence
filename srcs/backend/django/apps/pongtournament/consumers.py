@@ -22,6 +22,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.main_room = "main_room"
         self.tournament_room = None
 
+
     async def connect(self):
         self.user = self.scope["user"]
         self.user_name = self.user.username
@@ -34,12 +35,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if self.tournament_room:
             await send_tournament_room(self.channel_layer, self.tournament_room)
 
+
     async def disconnect(self, close_code):
         if self.tournament_room:
             await self.remove_from_tournament_group()
 
         await self.channel_layer.group_discard(self.main_room, self.channel_name)
         print(f"User {self.user_name} disconnected.")  # DEBUG
+
 
     async def receive(self, text_data=None, bytes_data=None):
         message = json.loads(text_data)
@@ -65,8 +68,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         elif message["type"] == "clean_tournaments":
             await handle_clean_tournaments(self.channel_layer)
 
+
     async def send_error(self, message):
         await self.send(text_data=json.dumps({"type": "error", "message": message}))
+
 
     async def main_room_update(self, event):
         public_tournaments = event["public_tournaments"]
@@ -82,20 +87,22 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         )
 
+
     async def tournament_room_update(self, event):
         participants = event["participants"]
-        state = event["state"]
+        next_state = event["next_state"]
         await self.send(
             text_data=json.dumps(
                 {
                     "type": "tournament_room_update",
                     "participants": participants,
                     "participants_data": event["participants_data"],
-                    "state": state,
+                    "next_state": next_state,
                     "tournament_id": event["tournament_id"],
                 }
             )
         )
+
 
     async def send_successfully_joined(self, tournament_id):
         await self.send(
@@ -103,6 +110,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 {"type": "successfully_joined", "tournament_id": tournament_id}
             )
         )
+
 
     async def notify_match_start(self, event):
         match_id = event["match_id"]
@@ -114,16 +122,28 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         )
 
-    async def notify_end_tournament(self, event):
-        tournament_id = event["tournament_id"]
-        results = event["results"]
 
+    async def notify_deleted_tournament(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "tournament_ended",
-                    "tournament_id": tournament_id,
-                    "results": results,
+                    "type": "notify_deleted_tournament",
+                    "tournament_id": event["tournament_id"],
+                    "tournament_name": event["tournament_name"],
+                }
+            )
+        )
+        self.tournament_room = None
+
+
+    async def notify_end_tournament(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "notify_end_tournament",
+                    "tournament_id": event["tournament_id"],
+                    "tournament_name": event["tournament_name"],
+                    "winner": event["winner"],
                 }
             )
         )
@@ -141,18 +161,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
 
-    async def notify_deleted_tournament(self, event):
-        await self.send(
-            text_data=json.dumps(
-                {
-                    "type": "notify_deleted_tournament",
-                    "tournament_id": event["tournament_id"],
-                    "tournament_name": event["tournament_name"],
-                }
-            )
-        )
-        self.tournament_room = None
-
     async def add_to_tournament_group(self, tournament_room):
         if not self.tournament_room:
             self.tournament_room = tournament_room
@@ -162,6 +170,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         else:
             print("User ", self.user_name, " already in a tournament.")
+
 
     async def remove_from_tournament_group(self, tournament_room=None):
         print("User ", self.user_name, " removed from ", tournament_room)
@@ -174,9 +183,3 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         else:
             print("User ", self.user_name, " not in any tournament.")
 
-    async def close_tournament_group(self):
-        if self.tournament_room:
-            await self.channel_layer.group_discard(
-                self.tournament_room, self.channel_name
-            )
-            print("User ", self.user_name, " closed ", self.tournament_room)

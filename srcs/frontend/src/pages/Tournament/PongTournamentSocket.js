@@ -23,7 +23,7 @@ class PongTournamentSocket {
         }
 
         this.t_socket.onmessage = (e) => this.handleMessage(e);
-        this.t_socket.onerror = (e) => {this.handleError(null, e, true);}
+        this.t_socket.onerror = (e) => this.handleError(null, e, true);
         this.t_socket.onclose = (e) => this.handleClose(e);
 
     }
@@ -70,17 +70,20 @@ class PongTournamentSocket {
                 customAlert('info', `You have been left ${data.tournament_name} tournament.`, 3000);
             }
 
-
             else if (data.type === 'notify_deleted_tournament') {
                 console.log("Deleted tournament:", data.tournament_name);
                 if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                     navigateTo(`/play`);
                 }
-                customAlert('info', `Tournament ${data.tournament_name} has been deleted.`, 3000);
+                customAlert('info', `Tournament "${data.tournament_name}" has been deleted.`, 3000);
             }
 
-            else if (data.type === 'tournament_ended') {
+            else if (data.type === 'notify_end_tournament') {
                 console.log("Tournament ended:", data.tournament_id, data.results);
+                if (window.location.pathname === `/tournament/${data.tournament_id}`) {
+                    navigateTo(`/play`);
+                }
+                customAlert('info', `Tournament "${data.tournament_name}" has ended. Winner: ${data.winner}`, 5000);
             }
 
             else {
@@ -101,6 +104,15 @@ class PongTournamentSocket {
         if (!event.wasClean) {
             console.error('Tournament socket closed unexpectedly:', event.reason || 'Unknown reason');
         }
+    }
+
+    handleError(errorCode, errorMessage, critical) {
+        if (critical) {
+            console.error('Critical error:', errorCode ? `Error ${errorCode}: ${errorMessage}` : `Critical error: ${errorMessage}`);
+        } else {
+            console.error('Error:', errorCode ? `Error ${errorCode}: ${errorMessage}` : `Error: ${errorMessage}`);
+        }
+
     }
 
     closeWebSocket() {
