@@ -2,8 +2,9 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-import { tournamentSocket } from '../../scripts/utils/TournamentWebsocket.js';
 import { pongTournamentSocket } from '../Tournament/PongTournamentSocket.js';
+import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
+
 
 export class Play extends Component {
 	constructor() {
@@ -12,16 +13,31 @@ export class Play extends Component {
 	}
 
 
+	init() {
+		this.getActiveTournamentsOnPlayData();
+		this.renderModalLayoutJoinTournament();
+		this.setupEventListeners();
+		setTimeout(() => languageSelector.updateLanguage(), 0);
+	}
+
 	destroy() {
-		tournamentSocket.closeWebSocket();
 		this.removeAllEventListeners();
 		this.removeModalInstance();
 	}
 
-	init() {
-		this.renderModalLayoutJoinTournament();
-		this.setupEventListeners();
-		setTimeout(() => languageSelector.updateLanguage(), 0);
+	async getActiveTournamentsOnPlayData() {
+		const response = await fetch("/api/pongtournament/get_active_tournaments/", {
+			method: 'GET',
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: 'include',
+		});
+
+        await handleResponse(response, (data) => {
+			Play.displayTournaments(data.public_tournaments, data.private_tournaments, data.player_id);
+			console.log(data);
+        });
 	}
 
 	renderModalLayoutJoinTournament() {
