@@ -63,7 +63,11 @@ class PongTournamentSocket {
             }
 
             else if (data.type === 'deleted_tournament') {
-                console.log("Deleted tournament:", data.tournament_id);
+                console.log("Deleted tournament:", data.tournament_name);
+                if (window.location.pathname === `/tournament/${data.tournament_id}`) {
+                    navigateTo(`/play`);
+                }
+                customAlert('info', `Tournament ${data.tournament_name} has been deleted.`, 3000);
             }
 
             else if (data.type === 'tournament_ended') {

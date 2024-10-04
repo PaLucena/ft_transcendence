@@ -37,9 +37,13 @@ async def send_tournament_room(channel_layer, tournament_room):
     )
 
 
-async def send_deleted_tournament(channel_layer, tournament_id):
+async def send_deleted_tournament(channel_layer, tournament_id, tournament_name):
     await channel_layer.group_send(
-        tournament_id, {"type": "deleted_tournament", "tournament_id": tournament_id}
+        tournament_id, {
+            "type": "deleted_tournament",
+            "tournament_id": tournament_id,
+            "tournament_name": tournament_name
+        }
     )
 
 
@@ -99,10 +103,11 @@ async def handle_leave_tournament(consumer, message):
     tournament_id = message["tournament_id"]
     tournament = manager.get_tournament_data(tournament_id)
     tournament_room = f"{tournament_id}"
+    tournament_name = tournament["name"]
 
     try:
         if consumer.user_id == tournament["creator"]:
-            await send_deleted_tournament(consumer.channel_layer, tournament_id)
+            await send_deleted_tournament(consumer.channel_layer, tournament_id, tournament_name)
             manager.delete_tournament(tournament_id)
         elif manager.leave_tournament(tournament_id, consumer.user_id):
             await consumer.remove_from_tournament_group()
