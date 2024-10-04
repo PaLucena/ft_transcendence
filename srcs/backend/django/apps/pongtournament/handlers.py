@@ -22,7 +22,6 @@ async def send_tournament_room(channel_layer, tournament_room):
     participants = tournament_data["participants"]
     participants_data = tournament_data["participants_data"]
     players = tournament_data["players"]
-    tournament_data
 
     await channel_layer.group_send(
         tournament_room,
@@ -37,10 +36,20 @@ async def send_tournament_room(channel_layer, tournament_room):
     )
 
 
+async def send_left_tournament(channel_layer, tournament_id, tournament_name, channel_name):
+    await channel_layer.send(
+        channel_name, {
+            "type": "notify_left_tournament",
+            "tournament_id": tournament_id,
+            "tournament_name": tournament_name
+        }
+    )
+
+
 async def send_deleted_tournament(channel_layer, tournament_id, tournament_name):
     await channel_layer.group_send(
         tournament_id, {
-            "type": "deleted_tournament",
+            "type": "notify_deleted_tournament",
             "tournament_id": tournament_id,
             "tournament_name": tournament_name
         }
@@ -110,11 +119,12 @@ async def handle_leave_tournament(consumer, message):
             await send_deleted_tournament(consumer.channel_layer, tournament_id, tournament_name)
             manager.delete_tournament(tournament_id)
         elif manager.leave_tournament(tournament_id, consumer.user_id):
-            await consumer.remove_from_tournament_group()
-            await send_main_room(consumer.channel_layer)
+            await send_left_tournament(consumer.channel_layer, tournament_id, tournament_name, consumer.channel_name)
+            await consumer.remove_from_tournament_group(tournament_id)
             await send_tournament_room(consumer.channel_layer, tournament_room)
         else:
             raise Exception("Failed to leave tournament.")
+        await send_main_room(consumer.channel_layer)
     except Exception as e:
         await consumer.send_error(str(e))
 

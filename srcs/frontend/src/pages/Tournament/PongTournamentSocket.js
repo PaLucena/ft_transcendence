@@ -62,7 +62,16 @@ class PongTournamentSocket {
                 this.notifyPlayerMatchStart(data.match_id, data.message);
             }
 
-            else if (data.type === 'deleted_tournament') {
+            else if (data.type === 'notify_left_tournament') {
+                console.log("Left tournament:", data.tournament_name);
+                if (window.location.pathname === `/tournament/${data.tournament_id}`) {
+                    navigateTo(`/play`);
+                }
+                customAlert('info', `You have been left ${data.tournament_name} tournament.`, 3000);
+            }
+
+
+            else if (data.type === 'notify_deleted_tournament') {
                 console.log("Deleted tournament:", data.tournament_name);
                 if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                     navigateTo(`/play`);

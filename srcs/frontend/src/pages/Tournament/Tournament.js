@@ -54,13 +54,6 @@ export class Tournament extends Component {
 		}
 	}
 
-	closeTournament() {
-
-	}
-
-	exitTournament() {
-
-	}
 
 	renderButtons(creatorId, currentId) {
 		const container = document.getElementById('root_tournament_container');
