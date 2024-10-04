@@ -16,7 +16,6 @@ export class Tournament extends Component {
 	async init() {
 		if (this.params.tournamentId) {
 			await this.getTournamentRoomData(this.params.tournamentId);
-			console.log(this.params.tournamentId);
 		}
 	}
 
