@@ -128,11 +128,24 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
         )
 
-    async def deleted_tournament(self, event):
+
+    async def notify_left_tournament(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "deleted_tournament",
+                    "type": "notify_left_tournament",
+                    "tournament_id": event["tournament_id"],
+                    "tournament_name": event["tournament_name"],
+                }
+            )
+        )
+
+
+    async def notify_deleted_tournament(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "notify_deleted_tournament",
                     "tournament_id": event["tournament_id"],
                     "tournament_name": event["tournament_name"],
                 }
@@ -150,14 +163,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         else:
             print("User ", self.user_name, " already in a tournament.")
 
-    async def remove_from_tournament_group(self):
-        if self.tournament_room:
+    async def remove_from_tournament_group(self, tournament_room=None):
+        print("User ", self.user_name, " removed from ", tournament_room)
+        if tournament_room:
             await self.channel_layer.group_discard(
-                self.tournament_room, self.channel_name
+                tournament_room, self.channel_name
             )
-            print(
-                "User ", self.user_name, " removed from ", self.tournament_room
-            )  # DEBUG
+            print("User ", self.user_name, " removed from ", tournament_room)  # DEBUG
             self.tournament_room = None
         else:
             print("User ", self.user_name, " not in any tournament.")
