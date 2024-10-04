@@ -1,10 +1,15 @@
 import time
 
-class TournamentState:
+
+class NextState:
     WAITING = "waiting"
-    STARTED = "ongoing"
+    FIRST = "first"
+    SECOND = "second"
+    THIRD = "third"
+    FOURTH = "fourth"
+    FINAL = "final"
     FINISHED = "finished"
-    CANCELLED = "cancelled"
+    DELETED = "deleted"
 
 class Tournament:
     def __init__(self, creator_id, name, is_private=False, password=None):
@@ -13,10 +18,11 @@ class Tournament:
         self.creator_id = creator_id
         self.participants = []
         self.players = []
+        self.match_counter = 0
+        self.next_state = NextState.WAITING
         self.finished_matches = []
         self.is_private = is_private
         self.password = password
-        self.state = TournamentState.WAITING
         self.initial_bracket = []
         self.winner_bracket = []
         self.loser_bracket = []
@@ -25,8 +31,7 @@ class Tournament:
 
 
     def can_join(self, user_id, password):
-        print("Tournament password: ", self.password, " User password: ", password)
-        if (self.state == TournamentState.WAITING and
+        if (self.next_state == NextState.WAITING and
                 len(self.participants) < 8 and
                 user_id not in self.participants):
             if not self.is_private:
@@ -49,9 +54,9 @@ class Tournament:
         if user_id not in self.participants:
             raise Exception("The user is not a participant of the tournament.")
 
-        if self.state == TournamentState.WAITING:
+        if self.next_state == NextState.WAITING:
             if user_id == self.creator_id:
-                self.state = TournamentState.CANCELLED
+                self.next_state = NextState.DELETED
             else:
                 self.participants.remove(user_id)
                 self.players.remove(user_id)
@@ -69,7 +74,7 @@ class Tournament:
             "participants_data": self.participants_data,
             "players": [p for p in self.players],
             "is_private": self.is_private,
-            "state": self.state,
+            "next_state": self.next_state,
             "winner": self.tournament_winner
         }
 

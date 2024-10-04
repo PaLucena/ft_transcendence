@@ -18,7 +18,7 @@ async def send_main_room(channel_layer):
 async def send_tournament_room(channel_layer, tournament_room):
     manager = TournamentManager()
     tournament_data = manager.get_tournament_data(tournament_room)
-    state = tournament_data["state"]
+    next_state = tournament_data["next_state"]
     participants = tournament_data["participants"]
     participants_data = tournament_data["participants_data"]
     players = tournament_data["players"]
@@ -31,7 +31,7 @@ async def send_tournament_room(channel_layer, tournament_room):
             "participants_data": participants_data,
             "players": players,
             "tournament_id": tournament_room,
-            "state": state,
+            "next_state": next_state,
         },
     )
 
@@ -53,6 +53,17 @@ async def send_deleted_tournament(channel_layer, tournament_id, tournament_name)
             "tournament_id": tournament_id,
             "tournament_name": tournament_name
         }
+    )
+
+
+async def send_end_tournament(channel_layer, tournament_id, tournament_name, winner):
+    await channel_layer.group_send(
+        tournament_id, {
+            "type": "notify_end_tournament",
+            "tournament_id": tournament_id,
+            "tournament_name": tournament_name,
+            "winner": winner,
+        },
     )
 
 
@@ -132,27 +143,32 @@ async def handle_leave_tournament(consumer, message):
 async def handle_start_tournament(consumer, message):
     manager = TournamentManager()
     tournament_id = message["tournament_id"]
-    user = message["user"]
 
     try:
-        await manager.start_tournament(tournament_id, user)
-        await send_tournament_room(consumer.channel_layer, message["tournament_room"])
+        await manager.start_tournament(tournament_id, consumer.user_id)
+        await manager.solve_first_round(tournament_id)
+        await manager.solve_second_round(tournament_id)
+        await manager.solve_third_round(tournament_id)
+        await manager.solve_fourth_round(tournament_id)
+        await manager.solve_final_round(tournament_id)
+
+        await handle_end_tournament(consumer, tournament_id)
     except Exception as e:
         await consumer.send_error(str(e))
 
 
-async def handle_end_tournament(channel_layer, message):
-    try:
-        manager = TournamentManager()
-        tournament_id = message["tournament_id"]
-        await manager.end_tournament(tournament_id, channel_layer)
-        await send_main_room(channel_layer)
+async def handle_end_tournament(consumer, tournament_id):
+    manager = TournamentManager()
+    tournament = manager.get_tournament_data(tournament_id)
+    t_name = tournament["name"]
+    t_winner = tournament["winner"]
 
+    try:
+        await send_end_tournament(consumer.channel_layer, tournament_id, t_name, t_winner)
+        await send_main_room(consumer.channel_layer)
+        await manager.delete_tournament(tournament_id)
     except Exception as e:
-        await channel_layer.group_send(
-            "tournament_room",
-            {"type": "error", "target id": message["user"].id, "message": str(e)},
-        )
+        await consumer.send_error(str(e))
 
 
 async def handle_clean_tournaments(channel_layer):
