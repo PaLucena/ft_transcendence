@@ -38,36 +38,21 @@ class TournamentWebsocket {
                 this.handleError(data.errorCode, data.errorMessage);
                 return;
             }
-            if (data.tournament_users) {
+            else if (data.tournament_users) {
                 Tournament.renderPlayers(data.tournament_users);
             }
-            if (data.action == "players_ready") {
+            else if (data.action == "players_ready") {
                 console.log("NAVIGATING TO PONG");
                 navigateTo("/pong");
             }
-            if (data.action == "players_done") {
-                fetch("/api/check_user_id/", {
-					method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-					credentials: 'include',
-                    body: JSON.stringify({"id": data.id})
-				})
-				.then(response => {
-					if (!response.ok) {
-						return response.json().then(errData => {
-							throw new Error(errData.error || `Response status: ${response.status}`);
-						});
-					}
-					return response.json();
-				})
-				.then(data => {
-					if (data["result"] == true) {
-                        console.log("NAVIGATING TO PLAY");
-                        navigateTo("/play");
-					}
-				})
+            else if (data.action == "players_done") {
+                console.log('IM HEREE!!!');
+                const userId = localStorage.getItem('user_id');
+                console.log('userId!!! ', userId);
+                if (userId && parseInt(userId) === data.id) {
+                    console.log('NAVIGATING TO PLAY!!!');
+                    navigateTo("/play");
+                }
             }
         } catch (error) {
             this.handleError(null, error, false);
@@ -108,5 +93,35 @@ class TournamentWebsocket {
 
     }
 }
+
+async function fetchUserId() {
+    try {
+        const response = await fetch('/api/check_user_id/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user ID');
+        }
+
+        const data = await response.json();
+        return data.user_id;
+    } catch (error) {
+        console.error('Error fetching user ID:', error);
+        return null;
+    }
+}
+
+fetchUserId().then(userId => {
+    if (userId) {
+        localStorage.setItem('user_id', userId);
+    } else {
+        //console.error('Could not store user ID in localStorage');
+    }
+});
 
 export const tournamentSocket = new TournamentWebsocket();

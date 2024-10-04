@@ -187,6 +187,7 @@ def create_initial_matches(tournament):
 
 
 def format_match(match):
+	print("MATCH in format match: ", match)
 	return {
 		'tournament_id': match.tournament.id,
 		'match_id': match.match_id,

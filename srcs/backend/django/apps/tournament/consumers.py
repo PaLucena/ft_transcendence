@@ -12,7 +12,6 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.tournament_name = self.scope["url_route"]["kwargs"]["tournament_name"]
         self.tournamentroom_name = f"tournament_{self.tournament_name}"
-        self.user_room = f"user_{self.scope['user'].id}"
 
         try:
             print(f"Client connected: {self.channel_name}")
@@ -20,9 +19,7 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_add(
                 self.tournamentroom_name, self.channel_name
             )
-            await self.channel_layer.group_add(
-                self.user_room, self.channel_name
-            )
+
             await self.send_tournament_users_list(self.tournament_name)
 
         except Exception as e:
@@ -37,9 +34,7 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             await self.channel_layer.group_discard(
                 self.tournamentroom_name, self.channel_name
             )
-            await self.channel_layer.group_discard(
-                self.user_room, self.channel_name
-            )
+
             await self.send_tournament_users_list(self.tournament_name)
 
         except Exception as e:
@@ -141,8 +136,8 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
         tournament_id = event["tournament_id"]
         matches = event["matches"]
         print("4 FIRST MATCHES RECEIVED: ", matches, flush=True)
-        if (creator_name != self.scope["user"].username):
-            return
+        # if (creator_name != self.scope["user"].username):
+        #     return
 
         tournament = await sync_to_async(Tournament.objects.get)(pk=tournament_id)
         results = await self.start_all_matches(tournament, matches)
@@ -174,6 +169,7 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             result = await task
 
             if result["player_1_id"] != 0:
+                print("PLAYER 1 DONE: ", result["player_1_id"])
                 await self.channel_layer.group_send(
                     self.tournamentroom_name,
                     {
@@ -183,6 +179,7 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
                     }
                 )
             if result["player_2_id"] != 0:
+                print("PLAYER 2 DONE: ", result["player_2_id"])
                 await self.channel_layer.group_send(
                     self.tournamentroom_name,
                     {
