@@ -50,6 +50,30 @@ export async function handleResponse(response, onSuccess) {
     onSuccess(data);
 }
 
+export async function checkAuthentication() {
+    try {
+        const response = await fetch('/api/check_auth', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        });
+
+        let is_auth = false;
+
+        await handleResponse(response, data => {
+            is_auth = data.authenticated;
+        });
+
+        return is_auth;
+
+    } catch (error) {
+        console.error("Error on checked authentication:", error);
+        return false;
+    }
+}
+
 function handleError(errorCode, errorMessage) {
     switch (errorCode) {
         case 400:
