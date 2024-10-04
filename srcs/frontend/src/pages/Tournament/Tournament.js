@@ -80,7 +80,8 @@ export class Tournament extends Component {
 						if (action === 'start') {
 							console.log('Start tournament');
 							pongTournamentSocket.t_socket.send(JSON.stringify({
-								type: 'start_tournament'
+								type: 'start_tournament',
+								tournament_id: this.params.tournamentId
 							}));
 						} else if (action === 'leave') {
 							console.log('Delete tournament');
