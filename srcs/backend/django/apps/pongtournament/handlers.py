@@ -22,6 +22,7 @@ async def send_tournament_room(channel_layer, tournament_room):
     participants = tournament_data["participants"]
     participants_data = tournament_data["participants_data"]
     players = tournament_data["players"]
+    tournament_data
 
     await channel_layer.group_send(
         tournament_room,
@@ -30,6 +31,7 @@ async def send_tournament_room(channel_layer, tournament_room):
             "participants": participants,
             "participants_data": participants_data,
             "players": players,
+            "tournament_id": tournament_room,
             "state": state,
         },
     )

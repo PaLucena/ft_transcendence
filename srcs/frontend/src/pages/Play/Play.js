@@ -13,8 +13,8 @@ export class Play extends Component {
 	}
 
 
-	init() {
-		this.getActiveTournamentsOnPlayData();
+	async init() {
+		await this.getActiveTournamentsOnPlayData();
 		this.renderModalLayoutJoinTournament();
 		this.setupEventListeners();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
@@ -36,7 +36,6 @@ export class Play extends Component {
 
         await handleResponse(response, (data) => {
 			Play.displayTournaments(data.public_tournaments, data.private_tournaments, data.player_id);
-			console.log(data);
         });
 	}
 

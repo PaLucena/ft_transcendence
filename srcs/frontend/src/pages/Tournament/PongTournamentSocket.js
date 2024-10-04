@@ -51,7 +51,7 @@ class PongTournamentSocket {
             }
 
             else if (data.type === 'tournament_room_update') {
-                if (window.location.pathname === '/tournament') {
+                if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                     console.log("Tournament room update:", data);
                     Tournament.renderPlayers(data.participants_data);
                 }

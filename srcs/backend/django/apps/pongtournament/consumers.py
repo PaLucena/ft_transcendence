@@ -92,6 +92,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     "participants": participants,
                     "participants_data": event["participants_data"],
                     "state": state,
+                    "tournament_id": event["tournament_id"],
                 }
             )
         )
@@ -99,10 +100,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def send_successfully_joined(self, tournament_id):
         await self.send(
             text_data=json.dumps(
-                {
-                    "type": "successfully_joined",
-                    "tournament_id": tournament_id
-                }
+                {"type": "successfully_joined", "tournament_id": tournament_id}
             )
         )
 
