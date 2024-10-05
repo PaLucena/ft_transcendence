@@ -66,6 +66,13 @@ class Tournament:
 
 
     def tournament_data(self):
+        winner = self.tournament_winner
+        winner_name = "AI"
+
+        for participant in self.participants_data:
+            if participant["user_id"] == winner:
+                winner_name = participant["user_name"]
+
         return {
             "id": self.id,
             "name": self.name,
@@ -75,7 +82,7 @@ class Tournament:
             "players": [p for p in self.players],
             "is_private": self.is_private,
             "next_state": self.next_state,
-            "winner": self.tournament_winner
+            "winner": winner_name
         }
 
 

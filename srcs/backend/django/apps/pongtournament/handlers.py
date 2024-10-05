@@ -166,7 +166,7 @@ async def handle_end_tournament(consumer, tournament_id):
     try:
         await send_end_tournament(consumer.channel_layer, tournament_id, t_name, t_winner)
         await send_main_room(consumer.channel_layer)
-        await manager.delete_tournament(tournament_id)
+        manager.delete_tournament(tournament_id)
     except Exception as e:
         await consumer.send_error(str(e))
 
