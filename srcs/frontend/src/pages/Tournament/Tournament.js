@@ -59,6 +59,7 @@ export class Tournament extends Component {
 		const container = document.getElementById('root_tournament_container');
 
 		if (container) {
+			console.log("PARAMS:", this.params);
 			const btnContainer = container.querySelector('#root_tournament_btn_container');
 
 			if (btnContainer) {
