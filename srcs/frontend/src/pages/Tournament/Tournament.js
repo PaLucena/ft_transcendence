@@ -2,7 +2,6 @@ import { Component } from "../../scripts/Component.js";
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from "../../scripts/utils/rtchatUtils.js";
 import { pongTournamentSocket } from './PongTournamentSocket.js';
-import {navigateTo} from "../../scripts/Router.js";
 
 export class Tournament extends Component {
 	constructor(params = {}) {
@@ -32,9 +31,9 @@ export class Tournament extends Component {
 			});
 
 			await handleResponse(response, (data) => {
-				console.log("DATA;:", data);
+				console.log('Tournament room data:', data);
 				this.renderButtons(data.creator_id, data.current_id)
-				Tournament.renderPlayers(data.participants_data)
+				Tournament.renderPlayers(data.participants_data, data.players, data.tournament_name, data.current_phase);
 			});
 		} catch(error) {
             this.handleError(error.errorCode, error.errorMessage);
@@ -84,6 +83,7 @@ export class Tournament extends Component {
 								type: 'start_tournament',
 								tournament_id: this.params.tournamentId
 							}));
+							console.log('Start tournament 2');
 						} else if (action === 'leave') {
 							console.log('Delete tournament');
 							pongTournamentSocket.t_socket.send(JSON.stringify({
@@ -91,6 +91,7 @@ export class Tournament extends Component {
 								tournament_id: this.params.tournamentId
 							}));
 						}
+						console.log("Start tournament 3");
 					}
 				});
 			} else {
@@ -101,7 +102,7 @@ export class Tournament extends Component {
 		}
 	}
 
-	static renderPlayers(players) {
+	static renderPlayers(participants, players, name, phase) {
 		const topHalf = document.querySelector('.top-half');
 		const bottomHalf = document.querySelector('.bottom-half');
 
@@ -110,7 +111,7 @@ export class Tournament extends Component {
 		const defaultAvatar = '/assets/images/default_avatar.jpg';
 		const defaultNickname = 'IA';
 
-		const fullPlayerList = [...players];
+		const fullPlayerList = [...participants];
 
 		while (fullPlayerList.length < totalPlayers) {
 			fullPlayerList.push({
@@ -123,11 +124,14 @@ export class Tournament extends Component {
 			topHalf.innerHTML = '';
 			bottomHalf.innerHTML = '';
 
+			const room_header = document.getElementById('tournamentName');
+			room_header.innerHTML = name + "<br>" + phase;
+
 			for (let i = 0; i < 4; i += 2) {
 				const matchContainerHtml = `
 					<div class="match-container col d-flex justify-content-center align-items-end ml-0">
-						${createPlayerHtml(fullPlayerList[i], i + 1)}
-						${createPlayerHtml(fullPlayerList[i + 1], i + 2)}
+						${createPlayerHtml(fullPlayerList[i], i + 1, players)}
+						${createPlayerHtml(fullPlayerList[i + 1], i + 2, players)}
 					</div>
 				`;
 				topHalf.insertAdjacentHTML('beforeend', matchContainerHtml);
@@ -136,20 +140,25 @@ export class Tournament extends Component {
 			for (let i = 4; i < 8; i += 2) {
 				const matchContainerHtml = `
 					<div class="match-container col d-flex justify-content-center align-items-end ml-0">
-						${createPlayerHtml(fullPlayerList[i], i + 1)}
-						${createPlayerHtml(fullPlayerList[i + 1], i + 2)}
+						${createPlayerHtml(fullPlayerList[i], i + 1, players)}
+						${createPlayerHtml(fullPlayerList[i + 1], i + 2, players)}
 					</div>
 				`;
 				bottomHalf.insertAdjacentHTML('beforeend', matchContainerHtml);
 			}
 		}
 
-		function createPlayerHtml(player, index) {
+		function createPlayerHtml(player, index, players) {
+			let avatarColor = 'black';
+
+			if (player.user_id) {
+				avatarColor = players.includes(player.user_id) ? 'green' : 'red';
+			}
 			return `
 				<div id="player${index}" class="player-container row d-flex col-6 h-60 justify-content-center">
 					<div class="col-10 col-sm-6">
 						<div class="d-flex justify-content-center">
-							<div class="avatar rounded-circle">
+							<div class="avatar rounded-circle" style="border: 5px solid ${avatarColor};">
 								<img id="avatar-${index}" class="rounded-circle h-100 square" src="${player.avatar}" alt="">
 							</div>
 						</div>

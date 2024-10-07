@@ -126,7 +126,7 @@ export class Play extends Component {
 
 			// DEBUG  ---------------------------------------------------------------------------
 			const testBtn = document.getElementById("testBtn");
-			testBtn.innerHTML = "Test Button";
+			testBtn.innerHTML = "Clean Tournaments";
 			this.addEventListener(testBtn, "click", async () => {
 				pongTournamentSocket.t_socket.send(JSON.stringify({
 					'type': 'clean_tournaments',
@@ -203,6 +203,7 @@ export class Play extends Component {
 			const	localBtn = document.getElementById("localBtn");
 			this.addEventListener(localBtn, "click", () => {
 				this.playLocal();
+				navigateTo("/pong");
 			});
 
 			// ai
@@ -317,12 +318,16 @@ export class Play extends Component {
 
 	// local match
 	playLocal() {
-		fetch("/api/start_local_match/", {
+		fetch("/api/new_single_match/", {
 			method: "POST",
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			credentials: 'include'
+			credentials: 'include',
+			body: JSON.stringify({
+				"player_2_id": 0,
+				"controls_mode": "local"
+			})
 		})
 		.then(response => {
 			if (!response.ok) {
@@ -344,12 +349,16 @@ export class Play extends Component {
 
 	// ai logic
 	playAi() {
-		fetch("/api/start_ai_match/", {
+		fetch("/api/new_single_match/", {
 			method: "POST",
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			credentials: 'include'
+			credentials: 'include',
+			body: JSON.stringify({
+				"player_2_id": 0,
+				"controls_mode": "AI"
+			})
 		})
 		.then(response => {
 			if (!response.ok) {

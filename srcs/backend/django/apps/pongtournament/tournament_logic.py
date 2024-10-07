@@ -72,7 +72,7 @@ class TournamentLogic:
 
             match_task = game_manager.start_match_test(  # DEBUG *******************************
                 tournament.id,
-                tournament.id + f"_match_{tournament.match_counter}",
+                tournament.id + f"{tournament.match_counter}",
                 player1_id,
                 player2_id,
                 controls_mode,

@@ -1,5 +1,6 @@
-from .models import Tournament, NextState
+from .models import Tournament, CurrentPhase
 from .tournament_logic import TournamentLogic
+from blockchain.views import create_tournament, record_match
 
 
 class TournamentManager:
@@ -21,12 +22,33 @@ class TournamentManager:
         return None
 
 
-    async def end_tournament(self, tournament_id):
+    async def save_tournament(self, tournament_id):
+        tournament = self.tournaments.get(tournament_id)
 
-        # TODO - send to blockchain
-
-        self.delete_tournament(tournament_id)
-
+        try:
+            if tournament:
+                uint_tournament_id = int(tournament.id)
+                uint_player_ids = [int(player_id) for player_id in tournament.initial_bracket]
+                tournament_data = {
+                    "tournament_id" : uint_tournament_id,
+                    "player_ids" : uint_player_ids
+                }
+                response = create_tournament(tournament_data)
+                if response.get('error'):
+                    raise Exception("Error(save tournament): Error creating tournament.")
+                print("Before record matches") # DEBUG
+                for match in tournament.finished_matches:
+                    print("Init loop") # DEBUG
+                    print(match)
+                    uint_match = self.match_to_uint(match)
+                    print(uint_match)
+                    response = record_match(uint_match)
+                    print(response)
+            else:
+                raise Exception("Error(save tournament): Tournament not found.")
+        except Exception as e:
+            print("Error: ", str(e))
+            raise Exception(str(e))
 
     async def notify_end_tournament(self, tournament, channel_layer):
         message = {
@@ -57,7 +79,7 @@ class TournamentManager:
         tournament = self.tournaments.get(tournament_id)
 
         if tournament:
-            if tournament.next_state == NextState.WAITING:
+            if tournament.current_phase == CurrentPhase.WAITING:
                 tournament.remove_participant(user_id)
                 return True
             else:
@@ -78,42 +100,47 @@ class TournamentManager:
         if len(tournament.participants) < 2:
             raise Exception("Error(start tournament): Not enough participants")
 
-        if tournament.next_state != NextState.WAITING:
+        if tournament.current_phase != CurrentPhase.WAITING:
             raise Exception("Error(start tournament): The tournament is already ongoing.")
 
         print("Tournament started") # DEBUG
         await TournamentLogic.init_tournament_logic(tournament)
-        tournament.next_state = NextState.FIRST
+        tournament.current_phase = CurrentPhase.PRE_FIRST
 
 
     async def solve_first_round(self, tournament_id):
         tournament = self.tournaments.get(tournament_id)
+        tournament.current_phase = CurrentPhase.FIRST
         await TournamentLogic.solve_first_round(tournament)
-        tournament.next_state = NextState.SECOND
+        tournament.current_phase = CurrentPhase.PRE_SECOND
 
 
     async def solve_second_round(self, tournament_id):
         tournament = self.tournaments.get(tournament_id)
+        tournament.current_phase = CurrentPhase.SECOND
         await TournamentLogic.solve_second_round(tournament)
-        tournament.next_state = NextState.THIRD
+        tournament.current_phase = CurrentPhase.PRE_THIRD
 
 
     async def solve_third_round(self, tournament_id):
         tournament = self.tournaments.get(tournament_id)
+        tournament.current_phase = CurrentPhase.THIRD
         await TournamentLogic.solve_third_round(tournament)
-        tournament.next_state = NextState.FOURTH
+        tournament.current_phase = CurrentPhase.PRE_FOURTH
 
 
     async def solve_fourth_round(self, tournament_id):
         tournament = self.tournaments.get(tournament_id)
+        tournament.current_phase = CurrentPhase.FOURTH
         await TournamentLogic.solve_fourth_round(tournament)
-        tournament.next_state = NextState.FINAL
+        tournament.current_phase = CurrentPhase.PRE_FINAL
 
 
     async def solve_final_round(self, tournament_id):
         tournament = self.tournaments.get(tournament_id)
+        tournament.current_phase = CurrentPhase.FINAL
         await TournamentLogic.solve_final_round(tournament)
-        tournament.next_state = NextState.FINISHED
+        tournament.next_state = CurrentPhase.FINISHED
 
 
     def get_player_active_tournament(self, user_id):
@@ -149,3 +176,19 @@ class TournamentManager:
     def clean_tournaments(self):
         while self.tournaments:
             self.delete_tournament(list(self.tournaments.keys())[0])
+
+
+    def match_to_uint(self, match):
+        return {
+            "tournament_id": int(match['tournament_id']),
+            "match_id": int(match['match_id']),
+            "player_1_id": int(match['player_1_id']),
+            "player_2_id": int(match['player_2_id']),
+            "player_1_goals": int(match['player_1_goals']),
+            "player_2_goals": int(match['player_2_goals']),
+            "player_1_max_hits": int(match['player_1_max_hits']),
+            "player_2_max_hits": int(match['player_2_max_hits']),
+            "match_total_time": int(match['match_total_time']),
+            "forfeit": int(match['forfeit']),
+            "winner_id": int(match['winner_id'])
+        }

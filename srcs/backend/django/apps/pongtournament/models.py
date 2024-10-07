@@ -1,15 +1,21 @@
 import time
 
 
-class NextState:
-    WAITING = "waiting"
-    FIRST = "first"
-    SECOND = "second"
-    THIRD = "third"
-    FOURTH = "fourth"
-    FINAL = "final"
+class CurrentPhase:
+    WAITING = "Waiting for players to join"
+    PRE_FIRST = "Tournament closed. The battle begins!!"
+    FIRST = "First round on progress."
+    PRE_SECOND = "First round finished. Get ready for the next round."
+    SECOND = "Second round on progress."
+    PRE_THIRD = "Second round finished. Get ready for the next round."
+    THIRD = "Third round on progress."
+    PRE_FOURTH = "Third round finished. Get ready for the next round."
+    FOURTH = "Fourth round on progress."
+    PRE_FINAL = "Fourth round finished. Get ready for the final round."
+    FINAL = "Final round on progress."
     FINISHED = "finished"
     DELETED = "deleted"
+
 
 class Tournament:
     def __init__(self, creator_id, name, is_private=False, password=None):
@@ -19,7 +25,7 @@ class Tournament:
         self.participants = []
         self.players = []
         self.match_counter = 0
-        self.next_state = NextState.WAITING
+        self.current_phase = CurrentPhase.WAITING
         self.finished_matches = []
         self.is_private = is_private
         self.password = password
@@ -31,7 +37,7 @@ class Tournament:
 
 
     def can_join(self, user_id, password):
-        if (self.next_state == NextState.WAITING and
+        if (self.current_phase == CurrentPhase.WAITING and
                 len(self.participants) < 8 and
                 user_id not in self.participants):
             if not self.is_private:
@@ -54,9 +60,9 @@ class Tournament:
         if user_id not in self.participants:
             raise Exception("The user is not a participant of the tournament.")
 
-        if self.next_state == NextState.WAITING:
+        if self.current_phase == CurrentPhase.WAITING:
             if user_id == self.creator_id:
-                self.next_state = NextState.DELETED
+                self.current_phase = CurrentPhase.DELETED
             else:
                 self.participants.remove(user_id)
                 self.players.remove(user_id)
@@ -81,7 +87,7 @@ class Tournament:
             "participants_data": self.participants_data,
             "players": [p for p in self.players],
             "is_private": self.is_private,
-            "next_state": self.next_state,
+            "current_phase": self.current_phase,
             "winner": winner_name
         }
 
@@ -89,5 +95,5 @@ class Tournament:
 def generate_unique_id(user_id):
     timestamp = int(time.time())
     formated_time = time.strftime("%y%m%d%H%M%S", time.localtime(timestamp))
-    tournament_id = f"{formated_time}_{user_id}"
+    tournament_id = f"{formated_time}{user_id}"
     return tournament_id

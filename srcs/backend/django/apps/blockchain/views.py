@@ -2,7 +2,6 @@ from django.http import JsonResponse
 from .blockchain_service import bc_create_tournament, bc_record_match, bc_get_tournament, bc_get_match
 from .blockchain_service import bc_get_player_tournaments, bc_get_player_matches, bc_get_face2face
 from .blockchain_service import bc_load_test_data, bc_get_all_tournaments_ids
-import json
 
 
 def create_tournament(data):
@@ -33,9 +32,12 @@ def record_match(data):
         mT = data.get('match_total_time')
         fF = data.get('forfeit')
 
+        print("In the record_match function")
+
         required_keys = ['tournament_id', 'match_id', 'player_1_id', 'player_2_id', 'player_1_goals', 'player_2_goals',
                          'player_1_max_hits', 'player_2_max_hits', 'match_total_time', 'forfeit', 'winner_id']
         if not all(key in data for key in required_keys):
+            print("Invalid input")
             return JsonResponse({'error': 'Invalid input'}, status=400)
 
         try:
@@ -45,6 +47,7 @@ def record_match(data):
                 'tx_hash': tx_hash.hex()
             }, status=200)
         except Exception as e:
+            print("Error: ", str(e))
             return JsonResponse({'error': str(e)}, status=500)
 
 
