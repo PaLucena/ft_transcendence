@@ -143,7 +143,7 @@ async def handle_and_record_single_match(tournament_id, match_id, player_1_id, p
             player_2_id=player_2_id,
             controls_mode=controls_mode,
         )
-        data = TournamentManager.match_to_uint(TournamentManager, result)
+        data = match_to_uint(result)
         record_match(data)
     except Exception as e:
         print(f"Error handling match result: {e}")

@@ -38,7 +38,6 @@ class GameManager:
 
 
 	async def start_match(self, tournament_id, match_id, player_1_id, player_2_id, controls_mode):
-		print ("Call to start_match with match", match_id, "between", player_1_id, "and", player_2_id)
 		"""
 		Start a match between two players
 

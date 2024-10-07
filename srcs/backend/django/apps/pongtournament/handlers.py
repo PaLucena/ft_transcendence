@@ -1,6 +1,9 @@
 import asyncio
+import time
 
-from .tournament_manager import TournamentManager
+from blockchain.views import record_match
+from ponggame.game_manager import game_manager
+from .tournament_manager import TournamentManager, match_to_uint
 
 
 async def send_main_room(channel_layer):
@@ -69,6 +72,36 @@ async def send_end_tournament(channel_layer, tournament_id, tournament_name, win
             "winner": winner,
         },
     )
+
+
+async def handle_start_single_match(consumer, message):
+    try:
+        user = consumer.user
+        tournament_id = 0
+        player_1_id = user.id
+        player_2_id = 0
+        controls_mode = message["controls_mode"]
+
+        timestamp = int(time.time())
+        formated_time = time.strftime("%y%m%d%H%M%S", time.localtime(timestamp))
+        match_id = f"{formated_time}{user.id}"
+
+        if player_2_id is None or controls_mode is None:
+            raise ValueError("Missing required fields: player_2_id or controls_mode")
+
+        result = await game_manager.start_match(
+            tournament_id=tournament_id,
+            match_id=match_id,
+            player_1_id=player_1_id,
+            player_2_id=player_2_id,
+            controls_mode=controls_mode,
+        )
+
+        data = match_to_uint(result)
+        record_match(data)
+
+    except Exception as e:
+        await consumer.send_error(str(e))
 
 
 async def handle_create_tournament(consumer, message):
@@ -151,19 +184,19 @@ async def handle_start_tournament(consumer, message):
     try:
         await manager.start_tournament(tournament_id, consumer.user_id)
         await send_tournament_room(consumer.channel_layer, f"{tournament_id}")
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
         await manager.solve_first_round(tournament_id)
         await send_tournament_room(consumer.channel_layer, f"{tournament_id}")
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
         await manager.solve_second_round(tournament_id)
         await send_tournament_room(consumer.channel_layer, f"{tournament_id}")
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
         await manager.solve_third_round(tournament_id)
         await send_tournament_room(consumer.channel_layer, f"{tournament_id}")
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
         await manager.solve_fourth_round(tournament_id)
         await send_tournament_room(consumer.channel_layer, f"{tournament_id}")
-        await asyncio.sleep(1)
+        await asyncio.sleep(5)
         await manager.solve_final_round(tournament_id)
 
         await handle_end_tournament(consumer, tournament_id)
