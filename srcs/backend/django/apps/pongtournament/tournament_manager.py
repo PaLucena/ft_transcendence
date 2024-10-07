@@ -3,6 +3,22 @@ from .tournament_logic import TournamentLogic
 from blockchain.views import create_tournament, record_match
 
 
+def match_to_uint(match):
+    return {
+        "tournament_id": int(match['tournament_id']),
+        "match_id": int(match['match_id']),
+        "player_1_id": int(match['player_1_id']),
+        "player_2_id": int(match['player_2_id']),
+        "player_1_goals": int(match['player_1_goals']),
+        "player_2_goals": int(match['player_2_goals']),
+        "player_1_max_hits": int(match['player_1_max_hits']),
+        "player_2_max_hits": int(match['player_2_max_hits']),
+        "match_total_time": int(match['match_total_time']),
+        "forfeit": int(match['forfeit']),
+        "winner_id": int(match['winner_id'])
+    }
+
+
 class TournamentManager:
     _instance = None
 
@@ -40,7 +56,7 @@ class TournamentManager:
                 for match in tournament.finished_matches:
                     print("Init loop") # DEBUG
                     print(match)
-                    uint_match = self.match_to_uint(match)
+                    uint_match = match_to_uint(match)
                     print(uint_match)
                     response = record_match(uint_match)
                     print(response)
@@ -178,17 +194,3 @@ class TournamentManager:
             self.delete_tournament(list(self.tournaments.keys())[0])
 
 
-    def match_to_uint(self, match):
-        return {
-            "tournament_id": int(match['tournament_id']),
-            "match_id": int(match['match_id']),
-            "player_1_id": int(match['player_1_id']),
-            "player_2_id": int(match['player_2_id']),
-            "player_1_goals": int(match['player_1_goals']),
-            "player_2_goals": int(match['player_2_goals']),
-            "player_1_max_hits": int(match['player_1_max_hits']),
-            "player_2_max_hits": int(match['player_2_max_hits']),
-            "match_total_time": int(match['match_total_time']),
-            "forfeit": int(match['forfeit']),
-            "winner_id": int(match['winner_id'])
-        }

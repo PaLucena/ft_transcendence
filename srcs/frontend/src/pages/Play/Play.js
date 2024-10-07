@@ -318,64 +318,30 @@ export class Play extends Component {
 
 	// local match
 	playLocal() {
-		fetch("/api/new_single_match/", {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include',
-			body: JSON.stringify({
-				"player_2_id": 0,
-				"controls_mode": "local"
-			})
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			customAlert('success', data.message, 3000);
-			navigateTo("/pong");
-
-		})
-		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, 5000);
-		})
+		try {
+			pongTournamentSocket.t_socket.send(JSON.stringify({
+				type: "start_single_match",
+				player_2_id: 0,
+				controls_mode: "local"
+			}));
+		}
+		catch (error) {
+			console.error('Failed on start local match:', error);
+		}
 	}
 
 	// ai logic
 	playAi() {
-		fetch("/api/new_single_match/", {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include',
-			body: JSON.stringify({
-				"player_2_id": 0,
-				"controls_mode": "AI"
-			})
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			customAlert('success', data.message, 3000);
-			navigateTo("/pong");
-
-		})
-		.catch((error) => {
-			customAlert('danger', `Error: ` + error.message, 5000);
-		})
+		try {
+			pongTournamentSocket.t_socket.send(JSON.stringify({
+				type: "start_single_match",
+				player_2_id: 0,
+				controls_mode: "AI"
+			}));
+		}
+		catch (error) {
+			console.error('Failed on start AI match:', error);
+		}
 	}
 
 	createTournament(type) {

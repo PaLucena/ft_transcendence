@@ -70,13 +70,22 @@ class TournamentLogic:
             else:
                 controls_mode = "remote"
 
-            match_task = game_manager.start_match_test(  # DEBUG *******************************
-                tournament.id,
-                tournament.id + f"{tournament.match_counter}",
-                player1_id,
-                player2_id,
-                controls_mode,
-            )
+            if player1_id == 0 and player2_id == 0:
+                match_task = game_manager.start_match_test(
+                    tournament.id,
+                    tournament.id + f"{tournament.match_counter}",
+                    player1_id,
+                    player2_id,
+                    "AI",
+                )
+            else:
+                match_task = game_manager.start_match_test(
+                    tournament.id,
+                    tournament.id + f"{tournament.match_counter}",
+                    player1_id,
+                    player2_id,
+                    controls_mode,
+                )
             tournament.match_counter += 1
             match_tasks.append(match_task)
 

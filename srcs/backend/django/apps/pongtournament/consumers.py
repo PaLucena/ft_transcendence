@@ -6,6 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .handlers import (
     send_main_room,
     send_tournament_room,
+    handle_start_single_match,
     handle_create_tournament,
     handle_join_tournament,
     handle_leave_tournament,
@@ -48,7 +49,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         message = json.loads(text_data)
 
-        if message["type"] == "create_tournament":
+        if message["type"] == "start_single_match":
+            await handle_start_single_match(self, message)
+
+        elif message["type"] == "create_tournament":
             await handle_create_tournament(self, message)
 
         elif message["type"] == "join_tournament":
