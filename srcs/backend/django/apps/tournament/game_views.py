@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from ponggame.game_manager import game_manager
 import asyncio
-from user.models import AppUser
 from .models import Match, Tournament
 from asgiref.sync import sync_to_async
 from user.authenticate import DefaultAuthentication

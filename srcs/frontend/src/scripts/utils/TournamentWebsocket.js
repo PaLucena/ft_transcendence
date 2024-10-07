@@ -33,6 +33,7 @@ class TournamentWebsocket {
             }
             if (data.tournament_users) {
                 Tournament.renderPlayers(data.tournament_users);
+                console.log("ERROR ----------------- bad calling")
             }
             if (data.goto_game) {
                 navigateTo("/pong");
