@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -60,7 +61,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await handle_leave_tournament(self, message)
 
         elif message["type"] == "start_tournament":
-            await handle_start_tournament(self, message)
+            asyncio.create_task(handle_start_tournament(self, message))
 
         elif message["type"] == "required_update":
             await send_main_room(self.channel_layer)
@@ -90,15 +91,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def tournament_room_update(self, event):
         participants = event["participants"]
-        next_state = event["next_state"]
+        current_phase = event["current_phase"]
         await self.send(
             text_data=json.dumps(
                 {
                     "type": "tournament_room_update",
                     "participants": participants,
                     "participants_data": event["participants_data"],
-                    "next_state": next_state,
+                    "players": event["players"],
+                    "current_phase": current_phase,
                     "tournament_id": event["tournament_id"],
+                    "tournament_name": event["tournament_name"],
                 }
             )
         )

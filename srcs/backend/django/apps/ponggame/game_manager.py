@@ -115,13 +115,23 @@ class GameManager:
 			winner = random.choice([1, 2])
 			loser = 2 if winner == 1 else 1
 
+		loser_goals = random.randint(0, 4)
+		loser_max_hits = random.randint(5, 20)
+
 		match_result = {
 			"tournament_id": tournament_id,
 			"match_id": match_id,
-			f"player_1_id": player1_id,
-			f"player_2_id": player2_id,
+			"player_1_id": player1_id,
+			"player_2_id": player2_id,
+			"player_1_goals": 6 if winner == 1 else loser_goals,
+			"player_2_goals": 6 if winner == 2 else loser_goals,
+			"winner_id": player1_id if winner == 1 else player2_id,
+			"player_1_max_hits": loser_max_hits if winner == 2 else loser_max_hits + 1,
+			"player_2_max_hits": loser_max_hits if winner == 1 else loser_max_hits + 1,
+			"match_total_time": random.randint(60, 200),
+			"forfeit": 0,
 			"winner": winner,
-			"loser": loser
+			"loser": loser,
 		}
 
 		return match_result
@@ -211,6 +221,7 @@ class GameRoom:
 			'player_2_id': self.player_2_id,
 			'player_1_goals': self.game_logic.player_1_goals,
 			'player_2_goals': self.game_logic.player_2_goals,
+			"winner_id": self.player_1_id if self.game_logic.winner == 1 else self.player_2_id,
 			'player_1_max_hits': self.game_logic.player_1_max_hits,
 			'player_2_max_hits': self.game_logic.player_2_max_hits,
 			'match_total_time': self.game_logic.match_total_time,
