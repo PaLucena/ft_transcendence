@@ -8,8 +8,8 @@ class GameLogic:
     PADDLE_SPEED = 4
     BALL_SPEED_INIT = 6
     BALL_SPEED_INC = 0.5
-    GOALS_TO_WIN = 6
-    GOALS_DIFFERENCE = 2
+    GOALS_TO_WIN = 2
+    GOALS_DIFFERENCE = 1
     INIT_COUNTDOWN = 3
     CONNECT_TIMEOUT = 30
 
@@ -28,7 +28,7 @@ class GameLogic:
     FPS = 64
     FRAME_TIME = 1 / FPS
 
-    def __init__(self):
+    def __init__(self, game_environment="single", tournament_id=0):
         # Initial values
         self.pad_1_x = self.PADDLE_TAB_MARGIN
         self.pad_1_y = self.TABLE_MID_HEIGHT
@@ -71,6 +71,9 @@ class GameLogic:
         self.player_2_channel = None
 
         self.pad_vertical = False
+
+        self.game_environment = game_environment
+        self.tournament_id = tournament_id
 
 
     def move_ball(self):

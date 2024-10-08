@@ -79,7 +79,7 @@ class TournamentLogic:
                     "AI",
                 )
             else:
-                match_task = game_manager.start_match_test(
+                match_task = game_manager.start_match(
                     tournament.id,
                     tournament.id + f"{tournament.match_counter}",
                     player1_id,

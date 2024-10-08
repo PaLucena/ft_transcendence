@@ -44,6 +44,8 @@ async def send_game_state(channel_layer, room_group_name, game_logic):
     game_state = {
         'type': 'game_state',
         'state': game_logic.game_state,
+        'winner': game_logic.winner,
+        'forfeit': game_logic.forfeit,
         'countdown': countdown,
     }
     await channel_layer.group_send(

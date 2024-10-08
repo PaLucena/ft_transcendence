@@ -78,20 +78,16 @@ export class Tournament extends Component {
 					if (btn) {
 						const action = btn.getAttribute('data-tournament-action');
 						if (action === 'start') {
-							console.log('Start tournament');
 							pongTournamentSocket.t_socket.send(JSON.stringify({
 								type: 'start_tournament',
 								tournament_id: this.params.tournamentId
 							}));
-							console.log('Start tournament 2');
 						} else if (action === 'leave') {
-							console.log('Delete tournament');
 							pongTournamentSocket.t_socket.send(JSON.stringify({
 								type: 'leave_tournament',
 								tournament_id: this.params.tournamentId
 							}));
 						}
-						console.log("Start tournament 3");
 					}
 				});
 			} else {

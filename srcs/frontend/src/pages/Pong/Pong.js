@@ -9,6 +9,8 @@ export class Pong extends Component {
 		super("/pages/Pong/pong.html");
 		this.gameSocket = null;
 		this.controls_side = 0;
+		this.game_environment = null;
+		this.tournament_id = null;
 		this.player_1_name = 'Player 1';
 		this.player_2_name = 'Player 2';
 		this.inputController = null;
@@ -107,6 +109,7 @@ export class Pong extends Component {
 					break;
 				case 'game_state':
 					this.updateGameState(gameState);
+					if (gameState.state === 'game_over') { this.handle_return(); }
 					break;
 			}
 		}
@@ -164,6 +167,8 @@ export class Pong extends Component {
 		this.controls_side = gameState.controls_side;
 		this.inputController = new InputController(this.gameSocket, gameState.controls_mode, gameState.controls_side);
 
+		this.game_environment = gameState.game_environment;
+		this.tournament_id = gameState.tournament_id;
 		this.player_1_name = gameState["player_1_name"];
 		this.p_1_name.innerHTML = `${gameState["player_1_name"]}`;
 		this.p_1_avatar.src = gameState.player_1_avatar;
@@ -237,12 +242,37 @@ export class Pong extends Component {
 			this.message_line_super.innerHTML = '';
 			this.message_line_main.innerHTML = '<span data-i18n="game-over"></span>';
 			this.message_line_sub_2.innerHTML = "";
+			if (gameState.forfeit) {
+				if (gameState.forfeit === this.controls_side) {
+					this.message_line_sub_2.innerHTML = '<span data-i18n="">Defeat!<br>You have given up.</span>';
+				} else {
+					this.message_line_sub_2.innerHTML = '<span data-i18n="">Victory!<br>Your opponent has given up.</span>';
+				}
+			} else {
+				if (gameState.winner === this.controls_side) {
+					this.message_line_sub_2.innerHTML = '<span data-i18n="">Victory!</span>';
+				} else {
+					this.message_line_sub_2.innerHTML = '<span data-i18n="">Defeat!</span>';
+				}
+			}
 			this.controls_1.innerHTML = '';
 			this.controls_2.innerHTML = '';
 			this.playing = false;
-			this.button_return.style.display = 'block';
+			this.button_quit.style.display = 'none';
+			//this.button_return.style.display = 'block';
 		}
 	}
+
+	handle_return() {
+		setTimeout(() => {
+				if (this.game_environment === 'tournament') {
+					navigateTo(`/tournament/${this.tournament_id}`);
+				} else {
+					navigateTo('/play');
+				}
+			}, 2000);
+	}
+
 
 	getCSSVar(name) {
 		return getComputedStyle(document.documentElement).getPropertyValue(name);
