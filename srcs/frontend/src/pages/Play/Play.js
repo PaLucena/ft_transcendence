@@ -203,13 +203,14 @@ export class Play extends Component {
 			const	localBtn = document.getElementById("localBtn");
 			this.addEventListener(localBtn, "click", () => {
 				this.playLocal();
-				navigateTo("/pong");
+				navigateTo('/pong');
 			});
 
 			// ai
 			const	aiBtn = document.getElementById("aiBtn");
 			this.addEventListener(aiBtn, "click", () => {
 				this.playAi();
+				navigateTo('/pong');
 			});
 
 			const	tournamentModalElement = document.getElementById("tournamentModal");

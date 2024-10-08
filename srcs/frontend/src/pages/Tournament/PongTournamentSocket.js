@@ -25,7 +25,6 @@ class PongTournamentSocket {
         this.t_socket.onmessage = (e) => this.handleMessage(e);
         this.t_socket.onerror = (e) => this.handleError(null, e, true);
         this.t_socket.onclose = (e) => this.handleClose(e);
-
     }
 
     handleMessage(event) {
@@ -57,9 +56,12 @@ class PongTournamentSocket {
                 }
             }
 
-            else if (data.type === 'match_start') {
-                console.log("Match starting:", data.match_id, data.message);
-                this.notifyPlayerMatchStart(data.match_id, data.message);
+            else if (data.type === 'start_match') {
+                console.log("Match starting");
+                customAlert('info', `Match starting in 5 seconds. Redirecting...`, 5000);
+                setTimeout(() => {
+                    navigateTo(`/pong`);
+                } , 5000);
             }
 
             else if (data.type === 'notify_left_tournament') {
@@ -95,10 +97,6 @@ class PongTournamentSocket {
         }
     }
 
-    notifyPlayerMatchStart(match_id, message) {
-        alert(`${message}`);
-        navigateTo(`/pong/`);
-    }
 
     handleClose(event) {
         if (!event.wasClean) {

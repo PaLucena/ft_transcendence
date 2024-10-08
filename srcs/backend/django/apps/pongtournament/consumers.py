@@ -119,13 +119,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
 
-    async def notify_match_start(self, event):
-        match_id = event["match_id"]
-        message = event["message"]
-
+    async def send_start_match(self, event):
+        print("Sending start match (consumer)")  # DEBUG
         await self.send(
             text_data=json.dumps(
-                {"type": "match_start", "match_id": match_id, "message": message}
+                {
+                    "type": "start_match",
+                    "tournament_id": event["tournament_id"],
+                }
             )
         )
 
@@ -182,9 +183,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def remove_from_tournament_group(self, tournament_room=None):
         print("User ", self.user_name, " removed from ", tournament_room)
         if tournament_room:
-            await self.channel_layer.group_discard(
-                tournament_room, self.channel_name
-            )
+            await self.channel_layer.group_discard(tournament_room, self.channel_name)
             print("User ", self.user_name, " removed from ", tournament_room)  # DEBUG
             self.tournament_room = None
         else:
