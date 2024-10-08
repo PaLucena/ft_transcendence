@@ -2,7 +2,6 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .game_manager import game_manager
 from .handlers import handle_player_ready, handle_quit, handle_move, handle_resize
-from user.models import AppUser as User
 
 
 class GameConsumer(AsyncWebsocketConsumer):
@@ -67,6 +66,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             'type': 'config',
             'controls_mode': self.game_logic.controls_mode,
             'controls_side': self.controls_side,
+            'game_environment': self.game_logic.game_environment,
+            'tournament_id': self.game_logic.tournament_id,
             'player_1_name': self.game_logic.player_1_name,
             'player_1_avatar': player_1_avatar,
             'player_2_name': self.game_logic.player_2_name,

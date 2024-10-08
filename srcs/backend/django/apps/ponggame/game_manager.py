@@ -38,7 +38,6 @@ class GameManager:
 
 
 	async def start_match(self, tournament_id, match_id, player_1_id, player_2_id, controls_mode):
-		print ("Call to start_match with match", match_id, "between", player_1_id, "and", player_2_id)
 		"""
 		Start a match between two players
 
@@ -52,6 +51,8 @@ class GameManager:
 			JSON object with the result of the match.
 			{tournament_id, match_id, player_1_id, player_2_id, player_1_goals, player_2_goals}
 		"""
+
+		tag = f"Match {match_id} ({player_1_id} vs {player_2_id})"
 
 		# Generate random scores for AI vs AI match
 
@@ -67,7 +68,10 @@ class GameManager:
 
 		try:
 			# Create game room and game logic
-			game_room_id = self.create_game_room(player_1_id, player_2_id)
+			if tournament_id == 0:
+				game_room_id = self.create_game_room(player_1_id, player_2_id)
+			else:
+				game_room_id = self.create_game_room(player_1_id, player_2_id, "tournament", tournament_id)
 			game_room = self.get_game_room_by_id(game_room_id)
 			game_logic = game_room.get_game_logic()
 			# Set the controls mode
@@ -89,13 +93,12 @@ class GameManager:
 			ai_player = AiPlayer(game_logic)
 
 			await self.run_game_loop(game_room, game_logic, ai_player)
+
 			# Get the game results
 			result = game_room.get_result(tournament_id, match_id)
 
 			# Remove the room
 			self.remove_game_room(game_room_id)
-
-			print(f"{player_1_id} VS {player_2_id} finished.")
 
 			return result
 		except Exception as e:
@@ -162,10 +165,10 @@ class GameManager:
 		except Exception as e:
 			print(f"Error running game loop: {e}")
 
-	def create_game_room(self, player_1_id, player_2_id):
+	def create_game_room(self, player_1_id, player_2_id, game_environment="single", tournament_id=0):
 		try:
 			room_id = f"{player_1_id}_vs_{player_2_id}"
-			room = GameRoom(room_id, player_1_id, player_2_id)
+			room = GameRoom(room_id, player_1_id, player_2_id, game_environment, tournament_id)
 			self.rooms[room_id] = room
 			self.player_to_room[player_1_id] = room_id
 			self.player_to_room[player_2_id] = room_id
@@ -190,17 +193,19 @@ class GameManager:
 	def remove_game_room(self, game_room_id):
 		if game_room_id in self.rooms:
 			room = self.rooms[game_room_id]
-			del self.player_to_room[room.player_1_id]
-			del self.player_to_room[room.player_2_id]
+			if room.player_1_id in self.player_to_room:
+				del self.player_to_room[room.player_1_id]
+			if room.player_2_id in self.player_to_room:
+				del self.player_to_room[room.player_2_id]
 			del self.rooms[game_room_id]
 
 
 class GameRoom:
-	def __init__(self, game_room_id, player_1_id, player_2_id):
+	def __init__(self, game_room_id, player_1_id, player_2_id, game_environment, tournament_id):
 		self.game_room_id = game_room_id
 		self.player_1_id = player_1_id
 		self.player_2_id = player_2_id
-		self.game_logic = GameLogic()
+		self.game_logic = GameLogic(game_environment, tournament_id)
 		self.game_logic.player_1_id = player_1_id
 		self.game_logic.player_2_id = player_2_id
 

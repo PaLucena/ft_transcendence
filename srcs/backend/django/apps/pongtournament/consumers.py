@@ -6,6 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .handlers import (
     send_main_room,
     send_tournament_room,
+    handle_start_single_match,
     handle_create_tournament,
     handle_join_tournament,
     handle_leave_tournament,
@@ -48,7 +49,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         message = json.loads(text_data)
 
-        if message["type"] == "create_tournament":
+        if message["type"] == "start_single_match":
+            await handle_start_single_match(self, message)
+
+        elif message["type"] == "create_tournament":
             await handle_create_tournament(self, message)
 
         elif message["type"] == "join_tournament":
@@ -115,13 +119,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
 
-    async def notify_match_start(self, event):
-        match_id = event["match_id"]
-        message = event["message"]
-
+    async def send_start_match(self, event):
+        print("Sending start match (consumer)")  # DEBUG
         await self.send(
             text_data=json.dumps(
-                {"type": "match_start", "match_id": match_id, "message": message}
+                {
+                    "type": "start_match",
+                    "tournament_id": event["tournament_id"],
+                }
             )
         )
 
@@ -178,9 +183,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def remove_from_tournament_group(self, tournament_room=None):
         print("User ", self.user_name, " removed from ", tournament_room)
         if tournament_room:
-            await self.channel_layer.group_discard(
-                tournament_room, self.channel_name
-            )
+            await self.channel_layer.group_discard(tournament_room, self.channel_name)
             print("User ", self.user_name, " removed from ", tournament_room)  # DEBUG
             self.tournament_room = None
         else:
