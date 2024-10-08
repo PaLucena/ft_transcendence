@@ -121,6 +121,8 @@ def close_tournament(request, tournament_id):
 						"tournament_id": tournament_id,
 						"matches": available_matches,
 						"creator_name": request.user.username
+						"matches": available_matches,
+						"creator_name": request.user.username
 					}
 				)
 

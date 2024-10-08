@@ -8,6 +8,7 @@ html, body {
 
 body {
 	background-color: #7ba9a9;
+	overflow-y: hidden;
 }
 
 nav {
@@ -49,6 +50,7 @@ nav {
     width: 7px;
 }
 
+/* background: linear-gradient(180deg, #9d8df1, #2c5784); */
 ::-webkit-scrollbar-thumb {
     background: #e6e6e6;
     border-radius: 10px;

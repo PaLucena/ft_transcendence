@@ -12,8 +12,8 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.tournament_name = self.scope["url_route"]["kwargs"]["tournament_name"]
         self.tournamentroom_name = f"tournament_{self.tournament_name}"
-
         try:
+            print(f"Client connected: {self.channel_name}")
             print(f"Client connected: {self.channel_name}")
             await self.accept()
             await self.channel_layer.group_add(
@@ -131,6 +131,8 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
 
     #a method to start all matches when triggered
     async def start_matches(self, event):
+        print("START CONSUMERS: start_matches")
+        creator_name = event["creator_name"]
         print("START CONSUMERS: start_matches")
         creator_name = event["creator_name"]
         tournament_id = event["tournament_id"]

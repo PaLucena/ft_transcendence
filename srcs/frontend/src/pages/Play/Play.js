@@ -87,6 +87,18 @@ export class Play extends Component {
 		this.addEventListener(tournamentModalElement, 'shown.bs.modal', () => {
 			document.getElementById('name-input').focus();
 		});
+
+		// close tournament modal
+		const closeTournamentBtn = document.querySelector('#closeTournamentBtn');
+		this.addEventListener(closeTournamentBtn, 'click', () => {
+			document.getElementById("tournamentForm").reset();
+		});
+
+		// close join modal
+		const closeJoinBtn = document.querySelector('#closeJoinBtn');
+		this.addEventListener(closeJoinBtn, 'click', () => {
+			document.getElementById("joinForm").reset();
+		});
 	}
 
 	async checkRunningTournaments() {
