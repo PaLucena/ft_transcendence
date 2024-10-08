@@ -11,6 +11,7 @@ export class Pong extends Component {
 		this.controls_side = 0;
 		this.game_environment = null;
 		this.tournament_id = null;
+		this.my_id = null;
 		this.player_1_name = 'Player 1';
 		this.player_2_name = 'Player 2';
 		this.inputController = null;
@@ -109,7 +110,9 @@ export class Pong extends Component {
 					break;
 				case 'game_state':
 					this.updateGameState(gameState);
-					if (gameState.state === 'game_over') { this.handle_return(); }
+					break;
+				case 'game_over':
+					this.handle_return(gameState.players_list);
 					break;
 			}
 		}
@@ -176,6 +179,7 @@ export class Pong extends Component {
 		this.p_2_name.innerHTML = `${gameState["player_2_name"]}`;
 		this.p_2_avatar.src = gameState.player_2_avatar;
 		this.win_goals.innerHTML = gameState["goals_to_win"] + ' (dif.' + gameState["goals_diff"] + ')';
+		this.my_id = gameState.my_id;
 
 		if (gameState.controls_mode === 'remote' || gameState.controls_mode === 'AI') {
 			this.setupRemoteControls(gameState);
@@ -263,11 +267,16 @@ export class Pong extends Component {
 		}
 	}
 
-	handle_return() {
+	handle_return(players_list) {
+		console.log("environment", this.game_environment, "tournament_id", this.tournament_id);
 		setTimeout(() => {
-				if (this.game_environment === 'tournament') {
+				if (this.game_environment === 'tournament' && this.my_id in players_list) {
+					console.log("Redirect to tournament");
+					this.game_environment = null;
 					navigateTo(`/tournament/${this.tournament_id}`);
 				} else {
+					console.log("Redirect to main menu");
+					this.game_environment = null;
 					navigateTo('/play');
 				}
 			}, 2000);
