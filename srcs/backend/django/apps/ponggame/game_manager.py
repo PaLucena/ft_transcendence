@@ -3,8 +3,9 @@ import time
 import random
 
 from channels.layers import get_channel_layer
+
 from .game_logic import GameLogic
-from .handlers import send_positions, send_game_state, send_score
+from .handlers import send_positions, send_game_state, send_score, send_game_over
 from .AI_player import AiPlayer
 
 
@@ -51,8 +52,6 @@ class GameManager:
 			JSON object with the result of the match.
 			{tournament_id, match_id, player_1_id, player_2_id, player_1_goals, player_2_goals}
 		"""
-
-		tag = f"Match {match_id} ({player_1_id} vs {player_2_id})"
 
 		# Generate random scores for AI vs AI match
 
@@ -162,6 +161,12 @@ class GameManager:
 				await send_score(self.channel_layer, game_room.game_room_id, game_logic)
 				game_logic.end_game_adjustments()
 			await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
+			# if tournament:
+			# 	players_list = tournament.players  ------------------------------------------------------------------------------
+			# else:
+			# 	players_list = None
+			await send_game_over(self.channel_layer, game_room.game_room_id, players_list)
+
 		except Exception as e:
 			print(f"Error running game loop: {e}")
 

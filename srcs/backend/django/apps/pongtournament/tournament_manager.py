@@ -193,4 +193,8 @@ class TournamentManager:
         while self.tournaments:
             self.delete_tournament(list(self.tournaments.keys())[0])
 
+    @classmethod
+    def get_tournament_by_id(cls, tournament_id):
+        return cls._instance.tournaments.get(tournament_id)
+
 
