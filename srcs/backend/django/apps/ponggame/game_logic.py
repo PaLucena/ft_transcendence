@@ -28,7 +28,7 @@ class GameLogic:
     FPS = 64
     FRAME_TIME = 1 / FPS
 
-    def __init__(self, game_environment="single", tournament_id=0):
+    def __init__(self, game_environment, tournament_id):
         # Initial values
         self.pad_1_x = self.PADDLE_TAB_MARGIN
         self.pad_1_y = self.TABLE_MID_HEIGHT

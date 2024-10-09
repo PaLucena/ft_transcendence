@@ -52,7 +52,7 @@ def get_tournament_room_data(request, tournament_id):
         tournament_name = tournament_data["name"]
         tournament_phase = tournament_data["current_phase"]
 
-        if current_id not in participants:
+        if current_id not in players:
             return Response(
                 {"detail": "You are not a participant in this tournament."},
                 status=status.HTTP_403_FORBIDDEN,

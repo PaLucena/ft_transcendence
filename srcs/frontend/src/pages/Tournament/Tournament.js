@@ -2,6 +2,7 @@ import { Component } from "../../scripts/Component.js";
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from "../../scripts/utils/rtchatUtils.js";
 import { pongTournamentSocket } from './PongTournamentSocket.js';
+import {navigateTo} from "../../scripts/Router.js";
 
 export class Tournament extends Component {
 	constructor(params = {}) {
@@ -37,6 +38,7 @@ export class Tournament extends Component {
 			});
 		} catch(error) {
             this.handleError(error.errorCode, error.errorMessage);
+			navigateTo('/play');
         }
 	}
 
