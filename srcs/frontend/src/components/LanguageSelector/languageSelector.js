@@ -18,7 +18,7 @@ export class languageSelector extends Component {
 				credentials: 'include'
 			})
 			const data = await response.json();
-			
+
 			this.currentLanguage = data.language.toLowerCase();
 			languageSelector.checkLanguage();
 		}
@@ -42,8 +42,6 @@ export class languageSelector extends Component {
 		document.querySelectorAll('[data-i18n]').forEach(element => {
 			const key = element.getAttribute('data-i18n');
 			element.textContent = langData[key];
-			if (!langData[key])
-				console.warn(`No translation found for key: ${key}`);
 		});
 	}
 }
