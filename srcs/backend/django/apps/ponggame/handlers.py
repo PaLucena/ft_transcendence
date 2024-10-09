@@ -57,10 +57,9 @@ async def send_game_state(channel_layer, room_group_name, game_logic):
     )
 
 
-async def send_game_over(channel_layer, room_group_name, players_list):
+async def send_game_over(channel_layer, room_group_name):
     game_over = {
         'type': 'game_over',
-        'players_list': players_list
     }
     await channel_layer.group_send(
         room_group_name,

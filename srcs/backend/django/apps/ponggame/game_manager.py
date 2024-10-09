@@ -161,11 +161,7 @@ class GameManager:
 				await send_score(self.channel_layer, game_room.game_room_id, game_logic)
 				game_logic.end_game_adjustments()
 			await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
-			# if tournament:
-			# 	players_list = tournament.players  ------------------------------------------------------------------------------
-			# else:
-			# 	players_list = None
-			await send_game_over(self.channel_layer, game_room.game_room_id, players_list)
+			await send_game_over(self.channel_layer, game_room.game_room_id)
 
 		except Exception as e:
 			print(f"Error running game loop: {e}")
