@@ -16,6 +16,10 @@ export class Auth extends Component {
 		const urlParams = new URLSearchParams(window.location.search);
 		const code = urlParams.get('code');
 
+		if (code === null) {
+			navigateTo("/login");
+			return ;
+		}
 		fetch("/api/42api-login/", {
 			method: 'POST',
 			headers: {
