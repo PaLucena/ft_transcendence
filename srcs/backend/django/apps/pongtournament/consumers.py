@@ -130,6 +130,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 }
             )
         )
+        print("Sent start match (consumer) to: ", self.user_id)
 
 
     async def send_closed_tournament(self, event):

@@ -94,6 +94,7 @@ async def handle_send_end_tournament(channel_layer, tournament):
 
 async def handle_send_start_match(channel_layer, tournament_id, players_ids):
     try:
+        print("players_ids: ", players_ids)
         for player_id in players_ids:
             if player_id != 0:
                 await channel_layer.group_send(
@@ -102,6 +103,7 @@ async def handle_send_start_match(channel_layer, tournament_id, players_ids):
                         "tournament_id": tournament_id,
                     }
                 )
+                print("Sent start match to user: ", player_id)
     except Exception as e:
         print("Error sending start match: ", str(e))
 
@@ -111,7 +113,7 @@ async def handle_start_single_match(consumer, message):
         user = consumer.user
         tournament_id = 0
         player_1_id = user.id
-        player_2_id = 0
+        player_2_id = message["player_2_id"]
         controls_mode = message["controls_mode"]
 
         if game_manager.get_game_room_by_player(player_1_id):
@@ -126,6 +128,9 @@ async def handle_start_single_match(consumer, message):
 
         if player_2_id is None or controls_mode is None:
             raise ValueError("Missing required fields: player_2_id or controls_mode")
+
+        if controls_mode == "remote":
+            await handle_send_start_match(consumer.channel_layer, 0, [player_1_id, player_2_id])
 
         result = await game_manager.start_match(
             tournament_id=tournament_id,

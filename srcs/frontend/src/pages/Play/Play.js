@@ -325,8 +325,8 @@ export class Play extends Component {
 			console.log("sending local match request");
 			pongTournamentSocket.t_socket.send(JSON.stringify({
 				type: "start_single_match",
-				player_2_id: 0,
-				controls_mode: "local"
+				controls_mode: "local",
+				player_2_id: 0
 			}));
 		}
 		catch (error) {
@@ -340,8 +340,8 @@ export class Play extends Component {
 			console.log("sending ai match request");
 			pongTournamentSocket.t_socket.send(JSON.stringify({
 				type: "start_single_match",
-				player_2_id: 0,
-				controls_mode: "AI"
+				controls_mode: "AI",
+				player_2_id: 0
 			}));
 		}
 		catch (error) {
