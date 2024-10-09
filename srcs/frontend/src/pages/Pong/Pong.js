@@ -123,11 +123,6 @@ export class Pong extends Component {
 			} else {
 				console.log('Connection died');
 			}
-
-			if (!this.playing) {
-				console.log("Redirect to main menu");
-				navigateTo('/play');
-			}
 		}
 
 		this.gameSocket.onerror = (error) => {
@@ -147,8 +142,8 @@ export class Pong extends Component {
 			quitModal.show();
 		});
 		this.button_confirm_quit.addEventListener('click', () => {
-			this.inputController.execCommands(`quit_p${this.controls_side}`);
 			quitModal.hide();
+			this.inputController.execCommands(`quit_p${this.controls_side}`);
 		});
 		this.p1_button_ready.addEventListener('contextmenu', event => event.preventDefault());
 		this.p1_button_down.addEventListener('contextmenu', event => event.preventDefault());
@@ -263,18 +258,15 @@ export class Pong extends Component {
 			this.controls_2.innerHTML = '';
 			this.playing = false;
 			this.button_quit.style.display = 'none';
-			//this.button_return.style.display = 'block';
 		}
 	}
 
 	handle_return() {
 		setTimeout(() => {
 				if (this.game_environment === 'tournament') {
-					console.log("Redirect to tournament");
 					this.game_environment = null;
 					navigateTo(`/tournament/${this.tournament_id}`);
-				} else {
-					console.log("Redirect to main menu");
+				} else if (this.game_environment === 'single') {
 					this.game_environment = null;
 					navigateTo('/play');
 				}

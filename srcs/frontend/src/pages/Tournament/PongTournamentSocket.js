@@ -47,6 +47,10 @@ class PongTournamentSocket {
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                         console.log("Tournament room update:", data);
                         Tournament.renderPlayers(data.participants_data, data.players, data.tournament_name, data.current_phase);
+                        if (!data.players.includes(data.user_id)) {
+                            console.log("User not in players list. Redirecting...");
+                            navigateTo(`/play`);
+                        }
                     }
                     break;
 

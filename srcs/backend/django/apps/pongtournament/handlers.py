@@ -106,10 +106,10 @@ async def handle_start_single_match(consumer, message):
         player_2_id = 0
         controls_mode = message["controls_mode"]
 
-        if game_manager.get_game_room_by_player(player_1_id) is not None:
+        if game_manager.get_game_room_by_player(player_1_id):
             raise ValueError("User already has an active match.")
 
-        if TournamentManager().get_player_active_tournament(player_1_id) is not None:
+        if TournamentManager().get_player_active_tournament(player_1_id):
             raise ValueError("User already has an active tournament.")
 
         timestamp = int(time.time())
@@ -253,9 +253,9 @@ async def handle_start_tournament(consumer, message):
 async def handle_end_tournament(channel_layer, manager, tournament):
     try:
         await handle_send_end_tournament(channel_layer, tournament)
-        await handle_send_tournaments_list(channel_layer)
         await manager.save_tournament(tournament.id)
         manager.delete_tournament(tournament)
+        await handle_send_tournaments_list(channel_layer)
     except Exception as e:
         print("Error ending tournament: ", str(e))
 
