@@ -10,9 +10,8 @@ import { Pong } from '../pages/Pong/Pong.js';
 import { Tournament } from '../pages/Tournament/Tournament.js';
 import { Match } from '../pages/Match/Match.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
-import { handleResponse } from './utils/rtchatUtils.js';
 import { Test } from '../pages/Test/Test.js';
-import { initGlobalSockets } from './utils/globalSocketManager.js';
+import { checkAuthentication } from './utils/rtchatUtils.js';
 
 class Router {
 	constructor() {
@@ -71,23 +70,11 @@ class Router {
 		const routeFactory = matchedRoute ? this.routes[matchedRoute] : this.routes['/404'];
 		const isProtectedRoute = matchedRoute && matchedRoute !== "/login" && matchedRoute !== "/signup" && matchedRoute !== "/auth";
 
-		const isAuthenticated = await this.checkAuthentication();
-
-		if (isAuthenticated) {
-			// if (matchedRoute === "/login" || matchedRoute === "/signup" || matchedRoute === "/auth") {
-			// 	this.navigateTo("/play");
-			// 	return;
-			// }
-
+		if (await checkAuthentication()) {
 			if (matchedRoute === "/login" || matchedRoute === "/signup" || matchedRoute === "/") {
-					this.navigateTo("/play");
-					return;
+				this.navigateTo("/play");
+				return;
 			}
-
-			if (isProtectedRoute)
-				initGlobalSockets();
-
-
 		} else {
 			if (isProtectedRoute) {
 				this.navigateTo("/login");
@@ -133,30 +120,6 @@ class Router {
 		}
 
 		this.previousPath = path;
-	}
-
-	async checkAuthentication() {
-		try {
-			const response = await fetch('/api/check_auth', {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials: 'include'
-			});
-
-			let is_auth = false;
-
-			await handleResponse(response, data => {
-				is_auth = data.authenticated;
-			});
-
-			return is_auth;
-
-		} catch (error) {
-			console.error("Error on checked authentication:", error);
-			return false;
-		}
 	}
 
 	extractParams(route, path) {

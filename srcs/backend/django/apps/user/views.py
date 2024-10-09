@@ -32,6 +32,7 @@ from django.contrib.auth import update_session_auth_hash
 from blockchain.views import load_test_data, get_face2face
 from friends.views import get_friendship_status
 from friends.models import Friend
+from user.serializer import SignupSerializer
 
 
 @api_view(["GET"])
@@ -99,85 +100,36 @@ def get_other_user_data(request, username):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-def validate_custom_password(password):
-    if len(password) < 8:
-        raise ValidationError("The password must contain at least 8 characters.")
-    if not re.search(r"[A-Z]", password):
-        raise ValidationError(
-            "The password must contain at least one uppercase letter."
-        )
-    if not re.search(r"[0-9]", password):
-        raise ValidationError("The password must contain at least one digit.")
-
-
 @api_view(["POST"])
 def signup(request):
-    data = request.data
-    username = data.get("username")
-    email = data.get("email")
-    password = data.get("password")
-    confirm_password = data.get("confirm_password")
+    serializer = SignupSerializer(data=request.data)
 
-    if not all([username, email, password, confirm_password]):
+    if serializer.is_valid():
+        try:
+            user = serializer.save()
+
+            auth_login(request, user)
+
+            refresh = RefreshToken.for_user(user)
+            access = refresh.access_token
+
+            response = Response(
+                {"message": "Signup successful"}, status=status.HTTP_201_CREATED
+            )
+            response.set_cookie(
+                "refresh_token", str(refresh), httponly=True, secure=True
+            )
+            response.set_cookie("access_token", str(access), httponly=True, secure=True)
+
+            return response
+        except Exception as e:
+            return Response(
+                {"message": f"An error occurred: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+    else:
         return Response(
-            {"error": {"code": 1000, "message": "All fields are required"}},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    if AppUser.objects.filter(username__iexact=username).exists():
-        return Response(
-            {"error": {"code": 2001, "message": "This username is already in use."}},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    if AppUser.objects.filter(email__iexact=email).exists():
-        return Response(
-            {"error": {"code": 2002, "message": "This email is already in use."}},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    try:
-        validate_email(email)
-    except ValidationError:
-        return Response(
-            {"error": {"code": 2003, "message": "Invalid email address."}},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    if password != confirm_password:
-        return Response(
-            {"error": {"code": 2006, "message": "Passwords don't match."}},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    try:
-        validate_custom_password(password)
-    except ValidationError as e:
-        return Response(
-            {"error": {"code": 2007, "message": e.message}},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    try:
-        new_user = AppUser.objects.create_user(
-            username=username, email=email, password=password
-        )
-
-        auth_login(request, new_user)
-
-        refresh = RefreshToken.for_user(new_user)
-        access = refresh.access_token
-
-        response = Response(
-            {"message": "Signup successful"}, status=status.HTTP_201_CREATED
-        )
-        response.set_cookie("refresh_token", str(refresh), httponly=True, secure=True)
-        response.set_cookie("access_token", str(access), httponly=True, secure=True)
-
-        return response
-    except IntegrityError as e:
-        return Response(
-            {"error": {"code": 1001, "message": str(e)}},
+            {"error": serializer.errors},
             status=status.HTTP_400_BAD_REQUEST,
         )
 

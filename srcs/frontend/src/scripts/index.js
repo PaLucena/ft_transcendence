@@ -1,7 +1,10 @@
 import routerInstance, { navigateTo } from './Router.js';
+import { initGlobalSockets } from './utils/globalSocketManager.js';
+import { checkAuthentication } from './utils/rtchatUtils.js';
 
-
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
+	if (await checkAuthentication())
+		initGlobalSockets();
 	routerInstance.router();
 });
 
