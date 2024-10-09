@@ -74,7 +74,7 @@ class GameConsumer(AsyncWebsocketConsumer):
             'player_2_avatar': player_2_avatar,
             'goals_to_win': self.game_logic.GOALS_TO_WIN,
             'goals_diff': self.game_logic.GOALS_DIFFERENCE,
-            'my_id': self.player_id,
+            'user_id': self.player_id,
         }))
 
         print(f"Player {self.player_id} sent config") # DEBUG
