@@ -26,6 +26,5 @@ export class Friends extends Component {
 		this.uiSetup.setupSearchForm();
 		this.uiSetup.setupFilterButtons();
 		this.uiSetup.setupFriendButtons();
-		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 }

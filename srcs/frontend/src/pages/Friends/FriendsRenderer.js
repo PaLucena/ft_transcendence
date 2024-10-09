@@ -16,9 +16,10 @@ export class FriendsRenderer {
 
 				if (userElement) {
 					container.appendChild(userElement);
-					setTimeout(() => languageSelector.updateLanguage(), 0);
 				}
 			});
+			
+			setTimeout(() => languageSelector.updateLanguage(), 0);
 		} else {
 			console.warn("friends_elements_container not found.");
 		}
@@ -53,8 +54,6 @@ export class FriendsRenderer {
 					</div>
 					${this.getActionButtons(user, filterType)}
 				</div>`;
-				setTimeout(() => languageSelector.updateLanguage(), 0);
-
 
 			const template = document.createElement('template');
 			template.innerHTML = commonHtml.trim();
