@@ -47,6 +47,14 @@ async def handle_send_tournament_data(channel_layer, tournament_id):
     )
 
 
+async def handle_send_closed_tournament(channel_layer, tournament_id):
+    await channel_layer.group_send(
+        tournament_id, {
+            "type": "send_closed_tournament",
+        }
+    )
+
+
 async def handle_send_left_tournament(channel_layer, tournament_id, tournament_name, channel_name):
     await channel_layer.send(
         channel_name, {
@@ -211,6 +219,10 @@ async def handle_start_tournament(consumer, message):
     tournament = manager.get_tournament_by_id(message["tournament_id"])
     channel_layer = consumer.channel_layer
     sleep_time = 3
+
+    print("Tournament id", tournament.id)
+
+    await handle_send_closed_tournament(channel_layer, tournament.id)
 
     try:
         await manager.start_tournament(tournament.id, consumer.user_id)

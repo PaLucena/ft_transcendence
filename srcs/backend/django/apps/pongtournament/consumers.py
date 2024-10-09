@@ -132,6 +132,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
 
+    async def send_closed_tournament(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "closed_tournament",
+                }
+            )
+        )
+
+
     async def send_deleted_tournament(self, event):
         await self.send(
             text_data=json.dumps(

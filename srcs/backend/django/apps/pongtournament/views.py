@@ -67,6 +67,7 @@ def get_tournament_room_data(request, tournament_id):
                 "participants": participants,
                 "players": players,
                 "current_phase": tournament_phase,
+                "is_open": tournament_data["is_open"]
             },
             status=status.HTTP_200_OK,
         )
