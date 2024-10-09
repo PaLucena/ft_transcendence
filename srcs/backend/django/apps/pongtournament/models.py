@@ -90,6 +90,7 @@ class Tournament:
             "players": [p for p in self.players],
             "is_private": self.is_private,
             "current_phase": self.current_phase,
+            "is_open": self.current_phase == CurrentPhase.WAITING,
             "winner": winner_name
         }
 

@@ -53,6 +53,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         message = json.loads(text_data)
 
         if message["type"] == "start_single_match":
+            print("Received start single match from: ", self.user_id)
             await handle_start_single_match(self, message)
 
         elif message["type"] == "create_tournament":
@@ -99,6 +100,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             text_data=json.dumps(
                 {
                     "type": "tournament_data",
+                    "user_id": self.user_id,
                     "tournament_id": event["tournament_id"],
                     "tournament_name": event["tournament_name"],
                     "current_phase": event["current_phase"],
