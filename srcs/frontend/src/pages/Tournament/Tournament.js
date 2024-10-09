@@ -33,7 +33,9 @@ export class Tournament extends Component {
 
 			await handleResponse(response, (data) => {
 				console.log('Tournament room data:', data);
-				this.renderButtons(data.creator_id, data.current_id)
+				if (data.is_open) {
+					this.renderButtons(data.creator_id, data.current_id)
+				}
 				Tournament.renderPlayers(data.participants_data, data.players, data.tournament_name, data.current_phase);
 			});
 		} catch(error) {

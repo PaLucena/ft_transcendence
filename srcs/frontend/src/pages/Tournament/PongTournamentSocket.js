@@ -69,6 +69,15 @@ class PongTournamentSocket {
                     customAlert('info', `You have been left ${data.tournament_name} tournament.`, 3000);
                     break;
 
+                case 'closed_tournament':
+                    console.log("Closed tournament (consumer)");
+                    const btnContainer = document.getElementById('root_tournament_btn_container');
+                    if (btnContainer) {
+                        console.log("Found button container");
+                        btnContainer.innerHTML = '';
+                    }
+                    break;
+
                 case 'deleted_tournament':
                     console.log("Deleted tournament:", data.tournament_name);
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
