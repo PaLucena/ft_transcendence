@@ -16,9 +16,6 @@
 	"create-button": "Crear",
 	"join-button": "Unirse",
 
-	"close-tournament-button": "CERRAR TORNEO",
-	"exit-tournament-button": "SALIR DEL TORNEO",
-
 	"filter-all": "Todos",
 	"filter-friends": "Amigos",
 	"filter-pending": "Pendientes",
@@ -28,6 +25,10 @@
 	"cancel-friend": "Cancelar",
 	"accept-friend": "Aceptar",
 	"remove-friend": "Eliminar",
+	"start-tournament-button": "Iniciar Torneo",
+	"delete-tournament-button": "Eliminar Torneo",
+	"leave-tournament-button": "Salir",
+
 
 	"number-of-friends": "amigos",
 	"friend": "amigo",
@@ -64,6 +65,19 @@
 	"user-not-found": "Usuario no encontrado",
 
 	"code": "Código",
+	"waiting-players": "Esperando a que los jugadores se unan",
+	"pre-first": "Torneo cerrado. ¡Vamos a empezar!",
+	"first-round": "Primera ronda en progreso...",
+	"pre-second": "Primera ronda finalizada. Prepárate",
+	"second-round": "Segunda ronda en progreso...",
+	"pre-third": "Segunda ronda finalizada. Prepárate",
+	"third-round": "Tercera ronda en progreso. (Solo cuadro de perdedores)",
+	"pre-fourth": "Tercera ronda finalizada. Prepárate",
+	"fourth-round": "Cuarta ronda en progreso.",
+	"pre-final": "Prepárate para la ronda final",
+	"final-round": "Ronda final en progreso.",
+	"finished": "finalizado",
+	"deleted": "eliminado",
 	"vs": "contra",
 	"accept-match": "ACEPTAR PARTIDA",
 

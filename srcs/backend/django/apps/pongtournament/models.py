@@ -2,17 +2,17 @@ import time
 
 
 class CurrentPhase:
-    WAITING = "Waiting for players to join"
-    PRE_FIRST = "Tournament closed. Let's start!"
-    FIRST = "First round in progress..."
-    PRE_SECOND = "First round finished. Get ready?"
-    SECOND = "Second round in progress..."
-    PRE_THIRD = "Second round finished. Get ready?"
-    THIRD = "Third round in progress. (Only loser bracket)"
-    PRE_FOURTH = "Third round finished. Get ready?"
-    FOURTH = "Fourth round in progress."
-    PRE_FINAL = "Get ready for the final?"
-    FINAL = "Final round in progress."
+    WAITING = "waiting-players"
+    PRE_FIRST = "pre-first"
+    FIRST = "first-round"
+    PRE_SECOND = "pre-second"
+    SECOND = "second-round"
+    PRE_THIRD = "pre-third"
+    THIRD = "third-round"
+    PRE_FOURTH = "pre-fourth"
+    FOURTH = "fourth-round"
+    PRE_FINAL = "pre-final"
+    FINAL = "final-round"
     FINISHED = "finished"
     DELETED = "deleted"
 

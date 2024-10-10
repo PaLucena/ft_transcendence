@@ -73,7 +73,7 @@ class PongTournamentSocket {
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                         navigateTo(`/play`);
                     }
-                    customAlert('info', `You have been left ${data.tournament_name} tournament.`, 3000);
+                    customAlert('info', `You have left ${data.tournament_name} tournament.`, 3000);
                     break;
 
                 case 'closed_tournament':

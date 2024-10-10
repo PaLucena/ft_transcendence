@@ -1,6 +1,7 @@
 import { Component } from "../../scripts/Component.js";
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from "../../scripts/utils/rtchatUtils.js";
+import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
 import { pongTournamentSocket } from './PongTournamentSocket.js';
 import {navigateTo} from "../../scripts/Router.js";
 
@@ -37,6 +38,7 @@ export class Tournament extends Component {
 					this.renderButtons(data.creator_id, data.current_id)
 				}
 				Tournament.renderPlayers(data.participants_data, data.players, data.tournament_name, data.current_phase);
+				setTimeout(() => languageSelector.updateLanguage(), 0);
 			});
 		} catch(error) {
             this.handleError(error.errorCode, error.errorMessage);
@@ -68,12 +70,12 @@ export class Tournament extends Component {
 			if (btnContainer) {
 				if (creatorId === currentId) {
 					btnContainer.innerHTML = `
-						<button data-tournament-action="start" class="btn btn-primary">Start Tournament</button>
-						<button data-tournament-action="leave" class="btn btn-danger">Delete Tournament</button>
+						<button data-tournament-action="start" class="btn btn-primary" data-i18n="start-tournament-button"></button>
+						<button data-tournament-action="leave" class="btn btn-danger" data-i18n="delete-tournament-button"></button>
 					`;
 				} else {
 					btnContainer.innerHTML = `
-						<button data-tournament-action="leave" class="btn btn-danger">Leave</button>
+						<button data-tournament-action="leave" class="btn btn-danger" data-i18n="leave-tournament-button"></button>
 					`;
 				}
 
@@ -125,7 +127,12 @@ export class Tournament extends Component {
 			bottomHalf.innerHTML = '';
 
 			const room_header = document.getElementById('tournamentName');
-			room_header.innerHTML = name + "<br>" + phase;
+			let phase_html = document.createElement('p');
+			phase_html.className = 'd-flex justify-content-center';
+			phase_html.setAttribute('data-i18n', phase);
+			phase_html.setAttribute('style', "font-size: x-large;");
+			room_header.innerHTML = `<p class="d-flex justify-content-center" style="font-size: 2rem; font-weight: bold;">${name}</p>`;
+			room_header.appendChild(phase_html);
 
 			for (let i = 0; i < 4; i += 2) {
 				const matchContainerHtml = `
