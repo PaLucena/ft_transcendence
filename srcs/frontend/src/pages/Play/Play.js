@@ -125,13 +125,13 @@ export class Play extends Component {
 
 
 			// DEBUG  ---------------------------------------------------------------------------
-			const testBtn = document.getElementById("testBtn");
-			testBtn.innerHTML = "Clean Tournaments";
-			this.addEventListener(testBtn, "click", async () => {
-				pongTournamentSocket.t_socket.send(JSON.stringify({
-					'type': 'clean_tournaments',
-				}));
-			});
+			// const testBtn = document.getElementById("testBtn");
+			// testBtn.innerHTML = "Clean Tournaments";
+			// this.addEventListener(testBtn, "click", async () => {
+			// 	pongTournamentSocket.t_socket.send(JSON.stringify({
+			// 		'type': 'clean_tournaments',
+			// 	}));
+			// });
 			// ----------------------------------------------------------------------------------
 
 
@@ -376,11 +376,15 @@ export class Play extends Component {
 
 	static displayTournaments(public_tournaments, private_tournaments, player_id) {
 
-		if (public_tournaments.length === 0)
-			document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
+		if (public_tournaments.length === 0) {
+			const publicTournamentDisplay = document.getElementById("publicTournamentDisplay");
+			if (publicTournamentDisplay)
+				publicTournamentDisplay.innerHTML = "No active tournaments";
+		}
 		else {
-			let	publicContainer = document.getElementById("publicTournamentDisplay");
-			publicContainer.innerHTML = '';
+			const publicContainer = document.getElementById("publicTournamentDisplay");
+			if (publicContainer)
+				publicContainer.innerHTML = '';
 
 			for (let i = 0; i < public_tournaments.length; i++) {
 				let isPlayer = public_tournaments[i].players.includes(player_id);
@@ -394,7 +398,8 @@ export class Play extends Component {
 				let tournamentName = isPlayer
 					? `⭐ ${public_tournaments[i].name}`
 					: public_tournaments[i].name;
-				publicContainer.innerHTML +=
+				if (publicContainer) {
+					publicContainer.innerHTML +=
 					`<button
 						class="tournament-item-btn display-tournament-item btn border-start-0
 							border-end-0 col-10 my-1 rounded"
@@ -410,13 +415,18 @@ export class Play extends Component {
 						</span>
 						[${bracket}]
 					</button>`;
+				}
 			}
 		}
-		if (private_tournaments.length === 0)
-			document.getElementById("privateTournamentDisplay").innerHTML = "No active tournaments";
+		if (private_tournaments.length === 0) {
+			const privateTournamentDisplay = document.getElementById("privateTournamentDisplay");
+			if (privateTournamentDisplay)
+				privateTournamentDisplay.innerHTML = "No active tournaments";
+		}
 		else {
-			let	privateContainer = document.getElementById("privateTournamentDisplay");
-			privateContainer.innerHTML = '';
+			const privateContainer = document.getElementById("privateTournamentDisplay");
+			if (privateContainer)
+				privateContainer.innerHTML = '';
 
 			for (let i = 0; i < private_tournaments.length; i++) {
 				let isPlayer = private_tournaments[i].players.includes(player_id);
@@ -430,7 +440,8 @@ export class Play extends Component {
 				let tournamentName = isPlayer
 					? `⭐ ${private_tournaments[i].name}`
 					: private_tournaments[i].name;
-				privateContainer.innerHTML +=
+				if (privateContainer) {
+					privateContainer.innerHTML +=
 					`<button
 						class="tournament-item-btn display-tournament-item
 							btn btn-success border-start-0 border-end-0
@@ -447,6 +458,7 @@ export class Play extends Component {
 						</span>
 						[${bracket}]
 					</button>`;
+				}
 			}
 		}
 	}
