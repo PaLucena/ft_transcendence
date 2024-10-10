@@ -123,7 +123,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": event["sub_type"],
+                    "type": "start_match",
+                    "sub_type": event["sub_type"],
                     "tournament_id": event["tournament_id"],
                 }
             )

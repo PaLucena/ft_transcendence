@@ -162,19 +162,19 @@ export class Pong extends Component {
 	}
 
 	updateGameConfig(gameState) {
+		console.log('Game Config:', gameState);
 		this.controls_side = gameState.controls_side;
 		this.inputController = new InputController(this.gameSocket, gameState.controls_mode, gameState.controls_side);
-
 		this.game_environment = gameState.game_environment;
 		this.tournament_id = gameState.tournament_id;
-		this.player_1_name = gameState["player_1_name"];
-		this.p_1_name.innerHTML = `${gameState["player_1_name"]}`;
+		this.player_1_name = gameState.player_1_name;
+		this.p_1_name.innerHTML = `${gameState.player_1_name}`;
 		this.p_1_avatar.src = gameState.player_1_avatar;
-		this.player_2_name = gameState["player_2_name"];
-		this.p_2_name.innerHTML = `${gameState["player_2_name"]}`;
+		this.player_2_name = gameState.player_2_name;
+		this.p_2_name.innerHTML = `${gameState.player_2_name}`;
 		this.p_2_avatar.src = gameState.player_2_avatar;
 		this.win_goals.innerHTML = gameState["goals_to_win"] + ' (dif.' + gameState["goals_diff"] + ')';
-		this.user_id = gameState.my_id;
+		this.user_id = gameState.user_id;
 
 		if (gameState.controls_mode === 'remote' || gameState.controls_mode === 'AI') {
 			this.setupRemoteControls(gameState);

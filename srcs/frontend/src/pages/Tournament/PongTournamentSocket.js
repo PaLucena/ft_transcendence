@@ -56,14 +56,16 @@ class PongTournamentSocket {
 
                 case 'start_match':
                     console.log("Received start_match:", data);
-                    customAlert('info', `Match starting in 5 seconds. Redirecting...`, 5000);
-                    setTimeout(() => {
-                        navigateTo(`/pong`);}, 5000);
-                    break;
-
-                case 'start_single_match':
-                    setTimeout(() => {
-                        navigateTo(`/pong`);}, 100);
+                    if (data.sub_type === 'start_match') {
+                        console.log("Received start_match:", data);
+                        customAlert('info', `Match starting in 5 seconds. Redirecting...`, 5000);
+                        setTimeout(() => {
+                            navigateTo(`/pong`);}, 5000);
+                    }
+                    else if (data.sub_type === 'start_single_match') {
+                        setTimeout(() => {
+                            navigateTo(`/pong`);}, 100);
+                    }
                     break;
 
                 case 'leave_tournament':
