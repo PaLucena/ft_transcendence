@@ -2,6 +2,7 @@ import { Component } from "../../scripts/Component.js";
 import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from "../../scripts/utils/rtchatUtils.js";
 import { pongTournamentSocket } from './PongTournamentSocket.js';
+import {navigateTo} from "../../scripts/Router.js";
 
 export class Tournament extends Component {
 	constructor(params = {}) {
@@ -32,11 +33,14 @@ export class Tournament extends Component {
 
 			await handleResponse(response, (data) => {
 				console.log('Tournament room data:', data);
-				this.renderButtons(data.creator_id, data.current_id)
+				if (data.is_open) {
+					this.renderButtons(data.creator_id, data.current_id)
+				}
 				Tournament.renderPlayers(data.participants_data, data.players, data.tournament_name, data.current_phase);
 			});
 		} catch(error) {
             this.handleError(error.errorCode, error.errorMessage);
+			navigateTo('/play');
         }
 	}
 

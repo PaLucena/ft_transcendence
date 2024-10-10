@@ -4,8 +4,8 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from .handlers import (
-    send_main_room,
-    send_tournament_room,
+    handle_send_tournaments_list,
+    handle_send_tournament_data,
     handle_start_single_match,
     handle_create_tournament,
     handle_join_tournament,
@@ -21,21 +21,24 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.user = None
         self.user_name = None
         self.user_id = None
+        self.user_room = None
         self.main_room = "main_room"
         self.tournament_room = None
 
 
     async def connect(self):
         self.user = self.scope["user"]
-        self.user_name = self.user.username
         self.user_id = self.user.id
+        self.user_room = f"user_{self.user_id}"
+        self.user_name = self.user.username
 
         await self.channel_layer.group_add(self.main_room, self.channel_name)
+        await self.channel_layer.group_add(self.user_room, self.channel_name)
 
         await self.accept()
-        await send_main_room(self.channel_layer)
+        await handle_send_tournaments_list(self.channel_layer)
         if self.tournament_room:
-            await send_tournament_room(self.channel_layer, self.tournament_room)
+            await handle_send_tournament_data(self.channel_layer, self.tournament_room)
 
 
     async def disconnect(self, close_code):
@@ -68,7 +71,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             asyncio.create_task(handle_start_tournament(self, message))
 
         elif message["type"] == "required_update":
-            await send_main_room(self.channel_layer)
+            await handle_send_tournaments_list(self.channel_layer)
 
         elif message["type"] == "clean_tournaments":
             await handle_clean_tournaments(self.channel_layer)
@@ -78,34 +81,31 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"type": "error", "message": message}))
 
 
-    async def main_room_update(self, event):
-        public_tournaments = event["public_tournaments"]
-        private_tournaments = event["private_tournaments"]
+    async def send_tournaments_list(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "main_room_update",
-                    "public_tournaments": public_tournaments,
-                    "private_tournaments": private_tournaments,
+                    "type": "tournaments_list",
                     "player_id": self.user_id,
+                    "t_public": event["public_tournaments"],
+                    "t_private": event["private_tournaments"],
                 }
             )
         )
 
 
-    async def tournament_room_update(self, event):
-        participants = event["participants"]
-        current_phase = event["current_phase"]
+    async def send_tournament_data(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "tournament_room_update",
-                    "participants": participants,
-                    "participants_data": event["participants_data"],
-                    "players": event["players"],
-                    "current_phase": current_phase,
+                    "type": "tournament_data",
+                    "user_id": self.user_id,
                     "tournament_id": event["tournament_id"],
                     "tournament_name": event["tournament_name"],
+                    "current_phase": event["current_phase"],
+                    "participants": event["participants"],
+                    "participants_data": event["participants_data"],
+                    "players": event["players"],
                 }
             )
         )
@@ -120,22 +120,32 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
     async def send_start_match(self, event):
-        print("Sending start match (consumer)")  # DEBUG
         await self.send(
             text_data=json.dumps(
                 {
                     "type": "start_match",
+                    "sub_type": event["sub_type"],
                     "tournament_id": event["tournament_id"],
                 }
             )
         )
 
 
-    async def notify_deleted_tournament(self, event):
+    async def send_closed_tournament(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "notify_deleted_tournament",
+                    "type": "closed_tournament",
+                }
+            )
+        )
+
+
+    async def send_deleted_tournament(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "deleted_tournament",
                     "tournament_id": event["tournament_id"],
                     "tournament_name": event["tournament_name"],
                 }
@@ -144,11 +154,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.tournament_room = None
 
 
-    async def notify_end_tournament(self, event):
+    async def send_end_tournament(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "notify_end_tournament",
+                    "type": "end_tournament",
                     "tournament_id": event["tournament_id"],
                     "tournament_name": event["tournament_name"],
                     "winner": event["winner"],
@@ -157,11 +167,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
 
-    async def notify_left_tournament(self, event):
+    async def send_leave_tournament(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "notify_left_tournament",
+                    "type": "leave_tournament",
                     "tournament_id": event["tournament_id"],
                     "tournament_name": event["tournament_name"],
                 }
@@ -174,7 +184,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.tournament_room = tournament_room
             await self.channel_layer.group_add(self.tournament_room, self.channel_name)
             print("User ", self.user_name, " added to ", self.tournament_room)
-            await send_tournament_room(self.channel_layer, self.tournament_room)
+            await handle_send_tournament_data(self.channel_layer, self.tournament_room)
 
         else:
             print("User ", self.user_name, " already in a tournament.")

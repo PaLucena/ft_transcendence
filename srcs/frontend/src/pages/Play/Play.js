@@ -202,15 +202,15 @@ export class Play extends Component {
 			// local
 			const	localBtn = document.getElementById("localBtn");
 			this.addEventListener(localBtn, "click", () => {
+				console.log('localBtn clicked');
 				this.playLocal();
-				navigateTo('/pong');
 			});
 
 			// ai
 			const	aiBtn = document.getElementById("aiBtn");
 			this.addEventListener(aiBtn, "click", () => {
+				console.log('aiBtn clicked');
 				this.playAi();
-				navigateTo('/pong');
 			});
 
 			const	tournamentModalElement = document.getElementById("tournamentModal");
@@ -320,10 +320,11 @@ export class Play extends Component {
 	// local match
 	playLocal() {
 		try {
+			console.log("sending local match request");
 			pongTournamentSocket.t_socket.send(JSON.stringify({
 				type: "start_single_match",
-				player_2_id: 0,
-				controls_mode: "local"
+				controls_mode: "local",
+				player_2_id: 0
 			}));
 		}
 		catch (error) {
@@ -334,10 +335,11 @@ export class Play extends Component {
 	// ai logic
 	playAi() {
 		try {
+			console.log("sending ai match request");
 			pongTournamentSocket.t_socket.send(JSON.stringify({
 				type: "start_single_match",
-				player_2_id: 0,
-				controls_mode: "AI"
+				controls_mode: "AI",
+				player_2_id: 0
 			}));
 		}
 		catch (error) {
@@ -382,6 +384,13 @@ export class Play extends Component {
 
 			for (let i = 0; i < public_tournaments.length; i++) {
 				let isPlayer = public_tournaments[i].players.includes(player_id);
+				let is_open = public_tournaments[i].is_open;
+				let bracket;
+				if (is_open) {
+					bracket = public_tournaments[i].participants.length;
+				} else {
+					bracket = "closed";
+				}
 				let tournamentName = isPlayer
 					? `⭐ ${public_tournaments[i].name}`
 					: public_tournaments[i].name;
@@ -399,7 +408,7 @@ export class Play extends Component {
 						<span class="tName">
 							${tournamentName}
 						</span>
-						[${public_tournaments[i].participants.length}]
+						[${bracket}]
 					</button>`;
 			}
 		}
@@ -411,6 +420,13 @@ export class Play extends Component {
 
 			for (let i = 0; i < private_tournaments.length; i++) {
 				let isPlayer = private_tournaments[i].players.includes(player_id);
+				let is_open = private_tournaments[i].is_open;
+				let bracket;
+				if (is_open) {
+					bracket = private_tournaments[i].participants.length;
+				} else {
+					bracket = "closed";
+				}
 				let tournamentName = isPlayer
 					? `⭐ ${private_tournaments[i].name}`
 					: private_tournaments[i].name;
@@ -429,7 +445,7 @@ export class Play extends Component {
 						<span class="tName">
 							${tournamentName}
 						</span>
-						[${private_tournaments[i].participants.length}]
+						[${bracket}]
 					</button>`;
 			}
 		}

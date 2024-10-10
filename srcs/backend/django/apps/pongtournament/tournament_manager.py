@@ -19,6 +19,36 @@ def match_to_uint(match):
     }
 
 
+async def solve_first_round(tournament):
+    tournament.current_phase = CurrentPhase.FIRST
+    await TournamentLogic.solve_first_round(tournament)
+    tournament.current_phase = CurrentPhase.PRE_SECOND
+
+
+async def solve_second_round(tournament):
+    tournament.current_phase = CurrentPhase.SECOND
+    await TournamentLogic.solve_second_round(tournament)
+    tournament.current_phase = CurrentPhase.PRE_THIRD
+
+
+async def solve_third_round(tournament):
+    tournament.current_phase = CurrentPhase.THIRD
+    await TournamentLogic.solve_third_round(tournament)
+    tournament.current_phase = CurrentPhase.PRE_FOURTH
+
+
+async def solve_fourth_round(tournament):
+    tournament.current_phase = CurrentPhase.FOURTH
+    await TournamentLogic.solve_fourth_round(tournament)
+    tournament.current_phase = CurrentPhase.PRE_FINAL
+
+
+async def solve_final_round(tournament):
+    tournament.current_phase = CurrentPhase.FINAL
+    await TournamentLogic.solve_final_round(tournament)
+    tournament.next_state = CurrentPhase.FINISHED
+
+
 class TournamentManager:
     _instance = None
 
@@ -52,40 +82,27 @@ class TournamentManager:
                 response = create_tournament(tournament_data)
                 if response.get('error'):
                     raise Exception("Error(save tournament): Error creating tournament.")
-                print("Before record matches") # DEBUG
                 for match in tournament.finished_matches:
-                    print("Init loop") # DEBUG
-                    print(match)
                     uint_match = match_to_uint(match)
-                    print(uint_match)
-                    response = record_match(uint_match)
-                    print(response)
+                    record_match(uint_match)
             else:
                 raise Exception("Error(save tournament): Tournament not found.")
         except Exception as e:
             print("Error: ", str(e))
             raise Exception(str(e))
 
-    async def notify_end_tournament(self, tournament, channel_layer):
-        message = {
-                'type': 'tournament_ended',
-                'tournament_id': tournament.id,
-                'results': self.get_tournament_data(tournament.id)
-        }
-        await channel_layer.group_send(f"tournament_{tournament.id}", message)
-
 
     def join_tournament(self, consumer, tournament_id, password=None):
         tournament = self.tournaments.get(tournament_id)
 
         if not tournament:
-            raise Exception("Error(join tournament): Tournament not found.")
+            raise Exception("Tournament not found.")
         if not tournament.can_join(consumer.user_id, password):
-            raise Exception(f"Error(join tournament): User '{consumer.user_id}' can't join the tournament.")
+            raise Exception("Permission denied.")
 
         for current_tournament in self.tournaments.values():
             if consumer.user_id in current_tournament.players:
-                raise Exception("Error(join tournament): User already has an active tournament.")
+                raise Exception("You can only be in one tournament at a time.")
 
         tournament.add_participant(consumer.user)
         return True
@@ -99,68 +116,33 @@ class TournamentManager:
                 tournament.remove_participant(user_id)
                 return True
             else:
-                raise Exception("Error(leave tournament): The tournament is ongoing.")
+                raise Exception("Can't leave: The tournament is ongoing.")
         else:
-            raise Exception("Error(leave tournament): Tournament not found.")
+            raise Exception("Can't leave: Tournament not found.")
 
 
     async def start_tournament(self, tournament_id, user):
         tournament = self.tournaments.get(tournament_id)
 
         if tournament is None:
-            raise Exception("Error(start tournament): Tournament not found.")
+            raise Exception("Error: Tournament not found.")
 
         if user != tournament.creator_id:
-            raise Exception("Error(start tournament): Only the creator can start it.")
+            raise Exception("Error: Only the creator can start it.")
 
         if len(tournament.participants) < 2:
-            raise Exception("Error(start tournament): Not enough participants")
+            raise Exception("Error: Not enough participants (minimum 2).")
 
         if tournament.current_phase != CurrentPhase.WAITING:
-            raise Exception("Error(start tournament): The tournament is already ongoing.")
+            raise Exception("Error: The tournament is already ongoing.")
 
         print("Tournament started") # DEBUG
         await TournamentLogic.init_tournament_logic(tournament)
         tournament.current_phase = CurrentPhase.PRE_FIRST
 
-
-    async def solve_first_round(self, tournament_id):
-        tournament = self.tournaments.get(tournament_id)
-        tournament.current_phase = CurrentPhase.FIRST
-        await TournamentLogic.solve_first_round(tournament)
-        tournament.current_phase = CurrentPhase.PRE_SECOND
-
-
-    async def solve_second_round(self, tournament_id):
-        tournament = self.tournaments.get(tournament_id)
-        tournament.current_phase = CurrentPhase.SECOND
-        await TournamentLogic.solve_second_round(tournament)
-        tournament.current_phase = CurrentPhase.PRE_THIRD
-
-
-    async def solve_third_round(self, tournament_id):
-        tournament = self.tournaments.get(tournament_id)
-        tournament.current_phase = CurrentPhase.THIRD
-        await TournamentLogic.solve_third_round(tournament)
-        tournament.current_phase = CurrentPhase.PRE_FOURTH
-
-
-    async def solve_fourth_round(self, tournament_id):
-        tournament = self.tournaments.get(tournament_id)
-        tournament.current_phase = CurrentPhase.FOURTH
-        await TournamentLogic.solve_fourth_round(tournament)
-        tournament.current_phase = CurrentPhase.PRE_FINAL
-
-
-    async def solve_final_round(self, tournament_id):
-        tournament = self.tournaments.get(tournament_id)
-        tournament.current_phase = CurrentPhase.FINAL
-        await TournamentLogic.solve_final_round(tournament)
-        tournament.next_state = CurrentPhase.FINISHED
-
-
-    def get_player_active_tournament(self, user_id):
-        for current_tournament in self.tournaments.values():
+    @classmethod
+    def get_player_active_tournament(cls, user_id):
+        for current_tournament in cls._instance.tournaments.values():
             if user_id in current_tournament.players:
                 return current_tournament.id
         return None
@@ -192,5 +174,9 @@ class TournamentManager:
     def clean_tournaments(self):
         while self.tournaments:
             self.delete_tournament(list(self.tournaments.keys())[0])
+
+    @classmethod
+    def get_tournament_by_id(cls, tournament_id):
+        return cls._instance.tournaments.get(tournament_id)
 
 

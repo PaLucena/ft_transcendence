@@ -24,73 +24,99 @@ export class Profile extends Component {
 	}
 
 	async displayUserInfo(username) {
-		const fetchUrl = username ? `/api/get_other_user_data/${username}` : "/api/get_user_data/";
-		const myUsername = await this.getOwnName();
+		try {
+			const fetchUrl = username ? `/api/get_other_user_data/${username}` : "/api/get_user_data/";
+			const myUsername = await this.getOwnName();
 
-		fetch(fetchUrl, {
-			method: "GET",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include'
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			return response.json();
-		})
-		.then(data => {
-			this.displayUserStats(data["username"]);
 
-			if (myUsername === data["username"]) {
-				document.getElementById("editPlaceholder").innerHTML = `<button id="editBtn" class="btn btn-green text-white col-12" data-i18n='edit-profile'></button>`;
-				document.getElementById("logoutPlaceholder").innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-12" data-i18n='logout'></button>`;
+			const response = await fetch(fetchUrl, {
+				method: "GET",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include'
+			});
+
+			await handleResponse(response, data => {
+				this.displayUserStats(data["username"]);
+
+				if (myUsername === data["username"]) {
+					const editPlaceholder = document.getElementById("editPlaceholder");
+					if (editPlaceholder)
+						editPlaceholder.innerHTML = `<button id="editBtn" class="btn btn-green text-white col-12" data-i18n='edit-profile'></button>`;
+
+					const logoutPlaceholder = document.getElementById("logoutPlaceholder");
+					if (logoutPlaceholder)
+						logoutPlaceholder.innerHTML = `<button id="logoutBtn" class="btn btn-outline-dark col-12" data-i18n='logout'></button>`;
+
+					setTimeout(() => languageSelector.updateLanguage(), 0);
+					this.editUserBtn(data);
+					this.logout();
+				}
+				else {
+					this.renderChatBtn(data["username"]);
+
+					const ownStatsBtn = document.getElementById("ownStatsBtn");
+					if (ownStatsBtn)
+						ownStatsBtn.innerHTML = `${data['username']} <span data-i18n='stats'></span>`;
+
+					if (!data['friendship']) {
+						const statsPlaceholder = document.getElementById('statsPlaceholder');
+						if (statsPlaceholder)
+							statsPlaceholder.innerHTML = `<div class="h-100 w-100 d-flex justify-content-center align-items-center"><h1><span data-i18n='friend'></span>n't</h1></div>`;
+					}
+
+					if (data['friendship'] && data['matches_in_common']) {
+						const statsSelector = document.getElementById('statsSelector');
+						if (statsSelector)
+							statsSelector.innerHTML += `<button id="friendshipStatsBtn" class="btn btn-outline-dark position-relative" data-i18n="our-stats"></button>`;
+
+						const friendName = document.getElementById('friendName');
+						if (friendName)
+							friendName.innerHTML = data['username'];
+
+						this.displayFriendshipStats(data['username']);
+						this.selectStats();
+					}
+				}
+
+				const profileContainer =document.getElementById('rootProfile');
+				if (profileContainer) {
+					const profilePhoto = profileContainer.querySelector('#profile_photo');
+					if (profilePhoto && data.avatar)
+						profilePhoto.style.backgroundImage = `url(${data.avatar || '/assets/images/default_avatar.jpg'})`;
+				}
+
+				const usernamePlaceholder = document.getElementById("usernamePlaceholder");
+				if (usernamePlaceholder)
+					usernamePlaceholder.innerHTML = data["username"];
+
+				const friendsNbPlaceholder = document.getElementById("friendsNbPlaceholder");
+				if (friendsNbPlaceholder)
+					friendsNbPlaceholder.innerHTML = data["number_of_friends"];
+
+				if (data["number_of_friends"] == 1) {
+					const friendsText = document.getElementById("friendsText");
+					if (friendsText)
+						friendsText.setAttribute("data-i18n", "friend");
+				}
+
 				setTimeout(() => languageSelector.updateLanguage(), 0);
-				this.editUserBtn(data);
-				this.logout();
-
-			}
-			else {
-				this.renderChatBtn(data["username"]);
-				document.getElementById("ownStatsBtn").innerHTML = `${data['username']} <span data-i18n='stats'></span>`;
-
-				if (!data['friendship']) {
-					document.getElementById('statsPlaceholder').innerHTML = `<div class="h-100 w-100 d-flex justify-content-center align-items-center"><h1><span data-i18n='friend'></span>n't</h1></div>`;
+			});
+		} catch (error) {
+			if (error.errorCode === 404) {
+				const profileContainer = document.getElementById("rootProfile");
+				if (profileContainer) {
+					document.getElementById("rootProfile").style.justifyContent = 'center';
+					document.getElementById("rootProfile").style.alignItems = 'center';
+					document.getElementById("rootProfile").innerHTML = '<p class="display-1" data-i18n="user-not-found"><p>';
 				}
 
-				if (data['friendship'] && data['matches_in_common']) {
-					document.getElementById('statsSelector').innerHTML += `<button id="friendshipStatsBtn" class="btn btn-outline-dark position-relative" data-i18n="our-stats"></button>`;
-					document.getElementById('friendName').innerHTML = data['username'];
-					this.displayFriendshipStats(data['username']);
-					this.selectStats();
-				}
+				setTimeout(() => languageSelector.updateLanguage(), 0);
+			} else {
+				console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
 			}
-
-			const profileContainer =document.getElementById('rootProfile');
-			if (profileContainer) {
-				const profilePhoto = profileContainer.querySelector('#profile_photo');
-				if (profilePhoto && data.avatar) {
-					profilePhoto.style.backgroundImage = `url(${data.avatar || '/assets/images/default_avatar.jpg'})`;
-				}
-			}
-			document.getElementById("usernamePlaceholder").innerHTML = data["username"];
-			document.getElementById("friendsNbPlaceholder").innerHTML = data["number_of_friends"];
-			if (data["number_of_friends"] == 1)
-				document.getElementById("friendsText").setAttribute("data-i18n", "friend");
-			setTimeout(() => languageSelector.updateLanguage(), 0);
-		})
-		.catch(error => {
-			customAlert('danger', `Error: ` + error.message, 5000);
-			console.log('Error(displayUserInfo):', error);
-			if (error.message === "AppUser matching query does not exist.")
-			document.getElementById("rootProfile").style.justifyContent = 'center';
-			document.getElementById("rootProfile").style.alignItems = 'center';
-			document.getElementById("rootProfile").innerHTML = '<p class="display-1" data-i18n="user-not-found"><p>';
-			setTimeout(() => languageSelector.updateLanguage(), 0);
-		})
+		}
 	}
 
 	displayUserStats(username) {
@@ -113,8 +139,10 @@ export class Profile extends Component {
 			data['average_score'] = Math.round(data['average_score'] * 100) / 100;
 
 			const winRateBar = document.getElementById('winRateBar');
-			winRateBar.innerHTML = `${winRate}%`;
-			winRateBar.style.width = `${winRate}%`;
+			if (winRateBar) {
+				winRateBar.innerHTML = `${winRate}%`;
+				winRateBar.style.width = `${winRate}%`;
+			}
 
 			if (data["match_total_time"] == -1)
 				data["match_total_time"] = 0;
@@ -123,7 +151,8 @@ export class Profile extends Component {
 
 			liStats.forEach(liStat => {
 				let currStat = liStat.querySelectorAll('div')[1];
-				currStat.innerHTML = data[currStat.id];
+				if (currStat)
+					currStat.innerHTML = data[currStat.id];
 			});
 		})
 		.catch(error => {
@@ -146,14 +175,19 @@ export class Profile extends Component {
 			return response.json();
 		})
 		.then(data => {
-			document.getElementById('friendshipWinRateBar').innerHTML = data['player1_win_percentage'];
-			document.getElementById('friendshipWinRateBar').style.width = `${data['player1_win_percentage']}%`;
+			const friendshipWinRateBar = document.getElementById('friendshipWinRateBar');
+			if (friendshipWinRateBar) {
+				friendshipWinRateBar.innerHTML = data['player1_win_percentage'];
+				friendshipWinRateBar.style.width = `${data['player1_win_percentage']}%`;
+			}
 
 			const liStats = document.querySelectorAll('#friendshipStatsList li');
 
 			liStats.forEach(liStat => {
 				let currStat = liStat.querySelectorAll('div')[1];
-				currStat.innerHTML = data[currStat.id];
+
+				if (currStat)
+					currStat.innerHTML = data[currStat.id];
 			});
 		})
 		.catch(error => {
@@ -162,42 +196,46 @@ export class Profile extends Component {
 	}
 
 	renderChatBtn(username) {
-		document.getElementById('chatBtnPlaceholder').innerHTML = '<button id="chatBtn" class="btn btn-green profile-chat-btn d-flex justify-content-center align-items-center ml-3 rounded-circle square"><i class="fa-regular fa-comment-dots"></i></button>';
+		const chatBtnPlaceholder = document.getElementById('chatBtnPlaceholder');
+		if (chatBtnPlaceholder)
+			chatBtnPlaceholder.innerHTML = '<button id="chatBtn" class="btn btn-green profile-chat-btn d-flex justify-content-center align-items-center ml-3 rounded-circle square"><i class="fa-regular fa-comment-dots"></i></button>';
+
 		const chatBtn = document.getElementById("chatBtn");
+		if (chatBtn) {
+			this.addEventListener(chatBtn, "click", async () => {
+				try {
+					const response = await fetch(`/api/chat/user/${username}/`, {
+						method: 'GET',
+						headers: {
+							"Content-Type": "application/json",
+						},
+						credentials: 'include',
+					});
 
-		this.addEventListener(chatBtn, "click", async () => {
-			try {
-				const response = await fetch(`/api/chat/user/${username}/`, {
-					method: 'GET',
-					headers: {
-						"Content-Type": "application/json",
-					},
-					credentials: 'include',
-				});
+					await handleResponse(response, data => {
+						const chatModalInstance = staticComponentsRenderer.getComponentInstance('ChatModal');
+						if (chatModalInstance) {
+							const messagesModal = document.getElementById('messages_modal');
 
-				await handleResponse(response, data => {
-					const chatModalInstance = staticComponentsRenderer.getComponentInstance('ChatModal');
-					if (chatModalInstance) {
-						const messagesModal = document.getElementById('messages_modal');
+							if (messagesModal) {
+								const bootstrapModal = new bootstrap.Modal(messagesModal);
+								bootstrapModal.show();
+								chatModalInstance.chatLoader.initChatroom(data.chatroom_name);
+							} else {
+								console.error("messages_modal not found.");
+							}
 
-						if (messagesModal) {
-							const bootstrapModal = new bootstrap.Modal(messagesModal);
-							bootstrapModal.show();
-							chatModalInstance.chatLoader.initChatroom(data.chatroom_name);
 						} else {
-							console.error("messages_modal not found.");
+							console.error("ChatModal instance is not initialized");
 						}
 
-					} else {
-						console.error("ChatModal instance is not initialized");
-					}
+					});
 
-				});
-
-			} catch (error) {
-				console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
-			}
-		});
+				} catch (error) {
+					console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+				}
+			});
+		}
 	}
 
 	async getOwnName() {
@@ -239,39 +277,80 @@ export class Profile extends Component {
 	}
 
 	saveInfoBtn(username) {
-		const editForm = document.getElementById("editForm");
+		const editForm = document.getElementById('editForm');
+		if (editForm) {
+			this.addEventListener(editForm, 'submit', async (event) => {
+				event.preventDefault();
 
-		this.addEventListener(editForm, "submit", async (event) => {
-			event.preventDefault();
+				const fileInput = editForm.querySelector('#avatar');
+				const maxSize = 1 * 1024 * 1024;
 
-			const formData = new FormData(event.target);
-			formData.append('language', document.getElementById('language_selector').value);
-
-			fetch("/api/update_user_info/", {
-				method: "POST",
-				body: formData,
-				credentials: 'include'
-			})
-			.then(response => {
-				if (!response.ok) {
-					return response.json().then(errData => {
-						throw new Error(errData.error || `Response status: ${response.status}`);
-					});
+				if (fileInput && fileInput.files[0] && fileInput.files[0].size > maxSize) {
+					customAlert('danger', 'Avatar\'s file is so big. Maximum size: 1MB', 5000);
+					return;
 				}
-				return response.json();
-			})
-			.then(data => {
-				customAlert('success', data.message, 3000);
-				document.getElementById("userInfo").style.display = "block";
-				document.getElementById("userEdit").style.display = "none";
-				this.displayUserInfo(username);
-				editForm.reset();
-				setTimeout(() => languageSelector.updateLanguage(), 0);
-			})
-			.catch((error) => {
-				customAlert('danger', `Error: ` + error.message, 5000);
+
+				const formData = new FormData(event.target);
+				formData.append('language', document.getElementById('language_selector').value);
+
+				try {
+					const response = await fetch("/api/update_user_info/", {
+						method: "POST",
+						body: formData,
+						credentials: 'include'
+					});
+
+					await handleResponse(response, data => {
+						customAlert('success', data.message, 3000);
+						document.getElementById("userInfo").style.display = "block";
+						document.getElementById("userEdit").style.display = "none";
+						this.displayUserInfo(username);
+						editForm.reset();
+						setTimeout(() => languageSelector.updateLanguage(), 0);
+					});
+				} catch (error) {
+					console.log(error);
+
+					if (error.errorCode === 400 || error.errorCode === 403) {
+						if (error.errorMessage.username) {
+							const inputUsername = event.target.querySelector('#new_username');
+							if (inputUsername) {
+								inputUsername.value = '';
+								inputUsername.focus();
+							}
+
+
+							customAlert('danger', error.errorMessage.username, 5000);
+						} else if (error.errorMessage.password) {
+							if (Array.isArray(error.errorMessage.password)) {
+								let responseMessage = '';
+
+								error.errorMessage.password.forEach(message => {
+									responseMessage += message + ' ';
+								});
+
+								customAlert('danger', responseMessage.trim(), 6000);
+							} else {
+								customAlert('danger', error.errorMessage.password, 5000);
+							}
+
+							const inputPass = event.target.querySelector('#new_password');
+							const inputConfPass = event.target.querySelector('#confirm_password');
+
+							if (inputConfPass && inputConfPass) {
+								inputPass.value = '';
+								inputConfPass.value = '';
+								inputPass.focus();
+							}
+						} else {
+							customAlert('danger', error.errorMessage, 5000);
+						}
+					} else {
+						console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+					}
+				}
 			});
-		});
+		}
 	}
 
 
@@ -380,7 +459,10 @@ export class Profile extends Component {
 				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
 				const imageSpan = document.getElementById('modalImageContainer');
 
-				imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
+
+				if (imageSpan)
+					imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
+
 				qrmodal.show();
 				this.addEventListener(ModalElement, 'hidden.bs.modal', () => {this.hideModal()});
 			})

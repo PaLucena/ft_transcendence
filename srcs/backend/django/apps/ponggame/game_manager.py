@@ -3,9 +3,12 @@ import time
 import random
 
 from channels.layers import get_channel_layer
+from channels.db import database_sync_to_async
+
 from .game_logic import GameLogic
-from .handlers import send_positions, send_game_state, send_score
+from .handlers import send_positions, send_game_state, send_score, send_game_over
 from .AI_player import AiPlayer
+from user.models import AppUser
 
 
 def random_ai_game(tournament_id, match_id, player_1_id, player_2_id):
@@ -52,10 +55,7 @@ class GameManager:
 			{tournament_id, match_id, player_1_id, player_2_id, player_1_goals, player_2_goals}
 		"""
 
-		tag = f"Match {match_id} ({player_1_id} vs {player_2_id})"
-
 		# Generate random scores for AI vs AI match
-
 		if player_1_id == 0 and player_2_id == 0:
 			return random_ai_game(tournament_id, match_id, player_1_id, player_2_id)
 
@@ -74,22 +74,31 @@ class GameManager:
 				game_room_id = self.create_game_room(player_1_id, player_2_id, "tournament", tournament_id)
 			game_room = self.get_game_room_by_id(game_room_id)
 			game_logic = game_room.get_game_logic()
+
 			# Set the controls mode
 			game_logic.controls_mode = controls_mode
 			if controls_mode == "local":
+				await self.get_player_data(1, player_1_id, game_logic)
 				game_logic.player_2_name = "Guest"
 				game_logic.player_2_avatar = 'media/default/anonymous_player.jpg'
 			elif controls_mode == "AI":
 				if player_1_id == 0:
+					await self.get_player_data(2, player_2_id, game_logic)
 					game_logic.ai_side = 1
 					game_logic.player_1_name = "AI"
 					game_logic.player_1_avatar = 'media/default/AI_player.jpg'
 					game_logic.player_1_ready = True
 				else:
+					await self.get_player_data(1, player_1_id, game_logic)
 					game_logic.ai_side = 2
 					game_logic.player_2_name = "AI"
 					game_logic.player_2_avatar = 'media/default/AI_player.jpg'
 					game_logic.player_2_ready = True
+			elif controls_mode == "remote":
+				await self.get_player_data(1, player_1_id, game_logic)
+				await self.get_player_data(2, player_2_id, game_logic)
+
+			# Create the AI player
 			ai_player = AiPlayer(game_logic)
 
 			await self.run_game_loop(game_room, game_logic, ai_player)
@@ -140,6 +149,26 @@ class GameManager:
 		return match_result
 
 
+	async def get_player_data(self, player_side, player_id, game_logic):
+		user = await self.get_user(player_id)
+		if player_side == 1:
+			game_logic.player_1_name = user.username
+			game_logic.player_1_avatar = user.avatar.url
+		elif player_side == 2:
+			game_logic.player_2_name = user.username
+			game_logic.player_2_avatar = user.avatar.url
+
+
+	@database_sync_to_async
+	def get_user(self, user_id):
+		try:
+			return AppUser.objects.get(id=user_id)
+		except AppUser.DoesNotExist:
+			return None
+		except Exception as e:
+			raise e
+
+
 	async def run_game_loop(self, game_room, game_logic, ai_player):
 		frame_count = 0
 		try:
@@ -162,6 +191,8 @@ class GameManager:
 				await send_score(self.channel_layer, game_room.game_room_id, game_logic)
 				game_logic.end_game_adjustments()
 			await send_game_state(self.channel_layer, game_room.game_room_id, game_logic)
+			await send_game_over(self.channel_layer, game_room.game_room_id)
+
 		except Exception as e:
 			print(f"Error running game loop: {e}")
 

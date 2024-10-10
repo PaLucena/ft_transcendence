@@ -3,15 +3,15 @@ import time
 
 class CurrentPhase:
     WAITING = "Waiting for players to join"
-    PRE_FIRST = "Tournament closed. The battle begins!!"
-    FIRST = "First round in progress."
-    PRE_SECOND = "First round finished. Get ready for the next round."
-    SECOND = "Second round in progress."
-    PRE_THIRD = "Second round finished. Get ready for the next round."
-    THIRD = "Third round in progress."
-    PRE_FOURTH = "Third round finished. Get ready for the next round."
+    PRE_FIRST = "Tournament closed. Let's start!"
+    FIRST = "First round in progress..."
+    PRE_SECOND = "First round finished. Get ready?"
+    SECOND = "Second round in progress..."
+    PRE_THIRD = "Second round finished. Get ready?"
+    THIRD = "Third round in progress. (Only loser bracket)"
+    PRE_FOURTH = "Third round finished. Get ready?"
     FOURTH = "Fourth round in progress."
-    PRE_FINAL = "Fourth round finished. Get ready for the final round."
+    PRE_FINAL = "Get ready for the final?"
     FINAL = "Final round in progress."
     FINISHED = "finished"
     DELETED = "deleted"
@@ -85,9 +85,12 @@ class Tournament:
             "creator": self.creator_id,
             "participants": [p for p in self.participants],
             "participants_data": self.participants_data,
+            "winner_bracket": [p for p in self.winner_bracket],
+            "loser_bracket": [p for p in self.loser_bracket],
             "players": [p for p in self.players],
             "is_private": self.is_private,
             "current_phase": self.current_phase,
+            "is_open": self.current_phase == CurrentPhase.WAITING,
             "winner": winner_name
         }
 

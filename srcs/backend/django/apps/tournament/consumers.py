@@ -176,3 +176,4 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
         await channel_layer.group_send(
             f"tournament_{tournament_name}", message
         )
+

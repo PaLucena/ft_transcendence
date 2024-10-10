@@ -1,7 +1,7 @@
 import { handleResponse, updateOnlineStatus } from './rtchatUtils.js'
 import customAlert from './customAlert.js';
 import { staticComponentsRenderer } from '../utils/StaticComponentsRenderer.js';
-import { navigateTo } from '../Router.js';
+import {pongTournamentSocket} from "../../pages/Tournament/PongTournamentSocket.js";
 
 class UserWebsocket {
     constructor() {
@@ -75,30 +75,15 @@ class UserWebsocket {
                             const authorPlayer = data.players.find(player => player.is_author === 1 && player.username === currentUser);
 
                             if (authorPlayer) {
-                                const oppositePlayer = data.players.find(player => player.username !== currentUser);
-                                if (oppositePlayer) {
-                                    try {
-                                        const response = await fetch(`/api/start_remote_match/`, {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                            },
-                                            credentials: 'include',
-                                            body: JSON.stringify({ player_2_id: oppositePlayer.id })
-                                        });
-
-                                        await handleResponse(response, data => {
-                                            navigateTo('/pong');
-                                        });
-
-                                    } catch(error) {
-                                        console.log(error);
-                                    }
+                                try {
+                                    pongTournamentSocket.t_socket.send(JSON.stringify({
+                                        type: 'start_single_match',
+                                        controls_mode: 'remote',
+                                        player_2_id: data.players.find(player => player.id !== authorPlayer.id).id,
+                                    }));
+                                } catch (error) {
+                                    console.error('Failed to send notification:', error);
                                 }
-                            } else {
-                                setTimeout(() => {
-                                    navigateTo('/pong');
-                                }, 0);
                             }
                         });
                     }

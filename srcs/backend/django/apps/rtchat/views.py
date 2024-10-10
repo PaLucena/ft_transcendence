@@ -7,6 +7,8 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
 from django.http import Http404
+
+from pongtournament.views import TournamentManager
 from rtchat.models import ChatGroup, Block, InviteRoom, InviteUser
 from user.models import AppUser
 from rtchat.serializers import GroupMessageSerializer, UserSerializer
@@ -342,6 +344,24 @@ def check_users_in_match(request):
             return Response(
                 {
                     "detail": f"{invite_user.username} is already in a game",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if TournamentManager.get_player_active_tournament(current_user.id):
+            return Response(
+                {
+                    "detail": f"You are already in a tournament",
+                    "status": 0,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if TournamentManager.get_player_active_tournament(invite_user.id):
+            return Response(
+                {
+                    "detail": f"{invite_user.username} is already in a tournament",
                     "status": 0,
                 },
                 status=status.HTTP_400_BAD_REQUEST,

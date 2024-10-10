@@ -32,8 +32,6 @@ def record_match(data):
         mT = data.get('match_total_time')
         fF = data.get('forfeit')
 
-        print("In the record_match function")
-
         required_keys = ['tournament_id', 'match_id', 'player_1_id', 'player_2_id', 'player_1_goals', 'player_2_goals',
                          'player_1_max_hits', 'player_2_max_hits', 'match_total_time', 'forfeit', 'winner_id']
         if not all(key in data for key in required_keys):

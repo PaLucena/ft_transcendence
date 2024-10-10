@@ -51,9 +51,8 @@ class TournamentLogic:
 
     @staticmethod
     async def solve_final_round(tournament):
-        print("Final round")  # DEBUG
         results_w = await TournamentLogic.solve_matches(tournament, tournament.winner_bracket)
-        TournamentLogic.move_players(tournament, results_w, "final", "winner")
+        TournamentLogic.move_players(tournament, results_w, "final")
 
 
     @staticmethod
@@ -99,7 +98,7 @@ class TournamentLogic:
 
 
     @staticmethod
-    def move_players(tournament, match_results, round_num, bracket_type):
+    def move_players(tournament, match_results, round_num, bracket_type=None):
         if round_num == "initial":
             for match_result in match_results:
                 if match_result["winner"] != 0 and match_result["loser"] != 0:  # Both players end the game
@@ -189,17 +188,8 @@ class TournamentLogic:
             print("Loser bracket: ", tournament.loser_bracket)
 
         elif round_num == "final":
-            for match_result in match_results:
-                if bracket_type == "winner":
-                    if match_result["winner"] != 0:
-                        tournament.tournament_winner = match_result[f"player_{match_result['winner']}_id"]
-                    else:
-                        tournament.tournament_winner = 0
-
-                    if match_result["winner"] != 0:
-                        tournament.players.remove(match_result["player_1_id"])
-                    if match_result["winner"] != 0:
-                        tournament.players.remove(match_result["player_2_id"])
+            final_result = match_results[0]
+            tournament.tournament_winner = final_result[f"player_{final_result['winner']}_id"]
 
             print("Tournament finished. Winner: ", tournament.tournament_winner)
 

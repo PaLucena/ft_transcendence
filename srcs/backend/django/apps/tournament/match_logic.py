@@ -82,10 +82,10 @@ def auto_advance_match(tournament, new_match):
 
 	for required_match_id in required_matches[new_match.match_id]:
 		match = Match.objects.filter(tournament=tournament, match_id=required_match_id).first()
-		
+
 		if match.winner == -1 and match.loser == -1:
 			auto_finish_match += 1
-		
+
 		elif match.winner != -1 and match.loser != -1:
 			potential_winner = match.winner
 			potential_loser = match.loser

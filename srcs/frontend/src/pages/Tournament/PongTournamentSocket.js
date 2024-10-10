@@ -6,9 +6,6 @@ import { Tournament } from "./Tournament.js";
 class PongTournamentSocket {
     constructor() {
         this.t_socket = null;
-        this.reconnectDelay = 5000;
-        this.maxReconnectAttempts = 10;
-        this.reconnectAttempts = 0;
     }
 
     initWebSocket() {
@@ -31,67 +28,87 @@ class PongTournamentSocket {
         try {
             const data = JSON.parse(event.data);
 
-            if (data.type === 'error') {
-                customAlert('danger', data.message, 5000);
-            }
+            switch (data.type) {
 
-            else if (data.type === 'main_room_update') {
-                if (window.location.pathname === '/play') {
-                    console.log("Main room update: public ", data);
-                    Play.displayTournaments(data.public_tournaments, data.private_tournaments, data.player_id);
-                }
-            }
+                case 'tournaments_list':
+                    if (window.location.pathname === '/play') {
+                        Play.displayTournaments(data.t_public, data.t_private, data.player_id);
+                    }
+                    break;
 
-            else if (data.type === 'successfully_joined') {
-                if (window.location.pathname === '/play') {
-                    console.log("successfully_joined", data);
-                    navigateTo(`/tournament/${data.tournament_id}`);
-                }
-            }
+                case 'successfully_joined':
+                    if (window.location.pathname === '/play') {
+                        console.log("successfully_joined", data);
+                        navigateTo(`/tournament/${data.tournament_id}`);
+                    }
+                    break;
 
-            else if (data.type === 'tournament_room_update') {
-                if (window.location.pathname === `/tournament/${data.tournament_id}`) {
-                    console.log("Tournament room update:", data);
-                    Tournament.renderPlayers(data.participants_data, data.players, data.tournament_name, data.current_phase);
-                }
-            }
+                case 'tournament_data':
+                    if (window.location.pathname === `/tournament/${data.tournament_id}`) {
+                        console.log("Tournament room update:", data);
+                        Tournament.renderPlayers(data.participants_data, data.players, data.tournament_name, data.current_phase);
+                        if (!data.players.includes(data.user_id)) {
+                            console.log("User not in players list. Redirecting...");
+                            navigateTo(`/play`);
+                        }
+                    }
+                    break;
 
-            else if (data.type === 'start_match') {
-                console.log("Match starting");
-                customAlert('info', `Match starting in 5 seconds. Redirecting...`, 5000);
-                setTimeout(() => {
-                    navigateTo(`/pong`);
-                } , 5000);
-            }
+                case 'start_match':
+                    console.log("Received start_match:", data);
+                    if (data.sub_type === 'start_match') {
+                        console.log("Received start_match:", data);
+                        customAlert('info', `Match starting in 5 seconds. Redirecting...`, 5000);
+                        setTimeout(() => {
+                            navigateTo(`/pong`);}, 5000);
+                    }
+                    else if (data.sub_type === 'start_single_match') {
+                        setTimeout(() => {
+                            navigateTo(`/pong`);}, 100);
+                    }
+                    break;
 
-            else if (data.type === 'notify_left_tournament') {
-                console.log("Left tournament:", data.tournament_name);
-                if (window.location.pathname === `/tournament/${data.tournament_id}`) {
-                    navigateTo(`/play`);
-                }
-                customAlert('info', `You have been left ${data.tournament_name} tournament.`, 3000);
-            }
+                case 'leave_tournament':
+                    console.log("Leave tournament:", data.tournament_name);
+                    if (window.location.pathname === `/tournament/${data.tournament_id}`) {
+                        navigateTo(`/play`);
+                    }
+                    customAlert('info', `You have been left ${data.tournament_name} tournament.`, 3000);
+                    break;
 
-            else if (data.type === 'notify_deleted_tournament') {
-                console.log("Deleted tournament:", data.tournament_name);
-                if (window.location.pathname === `/tournament/${data.tournament_id}`) {
-                    navigateTo(`/play`);
-                }
-                customAlert('info', `Tournament "${data.tournament_name}" has been deleted.`, 3000);
-            }
+                case 'closed_tournament':
+                    console.log("Closed tournament (consumer)");
+                    const btnContainer = document.getElementById('root_tournament_btn_container');
+                    if (btnContainer) {
+                        console.log("Found button container");
+                        btnContainer.innerHTML = '';
+                    }
+                    break;
 
-            else if (data.type === 'notify_end_tournament') {
-                console.log("Tournament ended:", data.tournament_id, data.results);
-                if (window.location.pathname === `/tournament/${data.tournament_id}`) {
-                    navigateTo(`/play`);
-                }
-                customAlert('info', `Tournament "${data.tournament_name}" has ended. Winner: ${data.winner}`, 5000);
-            }
+                case 'deleted_tournament':
+                    console.log("Deleted tournament:", data.tournament_name);
+                    if (window.location.pathname === `/tournament/${data.tournament_id}`) {
+                        navigateTo(`/play`);
+                    }
+                    customAlert('info', `Tournament "${data.tournament_name}" has been deleted.`, 3000);
+                    break;
 
-            else {
-                console.log("Unknown message type:", data.type);
-            }
+                case 'end_tournament':
+                   console.log("Tournament ended:", data.tournament_id, data.results);
+                    if (window.location.pathname === `/tournament/${data.tournament_id}`) {
+                        navigateTo(`/play`);
+                    }
+                    customAlert('info', `Tournament "${data.tournament_name}" has ended. Winner: ${data.winner}`, 5000);
+                    break;
 
+                case 'error':
+                    customAlert('danger', data.message, 5000);
+                    break;
+
+                default:
+                    console.log("Unknown message type:", data.type);
+                    break;
+            }
         } catch (error) {
             this.handleError(null, error, false);
         }

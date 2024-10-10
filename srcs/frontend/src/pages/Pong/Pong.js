@@ -11,6 +11,7 @@ export class Pong extends Component {
 		this.controls_side = 0;
 		this.game_environment = null;
 		this.tournament_id = null;
+		this.user_id = null;
 		this.player_1_name = 'Player 1';
 		this.player_2_name = 'Player 2';
 		this.inputController = null;
@@ -109,7 +110,9 @@ export class Pong extends Component {
 					break;
 				case 'game_state':
 					this.updateGameState(gameState);
-					if (gameState.state === 'game_over') { this.handle_return(); }
+					break;
+				case 'game_over':
+					this.handle_return();
 					break;
 			}
 		}
@@ -119,11 +122,6 @@ export class Pong extends Component {
 				console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
 			} else {
 				console.log('Connection died');
-			}
-
-			if (!this.playing) {
-				console.log("Redirect to main menu");
-				navigateTo('/play');
 			}
 		}
 
@@ -144,8 +142,8 @@ export class Pong extends Component {
 			quitModal.show();
 		});
 		this.button_confirm_quit.addEventListener('click', () => {
-			this.inputController.execCommands(`quit_p${this.controls_side}`);
 			quitModal.hide();
+			this.inputController.execCommands(`quit_p${this.controls_side}`);
 		});
 		this.p1_button_ready.addEventListener('contextmenu', event => event.preventDefault());
 		this.p1_button_down.addEventListener('contextmenu', event => event.preventDefault());
@@ -164,18 +162,19 @@ export class Pong extends Component {
 	}
 
 	updateGameConfig(gameState) {
+		console.log('Game Config:', gameState);
 		this.controls_side = gameState.controls_side;
 		this.inputController = new InputController(this.gameSocket, gameState.controls_mode, gameState.controls_side);
-
 		this.game_environment = gameState.game_environment;
 		this.tournament_id = gameState.tournament_id;
-		this.player_1_name = gameState["player_1_name"];
-		this.p_1_name.innerHTML = `${gameState["player_1_name"]}`;
+		this.player_1_name = gameState.player_1_name;
+		this.p_1_name.innerHTML = `${gameState.player_1_name}`;
 		this.p_1_avatar.src = gameState.player_1_avatar;
-		this.player_2_name = gameState["player_2_name"];
-		this.p_2_name.innerHTML = `${gameState["player_2_name"]}`;
+		this.player_2_name = gameState.player_2_name;
+		this.p_2_name.innerHTML = `${gameState.player_2_name}`;
 		this.p_2_avatar.src = gameState.player_2_avatar;
 		this.win_goals.innerHTML = gameState["goals_to_win"] + ' (dif.' + gameState["goals_diff"] + ')';
+		this.user_id = gameState.user_id;
 
 		if (gameState.controls_mode === 'remote' || gameState.controls_mode === 'AI') {
 			this.setupRemoteControls(gameState);
@@ -259,15 +258,16 @@ export class Pong extends Component {
 			this.controls_2.innerHTML = '';
 			this.playing = false;
 			this.button_quit.style.display = 'none';
-			//this.button_return.style.display = 'block';
 		}
 	}
 
 	handle_return() {
 		setTimeout(() => {
 				if (this.game_environment === 'tournament') {
+					this.game_environment = null;
 					navigateTo(`/tournament/${this.tournament_id}`);
-				} else {
+				} else if (this.game_environment === 'single') {
+					this.game_environment = null;
 					navigateTo('/play');
 				}
 			}, 2000);
