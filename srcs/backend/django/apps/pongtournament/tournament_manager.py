@@ -96,13 +96,13 @@ class TournamentManager:
         tournament = self.tournaments.get(tournament_id)
 
         if not tournament:
-            raise Exception("Error(join tournament): Tournament not found.")
+            raise Exception("Tournament not found.")
         if not tournament.can_join(consumer.user_id, password):
-            raise Exception(f"Error(join tournament): User '{consumer.user_id}' can't join the tournament.")
+            raise Exception("Permission denied.")
 
         for current_tournament in self.tournaments.values():
             if consumer.user_id in current_tournament.players:
-                raise Exception("Error(join tournament): User already has an active tournament.")
+                raise Exception("You can only be in one tournament at a time.")
 
         tournament.add_participant(consumer.user)
         return True
@@ -116,32 +116,33 @@ class TournamentManager:
                 tournament.remove_participant(user_id)
                 return True
             else:
-                raise Exception("Error(leave tournament): The tournament is ongoing.")
+                raise Exception("Can't leave: The tournament is ongoing.")
         else:
-            raise Exception("Error(leave tournament): Tournament not found.")
+            raise Exception("Can't leave: Tournament not found.")
 
 
     async def start_tournament(self, tournament_id, user):
         tournament = self.tournaments.get(tournament_id)
 
         if tournament is None:
-            raise Exception("Error(start tournament): Tournament not found.")
+            raise Exception("Error: Tournament not found.")
 
         if user != tournament.creator_id:
-            raise Exception("Error(start tournament): Only the creator can start it.")
+            raise Exception("Error: Only the creator can start it.")
 
         if len(tournament.participants) < 2:
-            raise Exception("Error(start tournament): Not enough participants")
+            raise Exception("Error: Not enough participants (minimum 2).")
 
         if tournament.current_phase != CurrentPhase.WAITING:
-            raise Exception("Error(start tournament): The tournament is already ongoing.")
+            raise Exception("Error: The tournament is already ongoing.")
 
         print("Tournament started") # DEBUG
         await TournamentLogic.init_tournament_logic(tournament)
         tournament.current_phase = CurrentPhase.PRE_FIRST
 
-    def get_player_active_tournament(self, user_id):
-        for current_tournament in self.tournaments.values():
+    @classmethod
+    def get_player_active_tournament(cls, user_id):
+        for current_tournament in cls._instance.tournaments.values():
             if user_id in current_tournament.players:
                 return current_tournament.id
         return None

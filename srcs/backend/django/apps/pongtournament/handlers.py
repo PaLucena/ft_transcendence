@@ -137,6 +137,9 @@ async def handle_start_single_match(consumer, message):
 
         asyncio.create_task(handle_solve_single_match(player_1_id, player_2_id, controls_mode))
 
+        if controls_mode != "remote":
+            await handle_send_start_match(consumer.channel_layer, 0, [player_2_id])
+
     except Exception as e:
         await consumer.send_error(str(e))
 
@@ -189,7 +192,7 @@ async def handle_join_tournament(consumer, message):
             await consumer.send_successfully_joined(tournament_id)
             await handle_send_tournament_data(consumer.channel_layer, tournament_room)
         except Exception as e:
-            await consumer.send_error(str(e))
+            await consumer.send_error("Permission denied to join the tournament.")
     else:
         password = message["password"]
 
@@ -202,7 +205,7 @@ async def handle_join_tournament(consumer, message):
                 await consumer.send_successfully_joined(tournament_id)
                 await handle_send_tournament_data(consumer.channel_layer, tournament_room)
             else:
-                await consumer.send_error("Failed to join tournament.")
+                await consumer.send_error("Permission denied to join the tournament.")
         except Exception as e:
             await consumer.send_error(str(e))
 

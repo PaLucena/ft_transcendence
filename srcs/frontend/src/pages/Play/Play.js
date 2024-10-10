@@ -204,7 +204,6 @@ export class Play extends Component {
 			this.addEventListener(localBtn, "click", () => {
 				console.log('localBtn clicked');
 				this.playLocal();
-				navigateTo('/pong');
 			});
 
 			// ai
@@ -212,7 +211,6 @@ export class Play extends Component {
 			this.addEventListener(aiBtn, "click", () => {
 				console.log('aiBtn clicked');
 				this.playAi();
-				navigateTo('/pong');
 			});
 
 			const	tournamentModalElement = document.getElementById("tournamentModal");
