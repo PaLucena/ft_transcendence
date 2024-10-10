@@ -277,39 +277,46 @@ export class Profile extends Component {
 	}
 
 	saveInfoBtn(username) {
-		const editForm = document.getElementById("editForm");
+		const editForm = document.getElementById('editForm');
+		if (editForm) {
+			this.addEventListener(editForm, 'submit', async (event) => {
+				event.preventDefault();
 
-		this.addEventListener(editForm, "submit", async (event) => {
-			event.preventDefault();
+				const fileInput = editForm.querySelector('#avatar');
+				const maxSize = 1 * 1024 * 1024;
 
-			const formData = new FormData(event.target);
-			formData.append('language', document.getElementById('language_selector').value);
-
-			fetch("/api/update_user_info/", {
-				method: "POST",
-				body: formData,
-				credentials: 'include'
-			})
-			.then(response => {
-				if (!response.ok) {
-					return response.json().then(errData => {
-						throw new Error(errData.error || `Response status: ${response.status}`);
-					});
+				if (fileInput && fileInput.files[0] && fileInput.files[0].size > maxSize) {
+					customAlert('danger', 'Avatar\'s file is so big. Maximum size: 1MB', 5000);
+					return;
 				}
-				return response.json();
-			})
-			.then(data => {
-				customAlert('success', data.message, 3000);
-				document.getElementById("userInfo").style.display = "block";
-				document.getElementById("userEdit").style.display = "none";
-				this.displayUserInfo(username);
-				editForm.reset();
-				setTimeout(() => languageSelector.updateLanguage(), 0);
-			})
-			.catch((error) => {
-				customAlert('danger', `Error: ` + error.message, 5000);
+
+				const formData = new FormData(event.target);
+				formData.append('language', document.getElementById('language_selector').value);
+
+				try {
+					const response = await fetch("/api/update_user_info/", {
+						method: "POST",
+						body: formData,
+						credentials: 'include'
+					});
+
+					await handleResponse(response, data => {
+						customAlert('success', data.message, 3000);
+						document.getElementById("userInfo").style.display = "block";
+						document.getElementById("userEdit").style.display = "none";
+						this.displayUserInfo(username);
+						editForm.reset();
+						setTimeout(() => languageSelector.updateLanguage(), 0);
+					});
+				} catch (error) {
+					if (error.errorCode === 400 || error.errorCode === 403) {
+						customAlert('danger', `Error: ${error.errorMessage}`, 5000);
+					} else {
+						console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+					}
+				}
 			});
-		});
+		}
 	}
 
 
