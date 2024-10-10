@@ -55,10 +55,10 @@ async def handle_send_closed_tournament(channel_layer, tournament_id):
     )
 
 
-async def handle_send_left_tournament(channel_layer, tournament_id, tournament_name, channel_name):
+async def handle_send_leave_tournament(channel_layer, tournament_id, tournament_name, channel_name):
     await channel_layer.send(
         channel_name, {
-            "type": "notify_left_tournament",
+            "type": "send_leave_tournament",
             "tournament_id": tournament_id,
             "tournament_name": tournament_name
         }
@@ -94,16 +94,24 @@ async def handle_send_end_tournament(channel_layer, tournament):
 
 async def handle_send_start_match(channel_layer, tournament_id, players_ids):
     try:
-        print("players_ids: ", players_ids)
         for player_id in players_ids:
             if player_id != 0:
-                await channel_layer.group_send(
-                    f"user_{player_id}", {
-                        "type": "send_start_match",
-                        "tournament_id": tournament_id,
-                    }
-                )
-                print("Sent start match to user: ", player_id)
+                if tournament_id != 0:
+                    await channel_layer.group_send(
+                        f"user_{player_id}", {
+                            "type": "send_start_match",
+                            "sub_type": "start_match",
+                            "tournament_id": tournament_id,
+                        }
+                    )
+                else:
+                    await channel_layer.group_send(
+                        f"user_{player_id}", {
+                            "type": "send_start_match",
+                            "sub_type": "start_single_match",
+                            "tournament_id": tournament_id,
+                        }
+                    )
     except Exception as e:
         print("Error sending start match: ", str(e))
 
@@ -111,7 +119,6 @@ async def handle_send_start_match(channel_layer, tournament_id, players_ids):
 async def handle_start_single_match(consumer, message):
     try:
         user = consumer.user
-        tournament_id = 0
         player_1_id = user.id
         player_2_id = message["player_2_id"]
         controls_mode = message["controls_mode"]
@@ -122,29 +129,32 @@ async def handle_start_single_match(consumer, message):
         if TournamentManager().get_player_active_tournament(player_1_id):
             raise ValueError("User already has an active tournament.")
 
-        timestamp = int(time.time())
-        formated_time = time.strftime("%y%m%d%H%M%S", time.localtime(timestamp))
-        match_id = f"{formated_time}{user.id}"
-
         if player_2_id is None or controls_mode is None:
             raise ValueError("Missing required fields: player_2_id or controls_mode")
 
         if controls_mode == "remote":
             await handle_send_start_match(consumer.channel_layer, 0, [player_1_id, player_2_id])
 
-        result = await game_manager.start_match(
-            tournament_id=tournament_id,
-            match_id=match_id,
-            player_1_id=player_1_id,
-            player_2_id=player_2_id,
-            controls_mode=controls_mode,
-        )
-
-        data = match_to_uint(result)
-        record_match(data)
+        asyncio.create_task(handle_solve_single_match(player_1_id, player_2_id, controls_mode))
 
     except Exception as e:
         await consumer.send_error(str(e))
+
+
+async def handle_solve_single_match(player_1_id, player_2_id, controls_mode):
+    timestamp = int(time.time())
+    formated_time = time.strftime("%y%m%d%H%M%S", time.localtime(timestamp))
+
+    result = await game_manager.start_match(
+        tournament_id=0,
+        match_id=f"{formated_time}{player_1_id}",
+        player_1_id=player_1_id,
+        player_2_id=player_2_id,
+        controls_mode=controls_mode,
+    )
+
+    data = match_to_uint(result)
+    record_match(data)
 
 
 async def handle_create_tournament(consumer, message):
@@ -209,7 +219,7 @@ async def handle_leave_tournament(consumer, message):
             await handle_send_deleted_tournament(consumer.channel_layer, tournament_id, tournament_name)
             manager.delete_tournament(tournament_id)
         elif manager.leave_tournament(tournament_id, consumer.user_id):
-            await handle_send_left_tournament(consumer.channel_layer, tournament_id, tournament_name, consumer.channel_name)
+            await handle_send_leave_tournament(consumer.channel_layer, tournament_id, tournament_name, consumer.channel_name)
             await consumer.remove_from_tournament_group(tournament_id)
             await handle_send_tournament_data(consumer.channel_layer, tournament_room)
         else:
@@ -271,7 +281,7 @@ async def handle_end_tournament(channel_layer, manager, tournament):
     try:
         await handle_send_end_tournament(channel_layer, tournament)
         await manager.save_tournament(tournament.id)
-        manager.delete_tournament(tournament)
+        manager.delete_tournament(tournament.id)
         await handle_send_tournaments_list(channel_layer)
     except Exception as e:
         print("Error ending tournament: ", str(e))

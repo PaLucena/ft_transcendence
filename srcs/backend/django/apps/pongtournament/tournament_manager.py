@@ -163,9 +163,9 @@ class TournamentManager:
             raise Exception("Error(tournament data): Tournament not found.")
 
 
-    def delete_tournament(self, tournament):
-        if tournament.id in self.tournaments:
-            del self.tournaments[tournament.id]
+    def delete_tournament(self, tournament_id):
+        if tournament_id in self.tournaments:
+            del self.tournaments[tournament_id]
         else:
             raise Exception("Error(delete tournament): Tournament not found.")
 

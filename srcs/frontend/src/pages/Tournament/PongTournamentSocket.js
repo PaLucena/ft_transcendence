@@ -61,8 +61,13 @@ class PongTournamentSocket {
                         navigateTo(`/pong`);}, 5000);
                     break;
 
-                case 'notify_left_tournament':
-                    console.log("Left tournament:", data.tournament_name);
+                case 'start_single_match':
+                    setTimeout(() => {
+                        navigateTo(`/pong`);}, 100);
+                    break;
+
+                case 'leave_tournament':
+                    console.log("Leave tournament:", data.tournament_name);
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                         navigateTo(`/play`);
                     }

@@ -121,16 +121,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
     async def send_start_match(self, event):
-        print("Sending start match (consumer) to: ", self.user_id)
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "start_match",
+                    "type": event["sub_type"],
                     "tournament_id": event["tournament_id"],
                 }
             )
         )
-        print("Sent start match (consumer) to: ", self.user_id)
 
 
     async def send_closed_tournament(self, event):
@@ -169,11 +167,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
 
-    async def notify_left_tournament(self, event):
+    async def send_leave_tournament(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "notify_left_tournament",
+                    "type": "leave_tournament",
                     "tournament_id": event["tournament_id"],
                     "tournament_name": event["tournament_name"],
                 }
