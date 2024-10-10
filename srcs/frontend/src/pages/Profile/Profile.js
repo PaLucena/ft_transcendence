@@ -293,6 +293,19 @@ export class Profile extends Component {
 				const formData = new FormData(event.target);
 				formData.append('language', document.getElementById('language_selector').value);
 
+				let passwordFields = ['old_password', 'new_password', 'confirm_password'];
+				let isAnyFilled = passwordFields.some(field => formData.get(field));
+
+				if (isAnyFilled) {
+					for (const [key, value] of formData.entries()) {
+						if (passwordFields.includes(key) && !value) {
+							customAlert('info', 'To change the password, all three fields are required (old password, new password, confirm password).', 5000);
+							event.target.querySelector(`[name="${key}"]`)?.focus();
+							return;
+						}
+					}
+				}
+
 				try {
 					const response = await fetch("/api/update_user_info/", {
 						method: "POST",
@@ -309,19 +322,43 @@ export class Profile extends Component {
 						setTimeout(() => languageSelector.updateLanguage(), 0);
 					});
 				} catch (error) {
-					console.log(error);
-
 					if (error.errorCode === 400 || error.errorCode === 403) {
-						if (error.errorMessage.username) {
+						if (error.errorMessage.empty) {
+							customAlert('warning', error.errorMessage.empty, '5000');
+						}
+
+						else if (error.errorMessage.username) {
 							const inputUsername = event.target.querySelector('#new_username');
 							if (inputUsername) {
 								inputUsername.value = '';
 								inputUsername.focus();
 							}
 
-
 							customAlert('danger', error.errorMessage.username, 5000);
-						} else if (error.errorMessage.password) {
+						}
+
+						else if (error.errorMessage.passwordMiss) {
+							customAlert('warning', error.errorMessage.passwordMiss, 5000);
+
+							for (const [key, value] of formData.entries()) {
+								if (['old_password', 'new_password', 'confirm_password'].includes(key) && !value) {
+									event.target.querySelector(`[name="${key}"]`)?.focus();
+									break ;
+								}
+							}
+						}
+
+						else if (error.errorMessage.oldPassword) {
+							customAlert('danger', error.errorMessage.oldPassword, 5000);
+
+							const inputOldPass = event.target.querySelector('#old_password');
+							if (inputOldPass) {
+								inputOldPass.value = '';
+								inputOldPass.focus();
+							}
+						}
+
+						else if (error.errorMessage.password) {
 							if (Array.isArray(error.errorMessage.password)) {
 								let responseMessage = '';
 
@@ -342,7 +379,9 @@ export class Profile extends Component {
 								inputConfPass.value = '';
 								inputPass.focus();
 							}
-						} else {
+						}
+
+						else {
 							customAlert('danger', error.errorMessage, 5000);
 						}
 					} else {

@@ -244,6 +244,25 @@ def update_user_info(request):
         confirm_password = request.data.get("confirm_password")
         language = request.data.get("language")
 
+        if not any(
+            [
+                new_username,
+                new_avatar,
+                old_password,
+                new_password,
+                confirm_password,
+                language,
+            ]
+        ):
+            return Response(
+                {
+                    "error": {
+                        "empty": "No data provided for update.",
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if new_username:
             if user.is_superuser or user.is_staff:
                 return Response(
@@ -287,12 +306,22 @@ def update_user_info(request):
                 )
             user.username = new_username
 
-        if old_password and new_password and confirm_password:
+        if old_password or new_password or confirm_password:
+            if not old_password or not new_password or not confirm_password:
+                return Response(
+                    {
+                        "error": {
+                            "passwordMiss": "To change the password, all three fields are required (old password, new password, confirm password).",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             if not check_password(old_password, user.password):
                 return Response(
                     {
                         "error": {
-                            "password": "Incorrect old password.",
+                            "oldPassword": "Incorrect old password.",
                         }
                     },
                     status=status.HTTP_400_BAD_REQUEST,
@@ -302,6 +331,15 @@ def update_user_info(request):
                     {
                         "error": {
                             "password": "Passwords do not match.",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if old_password == new_password:
+                return Response(
+                    {
+                        "error": {
+                            "password": "New password cannot be the same as the old password.",
                         }
                     },
                     status=status.HTTP_400_BAD_REQUEST,
