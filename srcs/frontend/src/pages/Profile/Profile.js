@@ -381,6 +381,10 @@ export class Profile extends Component {
 							}
 						}
 
+						else if (error.errorMessage.language) {
+							customAlert('danger', error.errorMessage.language, 5000);
+						}
+
 						else {
 							customAlert('danger', error.errorMessage, 5000);
 						}

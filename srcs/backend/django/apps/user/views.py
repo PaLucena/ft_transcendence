@@ -234,6 +234,7 @@ def logout(request):
 @default_authentication_required
 def update_user_info(request):
     USERNAME_REGEX = r"^[\w.@+-]+$"
+    SUPPORTED_LANGUAGES = ["EN", "ES", "LV"]
 
     try:
         user = request.user
@@ -368,8 +369,18 @@ def update_user_info(request):
             if avatar_error:
                 return Response(avatar_error, status=status.HTTP_400_BAD_REQUEST)
 
-        if language and user.language != language:
-            user.language = language
+        if language:
+            if language not in SUPPORTED_LANGUAGES:
+                return Response(
+                    {
+                        "error": {
+                            "language": "Unsupported language selected.",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if user.language != language:
+                user.language = language
 
         user.save()
 
