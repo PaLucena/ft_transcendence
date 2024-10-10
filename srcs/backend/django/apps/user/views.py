@@ -24,8 +24,7 @@ from django.conf import settings
 import os
 import requests
 from .utils import set_nickname, upload_avatar, get_friend_count
-from django.contrib.auth import logout as auth_logout
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout, login as auth_login
 from .decorators import default_authentication_required
 from django.http import JsonResponse, Http404
 from twofactor.utils import Has2faEnabled
@@ -34,6 +33,7 @@ from blockchain.views import load_test_data, get_face2face
 from friends.views import get_friendship_status
 from friends.models import Friend
 from user.serializer import SignupSerializer
+from django.contrib.auth.password_validation import validate_password
 
 
 @api_view(["GET"])
@@ -230,16 +230,11 @@ def logout(request):
     return response
 
 
-from django.db import connection, reset_queries
-from django.db import connections
-
-from django.contrib.auth.models import update_last_login
-from django.contrib.auth.signals import user_logged_in
-
-
 @api_view(["POST"])
 @default_authentication_required
 def update_user_info(request):
+    USERNAME_REGEX = r"^[\w.@+-]+$"
+
     try:
         user = request.user
         new_username = request.data.get("new_username")
@@ -249,56 +244,103 @@ def update_user_info(request):
         confirm_password = request.data.get("confirm_password")
         language = request.data.get("language")
 
-        if user.is_superuser or user.is_staff:
-            if new_username and new_username != user.username:
+        if new_username:
+            if user.is_superuser or user.is_staff:
                 return Response(
-                    {"error": "Admin username cannot be changed."},
+                    {
+                        "error": {
+                            "username": "Admin username cannot be changed.",
+                        }
+                    },
                     status=status.HTTP_403_FORBIDDEN,
                 )
-
-        if new_username:
             if (
                 AppUser.objects.filter(username__iexact=new_username)
                 .exclude(pk=user.pk)
                 .exists()
             ):
                 return Response(
-                    {"error": "This username is already taken."},
+                    {
+                        "error": {
+                            "username": "This username is already taken.",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if not re.match(USERNAME_REGEX, new_username):
+                return Response(
+                    {
+                        "error": {
+                            "username": "Username contains invalid characters.",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if new_username.startswith(" ") or new_username.endswith(" "):
+                return Response(
+                    {
+                        "error": {
+                            "username": "Username cannot start or end with a space.",
+                        }
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             user.username = new_username
 
-        if new_avatar:
-            avatar_error = upload_avatar(request)
-            if avatar_error:
-                return Response(avatar_error, status=status.HTTP_400_BAD_REQUEST)
-
         if old_password and new_password and confirm_password:
             if not check_password(old_password, user.password):
                 return Response(
-                    {"error": "Incorrect old password."},
+                    {
+                        "error": {
+                            "password": "Incorrect old password.",
+                        }
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             if new_password != confirm_password:
                 return Response(
-                    {"error": "Passwords do not match."},
+                    {
+                        "error": {
+                            "password": "Passwords do not match.",
+                        }
+                    },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            try:
+                validate_password(new_password)
+            except ValidationError as e:
+                return Response(
+                    {
+                        "error": {
+                            "password": e.messages,
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             user.password = make_password(new_password)
             user.save()
             request.session.flush()
             auth_logout(request)
             auth_login(request, user)
 
+        if new_avatar:
+            avatar_error = upload_avatar(request)
+            if avatar_error:
+                return Response(avatar_error, status=status.HTTP_400_BAD_REQUEST)
+
         if language and user.language != language:
             user.language = language
 
         user.save()
+
         response = Response(
             {"message": "User info updated successfully."},
             status=status.HTTP_201_CREATED,
         )
         return response
+
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_409_CONFLICT)
 

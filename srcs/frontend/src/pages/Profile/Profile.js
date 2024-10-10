@@ -309,8 +309,42 @@ export class Profile extends Component {
 						setTimeout(() => languageSelector.updateLanguage(), 0);
 					});
 				} catch (error) {
+					console.log(error);
+
 					if (error.errorCode === 400 || error.errorCode === 403) {
-						customAlert('danger', `Error: ${error.errorMessage}`, 5000);
+						if (error.errorMessage.username) {
+							const inputUsername = event.target.querySelector('#new_username');
+							if (inputUsername) {
+								inputUsername.value = '';
+								inputUsername.focus();
+							}
+
+
+							customAlert('danger', error.errorMessage.username, 5000);
+						} else if (error.errorMessage.password) {
+							if (Array.isArray(error.errorMessage.password)) {
+								let responseMessage = '';
+
+								error.errorMessage.password.forEach(message => {
+									responseMessage += message + ' ';
+								});
+
+								customAlert('danger', responseMessage.trim(), 6000);
+							} else {
+								customAlert('danger', error.errorMessage.password, 5000);
+							}
+
+							const inputPass = event.target.querySelector('#new_password');
+							const inputConfPass = event.target.querySelector('#confirm_password');
+
+							if (inputConfPass && inputConfPass) {
+								inputPass.value = '';
+								inputConfPass.value = '';
+								inputPass.focus();
+							}
+						} else {
+							customAlert('danger', error.errorMessage, 5000);
+						}
 					} else {
 						console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
 					}
