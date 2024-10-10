@@ -17,6 +17,7 @@ from rest_framework.permissions import IsAuthenticated
 import json
 from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.conf import settings
@@ -26,7 +27,7 @@ from .utils import set_nickname, upload_avatar, get_friend_count
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import login as auth_login
 from .decorators import default_authentication_required
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from twofactor.utils import Has2faEnabled
 from django.contrib.auth import update_session_auth_hash
 from blockchain.views import load_test_data, get_face2face
@@ -75,7 +76,14 @@ def get_user_language(request):
 def get_other_user_data(request, username):
     try:
         this_user = request.user
-        other_user = AppUser.objects.get(username=username)
+
+        try:
+            other_user = get_object_or_404(AppUser, username=username)
+        except Http404:
+            return Response(
+                {"detail": "The user does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         if get_friendship_status(this_user, other_user) == "accepted":
             friendship = True
