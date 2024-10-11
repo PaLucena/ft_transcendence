@@ -55,7 +55,7 @@ export class Profile extends Component {
 
 					setTimeout(() => languageSelector.updateLanguage(), 0);
 					this.editUserBtn(data);
-					this.logout();
+					this.setUpLogout();
 				}
 				else {
 					this.renderChatBtn(data["username"]);
@@ -185,7 +185,7 @@ export class Profile extends Component {
 			});
 		})
 		.catch(error => {
-			// console.log("Error(displayUserStats):", error);
+			console.error("Error(displayUserStats):", error);
 		})
 	}
 
@@ -220,7 +220,7 @@ export class Profile extends Component {
 			});
 		})
 		.catch(error => {
-			// console.log("Error(displayFriendshipStats):", error);
+			console.erro("Error(displayFriendshipStats):", error);
 		})
 	}
 
@@ -268,16 +268,25 @@ export class Profile extends Component {
 	}
 
 	async getOwnName() {
-		const response = await fetch('/api/get_user_data/', {
-			method: "GET",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			credentials: 'include'
-		});
+		try {
+			const response = await fetch('/api/get_user_data/', {
+				method: "GET",
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include'
+			});
 
-		const data = await response.json();
-		return data["username"];
+			let responseUsername = null;
+
+			await handleResponse(response, data => {
+				responseUsername = data["username"];
+
+			});
+			return responseUsername;
+		} catch (error) {
+			console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+		}
 	}
 
 	editUserBtn() {
@@ -563,22 +572,26 @@ export class Profile extends Component {
 		}
 	}
 
-	logout() {
-		let	logoutBtn = document.getElementById("logoutBtn");
+	setUpLogout() {
+		const logoutBtn = document.getElementById("logoutBtn");
 
-		this.addEventListener(logoutBtn, "click", () => {
-			fetch("/api/logout/", {
-				method: "GET",
-				credentials: 'include'
-			})
-			.then(response => {
-				closeGlobalSockets();
-				navigateTo("/login");
-			})
-			.catch((error) => {
-				// console.log("Logout error: ", error);
-			})
-		});
+		if (logoutBtn) {
+			this.addEventListener(logoutBtn, "click", async () => {
+				try {
+					const response = await fetch("/api/logout/", {
+						method: "GET",
+						credentials: 'include'
+					});
+
+					await handleResponse(response, () => {
+						closeGlobalSockets();
+						navigateTo("/login");
+					});
+				} catch(error) {
+					console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+				}
+			});
+		}
 	}
 
 	show2faButton() {
@@ -700,21 +713,31 @@ export class Profile extends Component {
 	}
 
 	async disable2fa() {
-		let TwofaBtn = document.getElementById("Disable2faBtn");
-		const username = await this.getOwnName()
-		this.addEventListener(TwofaBtn, "click", async (event) => {
-			const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
-			await TwoFactorCodeModalInstance.initTwoFactorAuth({"username": username});
-			fetch("/api/2fa/disable2fa/", {
-				method: 'POST',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-			.then(response => {
-				this.show2faButton();
-			})
-		})
+		const TwofaBtn = document.getElementById("Disable2faBtn");
+
+		if (TwofaBtn) {
+			const username = await this.getOwnName()
+			this.addEventListener(TwofaBtn, "click", async (event) => {
+				const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
+				await TwoFactorCodeModalInstance.initTwoFactorAuth({"username": username});
+
+				try {
+					const response = await fetch("/api/2fa/disable2fa/", {
+						method: 'POST',
+						credentials: 'include',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+					});
+
+					await handleResponse(response, () => {
+						this.show2faButton();
+					});
+				} catch (error) {
+
+				}
+
+			});
+		}
 	}
 }
