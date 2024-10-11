@@ -344,122 +344,141 @@ export class Profile extends Component {
 			this.addEventListener(editForm, 'submit', async (event) => {
 				event.preventDefault();
 
-				const fileInput = editForm.querySelector('#avatar');
-				const maxSize = 1 * 1024 * 1024;
+				const inputNewUsername = editForm.querySelector('#new_username').value.trim();
+				const inputAvatar = editForm.querySelector('#avatar').files.length > 0;
+				const inputOldPassword = editForm.querySelector('#old_password').value.trim();
+				const inputNewPassword = editForm.querySelector('#new_password').value.trim();
+				const inputConfirmPassword = editForm.querySelector('#confirm_password').value.trim();
+				const inputLanguageSelector = editForm.querySelector('#language_selector').value.trim();
 
-				if (fileInput && fileInput.files[0] && fileInput.files[0].size > maxSize) {
-					customAlert('danger', 'Avatar\'s file is so big. Maximum size: 1MB', 5000);
-					return;
-				}
+				if (inputNewUsername || inputAvatar || inputOldPassword || inputNewPassword || inputConfirmPassword || inputLanguageSelector) {
+					const fileInput = editForm.querySelector('#avatar');
+					const maxSize = 1 * 1024 * 1024;
 
-				const formData = new FormData(event.target);
-				formData.append('language', document.getElementById('language_selector').value);
+					if (fileInput && fileInput.files[0] && fileInput.files[0].size > maxSize) {
+						customAlert('danger', 'Avatar\'s file is so big. Maximum size: 1MB', 5000);
+						return;
+					}
 
-				let passwordFields = ['old_password', 'new_password', 'confirm_password'];
-				let isAnyFilled = passwordFields.some(field => formData.get(field));
+					const formData = new FormData(event.target);
+					formData.append('language', document.getElementById('language_selector').value);
 
-				if (isAnyFilled) {
-					for (const [key, value] of formData.entries()) {
-						if (passwordFields.includes(key) && !value) {
-							customAlert('info', 'To change the password, all three fields are required (old password, new password, confirm password).', 5000);
-							event.target.querySelector(`[name="${key}"]`)?.focus();
-							return;
+					let passwordFields = ['old_password', 'new_password', 'confirm_password'];
+					let isAnyFilled = passwordFields.some(field => formData.get(field));
+
+					if (isAnyFilled) {
+						for (const [key, value] of formData.entries()) {
+							if (passwordFields.includes(key) && !value) {
+								customAlert('info', 'To change the password, all three fields are required (old password, new password, confirm password).', 5000);
+								event.target.querySelector(`[name="${key}"]`)?.focus();
+								return;
+							}
 						}
 					}
-				}
 
-				try {
-					const response = await fetch("/api/update_user_info/", {
-						method: "POST",
-						body: formData,
-						credentials: 'include'
-					});
-
-					await handleResponse(response, data => {
-						customAlert('success', data.message, 3000);
-						this.backToProfilePrimaryPage();
-					});
-
-				} catch (error) {
-					if (error.errorCode === 400 || error.errorCode === 403) {
-						if (error.errorMessage.empty) {
-							customAlert('warning', error.errorMessage.empty, '5000');
-						}
-
-						else if (error.errorMessage.username) {
-							const inputUsername = event.target.querySelector('#new_username');
-							if (inputUsername) {
-								inputUsername.value = '';
-								inputUsername.focus();
-							}
-
-							customAlert('danger', error.errorMessage.username, 5000);
-						}
-
-						else if (error.errorMessage.password42) {
-							for (const [key, value] of formData.entries()) {
-								if (['old_password', 'new_password', 'confirm_password'].includes(key)) {
-									event.target.querySelector(`[name="${key}"]`).value = '';
-								}
-							}
-							customAlert('danger', error.errorMessage.password42, 5000);
-						}
-
-						else if (error.errorMessage.passwordMiss) {
-							customAlert('warning', error.errorMessage.passwordMiss, 5000);
-
-							for (const [key, value] of formData.entries()) {
-								if (['old_password', 'new_password', 'confirm_password'].includes(key) && !value) {
-									event.target.querySelector(`[name="${key}"]`)?.focus();
-									break ;
-								}
-							}
-						}
-
-						else if (error.errorMessage.oldPassword) {
-							customAlert('danger', error.errorMessage.oldPassword, 5000);
-
-							const inputOldPass = event.target.querySelector('#old_password');
-							if (inputOldPass) {
-								inputOldPass.value = '';
-								inputOldPass.focus();
-							}
-						}
-
-						else if (error.errorMessage.password) {
-							if (Array.isArray(error.errorMessage.password)) {
-								let responseMessage = '';
-
-								error.errorMessage.password.forEach(message => {
-									responseMessage += message + ' ';
-								});
-
-								customAlert('danger', responseMessage.trim(), 6000);
-							} else {
-								customAlert('danger', error.errorMessage.password, 5000);
-							}
-
-							const inputPass = event.target.querySelector('#new_password');
-							const inputConfPass = event.target.querySelector('#confirm_password');
-
-							if (inputConfPass && inputConfPass) {
-								inputPass.value = '';
-								inputConfPass.value = '';
-								inputPass.focus();
-							}
-						}
-
-						else if (error.errorMessage.language) {
-							customAlert('danger', error.errorMessage.language, 5000);
-						}
-
-						else {
-							customAlert('danger', error.errorMessage, 5000);
-						}
-					} else {
-						console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+					if (inputOldPassword && (inputNewPassword && inputNewPassword !== inputConfirmPassword)) {
+						customAlert('danger', 'Passwords do not match.', 5000);
+						return;
 					}
+
+
+					try {
+						const response = await fetch("/api/update_user_info/", {
+							method: "POST",
+							body: formData,
+							credentials: 'include'
+						});
+
+						await handleResponse(response, data => {
+							customAlert('success', data.message, 3000);
+							this.backToProfilePrimaryPage();
+						});
+
+					} catch (error) {
+						if (error.errorCode === 400 || error.errorCode === 403) {
+							if (error.errorMessage.empty) {
+								customAlert('warning', error.errorMessage.empty, '5000');
+							}
+
+							else if (error.errorMessage.username) {
+								const inputUsername = event.target.querySelector('#new_username');
+								if (inputUsername) {
+									inputUsername.value = '';
+									inputUsername.focus();
+								}
+
+								customAlert('danger', error.errorMessage.username, 5000);
+							}
+
+							else if (error.errorMessage.password42) {
+								for (const [key, value] of formData.entries()) {
+									if (['old_password', 'new_password', 'confirm_password'].includes(key)) {
+										event.target.querySelector(`[name="${key}"]`).value = '';
+									}
+								}
+								customAlert('danger', error.errorMessage.password42, 5000);
+							}
+
+							else if (error.errorMessage.passwordMiss) {
+								customAlert('warning', error.errorMessage.passwordMiss, 5000);
+
+								for (const [key, value] of formData.entries()) {
+									if (['old_password', 'new_password', 'confirm_password'].includes(key) && !value) {
+										event.target.querySelector(`[name="${key}"]`)?.focus();
+										break ;
+									}
+								}
+							}
+
+							else if (error.errorMessage.oldPassword) {
+								customAlert('danger', error.errorMessage.oldPassword, 5000);
+
+								const inputOldPass = event.target.querySelector('#old_password');
+								if (inputOldPass) {
+									inputOldPass.value = '';
+									inputOldPass.focus();
+								}
+							}
+
+							else if (error.errorMessage.password) {
+								if (Array.isArray(error.errorMessage.password)) {
+									let responseMessage = '';
+
+									error.errorMessage.password.forEach(message => {
+										responseMessage += message + ' ';
+									});
+
+									customAlert('danger', responseMessage.trim(), 6000);
+								} else {
+									customAlert('danger', error.errorMessage.password, 5000);
+								}
+
+								const inputPass = event.target.querySelector('#new_password');
+								const inputConfPass = event.target.querySelector('#confirm_password');
+
+								if (inputConfPass && inputConfPass) {
+									inputPass.value = '';
+									inputConfPass.value = '';
+									inputPass.focus();
+								}
+							}
+
+							else if (error.errorMessage.language) {
+								customAlert('danger', error.errorMessage.language, 5000);
+							}
+
+							else {
+								customAlert('danger', error.errorMessage, 5000);
+							}
+						} else {
+							console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+						}
+					}
+
+				} else {
+					customAlert('danger', 'No data provided for update.', 5000);
 				}
+
 			});
 		}
 	}
