@@ -56,9 +56,9 @@ def enable2fa(request):
             img_path = os.path.join(imgs_dir, img_name)
             os.makedirs(imgs_dir, exist_ok=True)
             qr_img = qr.save(img_path)
-            user.has_2fa_enabled = True
-            user.tf_fk = device
-            user.save()
+            #user.has_2fa_enabled = True
+            #user.tf_fk = device
+            #user.save()
             return Response(
                 {"qrpath": "qrs/" + img_name},
                 status=status.HTTP_200_OK,

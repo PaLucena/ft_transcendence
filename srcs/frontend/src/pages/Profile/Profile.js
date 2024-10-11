@@ -504,25 +504,23 @@ export class Profile extends Component {
 		});
 	}
 
-	hideModal() {
-		fetch("/api/2fa/confirmDevice/", {
-			method: 'POST',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			this.show2faButton();
-		})
-		.catch(error => {
-			customAlert('danger', `Error: ${error.message}`, 5000);
-		});
+	async confirm2fa() {
+		try {
+			const response = await fetch("/api/2fa/confirmDevice/", {
+				method: 'POST',
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			await handleResponse(response, () => {
+				this.show2faButton();
+			});
+
+		} catch (error) {
+			console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+		}
 	}
 
 	setUpEnable2fa() {
@@ -548,9 +546,12 @@ export class Profile extends Component {
 							const ModalElement = document.getElementById('imageModal');
 							if (ModalElement) {
 
-								if (!this.qrModalInstance) {
-									this.qrModalInstance = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false});
-								}
+								if (!this.qrModalInstance)
+									this.qrModalInstance = new bootstrap.Modal(ModalElement, {backdrop: false});
+
+								this.addEventListener(ModalElement, 'hide.bs.modal', () => {
+									this.deleteQRModal();
+								});
 
 								const imageSpan = document.getElementById('modalImageContainer');
 
@@ -559,21 +560,19 @@ export class Profile extends Component {
 									this.qrModalInstance.show();
 								}
 
-								const btnCloseModal = ModalElement.querySelector('.btn-close')
-								if (btnCloseModal) {
-									this.addEventListener(btnCloseModal, 'click', () => {
+								const btnEnable2faModal = ModalElement.querySelector('#two_fa_modal_enable_btn')
+								if (btnEnable2faModal) {
+									this.addEventListener(btnEnable2faModal, 'click', async () => {
 
-										const confirmed = window.confirm("Are you sure you want to close this modal? 2FA has been added, and if you haven't scanned the QR code, we strongly advise not losing it, as you may lose access to your account.");
+										const confirmed = window.confirm("Are you sure you scanned the code? If not, you won’t be able to deactivate 2FA, and you may lose access to your account.");
 
 										if (confirmed) {
-											this.qrModalInstance.hide();
-											setTimeout(() => {
-												const container = document.getElementById('twofa_modal_container');
-												if (container)
-													container.innerHTML = '';
+											await this.confirm2fa();
 
-												this.hideModal();
-											}, 100);
+											if (this.qrModalInstance)
+												this.qrModalInstance.hide();
+
+											this.deleteQRModal();
 										}
 
 									});
@@ -594,6 +593,16 @@ export class Profile extends Component {
 		}
 	}
 
+	deleteQRModal() {
+		setTimeout(() => {
+			const container = document.getElementById('twofa_modal_container');
+			if (container)
+				container.innerHTML = '';
+		}, 300);
+
+		this.qrModalInstance = null;
+	}
+
 	renderTwoFaModalHtml() {
 		const container = document.getElementById('twofa_modal_container');
 		if (container) {
@@ -601,13 +610,13 @@ export class Profile extends Component {
 				<div class="modal fade modal-background" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-dialog-centered">
 						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="imageModalLabel" data-i18n="twofactor-code"></h5>
-								<button type="button" class="btn-close"></button>
-							</div>
 							<div class="modal-body">
 								<!-- Placeholder for dynamic image -->
 								<span id="modalImageContainer" class="d-flex justify-content-center"></span>
+							</div>
+							<div class="modal-footer align-center justify-content-around border-0">
+								<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+								<button type="button" class="btn btn-success" id="two_fa_modal_enable_btn">Enable</button>
 							</div>
 						</div>
 					</div>
