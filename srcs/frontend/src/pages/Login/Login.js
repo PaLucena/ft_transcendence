@@ -80,7 +80,6 @@ export class Login extends Component {
 		const loginData = await this.submitLoginData(jsonData, csrftoken);
 
 		if (loginData.has_2fa) {
-			if (!this.TwoFactorCodeModalInstance) {
 				this.TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
 
 				const modal = document.getElementById('get2faCode_modal')
@@ -93,7 +92,6 @@ export class Login extends Component {
 				await this.TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
 				this.TwoFactorCodeModalInstance.destroy();
 				this.TwoFactorCodeModalInstance = null;
-			}
 
 			await this.submitTwoFactorCode(jsonData);
 		}
