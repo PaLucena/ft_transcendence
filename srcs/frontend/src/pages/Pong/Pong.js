@@ -91,7 +91,6 @@ export class Pong extends Component {
 
 		this.gameSocket.onopen = () => {
 			this.playing = true;
-			console.log("Connection established");
 			this.reconnectAttempts = 0;
 		};
 
@@ -119,14 +118,14 @@ export class Pong extends Component {
 
 		this.gameSocket.onclose = (event) => {
 			if (event.wasClean) {
-				console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+				// console.log(`Connection closed cleanly, code=${event.code} reason=${event.reason}`);
 			} else {
-				console.log('Connection died');
+				// console.log('Connection died');
 			}
 		}
 
 		this.gameSocket.onerror = (error) => {
-			console.log(`Error: ${error.message}`);
+			// console.log(`Error: ${error.message}`);
 		}
 	}
 
@@ -162,7 +161,6 @@ export class Pong extends Component {
 	}
 
 	updateGameConfig(gameState) {
-		console.log('Game Config:', gameState);
 		this.controls_side = gameState.controls_side;
 		this.inputController = new InputController(this.gameSocket, gameState.controls_mode, gameState.controls_side);
 		this.game_environment = gameState.game_environment;
@@ -195,6 +193,7 @@ export class Pong extends Component {
 				this.message_line_sub_2.style.color = this.p_1_color;
 			}
 			this.message_line_sub_2.innerHTML = '<span data-i18n="ai-is-ready"></span>';
+			setTimeout(() => languageSelector.updateLanguage(), 0);
 		}
 	}
 
@@ -231,6 +230,7 @@ export class Pong extends Component {
 				this.message_line_sub_2.style.color = this.p_2_color;
 				this.message_line_sub_2.innerHTML = `${this.player_2_name} <span data-i18n="is-ready"></span>`;
 			}
+			setTimeout(() => languageSelector.updateLanguage(), 0);
 		} else if (gameState.state === 'countdown') {
 			this.message_line_super.innerHTML = '';
 			this.message_line_main.innerHTML = `${gameState["countdown"]}...`;

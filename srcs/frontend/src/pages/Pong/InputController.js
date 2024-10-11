@@ -40,11 +40,9 @@ export class InputController {
                 this.gameSocket.send(JSON.stringify({ type: 'player_ready', player: 2 }));
                 break;
             case 'quit_p1':
-                console.log('quit_p1 received');
                 this.gameSocket.send(JSON.stringify({ type: 'quit', player: 1 }));
                 break;
             case 'quit_p2':
-                console.log('quit_p2 received');
                 this.gameSocket.send(JSON.stringify({ type: 'quit', player: 2 }));
                 break;
             case 'player_1_up':

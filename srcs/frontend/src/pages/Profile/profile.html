@@ -16,6 +16,13 @@
 			</div>
 		</div>
 		<div id="userEdit" class="user-edit bg-light align-items-center rounded-5 shadow">
+			<button
+				class="btn btn-secondary d-flex justify-content-center align-items-center rounded-circle"
+				style="height: 42px; width: 42px; position: relative; top: 10px; left: 10px;"
+				id="profile_edit_back_btn"
+				>
+				<i class="fa-solid fa-reply"></i>
+			</button>
 			<form id="editForm" class="edit-form d-flex mt-0 mt-md-5 justify-content-center align-items-center">
 				<div class="col-9 form-floating mt-3">
 					<input type="text" class="form-control" id="new_username" name="new_username" placeholder="" autocomplete="username" maxlength="15">
@@ -150,17 +157,5 @@
 	</div>
 </div>
 
-<div class="modal fade modal-background" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title" id="imageModalLabel" data-i18n="twofactor-code"></h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-									<!-- Placeholder for dynamic image -->
-				<span id="modalImageContainer" class="d-flex justify-content-center"></span>
-			</div>
-		</div>
-	</div>
-</div>
+<div id="twofa_modal_container"></div>
+

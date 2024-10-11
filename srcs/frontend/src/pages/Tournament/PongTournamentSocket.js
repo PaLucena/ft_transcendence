@@ -38,26 +38,21 @@ class PongTournamentSocket {
 
                 case 'successfully_joined':
                     if (window.location.pathname === '/play') {
-                        console.log("successfully_joined", data);
                         navigateTo(`/tournament/${data.tournament_id}`);
                     }
                     break;
 
                 case 'tournament_data':
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
-                        console.log("Tournament room update:", data);
                         Tournament.renderPlayers(data.participants_data, data.players, data.tournament_name, data.current_phase);
                         if (!data.players.includes(data.user_id)) {
-                            console.log("User not in players list. Redirecting...");
                             navigateTo(`/play`);
                         }
                     }
                     break;
 
                 case 'start_match':
-                    console.log("Received start_match:", data);
                     if (data.sub_type === 'start_match') {
-                        console.log("Received start_match:", data);
                         customAlert('info', `Match starting in 5 seconds. Redirecting...`, 5000);
                         setTimeout(() => {
                             navigateTo(`/pong`);}, 5000);
@@ -66,10 +61,13 @@ class PongTournamentSocket {
                         setTimeout(() => {
                             navigateTo(`/pong`);}, 100);
                     }
+                    else if (data.sub_type === 'back_to_game') {
+                        setTimeout(() => {
+                            navigateTo(`/pong`);}, 100);
+                    }
                     break;
 
                 case 'leave_tournament':
-                    console.log("Leave tournament:", data.tournament_name);
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                         navigateTo(`/play`);
                     }
@@ -77,16 +75,13 @@ class PongTournamentSocket {
                     break;
 
                 case 'closed_tournament':
-                    console.log("Closed tournament (consumer)");
                     const btnContainer = document.getElementById('root_tournament_btn_container');
                     if (btnContainer) {
-                        console.log("Found button container");
                         btnContainer.innerHTML = '';
                     }
                     break;
 
                 case 'deleted_tournament':
-                    console.log("Deleted tournament:", data.tournament_name);
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                         navigateTo(`/play`);
                     }
@@ -94,11 +89,17 @@ class PongTournamentSocket {
                     break;
 
                 case 'end_tournament':
-                   console.log("Tournament ended:", data.tournament_id, data.results);
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                         navigateTo(`/play`);
                     }
                     customAlert('info', `Tournament "${data.tournament_name}" has ended. Winner: ${data.winner}`, 5000);
+                    break;
+
+                case 'reload_play':
+                    const backToGameBtn = document.getElementById("backToGameBtn")
+                    if (backToGameBtn)
+                        backToGameBtn.style.display = "none";
+
                     break;
 
                 case 'error':
@@ -106,7 +107,7 @@ class PongTournamentSocket {
                     break;
 
                 default:
-                    console.log("Unknown message type:", data.type);
+                    // console.log('Unknown message type:', data.type);
                     break;
             }
         } catch (error) {

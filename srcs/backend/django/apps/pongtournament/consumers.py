@@ -9,6 +9,7 @@ from .handlers import (
     handle_start_single_match,
     handle_create_tournament,
     handle_join_tournament,
+    handle_back_to_game,
     handle_leave_tournament,
     handle_start_tournament,
     handle_clean_tournaments,
@@ -46,7 +47,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.remove_from_tournament_group()
 
         await self.channel_layer.group_discard(self.main_room, self.channel_name)
-        print(f"User {self.user_name} disconnected.")  # DEBUG
 
 
     async def receive(self, text_data=None, bytes_data=None):
@@ -69,6 +69,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         elif message["type"] == "start_tournament":
             asyncio.create_task(handle_start_tournament(self, message))
+
+        elif message["type"] == "back_to_game":
+            await handle_back_to_game(self)
 
         elif message["type"] == "required_update":
             await handle_send_tournaments_list(self.channel_layer)
@@ -179,11 +182,20 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
 
+    async def send_reload_play(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "reload_play",
+                }
+            )
+        )
+
+
     async def add_to_tournament_group(self, tournament_room):
         if not self.tournament_room:
             self.tournament_room = tournament_room
             await self.channel_layer.group_add(self.tournament_room, self.channel_name)
-            print("User ", self.user_name, " added to ", self.tournament_room)
             await handle_send_tournament_data(self.channel_layer, self.tournament_room)
 
         else:
@@ -191,10 +203,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
     async def remove_from_tournament_group(self, tournament_room=None):
-        print("User ", self.user_name, " removed from ", tournament_room)
         if tournament_room:
             await self.channel_layer.group_discard(tournament_room, self.channel_name)
-            print("User ", self.user_name, " removed from ", tournament_room)  # DEBUG
             self.tournament_room = None
         else:
             print("User ", self.user_name, " not in any tournament.")

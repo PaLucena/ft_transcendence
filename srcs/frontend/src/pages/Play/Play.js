@@ -1,7 +1,5 @@
 import { Component } from '../../scripts/Component.js';
-import { navigateTo } from '../../scripts/Router.js';
 import { languageSelector } from '../../components/LanguageSelector/languageSelector.js';
-import customAlert from '../../scripts/utils/customAlert.js';
 import { pongTournamentSocket } from '../Tournament/PongTournamentSocket.js';
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 
@@ -14,9 +12,9 @@ export class Play extends Component {
 
 
 	async init() {
-		await this.getActiveTournamentsOnPlayData();
 		this.renderModalLayoutJoinTournament();
 		this.setupEventListeners();
+		await this.IsPlayerInGame();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
@@ -25,9 +23,10 @@ export class Play extends Component {
 		this.removeModalInstance();
 	}
 
-	async getActiveTournamentsOnPlayData() {
-		const response = await fetch("/api/pongtournament/get_active_tournaments/", {
-			method: 'GET',
+	async IsPlayerInGame() {
+		const backToGameBtn = document.getElementById("backToGameBtn");
+		const response = await fetch("/api/pongtournament/is_player_in_game/", {
+			method: 'POST',
 			headers: {
 				"Content-Type": "application/json",
 			},
@@ -35,7 +34,11 @@ export class Play extends Component {
 		});
 
         await handleResponse(response, (data) => {
-			Play.displayTournaments(data.public_tournaments, data.private_tournaments, data.player_id);
+			if (data.in_game) {
+            	backToGameBtn.style.display = "block";
+        	} else {
+            	backToGameBtn.style.display = "none";
+        	}
         });
 	}
 
@@ -123,17 +126,12 @@ export class Play extends Component {
 				document.getElementById("dropdownTournaments").style.display = "block";
 			});
 
-
-			// DEBUG  ---------------------------------------------------------------------------
-			const testBtn = document.getElementById("testBtn");
-			testBtn.innerHTML = "Clean Tournaments";
-			this.addEventListener(testBtn, "click", async () => {
+			const backToGameBtn = document.getElementById("backToGameBtn");
+			this.addEventListener(backToGameBtn, "click", async () => {
 				pongTournamentSocket.t_socket.send(JSON.stringify({
-					'type': 'clean_tournaments',
+					type: 'back_to_game',
 				}));
 			});
-			// ----------------------------------------------------------------------------------
-
 
 			const	backOne = document.getElementById("backOne");
 			this.addEventListener(backOne, "click", () => {
@@ -202,14 +200,12 @@ export class Play extends Component {
 			// local
 			const	localBtn = document.getElementById("localBtn");
 			this.addEventListener(localBtn, "click", () => {
-				console.log('localBtn clicked');
 				this.playLocal();
 			});
 
 			// ai
 			const	aiBtn = document.getElementById("aiBtn");
 			this.addEventListener(aiBtn, "click", () => {
-				console.log('aiBtn clicked');
 				this.playAi();
 			});
 
@@ -320,7 +316,6 @@ export class Play extends Component {
 	// local match
 	playLocal() {
 		try {
-			console.log("sending local match request");
 			pongTournamentSocket.t_socket.send(JSON.stringify({
 				type: "start_single_match",
 				controls_mode: "local",
@@ -335,7 +330,6 @@ export class Play extends Component {
 	// ai logic
 	playAi() {
 		try {
-			console.log("sending ai match request");
 			pongTournamentSocket.t_socket.send(JSON.stringify({
 				type: "start_single_match",
 				controls_mode: "AI",
@@ -376,11 +370,15 @@ export class Play extends Component {
 
 	static displayTournaments(public_tournaments, private_tournaments, player_id) {
 
-		if (public_tournaments.length === 0)
-			document.getElementById("publicTournamentDisplay").innerHTML = "No active tournaments";
+		if (public_tournaments.length === 0) {
+			const publicTournamentDisplay = document.getElementById("publicTournamentDisplay");
+			if (publicTournamentDisplay)
+				publicTournamentDisplay.innerHTML = "No active tournaments";
+		}
 		else {
-			let	publicContainer = document.getElementById("publicTournamentDisplay");
-			publicContainer.innerHTML = '';
+			const publicContainer = document.getElementById("publicTournamentDisplay");
+			if (publicContainer)
+				publicContainer.innerHTML = '';
 
 			for (let i = 0; i < public_tournaments.length; i++) {
 				let isPlayer = public_tournaments[i].players.includes(player_id);
@@ -394,7 +392,8 @@ export class Play extends Component {
 				let tournamentName = isPlayer
 					? `⭐ ${public_tournaments[i].name}`
 					: public_tournaments[i].name;
-				publicContainer.innerHTML +=
+				if (publicContainer) {
+					publicContainer.innerHTML +=
 					`<button
 						class="tournament-item-btn display-tournament-item btn border-start-0
 							border-end-0 col-10 my-1 rounded"
@@ -410,13 +409,18 @@ export class Play extends Component {
 						</span>
 						[${bracket}]
 					</button>`;
+				}
 			}
 		}
-		if (private_tournaments.length === 0)
-			document.getElementById("privateTournamentDisplay").innerHTML = "No active tournaments";
+		if (private_tournaments.length === 0) {
+			const privateTournamentDisplay = document.getElementById("privateTournamentDisplay");
+			if (privateTournamentDisplay)
+				privateTournamentDisplay.innerHTML = "No active tournaments";
+		}
 		else {
-			let	privateContainer = document.getElementById("privateTournamentDisplay");
-			privateContainer.innerHTML = '';
+			const privateContainer = document.getElementById("privateTournamentDisplay");
+			if (privateContainer)
+				privateContainer.innerHTML = '';
 
 			for (let i = 0; i < private_tournaments.length; i++) {
 				let isPlayer = private_tournaments[i].players.includes(player_id);
@@ -430,7 +434,8 @@ export class Play extends Component {
 				let tournamentName = isPlayer
 					? `⭐ ${private_tournaments[i].name}`
 					: private_tournaments[i].name;
-				privateContainer.innerHTML +=
+				if (privateContainer) {
+					privateContainer.innerHTML +=
 					`<button
 						class="tournament-item-btn display-tournament-item
 							btn btn-success border-start-0 border-end-0
@@ -447,6 +452,7 @@ export class Play extends Component {
 						</span>
 						[${bracket}]
 					</button>`;
+				}
 			}
 		}
 	}

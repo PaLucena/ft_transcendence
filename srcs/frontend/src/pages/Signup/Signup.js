@@ -84,7 +84,7 @@ export class Signup extends Component {
 				try {
 					await this.handleFormSubmit(jsonData);
 				} catch (error) {
-					console.log(error);
+					// console.log(error);
 					this.handleError(error.errorCode, error.errorMessage);
 				}
 			});

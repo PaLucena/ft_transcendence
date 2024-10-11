@@ -169,14 +169,13 @@ async def handle_create_tournament(consumer, message):
         is_private = message["is_private"]
         password = message["password"]
 
-        print("Password (handle_create_tournament): ", password)
         new = manager.create_tournament(consumer, creator, name, is_private, password)
         if new:
             await consumer.add_to_tournament_group(new.id)
             await handle_send_tournaments_list(consumer.channel_layer)
 
         else:
-            await consumer.send_error("User already has an active tournament.")
+            await consumer.send_error("User already has an active game or tournament.")
 
     except Exception as e:
         await consumer.send_error(str(e))
@@ -238,12 +237,9 @@ async def handle_start_tournament(consumer, message):
     channel_layer = consumer.channel_layer
     sleep_time = 3
 
-    print("Tournament id", tournament.id)
-
-    await handle_send_closed_tournament(channel_layer, tournament.id)
-
     try:
         await manager.start_tournament(tournament.id, consumer.user_id)
+        await handle_send_closed_tournament(channel_layer, tournament.id)
         await handle_send_tournaments_list(channel_layer)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
 
@@ -277,7 +273,32 @@ async def handle_start_tournament(consumer, message):
 
         await handle_end_tournament(channel_layer, manager, tournament)
     except Exception as e:
-        print("Error starting tournament: ", str(e))
+        await consumer.send_error(str(e))
+
+
+async def handle_back_to_game(consumer):
+    user_id = consumer.user_id
+
+    try:
+        if game_manager.is_player_in_game(user_id):
+            await consumer.channel_layer.send(
+                consumer.channel_name,
+                {
+                    "type": "send_start_match",
+                    "sub_type": "back_to_game",
+                    "tournament_id": 0,
+                }
+            )
+        else:
+            raise Exception("The game has already ended.")
+    except Exception as e:
+        await consumer.send_error(str(e))
+        await consumer.channel_layer.send(
+            consumer.channel_name,
+            {
+                "type": "send_reload_play",
+            }
+        )
 
 
 async def handle_end_tournament(channel_layer, manager, tournament):

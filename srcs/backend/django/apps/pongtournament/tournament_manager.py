@@ -1,6 +1,7 @@
 from .models import Tournament, CurrentPhase
 from .tournament_logic import TournamentLogic
 from blockchain.views import create_tournament, record_match
+from ponggame.game_manager import game_manager as manager
 
 
 def match_to_uint(match):
@@ -60,6 +61,8 @@ class TournamentManager:
 
 
     def create_tournament(self, consumer, creator_id, name, is_private=False, password=None):
+        if manager.is_player_in_game(consumer.user_id):
+            return None
         if self.get_player_active_tournament(creator_id) is None:
             new_tournament = Tournament(creator_id, name, is_private, password)
             self.tournaments[new_tournament.id] = new_tournament
@@ -81,12 +84,12 @@ class TournamentManager:
                 }
                 response = create_tournament(tournament_data)
                 if response.get('error'):
-                    raise Exception("Error(save tournament): Error creating tournament.")
+                    raise Exception("Error creating tournament.")
                 for match in tournament.finished_matches:
                     uint_match = match_to_uint(match)
                     record_match(uint_match)
             else:
-                raise Exception("Error(save tournament): Tournament not found.")
+                raise Exception("Tournament not found.")
         except Exception as e:
             print("Error: ", str(e))
             raise Exception(str(e))
@@ -95,6 +98,8 @@ class TournamentManager:
     def join_tournament(self, consumer, tournament_id, password=None):
         tournament = self.tournaments.get(tournament_id)
 
+        if manager.is_player_in_game(consumer.user_id):
+            raise Exception("You are already in a game.")
         if not tournament:
             raise Exception("Tournament not found.")
         if not tournament.can_join(consumer.user_id, password):
@@ -116,27 +121,26 @@ class TournamentManager:
                 tournament.remove_participant(user_id)
                 return True
             else:
-                raise Exception("Can't leave: The tournament is ongoing.")
+                raise Exception("The tournament is ongoing.")
         else:
-            raise Exception("Can't leave: Tournament not found.")
+            raise Exception("Tournament not found.")
 
 
     async def start_tournament(self, tournament_id, user):
         tournament = self.tournaments.get(tournament_id)
 
         if tournament is None:
-            raise Exception("Error: Tournament not found.")
+            raise Exception("Tournament not found.")
 
         if user != tournament.creator_id:
-            raise Exception("Error: Only the creator can start it.")
+            raise Exception("Only the creator can start it.")
 
         if len(tournament.participants) < 2:
-            raise Exception("Error: Not enough participants (minimum 2).")
+            raise Exception("Not enough participants (minimum 2).")
 
         if tournament.current_phase != CurrentPhase.WAITING:
-            raise Exception("Error: The tournament is already ongoing.")
+            raise Exception("The tournament is already ongoing.")
 
-        print("Tournament started") # DEBUG
         await TournamentLogic.init_tournament_logic(tournament)
         tournament.current_phase = CurrentPhase.PRE_FIRST
 
@@ -161,14 +165,14 @@ class TournamentManager:
             tournament = self.tournaments[tournament_id]
             return tournament.tournament_data()
         else:
-            raise Exception("Error(tournament data): Tournament not found.")
+            raise Exception("Tournament not found.")
 
 
     def delete_tournament(self, tournament_id):
         if tournament_id in self.tournaments:
             del self.tournaments[tournament_id]
         else:
-            raise Exception("Error(delete tournament): Tournament not found.")
+            raise Exception("Tournament not found.")
 
 
     def clean_tournaments(self):

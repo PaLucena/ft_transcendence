@@ -54,6 +54,7 @@ def get_user_data(request):
             "email": user.email,
             "number_of_friends": get_friend_count(user),
             "language": user.language,
+            "is_42": user.api42auth,
         }
         return Response(user_data, status=status.HTTP_200_OK)
     except Exception as e:
@@ -102,6 +103,7 @@ def get_other_user_data(request, username):
             "number_of_friends": get_friend_count(other_user),
             "friendship": friendship,
             "matches_in_common": matches_in_common,
+            "is_42": other_user.api42auth,
         }
         return Response(user_data, status=status.HTTP_200_OK)
     except Exception as e:
@@ -234,6 +236,7 @@ def logout(request):
 @default_authentication_required
 def update_user_info(request):
     USERNAME_REGEX = r"^[\w.@+-]+$"
+    SUPPORTED_LANGUAGES = ["EN", "ES", "LV"]
 
     try:
         user = request.user
@@ -244,7 +247,35 @@ def update_user_info(request):
         confirm_password = request.data.get("confirm_password")
         language = request.data.get("language")
 
+        if not any(
+            [
+                new_username,
+                new_avatar,
+                old_password,
+                new_password,
+                confirm_password,
+                language,
+            ]
+        ):
+            return Response(
+                {
+                    "error": {
+                        "empty": "No data provided for update.",
+                    }
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if new_username:
+            if user.api42auth:
+                return Response(
+                    {
+                        "error": {
+                            "username": "A user created via the 42 API cannot change their username.",
+                        }
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
             if user.is_superuser or user.is_staff:
                 return Response(
                     {
@@ -276,6 +307,15 @@ def update_user_info(request):
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            if new_username == user.username:
+                return Response(
+                    {
+                        "error": {
+                            "username": "New username cannot be the same as the old one.",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             if new_username.startswith(" ") or new_username.endswith(" "):
                 return Response(
                     {
@@ -287,12 +327,31 @@ def update_user_info(request):
                 )
             user.username = new_username
 
-        if old_password and new_password and confirm_password:
+        if old_password or new_password or confirm_password:
+            if user.api42auth:
+                return Response(
+                    {
+                        "error": {
+                            "password42": "A user created via the 42 API cannot change their password.",
+                        }
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            if not old_password or not new_password or not confirm_password:
+                return Response(
+                    {
+                        "error": {
+                            "passwordMiss": "To change the password, all three fields are required (old password, new password, confirm password).",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             if not check_password(old_password, user.password):
                 return Response(
                     {
                         "error": {
-                            "password": "Incorrect old password.",
+                            "oldPassword": "Incorrect old password.",
                         }
                     },
                     status=status.HTTP_400_BAD_REQUEST,
@@ -302,6 +361,15 @@ def update_user_info(request):
                     {
                         "error": {
                             "password": "Passwords do not match.",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if old_password == new_password:
+                return Response(
+                    {
+                        "error": {
+                            "password": "New password cannot be the same as the old one.",
                         }
                     },
                     status=status.HTTP_400_BAD_REQUEST,
@@ -330,8 +398,18 @@ def update_user_info(request):
             if avatar_error:
                 return Response(avatar_error, status=status.HTTP_400_BAD_REQUEST)
 
-        if language and user.language != language:
-            user.language = language
+        if language:
+            if language not in SUPPORTED_LANGUAGES:
+                return Response(
+                    {
+                        "error": {
+                            "language": "Unsupported language selected.",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if user.language != language:
+                user.language = language
 
         user.save()
 

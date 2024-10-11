@@ -33,7 +33,6 @@ class TournamentWebsocket {
             }
             if (data.tournament_users) {
                 Tournament.renderPlayers(data.tournament_users);
-                console.log("ERROR ----------------- bad calling")
             }
             if (data.goto_game) {
                 navigateTo("/pong");
@@ -58,7 +57,7 @@ class TournamentWebsocket {
                 console.error('Maximum reconnect attempts reached. Connection closed.');
             }
         } else {
-            console.log('WebSocket connection closed cleanly.');
+            // console.log('WebSocket connection closed cleanly.');
         }
     }
 

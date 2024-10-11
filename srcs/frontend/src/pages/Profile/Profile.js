@@ -9,6 +9,7 @@ import { closeGlobalSockets } from '../../scripts/utils/globalSocketManager.js';
 export class Profile extends Component {
 	constructor(params = {}) {
 		super('/pages/Profile/profile.html', params);
+		this.qrModalInstance = null;
 	}
 
 	destroy() {
@@ -17,8 +18,7 @@ export class Profile extends Component {
 
 	init() {
 		this.displayUserInfo(this.params.username);
-		this.saveInfoBtn(this.params.username);
-		this.enable2fa();
+		this.setUpEventListeners();
 		this.disable2fa();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
@@ -27,7 +27,7 @@ export class Profile extends Component {
 		try {
 			const fetchUrl = username ? `/api/get_other_user_data/${username}` : "/api/get_user_data/";
 			const myUsername = await this.getOwnName();
-
+			let responseData = null;
 
 			const response = await fetch(fetchUrl, {
 				method: "GET",
@@ -38,9 +38,13 @@ export class Profile extends Component {
 			});
 
 			await handleResponse(response, data => {
+				responseData = data;
+
 				this.displayUserStats(data["username"]);
 
 				if (myUsername === data["username"]) {
+
+
 					const editPlaceholder = document.getElementById("editPlaceholder");
 					if (editPlaceholder)
 						editPlaceholder.innerHTML = `<button id="editBtn" class="btn btn-green text-white col-12" data-i18n='edit-profile'></button>`;
@@ -103,6 +107,31 @@ export class Profile extends Component {
 
 				setTimeout(() => languageSelector.updateLanguage(), 0);
 			});
+
+			if (myUsername === responseData['username'] && responseData['is_42']) {
+				const form = document.getElementById('editForm');
+
+				if (form) {
+					const inputIds = ["new_username", "old_password", "new_password", "confirm_password"];
+
+					inputIds.forEach(id => {
+						const inputElement = form.querySelector(`#${id}`);
+
+						if (inputElement) {
+							const containerDiv = inputElement.closest('.col-9.form-floating');
+
+							if (containerDiv) {
+								containerDiv.remove();
+							}
+						}
+					});
+				}
+
+				const twoFaButtons = document.getElementById('2faButtonPlaceholder');
+				if (twoFaButtons)
+					twoFaButtons.remove();
+			}
+
 		} catch (error) {
 			if (error.errorCode === 404) {
 				const profileContainer = document.getElementById("rootProfile");
@@ -156,7 +185,7 @@ export class Profile extends Component {
 			});
 		})
 		.catch(error => {
-			console.log("Error(displayUserStats):", error);
+			// console.log("Error(displayUserStats):", error);
 		})
 	}
 
@@ -191,7 +220,7 @@ export class Profile extends Component {
 			});
 		})
 		.catch(error => {
-			console.log("Error(displayFriendshipStats):", error);
+			// console.log("Error(displayFriendshipStats):", error);
 		})
 	}
 
@@ -254,95 +283,266 @@ export class Profile extends Component {
 	editUserBtn() {
 		const editBtn = document.getElementById("editBtn");
 
-		this.addEventListener(editBtn, "click", () => {
-			document.getElementById("userInfo").style.display = "none";
-			document.getElementById("userEdit").style.display = "block";
+		if (editBtn) {
+			this.addEventListener(editBtn, "click", () => {
+				document.getElementById("userInfo").style.display = "none";
+				document.getElementById("userEdit").style.display = "block";
 
-			this.startPasswordEL();
-			this.show2faButton();
-		});
+				this.startPasswordEL();
+				this.show2faButton();
+			});
+		}
 	}
 
 	startPasswordEL() {
 		const oldPwsd = document.getElementById('old_password');
 		const pswdLabel = document.getElementById('oldPasswordLabel');
 
-		this.addEventListener(oldPwsd, 'focus', () => {
-			pswdLabel.innerHTML = "Current password";
-		});
+		if (oldPwsd && pswdLabel) {
+			this.addEventListener(oldPwsd, 'focus', () => {
+				pswdLabel.innerHTML = "Current password";
+			});
 
-		this.addEventListener(oldPwsd, 'blur', () => {
-			pswdLabel.innerHTML = "Change password";
-		});
+			this.addEventListener(oldPwsd, 'blur', () => {
+				pswdLabel.innerHTML = "Change password";
+			});
+		}
+
 	}
 
-	saveInfoBtn(username) {
+	backToProfilePrimaryPage() {
+		const container = document.getElementById('rootProfile');
+		if (container) {
+			const userInfo = container.querySelector('#userInfo');
+			const userEdit = container.querySelector('#userEdit');
+
+			if (userInfo && userEdit) {
+				userInfo.style.display = "block";
+				userEdit.style.display = "none";
+
+				this.displayUserInfo(this.params.username);
+
+				const editForm = container.querySelector('#editForm');
+				if (editForm)
+					editForm.reset();
+
+				setTimeout(() => languageSelector.updateLanguage(), 0);
+			}
+
+		}
+	}
+
+	setUpEventListeners() {
+		this.setUpOnSubmitFormBtn();
+		this.setUpEnable2fa();
+		this.setUpBackProfileBtn();
+	}
+
+	setUpOnSubmitFormBtn() {
 		const editForm = document.getElementById('editForm');
 		if (editForm) {
 			this.addEventListener(editForm, 'submit', async (event) => {
 				event.preventDefault();
 
-				const fileInput = editForm.querySelector('#avatar');
-				const maxSize = 1 * 1024 * 1024;
+				const inputNewUsername = editForm.querySelector('#new_username').value.trim();
+				const inputAvatar = editForm.querySelector('#avatar').files.length > 0;
+				const inputOldPassword = editForm.querySelector('#old_password').value.trim();
+				const inputNewPassword = editForm.querySelector('#new_password').value.trim();
+				const inputConfirmPassword = editForm.querySelector('#confirm_password').value.trim();
+				const inputLanguageSelector = editForm.querySelector('#language_selector').value.trim();
 
-				if (fileInput && fileInput.files[0] && fileInput.files[0].size > maxSize) {
-					customAlert('danger', 'Avatar\'s file is so big. Maximum size: 1MB', 5000);
-					return;
-				}
+				if (inputNewUsername || inputAvatar || inputOldPassword || inputNewPassword || inputConfirmPassword || inputLanguageSelector) {
+					const fileInput = editForm.querySelector('#avatar');
+					const maxSize = 1 * 1024 * 1024;
 
-				const formData = new FormData(event.target);
-				formData.append('language', document.getElementById('language_selector').value);
+					if (fileInput && fileInput.files[0] && fileInput.files[0].size > maxSize) {
+						customAlert('danger', 'Avatar\'s file is so big. Maximum size: 1MB', 5000);
+						return;
+					}
 
-				try {
-					const response = await fetch("/api/update_user_info/", {
-						method: "POST",
-						body: formData,
-						credentials: 'include'
-					});
+					const formData = new FormData(event.target);
+					formData.append('language', document.getElementById('language_selector').value);
 
-					await handleResponse(response, data => {
-						customAlert('success', data.message, 3000);
-						document.getElementById("userInfo").style.display = "block";
-						document.getElementById("userEdit").style.display = "none";
-						this.displayUserInfo(username);
-						editForm.reset();
-						setTimeout(() => languageSelector.updateLanguage(), 0);
-					});
-				} catch (error) {
-					console.log(error);
+					let passwordFields = ['old_password', 'new_password', 'confirm_password'];
+					let isAnyFilled = passwordFields.some(field => formData.get(field));
 
-					if (error.errorCode === 400 || error.errorCode === 403) {
-						if (error.errorMessage.username) {
-							const inputUsername = event.target.querySelector('#new_username');
-							if (inputUsername) {
-								inputUsername.value = '';
-								inputUsername.focus();
+					if (isAnyFilled) {
+						for (const [key, value] of formData.entries()) {
+							if (passwordFields.includes(key) && !value) {
+								customAlert('info', 'To change the password, all three fields are required (old password, new password, confirm password).', 5000);
+								event.target.querySelector(`[name="${key}"]`)?.focus();
+								return;
+							}
+						}
+					}
+
+					if (inputOldPassword && (inputNewPassword && inputNewPassword !== inputConfirmPassword)) {
+						customAlert('danger', 'Passwords do not match.', 5000);
+						return;
+					}
+
+
+					try {
+						const response = await fetch("/api/update_user_info/", {
+							method: "POST",
+							body: formData,
+							credentials: 'include'
+						});
+
+						await handleResponse(response, data => {
+							customAlert('success', data.message, 3000);
+							this.backToProfilePrimaryPage();
+						});
+
+					} catch (error) {
+						if (error.errorCode === 400 || error.errorCode === 403) {
+							if (error.errorMessage.empty) {
+								customAlert('warning', error.errorMessage.empty, '5000');
 							}
 
+							else if (error.errorMessage.username) {
+								const inputUsername = event.target.querySelector('#new_username');
+								if (inputUsername) {
+									inputUsername.value = '';
+									inputUsername.focus();
+								}
 
-							customAlert('danger', error.errorMessage.username, 5000);
-						} else if (error.errorMessage.password) {
-							if (Array.isArray(error.errorMessage.password)) {
-								let responseMessage = '';
-
-								error.errorMessage.password.forEach(message => {
-									responseMessage += message + ' ';
-								});
-
-								customAlert('danger', responseMessage.trim(), 6000);
-							} else {
-								customAlert('danger', error.errorMessage.password, 5000);
+								customAlert('danger', error.errorMessage.username, 5000);
 							}
 
-							const inputPass = event.target.querySelector('#new_password');
-							const inputConfPass = event.target.querySelector('#confirm_password');
+							else if (error.errorMessage.password42) {
+								for (const [key, value] of formData.entries()) {
+									if (['old_password', 'new_password', 'confirm_password'].includes(key)) {
+										event.target.querySelector(`[name="${key}"]`).value = '';
+									}
+								}
+								customAlert('danger', error.errorMessage.password42, 5000);
+							}
 
-							if (inputConfPass && inputConfPass) {
-								inputPass.value = '';
-								inputConfPass.value = '';
-								inputPass.focus();
+							else if (error.errorMessage.passwordMiss) {
+								customAlert('warning', error.errorMessage.passwordMiss, 5000);
+
+								for (const [key, value] of formData.entries()) {
+									if (['old_password', 'new_password', 'confirm_password'].includes(key) && !value) {
+										event.target.querySelector(`[name="${key}"]`)?.focus();
+										break ;
+									}
+								}
+							}
+
+							else if (error.errorMessage.oldPassword) {
+								customAlert('danger', error.errorMessage.oldPassword, 5000);
+
+								const inputOldPass = event.target.querySelector('#old_password');
+								if (inputOldPass) {
+									inputOldPass.value = '';
+									inputOldPass.focus();
+								}
+							}
+
+							else if (error.errorMessage.password) {
+								if (Array.isArray(error.errorMessage.password)) {
+									let responseMessage = '';
+
+									error.errorMessage.password.forEach(message => {
+										responseMessage += message + ' ';
+									});
+
+									customAlert('danger', responseMessage.trim(), 6000);
+								} else {
+									customAlert('danger', error.errorMessage.password, 5000);
+								}
+
+								const inputPass = event.target.querySelector('#new_password');
+								const inputConfPass = event.target.querySelector('#confirm_password');
+
+								if (inputConfPass && inputConfPass) {
+									inputPass.value = '';
+									inputConfPass.value = '';
+									inputPass.focus();
+								}
+							}
+
+							else if (error.errorMessage.language) {
+								customAlert('danger', error.errorMessage.language, 5000);
+							}
+
+							else {
+								customAlert('danger', error.errorMessage, 5000);
 							}
 						} else {
+							console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+						}
+					}
+
+				} else {
+					customAlert('danger', 'No data provided for update.', 5000);
+				}
+
+			});
+		}
+	}
+
+	setUpEnable2fa() {
+		const twofaBtn = document.getElementById("Enable2faBtn");
+
+		if (twofaBtn) {
+			this.addEventListener(twofaBtn, "click", async () => {
+				try {
+					const confirmed = window.confirm("Are you sure you want to enable two-factor authentication? Once enabled, you will only be able to disable it using the security code after scanning the QR code.");
+
+					if (confirmed) {
+						const response = await fetch("/api/2fa/enable2fa/", {
+							method: 'POST',
+							credentials: 'include',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+						});
+
+						await handleResponse(response, data => {
+							this.renderTwoFaModalHtml();
+
+							const ModalElement = document.getElementById('imageModal');
+							if (ModalElement) {
+
+								if (!this.qrModalInstance)
+									this.qrModalInstance = new bootstrap.Modal(ModalElement, {backdrop: false});
+
+								this.addEventListener(ModalElement, 'hide.bs.modal', () => {
+									this.deleteQRModal();
+								});
+
+								const imageSpan = document.getElementById('modalImageContainer');
+
+								if (imageSpan && data['qrpath']) {
+									imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`;
+									this.qrModalInstance.show();
+								}
+
+								const btnEnable2faModal = ModalElement.querySelector('#two_fa_modal_enable_btn')
+								if (btnEnable2faModal) {
+									this.addEventListener(btnEnable2faModal, 'click', async () => {
+
+										const confirmed = window.confirm("Are you sure you scanned the code? If not, you won’t be able to deactivate 2FA, and you may lose access to your account.");
+
+										if (confirmed) {
+											await this.confirm2fa();
+
+											if (this.qrModalInstance)
+												this.qrModalInstance.hide();
+
+											this.deleteQRModal();
+										}
+
+									});
+								}
+							}
+						});
+					}
+				} catch (error) {
+					if (error.errorCode === 403) {
+						if (error.errorMessage) {
 							customAlert('danger', error.errorMessage, 5000);
 						}
 					} else {
@@ -353,6 +553,15 @@ export class Profile extends Component {
 		}
 	}
 
+	setUpBackProfileBtn() {
+		const profileBackBtn = document.getElementById('profile_edit_back_btn');
+
+		if (profileBackBtn) {
+			this.addEventListener(profileBackBtn, 'click', () => {
+				this.backToProfilePrimaryPage();
+			});
+		}
+	}
 
 	logout() {
 		let	logoutBtn = document.getElementById("logoutBtn");
@@ -367,7 +576,7 @@ export class Profile extends Component {
 				navigateTo("/login");
 			})
 			.catch((error) => {
-				console.log("Logout error: ", error);
+				// console.log("Logout error: ", error);
 			})
 		});
 	}
@@ -419,54 +628,54 @@ export class Profile extends Component {
 		});
 	}
 
-	hideModal() {
-		fetch("/api/2fa/confirmDevice/", {
-			method: 'POST',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		})
-		.then(response => {
-			if (!response.ok) {
-				return response.json().then(errData => {
-					throw new Error(errData.error || `Response status: ${response.status}`);
-				});
-			}
-			this.show2faButton();
-		})
-		.catch(error => {
-			customAlert('danger', `Error: ${error.message}`, 5000);
-		});
-	}
-
-	enable2fa() {
-		let twofaBtn = document.getElementById("Enable2faBtn");
-
-		this.addEventListener(twofaBtn, "click", (event) => {
-			fetch("/api/2fa/enable2fa/", {
+	async confirm2fa() {
+		try {
+			const response = await fetch("/api/2fa/confirmDevice/", {
 				method: 'POST',
 				credentials: 'include',
 				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-			.then(response => {
-				return response.json()
-			})
-			.then(data => {
-				const ModalElement = document.getElementById('imageModal');
-				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
-				const imageSpan = document.getElementById('modalImageContainer');
+					'Content-Type': 'application/json'
+				}
+			});
 
+			await handleResponse(response, () => {
+				this.show2faButton();
+			});
 
-				if (imageSpan)
-					imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
+		} catch (error) {
+			console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+		}
+	}
 
-				qrmodal.show();
-				this.addEventListener(ModalElement, 'hidden.bs.modal', () => {this.hideModal()});
-			})
-		})
+	deleteQRModal() {
+		setTimeout(() => {
+			const container = document.getElementById('twofa_modal_container');
+			if (container)
+				container.innerHTML = '';
+		}, 300);
+
+		this.qrModalInstance = null;
+	}
+
+	renderTwoFaModalHtml() {
+		const container = document.getElementById('twofa_modal_container');
+		if (container) {
+			container.innerHTML = `
+				<div class="modal fade modal-background" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-body">
+								<!-- Placeholder for dynamic image -->
+								<span id="modalImageContainer" class="d-flex justify-content-center"></span>
+							</div>
+							<div class="modal-footer align-center justify-content-around border-0">
+								<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+								<button type="button" class="btn btn-success" id="two_fa_modal_enable_btn">Enable</button>
+							</div>
+						</div>
+					</div>
+				</div>`;
+		}
 	}
 
 	selectStats() {
