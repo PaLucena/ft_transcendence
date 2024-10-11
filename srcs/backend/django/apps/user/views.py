@@ -307,6 +307,15 @@ def update_user_info(request):
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            if new_username == user.username:
+                return Response(
+                    {
+                        "error": {
+                            "username": "New username cannot be the same as the old one.",
+                        }
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             if new_username.startswith(" ") or new_username.endswith(" "):
                 return Response(
                     {
@@ -360,7 +369,7 @@ def update_user_info(request):
                 return Response(
                     {
                         "error": {
-                            "password": "New password cannot be the same as the old password.",
+                            "password": "New password cannot be the same as the old one.",
                         }
                     },
                     status=status.HTTP_400_BAD_REQUEST,
