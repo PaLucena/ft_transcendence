@@ -18,8 +18,7 @@ export class Profile extends Component {
 
 	init() {
 		this.displayUserInfo(this.params.username);
-		this.saveInfoBtn(this.params.username);
-		this.setUpEnable2fa();
+		this.setUpEventListeners();
 		this.disable2fa();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
@@ -284,13 +283,15 @@ export class Profile extends Component {
 	editUserBtn() {
 		const editBtn = document.getElementById("editBtn");
 
-		this.addEventListener(editBtn, "click", () => {
-			document.getElementById("userInfo").style.display = "none";
-			document.getElementById("userEdit").style.display = "block";
+		if (editBtn) {
+			this.addEventListener(editBtn, "click", () => {
+				document.getElementById("userInfo").style.display = "none";
+				document.getElementById("userEdit").style.display = "block";
 
-			this.startPasswordEL();
-			this.show2faButton();
-		});
+				this.startPasswordEL();
+				this.show2faButton();
+			});
+		}
 	}
 
 	startPasswordEL() {
@@ -309,7 +310,35 @@ export class Profile extends Component {
 
 	}
 
-	saveInfoBtn(username) {
+	backToProfilePrimaryPage() {
+		const container = document.getElementById('rootProfile');
+		if (container) {
+			const userInfo = container.querySelector('#userInfo');
+			const userEdit = container.querySelector('#userEdit');
+
+			if (userInfo && userEdit) {
+				userInfo.style.display = "block";
+				userEdit.style.display = "none";
+
+				this.displayUserInfo(this.params.username);
+
+				const editForm = container.querySelector('#editForm');
+				if (editForm)
+					editForm.reset();
+
+				setTimeout(() => languageSelector.updateLanguage(), 0);
+			}
+
+		}
+	}
+
+	setUpEventListeners() {
+		this.setUpOnSubmitFormBtn();
+		this.setUpEnable2fa();
+		this.setUpBackProfileBtn();
+	}
+
+	setUpOnSubmitFormBtn() {
 		const editForm = document.getElementById('editForm');
 		if (editForm) {
 			this.addEventListener(editForm, 'submit', async (event) => {
@@ -348,12 +377,9 @@ export class Profile extends Component {
 
 					await handleResponse(response, data => {
 						customAlert('success', data.message, 3000);
-						document.getElementById("userInfo").style.display = "block";
-						document.getElementById("userEdit").style.display = "none";
-						this.displayUserInfo(username);
-						editForm.reset();
-						setTimeout(() => languageSelector.updateLanguage(), 0);
+						this.backToProfilePrimaryPage();
 					});
+
 				} catch (error) {
 					if (error.errorCode === 400 || error.errorCode === 403) {
 						if (error.errorMessage.empty) {
@@ -438,6 +464,85 @@ export class Profile extends Component {
 		}
 	}
 
+	setUpEnable2fa() {
+		const twofaBtn = document.getElementById("Enable2faBtn");
+
+		if (twofaBtn) {
+			this.addEventListener(twofaBtn, "click", async () => {
+				try {
+					const confirmed = window.confirm("Are you sure you want to enable two-factor authentication? Once enabled, you will only be able to disable it using the security code after scanning the QR code.");
+
+					if (confirmed) {
+						const response = await fetch("/api/2fa/enable2fa/", {
+							method: 'POST',
+							credentials: 'include',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+						});
+
+						await handleResponse(response, data => {
+							this.renderTwoFaModalHtml();
+
+							const ModalElement = document.getElementById('imageModal');
+							if (ModalElement) {
+
+								if (!this.qrModalInstance)
+									this.qrModalInstance = new bootstrap.Modal(ModalElement, {backdrop: false});
+
+								this.addEventListener(ModalElement, 'hide.bs.modal', () => {
+									this.deleteQRModal();
+								});
+
+								const imageSpan = document.getElementById('modalImageContainer');
+
+								if (imageSpan && data['qrpath']) {
+									imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`;
+									this.qrModalInstance.show();
+								}
+
+								const btnEnable2faModal = ModalElement.querySelector('#two_fa_modal_enable_btn')
+								if (btnEnable2faModal) {
+									this.addEventListener(btnEnable2faModal, 'click', async () => {
+
+										const confirmed = window.confirm("Are you sure you scanned the code? If not, you won’t be able to deactivate 2FA, and you may lose access to your account.");
+
+										if (confirmed) {
+											await this.confirm2fa();
+
+											if (this.qrModalInstance)
+												this.qrModalInstance.hide();
+
+											this.deleteQRModal();
+										}
+
+									});
+								}
+							}
+						});
+					}
+				} catch (error) {
+					if (error.errorCode === 403) {
+						if (error.errorMessage) {
+							customAlert('danger', error.errorMessage, 5000);
+						}
+					} else {
+						console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+					}
+				}
+			});
+		}
+	}
+
+	setUpBackProfileBtn() {
+		const profileBackBtn = document.getElementById('profile_edit_back_btn');
+
+		if (profileBackBtn) {
+			this.addEventListener(profileBackBtn, 'click', () => {
+				this.backToProfilePrimaryPage();
+			});
+		}
+	}
 
 	logout() {
 		let	logoutBtn = document.getElementById("logoutBtn");
@@ -520,76 +625,6 @@ export class Profile extends Component {
 
 		} catch (error) {
 			console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
-		}
-	}
-
-	setUpEnable2fa() {
-		const twofaBtn = document.getElementById("Enable2faBtn");
-
-		if (twofaBtn) {
-			this.addEventListener(twofaBtn, "click", async () => {
-				try {
-					const confirmed = window.confirm("Are you sure you want to enable two-factor authentication? Once enabled, you will only be able to disable it using the security code after scanning the QR code.");
-
-					if (confirmed) {
-						const response = await fetch("/api/2fa/enable2fa/", {
-							method: 'POST',
-							credentials: 'include',
-							headers: {
-								'Content-Type': 'application/json',
-							},
-						});
-
-						await handleResponse(response, data => {
-							this.renderTwoFaModalHtml();
-
-							const ModalElement = document.getElementById('imageModal');
-							if (ModalElement) {
-
-								if (!this.qrModalInstance)
-									this.qrModalInstance = new bootstrap.Modal(ModalElement, {backdrop: false});
-
-								this.addEventListener(ModalElement, 'hide.bs.modal', () => {
-									this.deleteQRModal();
-								});
-
-								const imageSpan = document.getElementById('modalImageContainer');
-
-								if (imageSpan && data['qrpath']) {
-									imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`;
-									this.qrModalInstance.show();
-								}
-
-								const btnEnable2faModal = ModalElement.querySelector('#two_fa_modal_enable_btn')
-								if (btnEnable2faModal) {
-									this.addEventListener(btnEnable2faModal, 'click', async () => {
-
-										const confirmed = window.confirm("Are you sure you scanned the code? If not, you won’t be able to deactivate 2FA, and you may lose access to your account.");
-
-										if (confirmed) {
-											await this.confirm2fa();
-
-											if (this.qrModalInstance)
-												this.qrModalInstance.hide();
-
-											this.deleteQRModal();
-										}
-
-									});
-								}
-							}
-						});
-					}
-				} catch (error) {
-					if (error.errorCode === 403) {
-						if (error.errorMessage) {
-							customAlert('danger', error.errorMessage, 5000);
-						}
-					} else {
-						console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
-					}
-				}
-			});
 		}
 	}
 
