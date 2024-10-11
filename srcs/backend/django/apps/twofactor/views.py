@@ -52,7 +52,7 @@ def enable2fa(request):
             otp_uri = device.config_url
             qr = qrcode.make(otp_uri)
             imgs_dir = os.path.join(settings.MEDIA_ROOT, "qrs")
-            img_name = user.username + ".jpg"
+            img_name = f"qr_user_{user.id}.jpg"
             img_path = os.path.join(imgs_dir, img_name)
             os.makedirs(imgs_dir, exist_ok=True)
             qr_img = qr.save(img_path)
@@ -104,21 +104,36 @@ def verifyTwoFactor(request):
 @api_view(["POST"])
 @default_authentication_required
 def disable2fa(request):
-    user = userModel.objects.get(username=request.user)
     try:
-        device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
-        os.remove(
-            os.path.join(settings.MEDIA_ROOT, "qrs") + "/" + user.username + ".jpg"
-        )
-        TOTPDevice.delete(device)
-    except TOTPDevice.DoesNotExist:
+        try:
+            user = get_object_or_404(userModel, username=request.user.username)
+        except Http404:
+            return Response(
+                {"detail": "The user does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
+            device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
+            os.remove(
+                os.path.join(settings.MEDIA_ROOT, "qrs") + f"/qr_user_{user.id}.jpg"
+            )
+            TOTPDevice.delete(device)
+        except TOTPDevice.DoesNotExist:
+            return Response(
+                {"detail": "No TOTP device found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        response = Response(status=status.HTTP_200_OK)
+        response.delete_cookie("twofactor_access_token")
+        response.delete_cookie("twofactor_refresh_token")
+        return response
+
+    except Exception as e:
         return Response(
-            {"success": False, "error": "No TOTP device found."}, status=404
+            {"detail": f"An error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-    response = Response(status=status.HTTP_200_OK)
-    response.delete_cookie("twofactor_access_token")
-    response.delete_cookie("twofactor_refresh_token")
-    return response
 
 
 @api_view(["POST"])
