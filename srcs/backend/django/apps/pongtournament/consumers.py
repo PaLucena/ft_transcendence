@@ -9,6 +9,7 @@ from .handlers import (
     handle_start_single_match,
     handle_create_tournament,
     handle_join_tournament,
+    handle_back_to_game,
     handle_leave_tournament,
     handle_start_tournament,
     handle_clean_tournaments,
@@ -46,7 +47,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             await self.remove_from_tournament_group()
 
         await self.channel_layer.group_discard(self.main_room, self.channel_name)
-        print(f"User {self.user_name} disconnected.")  # DEBUG
 
 
     async def receive(self, text_data=None, bytes_data=None):
@@ -69,6 +69,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
         elif message["type"] == "start_tournament":
             asyncio.create_task(handle_start_tournament(self, message))
+
+        elif message["type"] == "back_to_game":
+            await handle_back_to_game(self)
 
         elif message["type"] == "required_update":
             await handle_send_tournaments_list(self.channel_layer)
@@ -174,6 +177,16 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     "type": "leave_tournament",
                     "tournament_id": event["tournament_id"],
                     "tournament_name": event["tournament_name"],
+                }
+            )
+        )
+
+
+    async def send_reload_play(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "reload_play",
                 }
             )
         )

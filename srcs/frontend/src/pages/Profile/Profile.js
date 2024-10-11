@@ -185,7 +185,7 @@ export class Profile extends Component {
 			});
 		})
 		.catch(error => {
-			console.log("Error(displayUserStats):", error);
+			// console.log("Error(displayUserStats):", error);
 		})
 	}
 
@@ -220,7 +220,7 @@ export class Profile extends Component {
 			});
 		})
 		.catch(error => {
-			console.log("Error(displayFriendshipStats):", error);
+			// console.log("Error(displayFriendshipStats):", error);
 		})
 	}
 
@@ -557,7 +557,7 @@ export class Profile extends Component {
 				navigateTo("/login");
 			})
 			.catch((error) => {
-				console.log("Logout error: ", error);
+				// console.log("Logout error: ", error);
 			})
 		});
 	}

@@ -100,3 +100,14 @@ def get_active_tournaments(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+
+@api_view(["POST"])
+@default_authentication_required
+def is_player_in_game(request):
+    try:
+        player_id = request.user.id
+        if game_manager.is_player_in_game(player_id):
+            return JsonResponse({"in_game": True}, status=200)
+        return JsonResponse({"in_game": False}, status=200)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

@@ -276,6 +276,31 @@ async def handle_start_tournament(consumer, message):
         await consumer.send_error(str(e))
 
 
+async def handle_back_to_game(consumer):
+    user_id = consumer.user_id
+
+    try:
+        if game_manager.is_player_in_game(user_id):
+            await consumer.channel_layer.send(
+                consumer.channel_name,
+                {
+                    "type": "send_start_match",
+                    "sub_type": "back_to_game",
+                    "tournament_id": 0,
+                }
+            )
+        else:
+            raise Exception("The game has already ended.")
+    except Exception as e:
+        await consumer.send_error(str(e))
+        await consumer.channel_layer.send(
+            consumer.channel_name,
+            {
+                "type": "send_reload_play",
+            }
+        )
+
+
 async def handle_end_tournament(channel_layer, manager, tournament):
     try:
         await handle_send_end_tournament(channel_layer, tournament)

@@ -10,8 +10,6 @@ export class Tournament extends Component {
 	}
 
 	destroy() {
-		console.log('Tournament custom destroy');
-
 		this.removeAllEventListeners();
 	}
 
@@ -32,7 +30,6 @@ export class Tournament extends Component {
 			});
 
 			await handleResponse(response, (data) => {
-				console.log('Tournament room data:', data);
 				if (data.is_open) {
 					this.renderButtons(data.creator_id, data.current_id)
 				}
@@ -62,7 +59,6 @@ export class Tournament extends Component {
 		const container = document.getElementById('root_tournament_container');
 
 		if (container) {
-			console.log("PARAMS:", this.params);
 			const btnContainer = container.querySelector('#root_tournament_btn_container');
 
 			if (btnContainer) {
