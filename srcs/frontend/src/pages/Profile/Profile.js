@@ -9,6 +9,7 @@ import { closeGlobalSockets } from '../../scripts/utils/globalSocketManager.js';
 export class Profile extends Component {
 	constructor(params = {}) {
 		super('/pages/Profile/profile.html', params);
+		this.qrModalInstance = null;
 	}
 
 	destroy() {
@@ -18,7 +19,7 @@ export class Profile extends Component {
 	init() {
 		this.displayUserInfo(this.params.username);
 		this.saveInfoBtn(this.params.username);
-		this.enable2fa();
+		this.setUpEnable2fa();
 		this.disable2fa();
 		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
@@ -111,19 +112,25 @@ export class Profile extends Component {
 			if (myUsername === responseData['username'] && responseData['is_42']) {
 				const form = document.getElementById('editForm');
 
-				const inputIds = ["new_username", "old_password", "new_password", "confirm_password"];
+				if (form) {
+					const inputIds = ["new_username", "old_password", "new_password", "confirm_password"];
 
-				inputIds.forEach(id => {
-					const inputElement = document.getElementById(id);
+					inputIds.forEach(id => {
+						const inputElement = form.querySelector(`#${id}`);
 
-					if (inputElement) {
-						const containerDiv = inputElement.closest('.col-9.form-floating');
+						if (inputElement) {
+							const containerDiv = inputElement.closest('.col-9.form-floating');
 
-						if (containerDiv) {
-							containerDiv.remove();
+							if (containerDiv) {
+								containerDiv.remove();
+							}
 						}
-					}
-				});
+					});
+				}
+
+				const twoFaButtons = document.getElementById('2faButtonPlaceholder');
+				if (twoFaButtons)
+					twoFaButtons.remove();
 			}
 
 		} catch (error) {
@@ -518,33 +525,94 @@ export class Profile extends Component {
 		});
 	}
 
-	enable2fa() {
-		let twofaBtn = document.getElementById("Enable2faBtn");
+	setUpEnable2fa() {
+		const twofaBtn = document.getElementById("Enable2faBtn");
 
-		this.addEventListener(twofaBtn, "click", (event) => {
-			fetch("/api/2fa/enable2fa/", {
-				method: 'POST',
-				credentials: 'include',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-			.then(response => {
-				return response.json()
-			})
-			.then(data => {
-				const ModalElement = document.getElementById('imageModal');
-				var qrmodal = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false})
-				const imageSpan = document.getElementById('modalImageContainer');
+		if (twofaBtn) {
+			this.addEventListener(twofaBtn, "click", async () => {
+				try {
+					const confirmed = window.confirm("Are you sure you want to enable two-factor authentication? Once enabled, you will only be able to disable it using the security code after scanning the QR code.");
 
+					if (confirmed) {
+						const response = await fetch("/api/2fa/enable2fa/", {
+							method: 'POST',
+							credentials: 'include',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+						});
 
-				if (imageSpan)
-					imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`
+						await handleResponse(response, data => {
+							this.renderTwoFaModalHtml();
 
-				qrmodal.show();
-				this.addEventListener(ModalElement, 'hidden.bs.modal', () => {this.hideModal()});
-			})
-		})
+							const ModalElement = document.getElementById('imageModal');
+							if (ModalElement) {
+
+								if (!this.qrModalInstance) {
+									this.qrModalInstance = new bootstrap.Modal(ModalElement, {backdrop: false, keyboard: false});
+								}
+
+								const imageSpan = document.getElementById('modalImageContainer');
+
+								if (imageSpan && data['qrpath']) {
+									imageSpan.innerHTML = `<img src="/media/${data['qrpath']}" class="w-75">`;
+									this.qrModalInstance.show();
+								}
+
+								const btnCloseModal = ModalElement.querySelector('.btn-close')
+								if (btnCloseModal) {
+									this.addEventListener(btnCloseModal, 'click', () => {
+
+										const confirmed = window.confirm("Are you sure you want to close this modal? 2FA has been added, and if you haven't scanned the QR code, we strongly advise not losing it, as you may lose access to your account.");
+
+										if (confirmed) {
+											this.qrModalInstance.hide();
+											setTimeout(() => {
+												const container = document.getElementById('twofa_modal_container');
+												if (container)
+													container.innerHTML = '';
+
+												this.hideModal();
+											}, 100);
+										}
+
+									});
+								}
+							}
+						});
+					}
+				} catch (error) {
+					if (error.errorCode === 403) {
+						if (error.errorMessage) {
+							customAlert('danger', error.errorMessage, 5000);
+						}
+					} else {
+						console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage}`);
+					}
+				}
+			});
+		}
+	}
+
+	renderTwoFaModalHtml() {
+		const container = document.getElementById('twofa_modal_container');
+		if (container) {
+			container.innerHTML = `
+				<div class="modal fade modal-background" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="imageModalLabel" data-i18n="twofactor-code"></h5>
+								<button type="button" class="btn-close"></button>
+							</div>
+							<div class="modal-body">
+								<!-- Placeholder for dynamic image -->
+								<span id="modalImageContainer" class="d-flex justify-content-center"></span>
+							</div>
+						</div>
+					</div>
+				</div>`;
+		}
 	}
 
 	selectStats() {
