@@ -2,7 +2,7 @@ import { Component } from '../../scripts/Component.js';
 import { navigateTo } from '../../scripts/Router.js';
 import { getCSRFToken } from '../../scripts/utils/csrf.js';
 import customAlert from '../../scripts/utils/customAlert.js';
-import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
+import { get2faCode } from '../../components/Get2faModal/Get2faModal.js';
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 import { initGlobalSockets } from '../../scripts/utils/globalSocketManager.js';
 
@@ -78,22 +78,16 @@ export class Login extends Component {
 		const csrftoken = getCSRFToken('csrftoken');
 
 		const loginData = await this.submitLoginData(jsonData, csrftoken);
-
 		if (loginData.has_2fa) {
-				this.TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
-
-				const modal = document.getElementById('get2faCode_modal')
-				let btn = modal.querySelector('.btn-close')
-
-				this.addEventListener(btn, 'click', () => {
-					this.TwoFactorCodeModalInstance.destroy();
-					this.TwoFactorCodeModalInstance = null;
-				});
-				await this.TwoFactorCodeModalInstance.initTwoFactorAuth(jsonData);
-				this.TwoFactorCodeModalInstance.destroy();
-				this.TwoFactorCodeModalInstance = null;
-
-			await this.submitTwoFactorCode(jsonData);
+			try {
+				await get2faCode.init(jsonData.username);
+				await this.submitTwoFactorCode(jsonData);
+				initGlobalSockets();
+				customAlert('success', 'Login successful', 3000);
+				navigateTo("/play");
+			} catch (error) {
+				console.error("2FA Error:", error);
+			}
 		}
 	}
 
@@ -118,10 +112,6 @@ export class Login extends Component {
 
 					try {
 						await this.handleFormSubmit(jsonData);
-						initGlobalSockets();
-						customAlert('success', 'Login successful', 3000);
-						navigateTo("/play");
-
 					} catch (error) {
 						this.handleError(error.errorCode, error.errorMessage);
 					}

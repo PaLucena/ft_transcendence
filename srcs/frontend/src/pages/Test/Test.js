@@ -1,7 +1,7 @@
 import { Component } from "../../scripts/Component.js";
 import customAlert from "../../scripts/utils/customAlert.js";
 import { userSocket } from "../../scripts/utils/UserWebsocket.js";
-
+import { get2faCode } from '../../components/Get2faModal/Get2faModal.js';
 export class Test extends Component {
 	constructor() {
 		super('/pages/Test/test.html');
@@ -99,6 +99,17 @@ export class Test extends Component {
 				userSocket.socket.send(message);
 			} catch (error) {
 				console.error('Failed to send notification:', error);
+			}
+		});
+
+		const twoFaBtn = document.getElementById('2fa_numbers');
+		this.addEventListener(twoFaBtn, 'click', async () => {
+			try {
+				get2faCode.init('Some', () => {
+					console.log(123123);
+				});
+			} catch(error) {
+				console.error(error);
 			}
 		});
 	}

@@ -1,45 +1,98 @@
-import { navigateTo } from '../../scripts/Router.js'
 import { getCSRFToken } from '../../scripts/utils/csrf.js'
 import customAlert from '../../scripts/utils/customAlert.js';
+import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 
-
-import { Component } from "../../scripts/Component.js";
-
-export class Get2faCode extends Component {
+class Get2faCode {
 	constructor() {
-		super('/components/Get2faModal/Get2faModal.html')
-		this.promise = null;
+		this.modalInstance = null;
+		this.username = null;
 	}
 
-	init() {}
+	init(username) {
+		if (this.modalInstance || this.username) this.destroy();
 
-	clearModal(inputs) {
-		if (inputs.length > 0)
-			inputs.forEach(input => input.value = '');
-		setTimeout(() => inputs[0].focus(), 400);
+		this.username = username;
+		this.initModalHtml();
+		this.setUpOnHideModal();
+
+		return new Promise(async (resolve, reject) => {
+			try {
+				await this.initTwoFactorAuth(resolve);
+			} catch (error) {
+				reject(error);
+			}
+		});
 	}
 
-	showModal(overlayElement, inputs, TwoFactorModal) {
-		TwoFactorModal.show();
-		setTimeout(() => this.clearModal(inputs), 0);
+	initModalHtml() {
+		const container = document.getElementById('get2faCode_modal');
+
+		if (container) {
+			const html = `
+				<div id="customOverlay" class="twofactor-overlay"></div>
+
+				<div class="modal fade modal-background" id="twoFactorModal" tabindex="-1" aria-labelledby="twoFactorModalLabel" aria-hidden="true">
+					<div class="modal-dialog twofactor-modal-dialog">
+						<div class="modal-content twofactor-modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="twoFactorModalLabel">Two-Factor Authentication</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body">
+								<form id="twoFactorForm">
+									<div class="mb-3">
+										<label for="otp" class="form-label">Enter your 2FA code</label>
+										<div class="d-flex justify-content-between">
+											<input type="text" class="otp-input" maxlength="1">
+											<input type="text" class="otp-input" maxlength="1">
+											<input type="text" class="otp-input" maxlength="1">
+											<input type="text" class="otp-input" maxlength="1">
+											<input type="text" class="otp-input" maxlength="1">
+											<input type="text" class="otp-input" maxlength="1">
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>`;
+
+			container.innerHTML = html;
+
+			const modalDOM = container.querySelector('#twoFactorModal');
+			if (modalDOM) {
+				if (!this.modalInstance)
+					this.modalInstance = new bootstrap.Modal(modalDOM, { backdrop: false, keyboard: true });
+
+				this.modalInstance.show();
+			}
+		}
 	}
 
-	hideModal(overlayElement, inputs, TwoFactorModal) {
-		this.clearModal(inputs);
-		TwoFactorModal.hide();
+	setUpOnHideModal() {
+		const container = document.getElementById('get2faCode_modal');
+
+		if (container || this.modalInstance) {
+			const modalDOM = container.querySelector('#twoFactorModal');
+			if (modalDOM) {
+				modalDOM.addEventListener('hide.bs.modal', () => {
+					setTimeout(() => {
+						this.destroy();
+					}, 300);
+				});
+			}
+		}
 	}
 
-	async initTwoFactorAuth(jsonData) {
-		const overlayElement = document.getElementById('customOverlay');
-		const inputs = document.querySelectorAll('.otp-input');
-		const TwoFactorModalElement = document.getElementById('twoFactorModal');
-		let TwoFactorModal = new bootstrap.Modal(TwoFactorModalElement, { backdrop: false, keyboard: true })
+	initTwoFactorAuth(resolve) {
+		const container = document.getElementById('twoFactorModal');
+		if (container) {
+			const inputs = document.querySelectorAll('.otp-input');
 
-		this.promise = new Promise(resolve => {
-			this.showModal(overlayElement, inputs, TwoFactorModal);
-			this.addEventListener(TwoFactorModalElement,'hidden.bs.modal', () => this.hideModal(overlayElement, inputs, TwoFactorModal));
+			setTimeout(() => inputs[0].focus(), 400);
+
 			inputs.forEach((input, index) => {
-				this.addEventListener(input, 'input', (event) => {
+				input.addEventListener('input', (event) => {
 					const value = event.target.value;
 
 					if (!/^\d$/.test(value)) {
@@ -50,11 +103,11 @@ export class Get2faCode extends Component {
 						inputs[index + 1].focus();
 					}
 					if (index === inputs.length - 1 && Array.from(inputs).every(input => input.value)) {
-						submit2FAForm(jsonData, overlayElement, inputs, TwoFactorModal);
+						this.submit2FAForm(inputs, resolve);
 					}
 				});
 
-				this.addEventListener(input, 'keydown', (event) => {
+				input.addEventListener('keydown', (event) => {
 					if (event.key === 'Backspace' && input.value === '') {
 						if (index > 0) {
 							inputs[index - 1].focus();
@@ -62,51 +115,60 @@ export class Get2faCode extends Component {
 					}
 				});
 			});
+		}
+	}
 
-			inputs[0].focus();
-			const submit2FAForm = (username, overlayElement, inputs, TwoFactorModal) => {
-				const otpCode = Array.from(inputs).map(input => input.value).join('');
-				const csrftoken = getCSRFToken('csrftoken');
+	async submit2FAForm(inputs, resolve) {
+		const otpCode = Array.from(inputs).map(input => input.value).join('');
+		const csrftoken = getCSRFToken('csrftoken');
 
-				fetch("/api/2fa/verify-2fa/", {
-					method: "POST",
-					credentials: 'include',
-					headers: {
-						'Content-Type': 'application/json',
-						'X-CSRFToken': csrftoken
-					},
-					body: JSON.stringify({ otpCode: otpCode, jsonData })
-				})
-				.then(response => {
-					if (!response.ok) {
-						this.clearModal(inputs);
-						return response.json().then(errData => {
-							throw new Error(errData.error || `Response status: ${response.status}`);
-						});
-					}
-					return response.json();
-				})
-				.then(() => {
-					resolve();
-					this.hideModal(overlayElement, inputs, TwoFactorModal);
-				})
-				.catch(error => {
-					customAlert('danger', `Error: ${error.message}`, 5000);
-					console.log(error)
-				});
-			}
-		})
-		return this.promise;
+		try {
+			const response = await fetch("/api/2fa/verify-2fa/", {
+				method: "POST",
+				credentials: 'include',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-CSRFToken': csrftoken
+				},
+				body: JSON.stringify({ otpCode: otpCode, username: this.username })
+			});
+
+			await handleResponse(response, () => {
+				resolve();
+
+				if (this.modalInstance)
+					this.modalInstance.hide();
+			});
+
+		} catch (error) {
+			customAlert('danger', `Error: ${error.errorMessage}`, 5000);
+			console.error(error);
+			this.clearModal();
+		}
+	}
+
+	clearModal() {
+		const container = document.getElementById('twoFactorModal');
+		if (container) {
+			const inputs = document.querySelectorAll('.otp-input');
+
+			if (inputs.length > 0)
+				inputs.forEach(input => input.value = '');
+			inputs[0].focus()
+		}
 	}
 
 	destroy() {
 		console.log("DESTROY 2FA");
-		const overlayElement = document.getElementById('customOverlay');
-		const inputs = document.querySelectorAll('.otp-input');
-		const TwoFactorModalElement = document.getElementById('twoFactorModal');
-		let TwoFactorModal = new bootstrap.Modal(TwoFactorModalElement, { backdrop: false, keyboard: true })
-		this.hideModal(overlayElement, inputs, TwoFactorModal);
-		this.promise = null;
-		this.removeAllEventListeners();
+		const container = document.getElementById('get2faCode_modal');
+
+		if (container) {
+			container.innerHTML = '';
+		}
+
+		this.username = null;
+		this.modalInstance = null;
 	}
 }
+
+export const get2faCode = new Get2faCode();

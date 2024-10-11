@@ -73,16 +73,36 @@ def enable2fa(request):
 
 @api_view(["POST"])
 def verifyTwoFactor(request):
-    body_unicode = request.body.decode("utf-8")
-    body_data = json.loads(body_unicode)
-    otp_code = body_data.get("otpCode")
-    userInfo = body_data.get("jsonData")
-    username = userInfo.get("username")
-
-    print(f"Checking OTP code for user {username}, CODE: {otp_code}")
     try:
-        user = userModel.objects.get(username=username)
+        body_unicode = request.body.decode("utf-8")
+        body_data = json.loads(body_unicode)
+        otp_code = body_data.get("otpCode")
+        username = body_data.get("username")
+
+        if not otp_code:
+            return Response(
+                {"detail": "No otp_code provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not username:
+            return Response(
+                {"detail": "No username provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        print("otp_code:", otp_code, "username:", username)
+
+        try:
+            user = get_object_or_404(userModel, username=username)
+        except Http404:
+            return Response(
+                {"detail": "The user does not exist"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         device = TOTPDevice.objects.get(user=user.pk, confirmed=True)
+
         if device.verify_token(otp_code):
             return Response(
                 {"success": True, "message": "OTP verified successfully."}, status=200
@@ -95,9 +115,10 @@ def verifyTwoFactor(request):
         return Response(
             {"success": False, "error": "No TOTP device found."}, status=404
         )
-    except userModel.DoesNotExist:
+    except Exception as e:
         return Response(
-            {"success": False, "error": f"User {request.user} found."}, status=404
+            {"detail": f"An error occurred: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 

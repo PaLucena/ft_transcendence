@@ -5,6 +5,7 @@ import customAlert from "../../scripts/utils/customAlert.js";
 import { handleResponse } from '../../scripts/utils/rtchatUtils.js';
 import { staticComponentsRenderer } from '../../scripts/utils/StaticComponentsRenderer.js';
 import { closeGlobalSockets } from '../../scripts/utils/globalSocketManager.js';
+import { get2faCode } from '../../components/Get2faModal/Get2faModal.js';
 
 export class Profile extends Component {
 	constructor(params = {}) {
@@ -712,16 +713,33 @@ export class Profile extends Component {
 		});
 	}
 
+	async handleFormSubmit(jsonData) {
+		const csrftoken = getCSRFToken('csrftoken');
+
+		const loginData = await this.submitLoginData(jsonData, csrftoken);
+		if (loginData.has_2fa) {
+			try {
+				await get2faCode.init(jsonData.username);
+				await this.submitTwoFactorCode(jsonData);
+				initGlobalSockets();
+				customAlert('success', 'Login successful', 3000);
+				navigateTo("/play");
+			} catch (error) {
+				console.error("2FA Error:", error);
+			}
+		}
+	}
+
 	async disable2fa() {
 		const TwofaBtn = document.getElementById("Disable2faBtn");
 
 		if (TwofaBtn) {
 			const username = await this.getOwnName()
-			this.addEventListener(TwofaBtn, "click", async (event) => {
-				const TwoFactorCodeModalInstance = staticComponentsRenderer.getComponentInstance('Get2faCode');
-				await TwoFactorCodeModalInstance.initTwoFactorAuth({"username": username});
+			this.addEventListener(TwofaBtn, "click", async () => {
 
 				try {
+					await get2faCode.init(username);
+
 					const response = await fetch("/api/2fa/disable2fa/", {
 						method: 'POST',
 						credentials: 'include',
@@ -732,11 +750,11 @@ export class Profile extends Component {
 
 					await handleResponse(response, () => {
 						this.show2faButton();
-					});
+					})
+
 				} catch (error) {
-
+					console.error(error.errorCode ? `Error ${error.errorCode}: ${error.errorMessage}` : `Critical error: ${error.errorMessage || error}`);
 				}
-
 			});
 		}
 	}
