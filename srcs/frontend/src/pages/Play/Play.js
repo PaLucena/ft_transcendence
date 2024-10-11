@@ -159,10 +159,10 @@ export class Play extends Component {
 
 						if (tournamentMember === 'false') {
 							if (tournamentType === 'public') {
-								this.setTournamentModalTitle(`Join ${tournamentName} tournament`);
+								this.setTournamentModalTitle(`<span data-i18n="join-tournament"></span>`);
 								this.setTournamentModalContent('join_public', tournamentName, tournamentCreator);
 							} else if (tournamentType === 'private') {
-								this.setTournamentModalTitle(`Join ${tournamentName} tournament`);
+								this.setTournamentModalTitle(`<span data-i18n="join-tournament"></span>`);
 								this.setTournamentModalContent('join_private', tournamentName, tournamentCreator);
 							} else {
 								console.error('Invalid type passed on Join tournament');
@@ -183,10 +183,10 @@ export class Play extends Component {
 
 					if (creationType) {
 						if (creationType === 'public') {
-							this.setTournamentModalTitle(`Create ${creationType} tournament`);
+							this.setTournamentModalTitle(`<span data-i18n="create-public"></span>`);
 							this.setTournamentModalContent('create_public');
 						} else if (creationType === 'private') {
-							this.setTournamentModalTitle(`Create ${creationType} tournament`);
+							this.setTournamentModalTitle(`<span data-i18n="create-private"></span>`);
 							this.setTournamentModalContent('create_private');
 						} else {
 							console.error('Invalid argument type passed on Create Tournament.');
@@ -250,12 +250,12 @@ export class Play extends Component {
 								<form id="tournament_modal_form">
 									<div class="form-floating">
 										<input type="text" class="form-control" id="tournament_name" name="name" placeholder="Tournament name" required>
-										<label for="name">Tournament name</label>
+										<label for="name"><span data-i18n="tournament-name"></span></label>
 									</div>
 								</form>`;
 
 							footerContainer.innerHTML = `
-								<button type="submit" form="tournament_modal_form" class="btn btn-primary">Create</button>
+								<button type="submit" form="tournament_modal_form" class="btn btn-primary" data-i18n="create-button"></button>
 							`;
 							break;
 						case 'create_private':
@@ -263,44 +263,46 @@ export class Play extends Component {
 								<form id="tournament_modal_form">
 									<div class="form-floating mb-1">
 										<input type="text" class="form-control" id="tournament_name" name="name" placeholder="Tournament name" required>
-										<label for="name">Tournament name</label>
+										<label for="name"><span data-i18n="tournament-name"></span></label>
 									</div>
 									<div class="form-floating">
 										<input type="text" class="form-control" id="tournament_password" name="code" placeholder="Tournament password" required>
-										<label for="code">Tournament password</label>
+										<label for="code"><span data-i18n="tournament-password"></span></label>
 									</div>
 								</form>`;
 							footerContainer.innerHTML = `
-								<button type="submit" form="tournament_modal_form" class="btn btn-primary">Create</button>
+								<button type="submit" form="tournament_modal_form" class="btn btn-primary" data-i18n="create-button"></button>
 							`;
 							break;
 						case 'join_public':
 							bodyContainer.innerHTML = `
 								<div>
-									<p>Name: ${name || 'Anonymous Tournament'}</p>
-									<p>Creator: ${creator || 'Anonymous Player'}</p>
+									<p class="d-flex justify-content-center" style="font-weight: bold; font-size: x-large;">${name || 'Anonymous Tournament'}</p>
+									<hr>
+									<p class="d-flex justify-content-center"><span data-i18n="creator"></span>: ${creator || 'Anonymous Player'}</p>
 								</div>
 								<form id="tournament_modal_form"></form>
 							`;
 							footerContainer.innerHTML = `
-								<button type="submit" form="tournament_modal_form" class="btn btn-primary">Join</button>
+								<button type="submit" form="tournament_modal_form" class="btn btn-primary"><span data-i18n="join-button"></span></button>
 							`;
 							break;
 						case 'join_private':
 							bodyContainer.innerHTML = `
 								<div>
-									<p>Name: ${name || 'Anonymous Tournament'}</p>
-									<p>Creator: ${creator || 'Anonymous Player'}</p>
+									<p class="d-flex justify-content-center" style="font-weight: bold; font-size: x-large;">${name || 'Anonymous Tournament'}</p>
+									<hr>
+									<p class="d-flex justify-content-center"><span data-i18n="creator"></span>: ${creator || 'Anonymous Player'}</p>
 								</div>
 								<form id="tournament_modal_form">
 									<div class="form-floating">
 										<input type="text" class="form-control" id="tournament_password" name="code" placeholder="Tournament password" required>
-										<label for="code">Tournament password</label>
+										<label for="code"><span data-i18n="tournament-password"></span></label>
 									</div>
 								</form>
 							`;
 							footerContainer.innerHTML = `
-								<button type="submit" form="tournament_modal_form" class="btn btn-primary">Join</button>
+								<button type="submit" form="tournament_modal_form" class="btn btn-primary"><span data-i18n="join-button"></span></button>
 							`;
 							break;
 						default:
@@ -373,7 +375,7 @@ export class Play extends Component {
 		if (public_tournaments.length === 0) {
 			const publicTournamentDisplay = document.getElementById("publicTournamentDisplay");
 			if (publicTournamentDisplay)
-				publicTournamentDisplay.innerHTML = "No active tournaments";
+				publicTournamentDisplay.innerHTML = "<span class='d-flex justify-content-center' data-i18n='no-active-t'></span>";
 		}
 		else {
 			const publicContainer = document.getElementById("publicTournamentDisplay");
@@ -415,7 +417,7 @@ export class Play extends Component {
 		if (private_tournaments.length === 0) {
 			const privateTournamentDisplay = document.getElementById("privateTournamentDisplay");
 			if (privateTournamentDisplay)
-				privateTournamentDisplay.innerHTML = "No active tournaments";
+				privateTournamentDisplay.innerHTML = "<span class='d-flex justify-content-center' data-i18n='no-active-t'></span>";
 		}
 		else {
 			const privateContainer = document.getElementById("privateTournamentDisplay");
@@ -455,6 +457,7 @@ export class Play extends Component {
 				}
 			}
 		}
+		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
 	joinTournament(id, type) {
@@ -499,6 +502,7 @@ export class Play extends Component {
 		if (container) {
 			const instance = bootstrap.Modal.getInstance(container);
 			if (instance) {
+				setTimeout(() => languageSelector.updateLanguage(), 0);
 				instance.show();
 			}
 		}
