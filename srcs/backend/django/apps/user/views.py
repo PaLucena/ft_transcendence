@@ -54,6 +54,7 @@ def get_user_data(request):
             "email": user.email,
             "number_of_friends": get_friend_count(user),
             "language": user.language,
+            "is_42": user.api42auth,
         }
         return Response(user_data, status=status.HTTP_200_OK)
     except Exception as e:
@@ -102,6 +103,7 @@ def get_other_user_data(request, username):
             "number_of_friends": get_friend_count(other_user),
             "friendship": friendship,
             "matches_in_common": matches_in_common,
+            "is_42": other_user.api42auth,
         }
         return Response(user_data, status=status.HTTP_200_OK)
     except Exception as e:
@@ -265,6 +267,15 @@ def update_user_info(request):
             )
 
         if new_username:
+            if user.api42auth:
+                return Response(
+                    {
+                        "error": {
+                            "username": "A user created via the 42 API cannot change their username.",
+                        }
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
             if user.is_superuser or user.is_staff:
                 return Response(
                     {
@@ -308,6 +319,15 @@ def update_user_info(request):
             user.username = new_username
 
         if old_password or new_password or confirm_password:
+            if user.api42auth:
+                return Response(
+                    {
+                        "error": {
+                            "password42": "A user created via the 42 API cannot change their password.",
+                        }
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
             if not old_password or not new_password or not confirm_password:
                 return Response(
                     {

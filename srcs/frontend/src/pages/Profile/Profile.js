@@ -27,7 +27,7 @@ export class Profile extends Component {
 		try {
 			const fetchUrl = username ? `/api/get_other_user_data/${username}` : "/api/get_user_data/";
 			const myUsername = await this.getOwnName();
-
+			let responseData = null;
 
 			const response = await fetch(fetchUrl, {
 				method: "GET",
@@ -38,9 +38,13 @@ export class Profile extends Component {
 			});
 
 			await handleResponse(response, data => {
+				responseData = data;
+
 				this.displayUserStats(data["username"]);
 
 				if (myUsername === data["username"]) {
+
+
 					const editPlaceholder = document.getElementById("editPlaceholder");
 					if (editPlaceholder)
 						editPlaceholder.innerHTML = `<button id="editBtn" class="btn btn-green text-white col-12" data-i18n='edit-profile'></button>`;
@@ -103,6 +107,25 @@ export class Profile extends Component {
 
 				setTimeout(() => languageSelector.updateLanguage(), 0);
 			});
+
+			if (myUsername === responseData['username'] && responseData['is_42']) {
+				const form = document.getElementById('editForm');
+
+				const inputIds = ["new_username", "old_password", "new_password", "confirm_password"];
+
+				inputIds.forEach(id => {
+					const inputElement = document.getElementById(id);
+
+					if (inputElement) {
+						const containerDiv = inputElement.closest('.col-9.form-floating');
+
+						if (containerDiv) {
+							containerDiv.remove();
+						}
+					}
+				});
+			}
+
 		} catch (error) {
 			if (error.errorCode === 404) {
 				const profileContainer = document.getElementById("rootProfile");
@@ -267,13 +290,16 @@ export class Profile extends Component {
 		const oldPwsd = document.getElementById('old_password');
 		const pswdLabel = document.getElementById('oldPasswordLabel');
 
-		this.addEventListener(oldPwsd, 'focus', () => {
-			pswdLabel.innerHTML = "Current password";
-		});
+		if (oldPwsd && pswdLabel) {
+			this.addEventListener(oldPwsd, 'focus', () => {
+				pswdLabel.innerHTML = "Current password";
+			});
 
-		this.addEventListener(oldPwsd, 'blur', () => {
-			pswdLabel.innerHTML = "Change password";
-		});
+			this.addEventListener(oldPwsd, 'blur', () => {
+				pswdLabel.innerHTML = "Change password";
+			});
+		}
+
 	}
 
 	saveInfoBtn(username) {
@@ -335,6 +361,15 @@ export class Profile extends Component {
 							}
 
 							customAlert('danger', error.errorMessage.username, 5000);
+						}
+
+						else if (error.errorMessage.password42) {
+							for (const [key, value] of formData.entries()) {
+								if (['old_password', 'new_password', 'confirm_password'].includes(key)) {
+									event.target.querySelector(`[name="${key}"]`).value = '';
+								}
+							}
+							customAlert('danger', error.errorMessage.password42, 5000);
 						}
 
 						else if (error.errorMessage.passwordMiss) {
