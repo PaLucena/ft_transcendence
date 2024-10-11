@@ -183,7 +183,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if not self.tournament_room:
             self.tournament_room = tournament_room
             await self.channel_layer.group_add(self.tournament_room, self.channel_name)
-            print("User ", self.user_name, " added to ", self.tournament_room)
             await handle_send_tournament_data(self.channel_layer, self.tournament_room)
 
         else:
@@ -191,10 +190,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
 
     async def remove_from_tournament_group(self, tournament_room=None):
-        print("User ", self.user_name, " removed from ", tournament_room)
         if tournament_room:
             await self.channel_layer.group_discard(tournament_room, self.channel_name)
-            print("User ", self.user_name, " removed from ", tournament_room)  # DEBUG
             self.tournament_room = None
         else:
             print("User ", self.user_name, " not in any tournament.")

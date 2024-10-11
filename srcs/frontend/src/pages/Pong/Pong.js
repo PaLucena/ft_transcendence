@@ -195,6 +195,7 @@ export class Pong extends Component {
 				this.message_line_sub_2.style.color = this.p_1_color;
 			}
 			this.message_line_sub_2.innerHTML = '<span data-i18n="ai-is-ready"></span>';
+			setTimeout(() => languageSelector.updateLanguage(), 0);
 		}
 	}
 
@@ -231,6 +232,7 @@ export class Pong extends Component {
 				this.message_line_sub_2.style.color = this.p_2_color;
 				this.message_line_sub_2.innerHTML = `${this.player_2_name} <span data-i18n="is-ready"></span>`;
 			}
+			setTimeout(() => languageSelector.updateLanguage(), 0);
 		} else if (gameState.state === 'countdown') {
 			this.message_line_super.innerHTML = '';
 			this.message_line_main.innerHTML = `${gameState["countdown"]}...`;

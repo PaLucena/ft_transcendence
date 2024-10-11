@@ -169,14 +169,13 @@ async def handle_create_tournament(consumer, message):
         is_private = message["is_private"]
         password = message["password"]
 
-        print("Password (handle_create_tournament): ", password)
         new = manager.create_tournament(consumer, creator, name, is_private, password)
         if new:
             await consumer.add_to_tournament_group(new.id)
             await handle_send_tournaments_list(consumer.channel_layer)
 
         else:
-            await consumer.send_error("User already has an active tournament.")
+            await consumer.send_error("User already has an active game or tournament.")
 
     except Exception as e:
         await consumer.send_error(str(e))
@@ -238,12 +237,9 @@ async def handle_start_tournament(consumer, message):
     channel_layer = consumer.channel_layer
     sleep_time = 3
 
-    print("Tournament id", tournament.id)
-
-    await handle_send_closed_tournament(channel_layer, tournament.id)
-
     try:
         await manager.start_tournament(tournament.id, consumer.user_id)
+        await handle_send_closed_tournament(channel_layer, tournament.id)
         await handle_send_tournaments_list(channel_layer)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
 
@@ -277,7 +273,7 @@ async def handle_start_tournament(consumer, message):
 
         await handle_end_tournament(channel_layer, manager, tournament)
     except Exception as e:
-        print("Error starting tournament: ", str(e))
+        await consumer.send_error(str(e))
 
 
 async def handle_end_tournament(channel_layer, manager, tournament):
