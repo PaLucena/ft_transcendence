@@ -49,7 +49,7 @@ export class ChatLoader {
                 this.chatModal.chatRenderer.renderChatMessages(data.chat_messages, currentUser, isPublicChat);
                 if (!isPublicChat) {
                     this.chatModal.chatRenderer.renderMessageInputContainer(data.block_status, data.other_user.username);
-                    this.chatModal.uiSetup.setupInviteToPlayButton(data.current_user, data.other_user.username);
+                    this.chatModal.uiSetup.setupInviteToPlayButton(data.current_user, data.other_user.id);
                 }
                 this.chatModal.webSocketHandler.initWebSocket(chatroomName, currentUser);
             });
@@ -59,9 +59,9 @@ export class ChatLoader {
         }
     }
 
-    async loadInvitation(username) {
+    async loadInvitation(id) {
         try {
-            const response = await fetch(`/api/chat/invite/${username}/`, {
+            const response = await fetch(`/api/chat/invite/${id}/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export class ChatLoader {
                     userSocket.socket.send(JSON.stringify({
                         action: 'notification',
                         type: "1x1_invite",
-                        to_user: username,
+                        to_user: id,
                         group_name: data.group_name
                     }));
                 } catch (error) {

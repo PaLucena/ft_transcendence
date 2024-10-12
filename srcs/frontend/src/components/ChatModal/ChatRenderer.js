@@ -187,6 +187,8 @@ export class ChatRenderer {
 	}
 
 	createPrivateChatHeaderContent(data) {
+		console.log("HERE!!!:", data);
+
 		const blockStatus = data.block_status;
 		const isBlocker = blockStatus === "blocker";
 		const action = isBlocker ? 'unblock' : 'block';
@@ -216,7 +218,7 @@ export class ChatRenderer {
 						<button
 							id="invite_to_play_btn"
 							class="dropdown-item"
-							data-invite-to-play-username="${data.other_user.username}">
+							data-invite-to-play-id="${data.other_user.id}">
 							<span data-i18n="invite-to-play"></span>
 						</button>
 					</li>

@@ -87,10 +87,10 @@ export class UISetup {
 
                 if (targetButton) {
                     const action = targetButton.getAttribute('data-action');
-                    const username = targetButton.getAttribute('data-username');
+                    const user_id = targetButton.getAttribute('data-user_id');
 
-                    if (action && username) {
-                        await this.handleFriendAction(action, username);
+                    if (action && user_id) {
+                        await this.handleFriendAction(action, user_id);
                     }
                 }
             });
@@ -99,7 +99,7 @@ export class UISetup {
         }
     }
 
-    async handleFriendAction(action, username) {
+    async handleFriendAction(action, user_id) {
         try {
             let endpoint;
             let notification_type;
@@ -130,19 +130,19 @@ export class UISetup {
                     "Content-Type": "application/json",
                 },
                 credentials: 'include',
-                body: JSON.stringify({ username })
+                body: JSON.stringify({user_id})
             });
 
             await handleResponse(response, async () => {
-                if (username && notification_type) {
+                if (user_id && notification_type) {
                     try {
                         userSocket.socket.send(JSON.stringify({
                             action: 'notification',
                             type: notification_type,
-                            to_user: username
+                            to_user: user_id
                         }));
                     } catch (error) {
-                        console.error('Failed to send notification:', error);
+                        console.error('Failed to send notification :', error);
                     }
                 }
                 await this.friends.friendsLoader.loadFriendsData(window.location.pathname.split('/').pop());

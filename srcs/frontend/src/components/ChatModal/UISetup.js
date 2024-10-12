@@ -214,9 +214,9 @@ export class UISetup {
         const inviteToPlayBtn = document.getElementById('invite_to_play_btn');
 
         this.chatModal.addEventListener(inviteToPlayBtn, 'click', async (e) => {
-            const inviteBtn = e.target.closest('[data-invite-to-play-username]');
+            const inviteBtn = e.target.closest('[data-invite-to-play-id]');
             if (inviteBtn) {
-                const usernameForInvite = inviteBtn.getAttribute('data-invite-to-play-username');
+                const idForInvite = inviteBtn.getAttribute('data-invite-to-play-id');
 
                 try {
                     const response = await fetch(`/api/chat/check_users_in_match/`, {
@@ -230,7 +230,7 @@ export class UISetup {
 
                     await handleResponse(response, (data) => {
                         if (data.status === 1) {
-                            this.chatModal.chatLoader.loadInvitation(usernameForInvite);
+                            this.chatModal.chatLoader.loadInvitation(idForInvite);
                         }
                     });
 
