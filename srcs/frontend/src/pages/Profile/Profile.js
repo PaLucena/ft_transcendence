@@ -354,12 +354,12 @@ export class Profile extends Component {
 			this.addEventListener(editForm, 'submit', async (event) => {
 				event.preventDefault();
 
-				const inputNewUsername = editForm.querySelector('#new_username').value.trim();
-				const inputAvatar = editForm.querySelector('#avatar').files.length > 0;
-				const inputOldPassword = editForm.querySelector('#old_password').value.trim();
-				const inputNewPassword = editForm.querySelector('#new_password').value.trim();
-				const inputConfirmPassword = editForm.querySelector('#confirm_password').value.trim();
-				const inputLanguageSelector = editForm.querySelector('#language_selector').value.trim();
+				const inputNewUsername = editForm.querySelector('#new_username') ? editForm.querySelector('#new_username').value.trim() : null;
+				const inputAvatar = editForm.querySelector('#avatar') ? editForm.querySelector('#avatar').files.length > 0 : false;
+				const inputOldPassword = editForm.querySelector('#old_password') ? editForm.querySelector('#old_password').value.trim() : null;
+				const inputNewPassword = editForm.querySelector('#new_password') ? editForm.querySelector('#new_password').value.trim() : null;
+				const inputConfirmPassword = editForm.querySelector('#confirm_password') ? editForm.querySelector('#confirm_password').value.trim() : null;
+				const inputLanguageSelector = editForm.querySelector('#language_selector') ? editForm.querySelector('#language_selector').value.trim() : null;
 
 				if (inputNewUsername || inputAvatar || inputOldPassword || inputNewPassword || inputConfirmPassword || inputLanguageSelector) {
 					const fileInput = editForm.querySelector('#avatar');
