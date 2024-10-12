@@ -305,7 +305,7 @@ async def handle_start_tournament(consumer, message):
 
         await handle_end_tournament(channel_layer, manager, tournament)
     except Exception as e:
-        await consumer.send_error(str(e))
+        print("Error starting tournament: ", str(e))
 
 
 async def handle_back_to_game(consumer):

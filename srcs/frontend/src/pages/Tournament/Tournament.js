@@ -38,7 +38,6 @@ export class Tournament extends Component {
 				setTimeout(() => languageSelector.updateLanguage(), 0);
 			});
 		} catch(error) {
-            this.handleError(error.errorCode, error.errorMessage);
 			navigateTo('/play');
         }
 	}
