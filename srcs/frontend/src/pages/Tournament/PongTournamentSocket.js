@@ -99,7 +99,10 @@ class PongTournamentSocket {
                     const backToGameBtn = document.getElementById("backToGameBtn")
                     if (backToGameBtn)
                         backToGameBtn.style.display = "none";
+                    break;
 
+                case 'eliminated_players':
+                    customAlert('info', `You have been eliminated from:\n"${data.tournament_name}"`, 5000);
                     break;
 
                 case 'error':

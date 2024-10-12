@@ -97,6 +97,7 @@ def bc_get_player_matches(player_id):
     global contract
     connect_to_blockchain()
     matches = contract.functions.getPlayerMatches(player_id).call()
+    print(matches)
     return matches
 
 

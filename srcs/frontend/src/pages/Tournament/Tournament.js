@@ -172,6 +172,7 @@ export class Tournament extends Component {
 				</div>
 			`;
 		}
+		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
 }

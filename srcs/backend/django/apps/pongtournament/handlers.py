@@ -116,6 +116,20 @@ async def handle_send_start_match(channel_layer, tournament_id, players_ids):
         print("Error sending start match: ", str(e))
 
 
+async def handle_send_eliminated_players(channel_layer, eliminated, tournament_name):
+    try:
+        for player_id in eliminated:
+            if player_id != 0:
+                await channel_layer.group_send(
+                    f"user_{player_id}", {
+                        "type": "send_eliminated_players",
+                        "tournament_name": tournament_name,
+                    }
+                )
+    except Exception as e:
+        print("Error sending eliminated players: ", str(e))
+
+
 async def handle_start_single_match(consumer, message):
     try:
         user = consumer.user
@@ -244,30 +258,43 @@ async def handle_start_tournament(consumer, message):
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
 
         await asyncio.sleep(sleep_time)
+        await handle_send_tournaments_list(channel_layer)
         await handle_send_start_match(channel_layer, tournament.id, tournament.players)
-        await solve_first_round(tournament)
+        eliminated = await solve_first_round(tournament)
+        await handle_send_tournament_data(channel_layer, f"{tournament.id}")
+        await handle_send_eliminated_players(channel_layer, eliminated, tournament.name)
         await handle_send_tournaments_list(channel_layer)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
 
         await asyncio.sleep(sleep_time)
+        await handle_send_tournaments_list(channel_layer)
         await handle_send_start_match(channel_layer, tournament.id, tournament.players)
-        await solve_second_round(tournament)
+        eliminated = await solve_second_round(tournament)
+        await handle_send_tournament_data(channel_layer, f"{tournament.id}")
+        await handle_send_eliminated_players(channel_layer, eliminated, tournament.name)
         await handle_send_tournaments_list(channel_layer)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
 
         await asyncio.sleep(sleep_time)
+        await handle_send_tournaments_list(channel_layer)
         await handle_send_start_match(channel_layer, tournament.id, tournament.loser_bracket)
-        await solve_third_round(tournament)
+        eliminated = await solve_third_round(tournament)
+        await handle_send_tournament_data(channel_layer, f"{tournament.id}")
+        await handle_send_eliminated_players(channel_layer, eliminated, tournament.name)
         await handle_send_tournaments_list(channel_layer)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
 
         await asyncio.sleep(sleep_time)
+        await handle_send_tournaments_list(channel_layer)
         await handle_send_start_match(channel_layer, tournament.id, tournament.winner_bracket)
-        await solve_fourth_round(tournament)
+        eliminated = await solve_fourth_round(tournament)
+        await handle_send_tournament_data(channel_layer, f"{tournament.id}")
+        await handle_send_eliminated_players(channel_layer, eliminated, tournament.name)
         await handle_send_tournaments_list(channel_layer)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
 
         await asyncio.sleep(sleep_time)
+        await handle_send_tournaments_list(channel_layer)
         await handle_send_start_match(channel_layer, tournament.id, tournament.winner_bracket)
         await solve_final_round(tournament)
 

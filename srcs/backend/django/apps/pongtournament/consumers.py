@@ -192,6 +192,17 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
 
+    async def send_eliminated_players(self, event):
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "eliminated_players",
+                    "tournament_name": event["tournament_name"],
+                }
+            )
+        )
+
+
     async def add_to_tournament_group(self, tournament_room):
         if not self.tournament_room:
             self.tournament_room = tournament_room

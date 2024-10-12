@@ -22,22 +22,29 @@ class TournamentLogic:
     @staticmethod
     async def solve_first_round(tournament):
         print("Initial round")  # DEBUG
+        previous_players = [player for player in tournament.players]
         results_i = await TournamentLogic.solve_matches(tournament, tournament.initial_bracket)
         TournamentLogic.move_players(tournament, results_i, "initial", "initial")
+        eliminated_players = [player for player in previous_players if player not in tournament.players]
+        return eliminated_players
 
 
     @staticmethod
     async def solve_second_round(tournament):
         print("Second round")  # DEBUG
+        previous_players = [player for player in tournament.players]
         results_w = await TournamentLogic.solve_matches(tournament, tournament.winner_bracket)
         results_l = await TournamentLogic.solve_matches(tournament, tournament.loser_bracket)
         TournamentLogic.move_players(tournament, results_l, "second", "loser")
         TournamentLogic.move_players(tournament, results_w, "second", "winner")
+        eliminated_players = [player for player in previous_players if player not in tournament.players]
+        return eliminated_players
 
 
     @staticmethod
     async def solve_third_round(tournament):
         print("Third round")  # DEBUG
+        previous_players = [player for player in tournament.players]
         results_l = await TournamentLogic.solve_matches(tournament, tournament.loser_bracket)
         TournamentLogic.move_players(tournament, results_l, "third", "loser")
 
@@ -45,12 +52,16 @@ class TournamentLogic:
     @staticmethod
     async def solve_fourth_round(tournament):
         print("Fourth round")  # DEBUG
+        previous_players = [player for player in tournament.players]
         results_w = await TournamentLogic.solve_matches(tournament, tournament.winner_bracket)
         TournamentLogic.move_players(tournament, results_w, "fourth", "winner")
+        eliminated_players = [player for player in previous_players if player not in tournament.players]
+        return eliminated_players
 
 
     @staticmethod
     async def solve_final_round(tournament):
+        print("Final round")
         results_w = await TournamentLogic.solve_matches(tournament, tournament.winner_bracket)
         TournamentLogic.move_players(tournament, results_w, "final")
 

@@ -22,26 +22,30 @@ def match_to_uint(match):
 
 async def solve_first_round(tournament):
     tournament.current_phase = CurrentPhase.FIRST
-    await TournamentLogic.solve_first_round(tournament)
+    eliminated = await TournamentLogic.solve_first_round(tournament)
     tournament.current_phase = CurrentPhase.PRE_SECOND
+    return eliminated
 
 
 async def solve_second_round(tournament):
     tournament.current_phase = CurrentPhase.SECOND
-    await TournamentLogic.solve_second_round(tournament)
+    eliminated = await TournamentLogic.solve_second_round(tournament)
     tournament.current_phase = CurrentPhase.PRE_THIRD
+    return eliminated
 
 
 async def solve_third_round(tournament):
     tournament.current_phase = CurrentPhase.THIRD
-    await TournamentLogic.solve_third_round(tournament)
+    eliminated = await TournamentLogic.solve_third_round(tournament)
     tournament.current_phase = CurrentPhase.PRE_FOURTH
+    return eliminated
 
 
 async def solve_fourth_round(tournament):
     tournament.current_phase = CurrentPhase.FOURTH
-    await TournamentLogic.solve_fourth_round(tournament)
+    eliminated = await TournamentLogic.solve_fourth_round(tournament)
     tournament.current_phase = CurrentPhase.PRE_FINAL
+    return eliminated
 
 
 async def solve_final_round(tournament):
