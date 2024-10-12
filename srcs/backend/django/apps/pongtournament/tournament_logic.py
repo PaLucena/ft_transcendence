@@ -33,8 +33,9 @@ class TournamentLogic:
     async def solve_second_round(tournament):
         print("Second round")  # DEBUG
         previous_players = [player for player in tournament.players]
-        results_w = await TournamentLogic.solve_matches(tournament, tournament.winner_bracket)
-        results_l = await TournamentLogic.solve_matches(tournament, tournament.loser_bracket)
+        results = await TournamentLogic.solve_matches(tournament, tournament.winner_bracket, tournament.loser_bracket)
+        results_w = results[:len(results) // 2]
+        results_l = results[len(results) // 2:]
         TournamentLogic.move_players(tournament, results_l, "second", "loser")
         TournamentLogic.move_players(tournament, results_w, "second", "winner")
         eliminated_players = [player for player in previous_players if player not in tournament.players]
@@ -47,6 +48,8 @@ class TournamentLogic:
         previous_players = [player for player in tournament.players]
         results_l = await TournamentLogic.solve_matches(tournament, tournament.loser_bracket)
         TournamentLogic.move_players(tournament, results_l, "third", "loser")
+        eliminated_players = [player for player in previous_players if player not in tournament.players]
+        return eliminated_players
 
 
     @staticmethod
@@ -67,13 +70,13 @@ class TournamentLogic:
 
 
     @staticmethod
-    async def solve_matches(tournament, bracket):
-        num_matches = len(bracket) // 2
+    async def solve_matches(tournament, bracket_a, bracket_b=None):
+        num_matches = len(bracket_a) // 2
         match_tasks = []
 
         for i in range(num_matches):
-            player1_id = bracket[i]
-            player2_id = bracket[i + num_matches]
+            player1_id = bracket_a[i]
+            player2_id = bracket_a[i + num_matches]
 
             if player1_id == 0 or player2_id == 0:
                 controls_mode = "AI"
@@ -98,6 +101,35 @@ class TournamentLogic:
                 )
             tournament.match_counter += 1
             match_tasks.append(match_task)
+
+        if bracket_b:
+            for j in range(num_matches):
+                player1_id = bracket_b[j]
+                player2_id = bracket_b[j + num_matches]
+
+                if player1_id == 0 or player2_id == 0:
+                    controls_mode = "AI"
+                else:
+                    controls_mode = "remote"
+
+                if player1_id == 0 and player2_id == 0:
+                    match_task = game_manager.start_match_test(
+                        tournament.id,
+                        tournament.id + f"{tournament.match_counter}",
+                        player1_id,
+                        player2_id,
+                        "AI",
+                    )
+                else:
+                    match_task = game_manager.start_match(
+                        tournament.id,
+                        tournament.id + f"{tournament.match_counter}",
+                        player1_id,
+                        player2_id,
+                        controls_mode,
+                    )
+                tournament.match_counter += 1
+                match_tasks.append(match_task)
 
         matches_results = await asyncio.gather(*match_tasks)
 
