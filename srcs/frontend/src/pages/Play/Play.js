@@ -124,6 +124,9 @@ export class Play extends Component {
 			this.addEventListener(tournamentBtn, "click", () => {
 				document.getElementById("btns").style.display = "none";
 				document.getElementById("dropdownTournaments").style.display = "block";
+				pongTournamentSocket.t_socket.send(JSON.stringify({
+					type: 'required_update',
+				}));
 			});
 
 			const backToGameBtn = document.getElementById("backToGameBtn");
