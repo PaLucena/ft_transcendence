@@ -67,8 +67,8 @@ services:
     volumes:
       - django_volume:/app
       - blockchain_volume:/blockchain_shared
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     networks:
       - transcendence_net
     restart: on-failure
@@ -85,8 +85,8 @@ services:
     env_file: srcs/.env
     volumes:
       - blockchain_volume:/app/blockchain_shared
-    ports:
-      - "8545:8545"
+    expose:
+      - "8545"
     networks:
       - transcendence_net
     restart: unless-stopped
@@ -106,7 +106,7 @@ volumes:
     driver_opts:
       type: none
       device: ${DATABASE_CONTAINER_PATH}/db_volume
-      o: bind
+
 
   ssl_volume:
     driver: local
@@ -122,7 +122,7 @@ volumes:
     driver_opts:
       type: none
       device: ./srcs/backend/django/apps
-      o: bind
+
 
   blockchain_volume:
     driver: local

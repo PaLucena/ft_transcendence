@@ -28,11 +28,11 @@ python3 /app/manage.py migrate
 
 
 # Create superusue if not exist
-djangouser=$(python3 /app/manage.py shell -c "from django.conf import settings; from django.apps import apps; UserModel = apps.get_model(settings.AUTH_USER_MODEL); print('True' if UserModel.objects.filter(username='admin').exists() else 'False')")
-if [ "$djangouser" = "False" ]; then
-    echo "Creating new user"
-    python3 /app/manage.py createsuperuser --noinput --username admin --email admin@admin.com
-fi
+# djangouser=$(python3 /app/manage.py shell -c "from django.conf import settings; from django.apps import apps; UserModel = apps.get_model(settings.AUTH_USER_MODEL); print('True' if UserModel.objects.filter(username='admin').exists() else 'False')")
+# if [ "$djangouser" = "False" ]; then
+#     echo "Creating new user"
+#     python3 /app/manage.py createsuperuser --noinput --username admin --email admin@admin.com
+# fi
 
 # Checking if a public chat exists
 chatgroup_exists=$(python3 /app/manage.py shell -c "from rtchat.models import ChatGroup; print('True' if ChatGroup.objects.filter(group_name='public-chat').exists() else 'False')")
@@ -46,6 +46,6 @@ else
 fi
 
 # Ejecutar el servidor
-python3 /app/manage.py create_random_users
+# python3 /app/manage.py create_random_users
 python3 /app/manage.py runserver 0.0.0.0:8000
 
