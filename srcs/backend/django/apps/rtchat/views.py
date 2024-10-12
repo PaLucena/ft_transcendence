@@ -197,7 +197,7 @@ def block_or_unblock_user_view(request):
 
             Block.objects.create(blocker=blocker, blocked=blocked_user)
 
-            response_message = f"User {blocked_user.username} blocked successfully"
+            response_message = f"{blocked_user.username} is now blocked"
             return Response(
                 {"detail": response_message},
                 status=status.HTTP_201_CREATED,
@@ -206,7 +206,7 @@ def block_or_unblock_user_view(request):
         elif action == "unblock":
             block = Block.objects.filter(blocker=blocker, blocked=blocked_user).first()
             if not block:
-                response_message = f"User {blocked_user.username} not blocked"
+                response_message = f"{blocked_user.username} not blocked"
                 return Response(
                     {"detail": response_message},
                     status=status.HTTP_400_BAD_REQUEST,
@@ -214,7 +214,7 @@ def block_or_unblock_user_view(request):
 
             block.delete()
 
-            response_message = f"User {blocked_user.username} unblocked successfully"
+            response_message = f"{blocked_user.username} is now unblocked"
             return Response(
                 {"detail": response_message},
                 status=status.HTTP_200_OK,

@@ -320,17 +320,17 @@ export class Profile extends Component {
 
 	}
 
-	backToProfilePrimaryPage() {
+	async backToProfilePrimaryPage() {
 		const container = document.getElementById('rootProfile');
 		if (container) {
 			const userInfo = container.querySelector('#userInfo');
 			const userEdit = container.querySelector('#userEdit');
 
 			if (userInfo && userEdit) {
+				await this.displayUserInfo(this.params.username);
+
 				userInfo.style.display = "block";
 				userEdit.style.display = "none";
-
-				this.displayUserInfo(this.params.username);
 
 				const editForm = container.querySelector('#editForm');
 				if (editForm)
