@@ -44,6 +44,12 @@ def get_tournament_room_data(request, tournament_id):
         manager = TournamentManager()
         tournament_data = manager.get_tournament_data(tournament_id)
 
+        if not tournament_data:
+            return Response(
+                {"detail": "You are the master"},
+                status=status.HTTP_200_OK,
+            )
+
         participants_data = tournament_data["participants_data"]
         creator_id = tournament_data["creator"]
         current_id = request.user.id

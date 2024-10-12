@@ -29,7 +29,7 @@ class AiPlayer:
         self.col_x_time = 0
 
         # AI settings
-        self.ai_handicap = 5
+        self.ai_handicap = 8
         self.error_base = self.game.PADDLE_HEIGHT / 4
 
         self.loop_count = 0

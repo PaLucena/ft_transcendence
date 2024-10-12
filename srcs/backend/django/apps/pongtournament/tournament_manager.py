@@ -169,7 +169,7 @@ class TournamentManager:
             tournament = self.tournaments[tournament_id]
             return tournament.tournament_data()
         else:
-            raise Exception("Tournament not found.")
+            print("Tournament not found.")
 
 
     def delete_tournament(self, tournament_id):
