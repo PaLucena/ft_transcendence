@@ -141,7 +141,7 @@ class Get2faCode {
 			});
 
 		} catch (error) {
-			customAlert('danger', `Error: ${error.errorMessage}`, 5000);
+			customAlert('danger', `${error.errorMessage}`, 5000);
 			console.error(error);
 			this.clearModal();
 		}
