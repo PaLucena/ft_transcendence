@@ -10,7 +10,7 @@ from friends.models import Friend
 from rest_framework import status
 import re
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -23,7 +23,7 @@ from django.core.files.temp import NamedTemporaryFile
 from django.conf import settings
 import os
 import requests
-from .utils import set_nickname, upload_avatar, get_friend_count
+from .utils import upload_avatar, get_friend_count
 from django.contrib.auth import logout as auth_logout, login as auth_login
 from .decorators import default_authentication_required
 from django.http import JsonResponse, Http404

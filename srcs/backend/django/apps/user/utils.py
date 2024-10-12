@@ -1,14 +1,14 @@
-from django.core.exceptions import ValidationError
 from .models import AppUser
 from friends.models import Friend
 from rest_framework.response import Response
 from rest_framework import status
-from datetime import datetime, timedelta
 from django.conf import settings
 from django.utils.timezone import utc
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import os
+import uuid
+
 
 def get_friend_count(user):
 	from_user_count = Friend.objects.filter(from_user=user, status=Friend.ACCEPTED).count()
@@ -44,7 +44,7 @@ def upload_avatar(request):
 			return {'error': 'Invalid file type. Only PNG, JPG, JPEG, and GIF are allowed.'}
 
 		extension = file.name.split('.')[-1]
-		filename = f"{user.username}.{extension}"
+		filename = f"{user.username}_{uuid.uuid4().hex}.{extension}"
 
 		if user.avatar and user.avatar.name != "default/default.jpg":
 			old_avatar_path = os.path.join(settings.MEDIA_ROOT, user.avatar.name)
