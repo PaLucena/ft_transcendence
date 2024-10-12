@@ -259,6 +259,7 @@ async def handle_start_tournament(consumer, message):
 
         await asyncio.sleep(sleep_time)
         await handle_send_tournaments_list(channel_layer)
+        await handle_send_tournament_data(channel_layer, f"{tournament.id}")
         await handle_send_start_match(channel_layer, tournament.id, tournament.players)
         eliminated = await solve_first_round(tournament)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
@@ -268,6 +269,7 @@ async def handle_start_tournament(consumer, message):
 
         await asyncio.sleep(sleep_time)
         await handle_send_tournaments_list(channel_layer)
+        await handle_send_tournament_data(channel_layer, f"{tournament.id}")
         await handle_send_start_match(channel_layer, tournament.id, tournament.players)
         eliminated = await solve_second_round(tournament)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
@@ -277,6 +279,7 @@ async def handle_start_tournament(consumer, message):
 
         await asyncio.sleep(sleep_time)
         await handle_send_tournaments_list(channel_layer)
+        await handle_send_tournament_data(channel_layer, f"{tournament.id}")
         await handle_send_start_match(channel_layer, tournament.id, tournament.loser_bracket)
         eliminated = await solve_third_round(tournament)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
@@ -286,6 +289,7 @@ async def handle_start_tournament(consumer, message):
 
         await asyncio.sleep(sleep_time)
         await handle_send_tournaments_list(channel_layer)
+        await handle_send_tournament_data(channel_layer, f"{tournament.id}")
         await handle_send_start_match(channel_layer, tournament.id, tournament.winner_bracket)
         eliminated = await solve_fourth_round(tournament)
         await handle_send_tournament_data(channel_layer, f"{tournament.id}")
@@ -295,6 +299,7 @@ async def handle_start_tournament(consumer, message):
 
         await asyncio.sleep(sleep_time)
         await handle_send_tournaments_list(channel_layer)
+        await handle_send_tournament_data(channel_layer, f"{tournament.id}")
         await handle_send_start_match(channel_layer, tournament.id, tournament.winner_bracket)
         await solve_final_round(tournament)
 
