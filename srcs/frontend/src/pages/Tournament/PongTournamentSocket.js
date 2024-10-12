@@ -53,7 +53,7 @@ class PongTournamentSocket {
 
                 case 'start_match':
                     if (data.sub_type === 'start_match') {
-                        customAlert('info', `Match starting in 5 seconds. Redirecting...`, 5000);
+                        customAlert('info', `Match starting in 5 seconds.<br>Redirecting...`, 5000);
                         setTimeout(() => {
                             navigateTo(`/pong`);}, 5000);
                     }
@@ -85,14 +85,14 @@ class PongTournamentSocket {
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                         navigateTo(`/play`);
                     }
-                    customAlert('info', `Tournament "${data.tournament_name}" has been deleted.`, 3000);
+                    customAlert('info', `Tournament: "${data.tournament_name}"<br>has been deleted.`, 3000);
                     break;
 
                 case 'end_tournament':
                     if (window.location.pathname === `/tournament/${data.tournament_id}`) {
                         navigateTo(`/play`);
                     }
-                    customAlert('info', `Tournament "${data.tournament_name}" has ended. Winner: ${data.winner}`, 5000);
+                    customAlert('info', `Tournament "${data.tournament_name}" has ended.<br>Winner: ${data.winner}`, 5000);
                     break;
 
                 case 'reload_play':
@@ -102,7 +102,7 @@ class PongTournamentSocket {
                     break;
 
                 case 'eliminated_players':
-                    customAlert('info', `You have been eliminated from:\n"${data.tournament_name}"`, 5000);
+                    customAlert('info', `You have been eliminated from:<br>"${data.tournament_name}"`, 5000);
                     break;
 
                 case 'error':

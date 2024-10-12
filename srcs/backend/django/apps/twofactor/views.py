@@ -106,7 +106,7 @@ def verifyTwoFactor(request):
         if device.verify_token(otp_code):
             return Response({"detail": "OTP verified successfully."}, status=200)
         else:
-            return Response({"detail": "Invalid OTP code."}, status=400)
+            return Response({"detail": "Invalid code."}, status=400)
     except TOTPDevice.DoesNotExist:
         return Response({"detail": "No TOTP device found."}, status=404)
     except Exception as e:
