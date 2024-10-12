@@ -13,7 +13,7 @@ export function updateOnlineStatus(onlineUsers) {
 }
 
 
-export async function handleBlockUnblock(action, username, callback) {
+export async function handleBlockUnblock(action, userId, callback) {
     try {
         const response = await fetch('/api/chat/block_or_unblock/', {
             method: 'POST',
@@ -21,7 +21,7 @@ export async function handleBlockUnblock(action, username, callback) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ blocked_username: username, action }),
+            body: JSON.stringify({ user_id: userId, action }),
         });
 
         await handleResponse(response, data => {

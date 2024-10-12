@@ -64,10 +64,10 @@ export class UISetup {
 
                 if (blockButton) {
                     const action = blockButton.getAttribute('data-block-action');
-                    const username = blockButton.getAttribute('data-block-username');
+                    const userId = blockButton.getAttribute('data-block-user-id');
 
-                    if (action && username) {
-                        handleBlockUnblock(action, username, () => {
+                    if (action && userId) {
+                        handleBlockUnblock(action, userId, () => {
                             const blockButtons = messagesModalElement.querySelectorAll('[data-block-action]');
 
                             blockButtons.forEach(button => {
@@ -77,7 +77,7 @@ export class UISetup {
                             this.chatModal.chatRenderer.removeBlockStatusMessage();
 
                             if (action === 'block') {
-                                this.chatModal.chatRenderer.renderMessageInputContainer('blocker', username);
+                                this.chatModal.chatRenderer.renderMessageInputContainer('blocker', userId);
                             } else if (action === 'unblock') {
                                 this.chatModal.chatRenderer.toggleInputState(false);
                             }

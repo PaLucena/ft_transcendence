@@ -48,7 +48,7 @@ export class ChatLoader {
                 this.chatModal.chatRenderer.renderChatHeader(isPublicChat, data);
                 this.chatModal.chatRenderer.renderChatMessages(data.chat_messages, currentUser, isPublicChat);
                 if (!isPublicChat) {
-                    this.chatModal.chatRenderer.renderMessageInputContainer(data.block_status, data.other_user.username);
+                    this.chatModal.chatRenderer.renderMessageInputContainer(data.block_status, data.other_user.id);
                     this.chatModal.uiSetup.setupInviteToPlayButton(data.current_user, data.other_user.id);
                 }
                 this.chatModal.webSocketHandler.initWebSocket(chatroomName, currentUser);

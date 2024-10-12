@@ -160,14 +160,14 @@ def get_all_private_chats_view(request):
 def block_or_unblock_user_view(request):
     try:
         blocker = request.user
-        blocked_username = request.data.get("blocked_username")
+        blocked_id = request.data.get("user_id")
         action = request.data.get("action")
 
         print(
-            f"blocker: {blocker}, blocked_username: {blocked_username}, action: {action}"
+            f"blocker: {blocker}, blocked_username_id: {blocked_id}, action: {action}", "HELLO:",  request.data
         )
 
-        if not blocked_username:
+        if not blocked_id:
             return Response(
                 {"detail": "No username provided"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -180,7 +180,7 @@ def block_or_unblock_user_view(request):
             )
 
         try:
-            blocked_user = get_object_or_404(AppUser, username=blocked_username)
+            blocked_user = get_object_or_404(AppUser, id=blocked_id)
         except Http404:
             return Response(
                 {"detail": "The user does not exist"},
