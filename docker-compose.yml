@@ -6,7 +6,7 @@ services:
     expose:
       - "80"
     volumes:
-      - webcnt_volume:/var/www/html
+      - ./srcs/frontend/src:/var/www/html
     networks:
       - transcendence_net
     restart: always
@@ -48,7 +48,7 @@ services:
     image: bitnami/postgresql:16.2.0-debian-12-r8
     env_file: srcs/.env
     volumes:
-      - db_volume:/var/lib/postgresql/data
+      - ${DATABASE_CONTAINER_PATH}/db_volume:/var/lib/postgresql/data
     expose:
       - "5432"
     networks:
@@ -65,7 +65,7 @@ services:
       - redis
       - blockchain
     volumes:
-      - django_volume:/app
+      - ./srcs/backend/django/apps:/app
       - blockchain_volume:/blockchain_shared
     expose:
       - "8000"
@@ -92,22 +92,6 @@ services:
     restart: unless-stopped
 
 volumes:
-  webcnt_volume:
-    name: webcnt_volume
-    driver: local
-    driver_opts:
-      type: none
-      device: ./srcs/frontend/src
-      o: bind
-
-  db_volume:
-    name: db_volume
-    driver: local
-    driver_opts:
-      type: none
-      device: ${DATABASE_CONTAINER_PATH}/db_volume
-
-
   ssl_volume:
     driver: local
     name: ssl_volume
@@ -115,14 +99,6 @@ volumes:
   redis_volume:
     driver: local
     name: redis_volume
-
-  django_volume:
-    name: django_volume
-    driver: local
-    driver_opts:
-      type: none
-      device: ./srcs/backend/django/apps
-
 
   blockchain_volume:
     driver: local
