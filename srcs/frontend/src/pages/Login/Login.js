@@ -82,9 +82,6 @@ export class Login extends Component {
 			try {
 				await get2faCode.init(jsonData.username);
 				await this.submitTwoFactorCode(jsonData);
-				initGlobalSockets();
-				customAlert('success', 'Login successful', 3000);
-				navigateTo("/play");
 			} catch (error) {
 				console.error("2FA Error:", error);
 			}
@@ -112,6 +109,9 @@ export class Login extends Component {
 
 					try {
 						await this.handleFormSubmit(jsonData);
+						initGlobalSockets();
+						customAlert('success', 'Login successful', 3000);
+						navigateTo("/play");
 					} catch (error) {
 						this.handleError(error.errorCode, error.errorMessage);
 					}

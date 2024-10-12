@@ -39,18 +39,11 @@ export async function handleBlockUnblock(action, username, callback) {
 
 export async function handleResponse(response, onSuccess) {
     if (!response.ok) {
-        try {
-            const errorData = await response.json();
-            throw {
-                errorCode: response.status,
-                errorMessage: errorData.detail || errorData.error || response
-            };
-        } catch (e) {
-            throw {
-                errorCode: response.status,
-                errorMessage: "Unable to parse error response"
-            };
-        }
+        const errorData = await response.json();
+        throw {
+            errorCode: response.status,
+            errorMessage: errorData.detail || errorData.error || response.statusText || "Unknown error"
+        };
     }
 
     if (response.headers.get('content-length') > 0) {

@@ -15,9 +15,9 @@ class Get2faCode {
 		this.initModalHtml();
 		this.setUpOnHideModal();
 
-		return new Promise(async (resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			try {
-				await this.initTwoFactorAuth(resolve);
+				this.initTwoFactorAuth(resolve);
 			} catch (error) {
 				reject(error);
 			}
