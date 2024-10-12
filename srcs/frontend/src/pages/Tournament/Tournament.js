@@ -97,6 +97,7 @@ export class Tournament extends Component {
 		} else {
 			console.warn('root_tournament_container is not found.');
 		}
+		setTimeout(() => languageSelector.updateLanguage(), 0);
 	}
 
 	static renderPlayers(participants, players, name, phase) {
