@@ -18,7 +18,7 @@ export class FriendsRenderer {
 					container.appendChild(userElement);
 				}
 			});
-			
+
 			setTimeout(() => languageSelector.updateLanguage(), 0);
 		} else {
 			console.warn("friends_elements_container not found.");
@@ -100,7 +100,7 @@ export class FriendsRenderer {
 			case 'my_friends':
 				return `<button class="btn btn-outline-dark"
 							data-action="remove"
-							data-username="${user.username}"
+							data-user_id="${user.id}"
 							data-i18n='remove-friend'>
 							‎
 						</button>`;
@@ -108,7 +108,7 @@ export class FriendsRenderer {
 				return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
 							<button class="btn btn-outline-dark"
 								data-action="remove"
-								data-username="${user.username}"
+								data-user_id="${user.id}"
 								data-i18n='cancel-friend'>
 								‎
 							</button>
@@ -117,13 +117,13 @@ export class FriendsRenderer {
 				return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
 							<button class="btn btn-green text-white"
 								data-action="accept"
-								data-username="${user.username}"
+								data-user_id="${user.id}"
 								data-i18n='accept-friend'>
 								‎
 							</button>
 							<button class="btn btn-outline-dark"
 								data-action="cancel"
-								data-username="${user.username}"
+								data-user_id="${user.id}"
 								data-i18n='cancel-friend'>
 								‎
 							</button>
@@ -138,7 +138,7 @@ export class FriendsRenderer {
 			case 'accepted':
 				return `<button class="btn btn-outline-dark"
 							data-action="remove"
-							data-username="${user.username}"
+							data-user_id="${user.id}"
 							data-i18n='remove-friend'>
 							‎
 						</button>`;
@@ -146,7 +146,7 @@ export class FriendsRenderer {
 				return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
 							<button class="btn btn-outline-dark"
 								data-action="remove"
-								data-username="${user.username}"
+								data-user_id="${user.id}"
 								data-i18n='cancel-friend'>
 								‎
 							</button>
@@ -155,12 +155,12 @@ export class FriendsRenderer {
 				return `<div class="custon-btn-group d-flex justify-content-center align-items-center flex-wrap gap-1">
 							<button class="btn btn-green text-light"
 								data-action="accept"
-								data-username="${user.username}"
+								data-user_id="${user.id}"
 								data-i18n='accept-friend'>
 							</button>
 							<button class="btn btn-outline-dark"
 								data-action="cancel"
-								data-username="${user.username}"
+								data-user_id="${user.id}"
 								data-i18n='cancel-friend'>
 							</button>
 							‎
@@ -169,7 +169,7 @@ export class FriendsRenderer {
 			default:
 				return `<button class="btn btn-green text-white"
 							data-action="invite"
-							data-username="${user.username}"
+							data-user_id="${user.id}"
 							data-i18n='invite-friend'>
 							‎
 						</button>`;

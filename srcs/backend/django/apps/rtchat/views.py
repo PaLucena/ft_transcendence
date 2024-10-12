@@ -160,14 +160,14 @@ def get_all_private_chats_view(request):
 def block_or_unblock_user_view(request):
     try:
         blocker = request.user
-        blocked_username = request.data.get("blocked_username")
+        blocked_id = request.data.get("user_id")
         action = request.data.get("action")
 
         print(
-            f"blocker: {blocker}, blocked_username: {blocked_username}, action: {action}"
+            f"blocker: {blocker}, blocked_username_id: {blocked_id}, action: {action}", "HELLO:",  request.data
         )
 
-        if not blocked_username:
+        if not blocked_id:
             return Response(
                 {"detail": "No username provided"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -180,7 +180,7 @@ def block_or_unblock_user_view(request):
             )
 
         try:
-            blocked_user = get_object_or_404(AppUser, username=blocked_username)
+            blocked_user = get_object_or_404(AppUser, id=blocked_id)
         except Http404:
             return Response(
                 {"detail": "The user does not exist"},
@@ -229,18 +229,18 @@ def block_or_unblock_user_view(request):
 
 @api_view(["POST"])
 @default_authentication_required
-def create_invite(request, username):
+def create_invite(request, other_id):
     try:
         invitation_lifetime = 20
 
-        if request.user.username == username:
+        if request.user.id == id:
             return Response(
                 {"detail": "You cannot invite yourself"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
-            other_user = get_object_or_404(AppUser, username=username)
+            other_user = get_object_or_404(AppUser, id=other_id)
         except Http404:
             return Response(
                 {"detail": "The user does not exist"},
@@ -267,7 +267,7 @@ def create_invite(request, username):
 
         expires_at = current_time + timezone.timedelta(seconds=invitation_lifetime)
         invite_room = InviteRoom.objects.create(
-            group_name=f"invite_1x1_{request.user.username}_to_{other_user.username}",
+            group_name=f"invite_1x1_{request.user.id}_to_{other_user.id}",
             author=request.user,
             expires_at=expires_at,
         )
@@ -307,7 +307,7 @@ def delete_invite_room_after_delay(room_id, delay=20):
 def check_users_in_match(request):
     try:
         current_username = request.data.get("current_user")
-        invite_username = request.data.get("invite_user")
+        invite_id = request.data.get("invite_user")
 
         try:
             current_user = AppUser.objects.get(username=current_username)
@@ -321,11 +321,11 @@ def check_users_in_match(request):
             )
 
         try:
-            invite_user = AppUser.objects.get(username=invite_username)
+            invite_user = AppUser.objects.get(id=invite_id)
         except AppUser.DoesNotExist:
             return Response(
                 {
-                    "detail": f"User with username '{invite_username}' does not exist",
+                    "detail": f"User with id '{invite_id}' does not exist",
                     "status": 0,
                 },
                 status=status.HTTP_400_BAD_REQUEST,

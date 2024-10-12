@@ -1,3 +1,4 @@
+from re import L
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from user.models import AppUser
@@ -12,7 +13,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
             return
 
-        self.notification_group_name = f"notification-{self.user.username}"
+        self.notification_group_name = f"notification-{self.user.id}"
         self.online_status_group_name = "online-status"
 
         try:
@@ -108,13 +109,14 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                 return
 
             current_user = self.scope["user"]
+            user_data = await self.get_user_data(current_user.id)
 
             await self.send_json(
                 {
                     "invitation_1x1": {
                         "type": invitation_1x1_type,
                         "players": invite_data,
-                        "current_user": current_user.username,
+                        "current_user": user_data.username,
                         "group_name": group_name,
                     }
                 }
@@ -138,7 +140,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
             new_status = 1 if invitation_1x1_type == "accept" else -1
 
             for player in invite_data:
-                if player["username"] == current_user.username:
+                if player["id"] == current_user.id:
                     if player["status"] == new_status:
                         await self.send_error(
                             400,
@@ -170,18 +172,18 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
 
     async def handle_notification(self, data):
         notification_type = data.get("type")
-        to_user = data.get("to_user")
+        to_user_id = data.get("to_user")
 
         if not notification_type:
             await self.send_error(400, "Missing type field.")
             return
 
-        if not to_user:
+        if not to_user_id:
             await self.send_error(400, "Missing to_user field.")
             return
 
-        if not await self.user_exists(to_user):
-            await self.send_error(404, f"User '{to_user}' not found.")
+        if not await self.user_exists(to_user_id):
+            await self.send_error(404, f"User widh id '{to_user_id}' not found.")
             return
 
         if notification_type in ["friend_invite", "friend_accept", "friend_cancel"]:
@@ -192,7 +194,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                 )
                 return
 
-            await self.send_notification(notification_type, to_user, message)
+            await self.send_notification(notification_type, to_user_id, message)
         elif notification_type in ["1x1_invite"]:
             group_name_1x1 = data.get("group_name")
 
@@ -204,7 +206,7 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_error(404, f"Group '{group_name_1x1}' not found.")
                 return
 
-            await self.send_notification(notification_type, to_user, group_name_1x1)
+            await self.send_notification(notification_type, to_user_id, group_name_1x1)
         else:
             await self.send_error(
                 404, f"Notification type '{notification_type}' not found."
@@ -226,9 +228,9 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
         except Exception as e:
             await self.send_error(500, f"Failed to send 1x1 update: {str(e)}")
 
-    async def send_notification(self, notification_type, username, message):
+    async def send_notification(self, notification_type, id_to_send, message):
         try:
-            group_name = f"notification-{username}"
+            group_name = f"notification-{id_to_send}"
             event = {
                 "type": "user.notification",
                 "notification": {
@@ -250,6 +252,15 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
         return None
 
     @database_sync_to_async
+    def get_user_data(self, user_id):
+        try:
+            return AppUser.objects.get(id=user_id)
+        except AppUser.DoesNotExist:
+            return None
+        except Exception as e:
+            raise e
+
+    @database_sync_to_async
     def delete_invite_room(self, group_name):
         try:
             room = InviteRoom.objects.get(group_name=group_name)
@@ -268,8 +279,8 @@ class UserSocketConsumer(AsyncJsonWebsocketConsumer):
         invite_user.save()
 
     @database_sync_to_async
-    def user_exists(self, username):
-        return AppUser.objects.filter(username=username).exists()
+    def user_exists(self, user_id):
+        return AppUser.objects.filter(id=user_id).exists()
 
     @database_sync_to_async
     def group_1x1_exists(self, group_name):

@@ -216,14 +216,14 @@ export class ChatRenderer {
 						<button
 							id="invite_to_play_btn"
 							class="dropdown-item"
-							data-invite-to-play-username="${data.other_user.username}">
+							data-invite-to-play-id="${data.other_user.id}">
 							<span data-i18n="invite-to-play"></span>
 						</button>
 					</li>
 					<li>
 						<button class="dropdown-item block-unblock-btn"
 							data-block-action="${action}"
-							data-block-username="${data.other_user.username}">
+							data-block-user-id="${data.other_user.id}">
 							${buttonText}
 						</button>
                 	</li>
@@ -234,12 +234,12 @@ export class ChatRenderer {
 		`;
 	}
 
-	renderMessageInputContainer(blockStatus, otherUser) {
+	renderMessageInputContainer(blockStatus, otherUserId) {
         const messageInputContainer = document.getElementById('message_input_container');
         if (messageInputContainer) {
             this.removeBlockStatusMessage();
 
-            const blockMessage = this.createInputBlockMessage(blockStatus, otherUser);
+            const blockMessage = this.createInputBlockMessage(blockStatus, otherUserId);
 
             if (blockMessage) {
                 messageInputContainer.insertAdjacentHTML('afterbegin', blockMessage);
@@ -250,12 +250,12 @@ export class ChatRenderer {
         }
     }
 
-	createInputBlockMessage(blockStatus, username) {
+	createInputBlockMessage(blockStatus, otherUserId) {
 		if (blockStatus === "blocker") {
 			 return `
 			 	<div class="text-light block-status-message mb-2">
 					You have blocked this user.
-					<a id="unblock_btn" class="unblock-btn" data-block-action="unblock" data-block-username="${username}">Unblock</a>.
+					<a id="unblock_btn" class="unblock-btn" data-block-action="unblock" data-block-user-id="${otherUserId}">Unblock</a>.
 				</div>
 			`;
 		} else if (blockStatus === "blocked") {

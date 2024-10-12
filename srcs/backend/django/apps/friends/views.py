@@ -44,6 +44,7 @@ def get_friend_data(user, friend):
             other_user = friend.from_user
 
         return {
+            "id": other_user.username,
             "username": other_user.username,
             "is_online": other_user.is_online,
             "other_user_avatar_url": (
@@ -53,6 +54,7 @@ def get_friend_data(user, friend):
     except AttributeError as e:
         print(f"Error in get_friend_data: {str(e)}")
         return {
+            "id": "",
             "username": "Unknown",
             "is_online": False,
             "other_user_avatar_url": None,
@@ -82,6 +84,7 @@ def filter_users(request, filter_type):
         if filter_type == "all":
             users_data = [
                 {
+                    "id": other_user.id,
                     "username": other_user.username,
                     "friendship_status": get_friendship_status(user, other_user),
                     "is_online": other_user.is_online,
@@ -100,6 +103,7 @@ def filter_users(request, filter_type):
             pending_requests = friendships.filter(from_user=user, status=Friend.PENDING)
             users_data = [
                 {
+                    "id": friend.to_user.id,
                     "username": friend.to_user.username,
                     "other_user_avatar_url": (
                         friend.to_user.avatar.url if friend.to_user.avatar else None
@@ -112,6 +116,7 @@ def filter_users(request, filter_type):
             incoming_requests = friendships.filter(to_user=user, status=Friend.PENDING)
             users_data = [
                 {
+                    "id": friend.from_user.id,
                     "username": friend.from_user.username,
                     "other_user_avatar_url": (
                         friend.from_user.avatar.url if friend.from_user.avatar else None
@@ -141,15 +146,15 @@ def filter_users(request, filter_type):
 @api_view(["POST"])
 @default_authentication_required
 def invite_friend(request):
-    username = request.data.get("username")
+    user_id = request.data.get("user_id")
 
-    if not username:
+    if not user_id:
         return Response(
-            {"detail": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Friend user_id required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     try:
-        friend = AppUser.objects.get(username=username)
+        friend = AppUser.objects.get(id=user_id)
     except AppUser.DoesNotExist:
         return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
@@ -188,15 +193,15 @@ def invite_friend(request):
 @api_view(["POST"])
 @default_authentication_required
 def accept_invitation(request):
-    username = request.data.get("username")
+    user_id = request.data.get("user_id")
 
-    if not username:
+    if not user_id:
         return Response(
-            {"detail": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Friend id required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     try:
-        friend = AppUser.objects.get(username=username)
+        friend = AppUser.objects.get(id=user_id)
     except AppUser.DoesNotExist:
         return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
@@ -234,15 +239,15 @@ def accept_invitation(request):
 @api_view(["POST"])
 @default_authentication_required
 def remove_friend(request):
-    friend_username = request.data.get("username")
+    user_id = request.data.get("user_id")
 
-    if not friend_username:
+    if not user_id:
         return Response(
-            {"detail": "Friend username required"}, status=status.HTTP_400_BAD_REQUEST
+            {"detail": "Friend id required"}, status=status.HTTP_400_BAD_REQUEST
         )
 
     try:
-        friend = AppUser.objects.get(username=friend_username)
+        friend = AppUser.objects.get(id=user_id)
     except AppUser.DoesNotExist:
         return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
@@ -292,6 +297,7 @@ def search_friends(request):
         if filter_type == "all":
             users_data = [
                 {
+                    "id": other_user.id,
                     "username": other_user.username,
                     "friendship_status": get_friendship_status(user, other_user),
                     "is_online": other_user.is_online,
@@ -315,6 +321,7 @@ def search_friends(request):
             ).filter(to_user__username__icontains=query)
             users_data = [
                 {
+                    "id": friend.to_user.id,
                     "username": friend.to_user.username,
                     "other_user_avatar_url": (
                         friend.to_user.avatar.url if friend.to_user.avatar else None
@@ -329,6 +336,7 @@ def search_friends(request):
             ).filter(from_user__username__icontains=query)
             users_data = [
                 {
+                    "id": friend.from_user.id,
                     "username": friend.from_user.username,
                     "other_user_avatar_url": (
                         friend.from_user.avatar.url if friend.from_user.avatar else None
