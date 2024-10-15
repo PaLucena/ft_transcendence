@@ -60,7 +60,7 @@ ft_transcendence is a full-stack web application built for the 42 programming sc
 
 1. Clone the repository:
 	```bash
-	git clone https://github.com/your_username/ft_transcendence.git
+	git clone https://github.com/Palucena/ft_transcendence.git
 	cd ft_transcendence
 	```
 
@@ -88,7 +88,7 @@ ft_transcendence is a full-stack web application built for the 42 programming sc
 	- If no human players are available, users can play against an AI opponent.
 
 3. **Live Chat:**
-	ayers can use the integrated real-time chat to communicate during games.
+	Players can use the integrated real-time chat to communicate during games.
 
 4. **Tournaments:**
 	- Players can join and participate in tournaments, with all results stored securely on the blockchain.
