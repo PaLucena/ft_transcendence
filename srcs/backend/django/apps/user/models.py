@@ -4,7 +4,6 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.crypto import get_random_string
 
 class AppUser(AbstractUser):
-    nickname = models.CharField(max_length=15, null=True, blank=True, unique=True)
     avatar = models.FileField(upload_to="avatars/", default="default/default.jpg", null=True, blank=True)
     last_seen = models.DateTimeField(null=True, blank=True)
     is_online = models.BooleanField(default=False)
@@ -23,7 +22,6 @@ class AppUser(AbstractUser):
         self.email = f"deleted_user_{self.id}@example.com"
         self.set_unusable_password()
         self.username = f"deleted_user_{self.id}"
-        self.nickname = f"Deleted User {unique_suffix}"
         self.avatar = None
         self.last_seen = None
         self.is_online = False

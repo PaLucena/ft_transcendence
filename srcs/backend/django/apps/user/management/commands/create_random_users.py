@@ -11,16 +11,11 @@ class Command(BaseCommand):
 		while created_users < 8:
 			username = fake.user_name()
 			email = fake.email()
-			nickname = fake.first_name()
-
-			if AppUser.objects.filter(nickname=nickname).exists():
-				continue
 
 			user = AppUser.objects.create_user(
 				username=username,
 				email=email,
 				password='123',
-				nickname=nickname,
 				avatar='default/default.jpg',
 				last_seen=fake.date_time_this_year(),
 				is_online=False,

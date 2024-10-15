@@ -10,17 +10,16 @@ class AppUserAdmin(UserAdmin):
         "username",
         "email",
         "id",
-        "nickname",
         "is_online",
         "avatar",
         "display_avatar",
         "api42auth",
     ]
     fieldsets = UserAdmin.fieldsets + (
-        (None, {"fields": ("nickname", "is_online", "avatar")}),
+        (None, {"fields": ("username", "is_online", "avatar")}),
     )
     add_fieldsets = UserAdmin.add_fieldsets + (
-        (None, {"fields": ("nickname", "is_online", "avatar")}),
+        (None, {"fields": ("username", "is_online", "avatar")}),
     )
 
     def display_avatar(self, obj):

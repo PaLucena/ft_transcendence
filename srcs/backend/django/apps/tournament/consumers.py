@@ -76,7 +76,6 @@ class TournamentConsumer(AsyncJsonWebsocketConsumer):
             participants = tournament.participants.all()
             return [
                 {
-                    "nickname": participant.nickname,
                     "avatar": participant.avatar.url if participant.avatar else None,
                 }
                 for participant in participants
