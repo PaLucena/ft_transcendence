@@ -45,7 +45,9 @@ else
     echo "Chat group 'public-chat' already exists"
 fi
 
-# Ejecutar el servidor
+# Create 10 random users for test app
 # python3 /app/manage.py create_random_users
+
+# Ejecutar el servidor
 python3 /app/manage.py runserver 0.0.0.0:8000
 

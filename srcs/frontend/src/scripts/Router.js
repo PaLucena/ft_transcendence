@@ -10,7 +10,6 @@ import { Pong } from '../pages/Pong/Pong.js';
 import { Tournament } from '../pages/Tournament/Tournament.js';
 import { Match } from '../pages/Match/Match.js';
 import { staticComponentsRenderer } from './utils/StaticComponentsRenderer.js';
-import { Test } from '../pages/Test/Test.js';
 import { checkAuthentication } from './utils/rtchatUtils.js';
 
 class Router {
@@ -30,7 +29,6 @@ class Router {
 			'/tournament': () => new Tournament(),
 			'/tournament/:tournamentId': params => new Tournament(params),
 			'/match': () => new Match(),
-			'/test': () => new Test(),
 		};
 		this.currentComponent = null;
 		this.previousPath = null;

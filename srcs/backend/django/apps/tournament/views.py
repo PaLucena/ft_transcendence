@@ -46,7 +46,7 @@ def create_tournament(request):
 		active_tournaments = Tournament.objects.filter(creator=creator)
 		if active_tournaments.exists():
 			return Response({"error": "You can only create one tournament at a time."}, status=status.HTTP_400_BAD_REQUEST)
-		
+
 		if type == Tournament.PRIVATE:
 			invitation_code = str(random.randint(1000, 9999))
 
@@ -79,7 +79,6 @@ def get_tournament_creator(request, tournament_id):
 	except Tournament.DoesNotExist:
 		return Response({"error": "Tournament not found"}, status=status.HTTP_404_NOT_FOUND)
 
-
 @api_view(["POST"])
 @default_authentication_required
 def join_tournament(request, tournament_id):
@@ -100,7 +99,7 @@ def join_tournament(request, tournament_id):
 		tournament.participants.add(user)
 
 		return Response({"success": "You have joined the tournament."}, status=status.HTTP_200_OK)
-	
+
 	except Exception as e:
 		return Response({"Oops! Tournament is closed or doesn't exist!"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -123,7 +122,7 @@ def remove_participation(request, tournament_id):
 			if tournament.participants.count() == 0:
 				tournament.delete()
 				return Response({"message": "You were the last participant, so the tournament has been deleted."}, status=status.HTTP_200_OK)
-			
+
 		return Response({"success": "You have been removed from the tournament."}, status=status.HTTP_200_OK)
 
 	except Exception as e:

@@ -10,5 +10,4 @@ urlpatterns = [
 	path('remove_participation/<int:tournament_id>/', views.remove_participation, name='remove_participation'),
 	path('start_local_match/', LocalMatch.as_view(), name='start_local_match'),
 	path('start_ai_match/', AiMatch.as_view(), name='start_ai_match'),
-	# path('start_remote_match/', RemoteMatch.as_view(), name='start_remote_match'),
 ]

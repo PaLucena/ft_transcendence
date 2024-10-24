@@ -15,7 +15,6 @@ def get_friend_count(user):
 	to_user_count = Friend.objects.filter(to_user=user, status=Friend.ACCEPTED).count()
 	return from_user_count + to_user_count
 
-
 def upload_avatar(request):
 	try:
 		user = request.user
